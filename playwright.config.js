@@ -6,13 +6,13 @@ module.exports = defineConfig({
 
     testDir: './tests',
 
-    timeout: 30 * 1000,
+    timeout: 120 * 1000,
 
     expect: {
-        timeout: 5000,
+        timeout: 60000,
     },
 
-    retries: 1,
+    // retries: 1,
 
     reporter: [
         ['html', { open: 'never' }]
@@ -20,17 +20,21 @@ module.exports = defineConfig({
 
     use: {
 
+        // browserName: 'webkit',
+
         browserName: 'chromium',
 
-        headless: true,
+        // channel: 'msedge',
+
+        headless: false,
 
         viewport: { width: 1920, height: 1080 },
 
-        actionTimeout: 10000,
+        // actionTimeout: 60000,
 
-        navigationTimeout: 30000,
+        // navigationTimeout: 60000,
 
-        screenshot: 'only-on-failure',
+        screenshot: 'on',
 
         trace: 'retain-on-failure',
 

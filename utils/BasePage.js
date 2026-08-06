@@ -8,6 +8,7 @@ class BasePage {
 
     async navigate(url) {
         await this.page.goto(url);
+        await this.page.waitForLoadState("networkidle");
     }
 
     async click(locator) {
