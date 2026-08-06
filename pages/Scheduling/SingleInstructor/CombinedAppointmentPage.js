@@ -7,7 +7,8 @@ export default class CombinedAppointmentPage extends BasePage {
         this.uniqueId = Date.now();
 
         this.popupTitle = page.locator("#window1_wnd_title");
-        this.maximisepopup=page.locator("xpath=(//a[@aria-label='window-Maximize'])[1]")
+        this.instructorDropdown=page.locator("#FirstTypeAppointment_p_dec_InstID")
+
 
         this.submitButton = page.getByRole("button", {
             name: "Submit"
@@ -49,6 +50,10 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
 
+
+getDropdownTitle(dataId) {
+    return this.page.locator(`xpath=//button[data-id*="${dataId}"]`);
+}
 
     getDropdownButton(dropdownName) {
         return this.page.locator(
@@ -111,9 +116,6 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     async selectDropdown(dropdownName) {
-        // if(dropdownName === "Vehicle"){
-        //     await this.click(this.showAllVehiclesCheckbox);
-        // }
         await this.click(this.getDropdownButton(dropdownName));
         await this.click(this.getFirstDropdownOption(dropdownName));
     }
@@ -143,14 +145,45 @@ export default class CombinedAppointmentPage extends BasePage {
     async submitAppointment() {
         await this.click(this.submitButton);
         await this.click(this.confirmYesButton);
-        this.page.pause();
-            if (await this.submitButtonPopup.isVisible({ timeout: 10000 })) {
-                await this.submitButtonPopup.click();}
+        try {
+            console.log('in try');
+            await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 10000 });
+            console.log('try2');
+            await this.submitButtonPopup.click();
 
-        // await this.appointmentCreatedToastMsg.isVisible({ timeout: 10000 });
-        // await expect(this.appointmentCreatedToastMsg).toContainText("Appointment updated successfully.");
+        } catch {
 
-        // await this.page.pause();
+            console.log('Popup did not appear');
+
+        }
+
+    }
+
+    async verifyCombinedAppointmentCreatedValues(){
+await this.getDropdownTitle("InstID").getAttribute("title") ;
+
+        await this.getDropdownTitle("VehicleID").getAttribute("title") ;
+        await this.getDropdownTitle("Location_ID").getAttribute("title") ;
+
+        await this.page.locator("#FirstTypeAppointment_Student1Name").toContainText("");
+        await this.student1Pickup.getAttribute("oldval")
+        await this.getDropdownTitle("Product_Id").getAttribute("title") ;
+        await this.getDropdownTitle("Instructions").getAttribute("title") ;
+        await this.getDropdownTitle("Instructions1").getAttribute("title") ;
+        await this.student1Notes.getAttribute("oldval");
+
+        await this.page.locator("#FirstTypeAppointment_Student2Name").toContainText("");
+        await this.student2Pickup.getAttribute("oldval")
+        await this.getDropdownTitle("Product_Id_Student2").getAttribute("title") ;
+        await this.getDropdownTitle("InstructionsStudent2").getAttribute("title") ;
+        await this.getDropdownTitle("Instructions1Student2").getAttribute("title") ;
+        await this.student2Notes.getAttribute("oldval");
+
+
+
+
+
+
 
     }
 }
