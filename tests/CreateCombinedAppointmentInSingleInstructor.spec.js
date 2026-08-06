@@ -30,7 +30,7 @@ test("Create Combined Appointment", async ({ page }) => {
     // Navigate to Single Instructor
     await homePage.navigateToSingleInstructor();
 
-    await instructorPage.selectInstructor("dssteststaff");
+    await instructorPage.selectInstructor();
 
     await instructorPage.getSchedule();
 
@@ -49,10 +49,11 @@ test("Create Combined Appointment", async ({ page }) => {
     );
 
 
-    // await combinedAppointmentPage.selectDuration();
 
 await combinedAppointmentPage.fillStudentDetails(1,studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2,studentData.student2);
+    await combinedAppointmentPage.selectDuration();
+
 
     await combinedAppointmentPage.submitAppointment();
 

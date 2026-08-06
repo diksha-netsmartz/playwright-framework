@@ -6,10 +6,10 @@ module.exports = defineConfig({
 
     testDir: './tests',
 
-    timeout: 120 * 1000,
+    timeout: 60 * 1000,
 
     expect: {
-        timeout: 60000,
+        timeout: 10000,
     },
 
     // retries: 1,
@@ -28,7 +28,7 @@ module.exports = defineConfig({
 
         headless: false,
 
-        viewport: { width: 1920, height: 1080 },
+        // viewport: { width: 1920, height: 1080 },
 
         // actionTimeout: 60000,
 

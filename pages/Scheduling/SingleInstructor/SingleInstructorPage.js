@@ -67,6 +67,8 @@ export default class SingleInstructorPage extends BasePage {
 
     async getSchedule() {
         await this.click(this.getScheduleBtn);
+        await this.page.waitForLoadState("domcontentloaded")
+
     }
 
 

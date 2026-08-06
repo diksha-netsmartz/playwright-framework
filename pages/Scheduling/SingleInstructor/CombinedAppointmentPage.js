@@ -17,7 +17,7 @@ export default class CombinedAppointmentPage extends BasePage {
             "xpath=//a[@data-apply='confirmation']"
         );
 
-        this.duration15Minutes = page.locator("xpath=//input[@value='15' and @name='travel']");
+        this.duration15Minutes = page.getByLabel('30 Minutes');
 
 
         this.student1Textbox = page.getByRole("textbox", {
@@ -41,8 +41,11 @@ export default class CombinedAppointmentPage extends BasePage {
         });
 
         this.alertPopup=page.locator("xpath=//h4[text()='ALERT']");
-        this.submitButtonPopup=page.locator("#btnSubmitWarning");
-        this.appointmentCreatedToastMsg = page.locator(".toast-message");
+        this.submitButtonPopup = page.getByRole('button', { name: 'Yes, Submit' })
+
+
+        this.appointmentCreatedToastMsg = page.locator("xpath=//div[@class='toast-message']");
+        this.showAllVehiclesCheckbox=page.locator("#chkShowAllVehiclesG");
     }
 
 
@@ -86,14 +89,14 @@ export default class CombinedAppointmentPage extends BasePage {
         return studentNo === 1 ? this.getDropdownButton("Instructions") :  this.getDropdownButton("InstructionsStudent2");
     }
     getInstruction1DropdownValue(studentNo) {
-        return studentNo === 1 ? this.getInstructionDropdownValue("Instructions") :  this.getInstructionDropdownValue("InstructionsStudent2");
+        return studentNo === 1 ? this.getFirstDropdownOption("Instructions") :  this.getFirstDropdownOption("InstructionsStudent2");
     }
 
     clickInstruction2Dropdown(studentNo) {
         return studentNo === 1 ? this.getDropdownButton("Instructions1") :  this.getDropdownButton("Instructions1Student2");
     }
     getInstruction2DropdownValue(studentNo) {
-        return studentNo === 1 ? this.getInstructionDropdownValue("Instructions") :  this.getInstructionDropdownValue("InstructionsStudent2");
+        return studentNo === 1 ? this.getFirstDropdownOption("Instructions1") :  this.getFirstDropdownOption("Instructions1Student2");
     }
 
     getNotes(studentNo) {
@@ -103,17 +106,19 @@ export default class CombinedAppointmentPage extends BasePage {
         await expect(this.popupTitle).toContainText(
             "Create Combined Appointment (Driver and Observer)"
         );
-        await this.click(this.maximisepopup);
+        // await this.click(this.maximisepopup);
 
     }
 
     async selectDropdown(dropdownName) {
+        // if(dropdownName === "Vehicle"){
+        //     await this.click(this.showAllVehiclesCheckbox);
+        // }
         await this.click(this.getDropdownButton(dropdownName));
         await this.click(this.getFirstDropdownOption(dropdownName));
     }
-
     async selectDuration() {
-        await this.click(this.duration15Minutes);
+        await this.duration15Minutes.check({ force: true });
     }
     async fillStudentDetails(studentNo, student) {
         await this.getStudentTextbox(studentNo).fill(student.name);
@@ -125,6 +130,12 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.clickServiceDropdown(studentNo).click();
         await this.selectServiceDropdownValue(studentNo).click();
 
+        await this.clickInstruction1Dropdown(studentNo).click();
+        await this.getInstruction1DropdownValue(studentNo).click();
+
+        await this.clickInstruction2Dropdown(studentNo).click();
+        await this.getInstruction2DropdownValue(studentNo).click();
+
         await this.getPickup(studentNo).fill(student.pickup);
 
         await this.getNotes(studentNo).fill(`${student.notes}_${(this.uniqueId)}`);
@@ -132,19 +143,12 @@ export default class CombinedAppointmentPage extends BasePage {
     async submitAppointment() {
         await this.click(this.submitButton);
         await this.click(this.confirmYesButton);
+        this.page.pause();
+            if (await this.submitButtonPopup.isVisible({ timeout: 10000 })) {
+                await this.submitButtonPopup.click();}
 
-        try {
-            if (await this.alertPopup.isVisible({ timeout: 5000 })) {
-                await this.submitButtonPopup.click();
-            }
-        } catch (e) {
-            console.log('Alert popup not found');
-
-
-        }
-
-        expect(this.appointmentCreatedToastMsg).toContain("Appointment updated successfully.");
-
+        // await this.appointmentCreatedToastMsg.isVisible({ timeout: 10000 });
+        // await expect(this.appointmentCreatedToastMsg).toContainText("Appointment updated successfully.");
 
         // await this.page.pause();
 

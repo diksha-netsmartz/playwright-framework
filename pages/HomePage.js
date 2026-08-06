@@ -36,7 +36,6 @@ class HomePage extends BasePage {
     async navigateToSingleInstructor() {
         await this.click(this.schedulingMenu);
         await this.click(this.singleInstructorLink);
-        await this.page.waitForLoadState("networkidle")
     }
 }
 
