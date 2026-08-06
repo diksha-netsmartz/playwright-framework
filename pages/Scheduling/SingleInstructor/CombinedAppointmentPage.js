@@ -51,9 +51,9 @@ export default class CombinedAppointmentPage extends BasePage {
 
 
 
-getDropdownTitle(dataId) {
-    return this.page.locator(`xpath=//button[data-id*="${dataId}"]`);
-}
+    getDropdownTitle(dataId) {
+        return this.page.locator(`xpath=//button[data-id*="${dataId}"]`);
+    }
 
     getDropdownButton(dropdownName) {
         return this.page.locator(
@@ -160,7 +160,7 @@ getDropdownTitle(dataId) {
     }
 
     async verifyCombinedAppointmentCreatedValues(){
-await this.getDropdownTitle("InstID").getAttribute("title") ;
+        await this.getDropdownTitle("InstID").getAttribute("title") ;
 
         await this.getDropdownTitle("VehicleID").getAttribute("title") ;
         await this.getDropdownTitle("Location_ID").getAttribute("title") ;
