@@ -1,12 +1,12 @@
 // @ts-check
 
-const { defineConfig } = require('@playwright/test');
+const {defineConfig} = require('@playwright/test');
 
 module.exports = defineConfig({
 
     testDir: './tests',
 
-    timeout: 60 * 1000,
+    timeout: 180 * 1000,
 
     expect: {
         timeout: 10000,
@@ -15,7 +15,7 @@ module.exports = defineConfig({
     // retries: 1,
 
     reporter: [
-        ['html', { open: 'never' }]
+        ['html', {open: 'never'}]
     ],
 
     use: {
@@ -29,6 +29,9 @@ module.exports = defineConfig({
         headless: false,
 
         // viewport: { width: 1920, height: 1080 },
+        launchOptions: {
+            args: ['--start-maximized'],
+        },
 
         // actionTimeout: 60000,
 

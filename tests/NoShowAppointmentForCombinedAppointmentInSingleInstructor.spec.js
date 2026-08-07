@@ -46,10 +46,10 @@ test("Mark created Combined Appointment as no show", async ({page}) => {
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
     await combinedAppointmentPage.selectDuration();
     await combinedAppointmentPage.submitAppointment();
-    await instructorPage.editAppointment();
+    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student1.name.replace(" ", ", "));
-    await instructorPage.editAppointment();
+    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student2.name.replace(" ", ", "));
-    // await instructorPage.deleteAppointment();
+    await instructorPage.deleteAppointment();
 
 });

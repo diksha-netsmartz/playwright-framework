@@ -94,13 +94,13 @@ export default class CombinedAppointmentPage extends BasePage {
 
     cancelAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=//a[@data-sname1='${studentName}' or @data-sname2='${studentName}'  and contains(@id,'CancelAppointment')]`
+            `xpath=(//a[@data-sname1='${studentName}' or @data-sname2='${studentName}'  and contains(@id,'CancelAppointment')])[1]`
         );
     }
 
     noShowAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=//a[@data-sname1='${studentName}' or @data-sname2='${studentName}' and contains(@id,'NoShowAppointment')]`
+            `xpath=(//a[@data-sname1='${studentName}' or @data-sname2='${studentName}' and contains(@id,'NoShowAppointment')])[1]`
         );
     }
 
@@ -361,27 +361,35 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.verifyStudent(1, studentData.student1);
 
         await this.verifyStudent(2, studentData.student2);
-
         await expect(this.duration15Minutes).toBeChecked();
-
         await this.click(this.closePopup);
     }
 
 
     async cancelAppointment(studentName) {
-        expect(this.cancelAppointmentButton.isVisible()).toBeTruthy();
-        await this.click(this.cancelAppointmentButton);
+        await this.cancelAppointmentButton(studentName).isVisible();
+        await this.click(this.cancelAppointmentButton(studentName));
         await this.cancelAppointmentTextbox.fill("Cancelling appointment for " + studentName);
         await this.click(this.cancelAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton)
     }
 
     async markAppointmentAsNoShow(studentName) {
-        expect(this.noShowAppointmentButton(studentName).isVisible()).toBeTruthy();
+        await this.noShowAppointmentButton(studentName).isVisible();
         await this.click(this.noShowAppointmentButton(studentName));
         await this.noShowAppointmentTextbox.fill("Marking No Show appointment for " + studentName);
         await this.click(this.noShowAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton)
     }
+
+    async verifyAppointmentIsCancelledSuccessfully(studentName) {
+        expect(await this.noShowAppointmentButton(studentName).isVisible()).toBeFalsy();
+    }
+
+    async closeTheDialogPopup() {
+        await this.click(this.closePopup);
+
+    }
+
 
 }

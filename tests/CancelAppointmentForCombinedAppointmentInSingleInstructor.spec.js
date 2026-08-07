@@ -31,7 +31,6 @@ test("Cancel created Combined Appointment", async ({page}) => {
 
     await instructorPage.selectCreateAppointment(" Create Combined Appointment (Driver and Observer)");
 
-    // Combined Appointment Popup
     await combinedAppointmentPage.verifyPopup();
 
     await combinedAppointmentPage.selectDropdown(
@@ -46,10 +45,14 @@ test("Cancel created Combined Appointment", async ({page}) => {
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
     await combinedAppointmentPage.selectDuration();
     await combinedAppointmentPage.submitAppointment();
-    await instructorPage.editAppointment();
+    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.cancelAppointment(studentData.student1.name.replace(" ", ", "));
-    await instructorPage.editAppointment();
+    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
+    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully(studentData.student1.name.replace(" ", ", "));
     await combinedAppointmentPage.cancelAppointment(studentData.student2.name.replace(" ", ", "));
-    // await instructorPage.deleteAppointment();
+    await instructorPage.editCancelledAppointment();
+    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully(studentData.student2.name.replace(" ", ", "));
+    await combinedAppointmentPage.closeTheDialogPopup();
+    await instructorPage.deleteCancelledAppointment();
 
 });

@@ -7,7 +7,7 @@ import CombinedAppointmentPage from "../pages/Scheduling/SingleInstructor/Combin
 import studentData from "../test-data/studentData.json";
 import login from "../test-data/login.json";
 
-test("Create Combined Appointment", async ({page}) => {
+test("Copy Create Combined Appointment", async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -54,6 +54,11 @@ test("Create Combined Appointment", async ({page}) => {
 
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues();
+    await instructorPage.copyAppointment(combinedAppointmentPage.uniqueId);
+    await instructorPage.verifyAppointmentIsCopied(combinedAppointmentPage.uniqueId);
+    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
+    await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues();
+    await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
     await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
 
 });

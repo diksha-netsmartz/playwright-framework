@@ -2,7 +2,7 @@ const config = {
     environments: {
 
         qa: {
-            baseURL: 'https://www.tdsm.app/CentralizeAdmin/Login/Login/CoreAutomationtesting260805'
+            baseURL: 'https://www.tdsm.app/CentralizeAdmin/Login/Login?encId=VlihNAnvV5M_EQUAL_'
         },
 
         uat: {
