@@ -7,7 +7,7 @@ import CombinedAppointmentPage from "../pages/Scheduling/SingleInstructor/Combin
 import studentData from "../test-data/studentData.json";
 import login from "../test-data/login.json";
 
-test("Create Combined Appointment", async ({page}) => {
+test("Mark created Combined Appointment as no show", async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -22,9 +22,6 @@ test("Create Combined Appointment", async ({page}) => {
         login.validUser.password
     );
 
-    // await loginPage.closeMobilePopup();
-
-    // Navigate to Single Instructor
     await homePage.navigateToSingleInstructor();
 
     await instructorPage.selectInstructor();
@@ -48,12 +45,11 @@ test("Create Combined Appointment", async ({page}) => {
     await combinedAppointmentPage.fillStudentDetails(1, studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
     await combinedAppointmentPage.selectDuration();
-
-    await combinedAppointmentPage.storeAppointmentValues();
     await combinedAppointmentPage.submitAppointment();
-
     await instructorPage.editAppointment();
-    await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues();
-    await instructorPage.deleteAppointment();
+    await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student1.name.replace(" ", ", "));
+    await instructorPage.editAppointment();
+    await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student2.name.replace(" ", ", "));
+    // await instructorPage.deleteAppointment();
 
 });
