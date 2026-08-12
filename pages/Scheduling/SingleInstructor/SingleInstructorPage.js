@@ -6,14 +6,9 @@ export default class SingleInstructorPage extends BasePage {
     constructor(page) {
         super(page);
 
-
-        this.instructorValueFromDropdown = page.locator(
-            "//ul[@class='dropdown-menu inner selectpicker']//li[@class='active']"
-        );
         this.submitButtonPopup = page.getByRole("button", {
             name: "Yes, Submit",
         });
-        // this.listMenuOfCreatedAppointment = page.locator("xpath=//span[@data-types='Appointment']//img");
 
         this.editAppointmentLink = page.getByRole('link', {name: 'Edit Appointment'});
         this.copyAppointmentLink = page.getByRole('link', {name: 'Copy Appointment'});
@@ -32,12 +27,6 @@ export default class SingleInstructorPage extends BasePage {
 
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
 
-        // Context Menu
-        // this.createAppointmentOption = page.getByRole("link", {
-        //     name: "Create Single Appointment (Driver Only)"
-        // });
-
-        // Calendar navigation
         this.calendarPrevBtn = page.getByRole('group').filter({hasText: 'Single Instructor View:'}).getByLabel('Previous').first();
         this.listMenuOfANoShowAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='No Show']//span[@data-types='Appointment']//img)[1]");
         this.listMenuOfCancelledAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//span[@data-types='Appointment']//img)[1]");

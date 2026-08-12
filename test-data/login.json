@@ -2,5 +2,9 @@
     "validUser": {
         "username": "owner1",
         "password": "123456Aa#"
+    },
+    "studentUser": {
+        "username": "tes1",
+        "password": "Student@123123"
     }
 }

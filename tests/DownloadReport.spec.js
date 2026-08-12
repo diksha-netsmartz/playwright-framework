@@ -1,14 +1,15 @@
 import {expect} from "@playwright/test";
-
-const { test } = require('@playwright/test');import LoginPage from "../pages/LoginPage";
+import LoginPage from "../pages/AdminLoginPage";
 import ReportCenterPage from "../pages/ReportPage";
 import HeaderPage from "../pages/HeaderPage";
-import HomePage from "../pages/HomePage";
+import HomePage from "../pages/AdminPortalHomePage";
 // import reportData from "../pages/ReportPage";
 import login from "../test-data/login.json";
 import reportData from "../test-data/reportData.json"
 
-test('Download OH Classroom Training Report', async ({ page},testInfo ) => {
+const {test} = require('@playwright/test');
+
+test('Download OH Classroom Training Report', async ({page}, testInfo) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

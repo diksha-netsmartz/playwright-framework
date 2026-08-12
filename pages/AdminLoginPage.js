@@ -2,18 +2,18 @@ const BasePage = require('../utils/BasePage');
 const config = require('../config/config');
 const {expect} = require("@playwright/test");
 
-class LoginPage extends BasePage {
+class AdminLoginPage extends BasePage {
 
     constructor(page) {
         super(page);
 
-        this.usernameTxt = page.getByRole('textbox', { name: 'Username' });
-        this.passwordTxt = page.getByRole('textbox', { name: 'Password' });
-        this.loginBtn = page.getByRole('button', { name: 'Login' });
-        this.captchaFrame=page.frameLocator('iframe[title="reCAPTCHA"]').first();
-        this.mobilePopUp=page.getByText('No mobile number on file.');
+        this.usernameTxt = page.getByRole('textbox', {name: 'Username'});
+        this.passwordTxt = page.getByRole('textbox', {name: 'Password'});
+        this.loginBtn = page.getByRole('button', {name: 'Login'});
+        this.captchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]').first();
+        this.mobilePopUp = page.getByText('No mobile number on file.');
         this.mobilePopupCloseButton = page.locator('.close.closemodalphone');
-        this.quickLinks = page.getByText('Quick Links', { exact: true });
+        this.quickLinks = page.getByText('Quick Links', {exact: true});
 
 
     }
@@ -30,7 +30,7 @@ class LoginPage extends BasePage {
         const captcha = this.captchaFrame.locator('#recaptcha-anchor');
 
         try {
-            if (await captcha.isVisible({ timeout: 3000 })) {
+            if (await captcha.isVisible({timeout: 3000})) {
                 await captcha.click();
                 await expect(captcha).toHaveAttribute("aria-checked", "true");
             }
@@ -53,4 +53,4 @@ class LoginPage extends BasePage {
 
 }
 
-module.exports = LoginPage;
+module.exports = AdminLoginPage;

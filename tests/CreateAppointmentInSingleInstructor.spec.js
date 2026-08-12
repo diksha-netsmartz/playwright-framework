@@ -1,13 +1,13 @@
-import { test } from "@playwright/test";
+import {test} from "@playwright/test";
 
-import LoginPage from "../pages/LoginPage";
-import HomePage from "../pages/HomePage";
+import LoginPage from "../pages/AdminLoginPage";
+import HomePage from "../pages/AdminPortalHomePage";
 import SingleInstructorPage from "../pages/Scheduling/SingleInstructor/SingleInstructorPage";
 import AppointmentPage from "../pages/Scheduling/SingleInstructor/SingleInstructorAppointmentPage";
 
 import login from "../test-data/login.json";
 
-test("Create Appointment", async ({ page }) => {
+test("Create Appointment", async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

@@ -6,10 +6,10 @@ module.exports = defineConfig({
 
     testDir: './tests',
 
-    timeout: 180 * 1000,
+    timeout: 60 * 1000,
 
     expect: {
-        timeout: 10000,
+        timeout: 5000,
     },
 
     // retries: 1,

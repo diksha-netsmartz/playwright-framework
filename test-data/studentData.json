@@ -2,7 +2,26 @@
   "student1": {
     "name": "test student1",
     "pickup": "test PU1231",
-    "notes": "note student1"
+    "notes": "note student1",
+    "firstName": "test",
+    "middleName": "test1",
+    "lastName": "test2",
+    "address": "los angeles",
+    "zipCode": "10020",
+    "studentEmail": "test@test.com",
+    "studentCellPhone": "2222222222",
+    "parentName": "rachel",
+    "parentEmail": "rachel@gmail.com",
+    "parentCellPhone": "4444444444",
+    "parentName2": "ross",
+    "parentEmail2": "ross@gmail.com",
+    "parentPhone2": "1111111111",
+    "emergencyName": "monica",
+    "emergencyRelationship": "siblings",
+    "permitNumber": "222222222",
+    "medicalConditions": "meddd conditions",
+    "studentNotes": "studentttt",
+    "drivingNotes": "111111"
   },
   "student2": {
     "name": "test student2",
