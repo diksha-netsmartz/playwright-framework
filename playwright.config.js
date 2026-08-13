@@ -19,7 +19,7 @@ module.exports = defineConfig({
     ],
 
     use: {
-
+        slowMo: 500,
         // browserName: 'webkit',
 
         browserName: 'chromium',
@@ -28,10 +28,10 @@ module.exports = defineConfig({
 
         headless: false,
 
-        // viewport: { width: 1920, height: 1080 },
-        launchOptions: {
-            args: ['--start-maximized'],
-        },
+        viewport: {width: 1920, height: 1080},
+        // launchOptions: {
+        //     args: ['--start-maximized'],
+        // },
 
         // actionTimeout: 60000,
 
