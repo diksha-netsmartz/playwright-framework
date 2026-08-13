@@ -1,4 +1,5 @@
 import BasePage from "../../../utils/BasePage";
+import {expect} from "@playwright/test";
 
 export default class BulkAppointmentPage extends BasePage {
 
@@ -77,7 +78,7 @@ export default class BulkAppointmentPage extends BasePage {
     }
 
     async selectAppointment() {
-
+        await this.page.waitForTimeout(5000);
         await this.selectAppointmentCheckbox.click();
     }
 
@@ -88,6 +89,8 @@ export default class BulkAppointmentPage extends BasePage {
         await this.updateButton.click();
         await this.yesConfirmationButton.click();
         await this.waitForLoaders();
+        await expect(this.page.getByText('Appointments updated successfully.', {exact: true})).toBeVisible();
+
     }
 
     // Delete selected appointment
@@ -96,6 +99,9 @@ export default class BulkAppointmentPage extends BasePage {
         await this.deleteAppointmentsLink.click();
         await this.deleteYesButton.click();
         await this.waitForLoaders();
+        await expect(this.page.getByText('Appointments deleted successfully.', {exact: true})).toBeVisible();
+
+
     }
 
     // Cancel a Confirmed appointment
@@ -104,6 +110,9 @@ export default class BulkAppointmentPage extends BasePage {
         await this.cancelAppointmentsLink.click();
         await this.cancelYesButton.click();
         await this.waitForLoaders();
+        await expect(this.page.getByText('Appointments cancelled successfully.', {exact: true})).toBeVisible();
+
+
     }
 
     // Shift appointment by date: picks the given day from the calendar picker
@@ -126,6 +135,9 @@ export default class BulkAppointmentPage extends BasePage {
         }
 
         await this.waitForLoaders();
+        await expect(this.page.getByText('Appointments updated successfully.', {exact: true})).toBeVisible();
+
+
     }
 
 }
