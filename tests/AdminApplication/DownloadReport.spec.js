@@ -1,11 +1,11 @@
 import {expect} from "@playwright/test";
-import LoginPage from "../pages/AdminLoginPage";
-import ReportCenterPage from "../pages/ReportPage";
-import HeaderPage from "../pages/HeaderPage";
-import HomePage from "../pages/AdminPortalHomePage";
+import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
+import ReportCenterPage from "../../pages/AdminApplication/ReportPage";
+import HeaderPage from "../../pages/AdminApplication/HeaderPage";
+import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 // import reportData from "../pages/ReportPage";
-import login from "../test-data/login.json";
-import reportData from "../test-data/reportData.json"
+import login from "../../test-data/login.json";
+import reportData from "../../test-data/reportData.json"
 
 const {test} = require('@playwright/test');
 

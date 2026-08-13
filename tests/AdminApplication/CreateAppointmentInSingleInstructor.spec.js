@@ -1,11 +1,11 @@
 import {test} from "@playwright/test";
 
-import LoginPage from "../pages/AdminLoginPage";
-import HomePage from "../pages/AdminPortalHomePage";
-import SingleInstructorPage from "../pages/Scheduling/SingleInstructor/SingleInstructorPage";
-import AppointmentPage from "../pages/Scheduling/SingleInstructor/SingleInstructorAppointmentPage";
+import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
+import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
+import SingleInstructorPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/SingleInstructorPage";
+import AppointmentPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/SingleInstructorAppointmentPage";
 
-import login from "../test-data/login.json";
+import login from "../../test-data/login.json";
 
 test("Create Appointment", async ({page}) => {
 

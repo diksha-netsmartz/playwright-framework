@@ -1,20 +1,19 @@
 import {test} from "@playwright/test";
 
-import LoginPage from "../pages/AdminLoginPage";
-import HomePage from "../pages/AdminPortalHomePage";
-import SingleInstructorPage from "../pages/Scheduling/SingleInstructor/SingleInstructorPage";
-import CombinedAppointmentPage from "../pages/Scheduling/SingleInstructor/CombinedAppointmentPage";
-import studentData from "../test-data/studentData.json";
-import login from "../test-data/login.json";
+import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
+import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
+import SingleInstructorPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/SingleInstructorPage";
+import CombinedAppointmentPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/CombinedAppointmentPage";
+import studentData from "../../test-data/studentData.json";
+import login from "../../test-data/login.json";
 
-test("Create Combined Appointment", async ({page}) => {
+test("Delete created Combined Appointment", async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const instructorPage = new SingleInstructorPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
-    // Login
     await loginPage.navigateToLoginPage();
 
     await loginPage.login(
@@ -22,9 +21,6 @@ test("Create Combined Appointment", async ({page}) => {
         login.validUser.password
     );
 
-    // await loginPage.closeMobilePopup();
-
-    // Navigate to Single Instructor
     await homePage.navigateToSingleInstructor();
 
     await instructorPage.selectInstructor();
@@ -34,7 +30,6 @@ test("Create Combined Appointment", async ({page}) => {
 
     await instructorPage.selectCreateAppointment(" Create Combined Appointment (Driver and Observer)");
 
-    // Combined Appointment Popup
     await combinedAppointmentPage.verifyPopup();
 
     await combinedAppointmentPage.selectDropdown(

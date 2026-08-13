@@ -6,5 +6,9 @@
     "studentUser": {
         "username": "tes1",
         "password": "Student@123123"
+    },
+    "staffUser": {
+        "username": "instructor6",
+        "password": "123456Aa#"
     }
 }

@@ -1,6 +1,6 @@
 import {expect} from "@playwright/test";
-import BasePage from "../../../utils/BasePage";
-import studentData from "../../../test-data/studentData.json";
+import BasePage from "../../../../utils/BasePage";
+import studentData from "../../../../test-data/studentData.json";
 
 export default class CombinedAppointmentPage extends BasePage {
     constructor(page) {

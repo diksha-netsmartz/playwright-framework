@@ -1,13 +1,13 @@
 import {test} from "@playwright/test";
 
-import LoginPage from "../pages/AdminLoginPage";
-import HomePage from "../pages/AdminPortalHomePage";
-import SingleInstructorPage from "../pages/Scheduling/SingleInstructor/SingleInstructorPage";
-import CombinedAppointmentPage from "../pages/Scheduling/SingleInstructor/CombinedAppointmentPage";
-import studentData from "../test-data/studentData.json";
-import login from "../test-data/login.json";
+import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
+import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
+import SingleInstructorPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/SingleInstructorPage";
+import CombinedAppointmentPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/CombinedAppointmentPage";
+import studentData from "../../test-data/studentData.json";
+import login from "../../test-data/login.json";
 
-test("Cancel created Combined Appointment", async ({page}) => {
+test("Mark created Combined Appointment as no show", async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -31,6 +31,7 @@ test("Cancel created Combined Appointment", async ({page}) => {
 
     await instructorPage.selectCreateAppointment(" Create Combined Appointment (Driver and Observer)");
 
+    // Combined Appointment Popup
     await combinedAppointmentPage.verifyPopup();
 
     await combinedAppointmentPage.selectDropdown(
@@ -46,13 +47,9 @@ test("Cancel created Combined Appointment", async ({page}) => {
     await combinedAppointmentPage.selectDuration();
     await combinedAppointmentPage.submitAppointment();
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
-    await combinedAppointmentPage.cancelAppointment(studentData.student1.name.replace(" ", ", "));
+    await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student1.name.replace(" ", ", "));
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully(studentData.student1.name.replace(" ", ", "));
-    await combinedAppointmentPage.cancelAppointment(studentData.student2.name.replace(" ", ", "));
-    await instructorPage.editCancelledAppointment();
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully(studentData.student2.name.replace(" ", ", "));
-    await combinedAppointmentPage.closeTheDialogPopup();
-    await instructorPage.deleteCancelledAppointment();
+    await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student2.name.replace(" ", ", "));
+    await instructorPage.deleteAppointment();
 
 });

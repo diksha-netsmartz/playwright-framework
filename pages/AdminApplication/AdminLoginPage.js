@@ -1,5 +1,5 @@
-const BasePage = require('../utils/BasePage');
-const config = require('../config/config');
+const BasePage = require('../../utils/BasePage');
+const config = require('../../config/config');
 const {expect} = require("@playwright/test");
 
 class AdminLoginPage extends BasePage {

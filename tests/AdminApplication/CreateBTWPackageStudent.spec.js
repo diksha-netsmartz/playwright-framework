@@ -1,9 +1,9 @@
 import {test} from '@playwright/test';
-import LoginPage from '../pages/AdminLoginPage';
-import NewStudentEnrollmentPage from '../pages/NewStudentEnrollmentPage';
-import login from "../test-data/login.json";
-import HomePage from "../pages/AdminPortalHomePage";
-import studentData from "../test-data/studentData.json";
+import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
+import NewStudentEnrollmentPage from '../../pages/AdminApplication/NewStudentEnrollmentPage';
+import login from "../../test-data/login.json";
+import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
+import studentData from "../../test-data/studentData.json";
 
 
 test('Create student with BTW package', async ({page}) => {

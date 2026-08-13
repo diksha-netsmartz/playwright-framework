@@ -1,6 +1,6 @@
-import BasePage from "../utils/BasePage";
+import BasePage from "../../utils/BasePage";
 import {expect} from "@playwright/test";
-import paymentData from "../test-data/paymentData.json";
+import paymentData from "../../test-data/paymentData.json";
 
 export class EnrollmentBillingPage extends BasePage {
 

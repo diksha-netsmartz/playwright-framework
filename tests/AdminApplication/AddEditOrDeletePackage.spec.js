@@ -1,10 +1,10 @@
 import {test} from '@playwright/test';
 
-import LoginPage from '../pages/AdminLoginPage';
-import EnrollmentBillingPage from '../pages/EnrollmentBillingPage';
-import HomePage from '../pages/AdminPortalHomePage'
-import login from "../test-data/login.json";
-import studentData from "../test-data/studentData.json"
+import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
+import EnrollmentBillingPage from '../../pages/AdminApplication/EnrollmentBillingPage';
+import HomePage from '../../pages/AdminApplication/AdminPortalHomePage'
+import login from "../../test-data/login.json";
+import studentData from "../../test-data/studentData.json"
 
 test('Add CR and RT package and delete enrollment', async ({page}) => {
 

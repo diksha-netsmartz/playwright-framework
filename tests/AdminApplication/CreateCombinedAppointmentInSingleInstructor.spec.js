@@ -1,13 +1,13 @@
 import {test} from "@playwright/test";
 
-import LoginPage from "../pages/AdminLoginPage";
-import HomePage from "../pages/AdminPortalHomePage";
-import SingleInstructorPage from "../pages/Scheduling/SingleInstructor/SingleInstructorPage";
-import CombinedAppointmentPage from "../pages/Scheduling/SingleInstructor/CombinedAppointmentPage";
-import studentData from "../test-data/studentData.json";
-import login from "../test-data/login.json";
+import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
+import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
+import SingleInstructorPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/SingleInstructorPage";
+import CombinedAppointmentPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/CombinedAppointmentPage";
+import studentData from "../../test-data/studentData.json";
+import login from "../../test-data/login.json";
 
-test("Mark created Combined Appointment as no show", async ({page}) => {
+test("Create Combined Appointment", async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -22,6 +22,9 @@ test("Mark created Combined Appointment as no show", async ({page}) => {
         login.validUser.password
     );
 
+    // await loginPage.closeMobilePopup();
+
+    // Navigate to Single Instructor
     await homePage.navigateToSingleInstructor();
 
     await instructorPage.selectInstructor();
@@ -45,11 +48,12 @@ test("Mark created Combined Appointment as no show", async ({page}) => {
     await combinedAppointmentPage.fillStudentDetails(1, studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
     await combinedAppointmentPage.selectDuration();
+
+    await combinedAppointmentPage.storeAppointmentValues();
     await combinedAppointmentPage.submitAppointment();
+
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
-    await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student1.name.replace(" ", ", "));
-    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
-    await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student2.name.replace(" ", ", "));
-    await instructorPage.deleteAppointment();
+    await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues();
+    await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
 
 });

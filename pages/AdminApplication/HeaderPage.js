@@ -1,4 +1,4 @@
-const BasePage = require('../utils/BasePage');
+const BasePage = require('../../utils/BasePage');
 
 class HeaderPage extends BasePage {
 
@@ -6,9 +6,9 @@ class HeaderPage extends BasePage {
         super(page);
 
         this.userMenu = page.locator(".dropdown-user");
-        this.logoutBtn = page.getByRole('link', { name: 'Log Out' });
-        this.loginHeading = page.getByRole('heading', { name: 'Admin Portal Login' });
-        this.helpHeading = page.getByRole('heading', { name: 'Need help logging in?' });
+        this.logoutBtn = page.getByRole('link', {name: 'Log Out'});
+        this.loginHeading = page.getByRole('heading', {name: 'Admin Portal Login'});
+        this.helpHeading = page.getByRole('heading', {name: 'Need help logging in?'});
     }
 
     async logout() {

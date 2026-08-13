@@ -1,4 +1,4 @@
-const BasePage = require('../utils/BasePage');
+const BasePage = require('../../utils/BasePage');
 
 class ReportCenterPage extends BasePage {
 
@@ -6,17 +6,17 @@ class ReportCenterPage extends BasePage {
         super(page);
 
         this.selectReportHeading = page.locator('.sorting_disabled');
-        this.studentLastName = page.getByRole('textbox', { name: 'Enter Student Last Name' });
-        this.filterStudents = page.getByRole('link', { name: 'Filter Students' });
-        this.selectStudentBtn = page.getByRole('button', { name: 'Select Student' });
-        this.downloadReportBtn = page.locator('a').filter({ hasText: 'Download Report'});
+        this.studentLastName = page.getByRole('textbox', {name: 'Enter Student Last Name'});
+        this.filterStudents = page.getByRole('link', {name: 'Filter Students'});
+        this.selectStudentBtn = page.getByRole('button', {name: 'Select Student'});
+        this.downloadReportBtn = page.locator('a').filter({hasText: 'Download Report'});
     }
 
 
     async selectReport(reportName) {
 
         await this.verifyVisible(this.selectReportHeading);
-        const report = this.page.getByRole('link', { name: reportName });
+        const report = this.page.getByRole('link', {name: reportName});
         await this.verifyVisible(report);
         await this.click(report);
 
@@ -31,7 +31,7 @@ class ReportCenterPage extends BasePage {
 
     async selectStudent(studentName) {
         await this.click(this.selectStudentBtn);
-        const student = this.page.locator('a').filter({ hasText: studentName });
+        const student = this.page.locator('a').filter({hasText: studentName});
         await this.click(student);
     }
 

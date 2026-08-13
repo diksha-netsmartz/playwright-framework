@@ -1,4 +1,4 @@
-const BasePage = require("../utils/BasePage");
+const BasePage = require("../../utils/BasePage");
 const {expect} = require("@playwright/test");
 
 class AdminPortalHomePage extends BasePage {

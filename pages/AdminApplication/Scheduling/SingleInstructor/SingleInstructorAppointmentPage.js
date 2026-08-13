@@ -1,5 +1,5 @@
-import { expect } from "@playwright/test";
-import BasePage from "../../../utils/BasePage";
+import {expect} from "@playwright/test";
+import BasePage from "../../../../utils/BasePage";
 
 export default class AppointmentPage extends BasePage {
 

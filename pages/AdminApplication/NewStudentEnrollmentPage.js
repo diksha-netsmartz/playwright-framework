@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import BasePage from "../utils/BasePage";
+import BasePage from "../../utils/BasePage";
 
 
 class NewStudentEnrollmentPage extends BasePage {
