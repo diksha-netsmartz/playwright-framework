@@ -26,6 +26,7 @@ export default class SingleInstructorPage extends BasePage {
 
 
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
+        // this.deletionSuccessToast = page.getByText('Appointment deleted successfully.', { exact: true });
 
         this.calendarPrevBtn = page.getByRole('group').filter({hasText: 'Single Instructor View:'}).getByLabel('Previous').first();
         this.listMenuOfANoShowAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='No Show']//span[@data-types='Appointment']//img)[1]");
@@ -80,6 +81,13 @@ export default class SingleInstructorPage extends BasePage {
 
     }
 
+    async waitForLoaders() {
+        await this.page.waitForFunction(() =>
+            [...document.querySelectorAll('.load-area')].every(
+                el => el.style.display === 'none'
+            )
+        );
+    }
 
     async selectDateInCalendar() {
         const today = new Date();
@@ -143,8 +151,13 @@ export default class SingleInstructorPage extends BasePage {
         await this.deleteAppointmentButton(notesValue).click();
         await this.deleteButtonInPopup.click();
         await this.deleteButtonInPopup.isHidden();
-        await this.page.waitForLoadState("networkidle");
+        await this.waitForLoaders();
+        const toast = this.page.locator('#toast-container .toast-success .toast-message');
+        await toast.waitFor();
+        await expect(toast).toBeVisible();
+        await expect(toast).toHaveText('Appointment deleted successfully.');
     }
+
 
     async copyAppointment(notesValue) {
         await this.appointmentConfirmed.isVisible();
@@ -194,6 +207,11 @@ export default class SingleInstructorPage extends BasePage {
         await this.deleteCancelledAppointmentButton.click();
         await this.deleteButtonInPopup.click();
         await this.deleteButtonInPopup.isHidden();
+        await this.waitForLoaders();
+        const toast = this.page.locator('#toast-container .toast-success .toast-message');
+        await toast.waitFor();
+        await expect(toast).toBeVisible();
+        await expect(toast).toHaveText('Appointment deleted successfully.');
     }
 
     async editCancelledAppointment() {

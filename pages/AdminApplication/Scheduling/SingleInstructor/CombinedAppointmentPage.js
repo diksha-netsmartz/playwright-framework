@@ -304,6 +304,11 @@ export default class CombinedAppointmentPage extends BasePage {
 
         }
 
+        const toast = this.page.locator('#toast-container .toast-success .toast-message');
+        await toast.waitFor();
+        await expect(toast).toBeVisible();
+        await expect(toast).toHaveText('Appointment created successfully.');
+
     }
 
     async verifyStudent(studentNo, student) {
