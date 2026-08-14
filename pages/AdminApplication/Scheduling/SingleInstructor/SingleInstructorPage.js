@@ -20,9 +20,9 @@ export default class SingleInstructorPage extends BasePage {
 
         this.appointmentConfirmed = page.locator("xpath=//div[@data-statuss1='Confirmed' and @data-types='Appointment']");
 
-        this.timeSlot = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[5]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[1]");
+        this.timeSlot = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[10]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[1]");
 
-        this.timeSlot2 = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[5]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[2]");
+        this.timeSlot2 = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[10]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[2]");
 
 
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
