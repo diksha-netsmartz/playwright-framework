@@ -1,0 +1,39 @@
+{
+  "swipedTransaction": {
+    "amount": "100",
+    "last4Digits": "2222",
+    "cardType": "Discover",
+    "transactionNumber": "11111222223",
+    "receiptNumber": "33333333",
+    "notes": "swiped transaction payment"
+  },
+  "checkPayment": {
+    "amount": "100",
+    "checkNumber": "22222222222",
+    "receiptNumber": "22222",
+    "notes": "cheque payment"
+  },
+  "cashPayment": {
+    "amount": "100",
+    "receiptNumber": "2222222",
+    "notes": "cash payment"
+  },
+  "adjustment": {
+    "amount": "2000",
+    "type": "Refund (Add to balance)",
+    "receiptNumber": "2222",
+    "notes": "adjustment for add to balance"
+  },
+  "processCreditCard": {
+    "cardNumber": "4111111111111111",
+    "expiryDate": "112030",
+    "cvv": "076",
+    "nameOnCard": "jenifer",
+    "receiptNumber": "222222",
+    "billingAddress": "canada",
+    "billingCity": "canada",
+    "billState": "AK",
+    "billingZipCode": "1234567",
+    "notes": "credit card"
+  }
+}
