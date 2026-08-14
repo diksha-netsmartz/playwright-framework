@@ -152,7 +152,7 @@ export default class SingleInstructorPage extends BasePage {
         await this.deleteButtonInPopup.click();
         await this.deleteButtonInPopup.isHidden();
         await this.waitForLoaders();
-        const toast = this.page.locator('#toast-container .toast-success .toast-message');
+        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await toast.waitFor();
         await expect(toast).toBeVisible();
         await expect(toast).toHaveText('Appointment deleted successfully.');
@@ -208,7 +208,7 @@ export default class SingleInstructorPage extends BasePage {
         await this.deleteButtonInPopup.click();
         await this.deleteButtonInPopup.isHidden();
         await this.waitForLoaders();
-        const toast = this.page.locator('#toast-container .toast-success .toast-message');
+        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await toast.waitFor();
         await expect(toast).toBeVisible();
         await expect(toast).toHaveText('Appointment deleted successfully.');

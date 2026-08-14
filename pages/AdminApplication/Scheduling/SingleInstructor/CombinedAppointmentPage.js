@@ -304,7 +304,7 @@ export default class CombinedAppointmentPage extends BasePage {
 
         }
 
-        const toast = this.page.locator('#toast-container .toast-success .toast-message');
+        const toast = this.page.locator('#toast-container .toast-success .toast-message').last();
         await toast.waitFor();
         await expect(toast).toBeVisible();
         await expect(toast).toHaveText('Appointment created successfully.');
@@ -377,6 +377,10 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.cancelAppointmentTextbox.fill("Cancelling appointment for " + studentName);
         await this.click(this.cancelAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton)
+        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
+        await toast.waitFor();
+        await expect(toast).toBeVisible();
+        await expect(toast).toHaveText('Appointment cancelled successfully.');
     }
 
     async markAppointmentAsNoShow(studentName) {
