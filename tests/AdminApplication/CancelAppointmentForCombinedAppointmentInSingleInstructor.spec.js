@@ -28,18 +28,14 @@ test("Cancel created Combined Appointment", async ({page}) => {
 
     await instructorPage.getSchedule();
 
-
     await instructorPage.selectCreateAppointment(" Create Combined Appointment (Driver and Observer)");
 
     await combinedAppointmentPage.verifyPopup();
 
-    await combinedAppointmentPage.selectDropdown(
-        "Location"
-    );
-
-    await combinedAppointmentPage.selectDropdown(
-        "Vehicle"
-    );
+    await combinedAppointmentPage.selectMidTimeDropdown();
+    await combinedAppointmentPage.selectEndTimeDropdown();
+    await combinedAppointmentPage.selectDropdown("Location");
+    await combinedAppointmentPage.selectDropdown("Vehicle");
 
     await combinedAppointmentPage.fillStudentDetails(1, studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
@@ -48,11 +44,9 @@ test("Cancel created Combined Appointment", async ({page}) => {
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.cancelAppointment(studentData.student1.name.replace(" ", ", "));
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully(studentData.student1.name.replace(" ", ", "));
+    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
     await combinedAppointmentPage.cancelAppointment(studentData.student2.name.replace(" ", ", "));
-    await instructorPage.editCancelledAppointment();
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully(studentData.student2.name.replace(" ", ", "));
-    await combinedAppointmentPage.closeTheDialogPopup();
-    await instructorPage.deleteCancelledAppointment();
+    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
+    await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
 
 });

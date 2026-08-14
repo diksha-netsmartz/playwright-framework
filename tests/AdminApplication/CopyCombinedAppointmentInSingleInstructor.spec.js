@@ -37,13 +37,10 @@ test("Copy Create Combined Appointment", async ({page}) => {
     // Combined Appointment Popup
     await combinedAppointmentPage.verifyPopup();
 
-    await combinedAppointmentPage.selectDropdown(
-        "Location"
-    );
-
-    await combinedAppointmentPage.selectDropdown(
-        "Vehicle"
-    );
+    await combinedAppointmentPage.selectMidTimeDropdown();
+    await combinedAppointmentPage.selectEndTimeDropdown();
+    await combinedAppointmentPage.selectDropdown("Location");
+    await combinedAppointmentPage.selectDropdown("Vehicle");
 
     await combinedAppointmentPage.fillStudentDetails(1, studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);

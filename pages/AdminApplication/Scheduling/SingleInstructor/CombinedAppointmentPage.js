@@ -73,6 +73,8 @@ export default class CombinedAppointmentPage extends BasePage {
         this.noShowAppointmentPopupButton = page.getByRole("button", {
             name: "Yes, No Show Lesson",
         });
+
+        this.noShowYesButton = page.locator("#btnDeleteMakeFullAppointment");
     }
 
 
@@ -92,15 +94,27 @@ export default class CombinedAppointmentPage extends BasePage {
         );
     }
 
+    getEndTimeDropdownValue(startTime) {
+        return this.page.locator(
+            `xpath=(//button[contains(@data-id,'EndTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1]//following-sibling::li[2])[1]`
+        );
+    }
+
+    getMidTimeDropdownValue(startTime) {
+        return this.page.locator(
+            `xpath=(//button[contains(@data-id,'MidTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1]//following-sibling::li[1])[1]`
+        );
+    }
+
     cancelAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=(//a[@data-sname1='${studentName}' or @data-sname2='${studentName}'  and contains(@id,'CancelAppointment')])[1]`
+            `xpath=(//a[text()='Cancel Appointment' and @data-sname1='${studentName}' or @data-sname2='${studentName}'])[1]`
         );
     }
 
     noShowAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=(//a[@data-sname1='${studentName}' or @data-sname2='${studentName}' and contains(@id,'NoShowAppointment')])[1]`
+            `xpath=(//a[text()='No Show' and @data-sname1='${studentName}' or @data-sname2='${studentName}'])[1]`
         );
     }
 
@@ -207,6 +221,20 @@ export default class CombinedAppointmentPage extends BasePage {
     async selectDropdown(dropdownName) {
         await this.click(this.getDropdownButton(dropdownName));
         await this.click(this.getFirstDropdownOption(dropdownName));
+    }
+
+    async selectMidTimeDropdown() {
+        const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
+        console.log("start time : " + startTime);
+        await this.click(this.getDropdownButton("MidTime"));
+        await this.click(this.getMidTimeDropdownValue(startTime));
+    }
+
+    async selectEndTimeDropdown() {
+        const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
+        console.log("start time : " + startTime);
+        await this.click(this.getDropdownButton("EndTime"));
+        await this.click(this.getEndTimeDropdownValue(startTime));
     }
 
     async selectDuration() {
@@ -339,11 +367,7 @@ export default class CombinedAppointmentPage extends BasePage {
         );
 
         await this.verifyRegexAttribute(
-            this.getDropdownTitle(`Product_Id${suffix}`),
-            "title",
-            expected.product,
-            `Student ${studentNo} Product`
-        );
+            this.getDropdownTitle(`Product_Id${suffix}`), "title", expected.product, `Student ${studentNo} Product`);
 
         await this.verifyAttribute(this.getDropdownTitle(instruction1Id), "title", expected.instruction1, `Student ${studentNo} Instruction 1`);
 
@@ -374,25 +398,42 @@ export default class CombinedAppointmentPage extends BasePage {
     async cancelAppointment(studentName) {
         await this.cancelAppointmentButton(studentName).isVisible();
         await this.click(this.cancelAppointmentButton(studentName));
-        await this.cancelAppointmentTextbox.fill("Cancelling appointment for " + studentName);
+        this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
+        await this.cancelAppointmentTextbox.fill(this.cancelledNotes);
         await this.click(this.cancelAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton)
+
+    }
+
+    async markAppointmentAsNoShow(studentName) {
+        await this.noShowAppointmentButton(studentName).isVisible();
+        await this.click(this.noShowAppointmentButton(studentName));
+        this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
+        await this.noShowAppointmentTextbox.fill(this.noShowNotes);
+        await this.click(this.noShowAppointmentPopupButton);
+        await this.click(this.deleteConfirmationButton)
+        try {
+            if (await this.noShowYesButton.isVisible({timeout: 2000})) {
+                await this.click(this.noShowYesButton);
+            }
+        } catch (e) {
+            console.log('Captcha not present. Continuing login...');
+        }
+
+    }
+
+    async verifyAppointmentIsCancelledSuccessfully() {
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await toast.waitFor();
         await expect(toast).toBeVisible();
         await expect(toast).toHaveText('Appointment cancelled successfully.');
     }
 
-    async markAppointmentAsNoShow(studentName) {
-        await this.noShowAppointmentButton(studentName).isVisible();
-        await this.click(this.noShowAppointmentButton(studentName));
-        await this.noShowAppointmentTextbox.fill("Marking No Show appointment for " + studentName);
-        await this.click(this.noShowAppointmentPopupButton);
-        await this.click(this.deleteConfirmationButton)
-    }
-
-    async verifyAppointmentIsCancelledSuccessfully(studentName) {
-        expect(await this.noShowAppointmentButton(studentName).isVisible()).toBeFalsy();
+    async verifyAppointmentIsMarkedAsNoShowSuccessfully() {
+        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
+        await toast.waitFor();
+        await expect(toast).toBeVisible();
+        await expect(toast).toHaveText('Appointment marked No Show successfully.');
     }
 
     async closeTheDialogPopup() {

@@ -7,6 +7,8 @@ import CombinedAppointmentPage from "../../pages/AdminApplication/Scheduling/Sin
 import studentData from "../../test-data/studentData.json";
 import login from "../../test-data/login.json";
 
+
+// This test does not delete the created appointment , if you want to delete it afterwards use the DeleteAppointmentForCombinedAppointmentInSingleInstructor.spec.js file in same folder
 test("Create Combined Appointment", async ({page}) => {
 
     const loginPage = new LoginPage(page);
@@ -37,13 +39,10 @@ test("Create Combined Appointment", async ({page}) => {
     // Combined Appointment Popup
     await combinedAppointmentPage.verifyPopup();
 
-    await combinedAppointmentPage.selectDropdown(
-        "Location"
-    );
-
-    await combinedAppointmentPage.selectDropdown(
-        "Vehicle"
-    );
+    await combinedAppointmentPage.selectMidTimeDropdown();
+    await combinedAppointmentPage.selectEndTimeDropdown();
+    await combinedAppointmentPage.selectDropdown("Location");
+    await combinedAppointmentPage.selectDropdown("Vehicle");
 
     await combinedAppointmentPage.fillStudentDetails(1, studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
@@ -54,6 +53,6 @@ test("Create Combined Appointment", async ({page}) => {
 
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues();
-    await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
+    // await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
 
 });

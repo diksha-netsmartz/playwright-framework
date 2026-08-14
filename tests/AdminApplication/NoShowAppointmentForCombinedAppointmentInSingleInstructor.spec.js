@@ -34,13 +34,10 @@ test("Mark created Combined Appointment as no show", async ({page}) => {
     // Combined Appointment Popup
     await combinedAppointmentPage.verifyPopup();
 
-    await combinedAppointmentPage.selectDropdown(
-        "Location"
-    );
-
-    await combinedAppointmentPage.selectDropdown(
-        "Vehicle"
-    );
+    await combinedAppointmentPage.selectMidTimeDropdown();
+    await combinedAppointmentPage.selectEndTimeDropdown();
+    await combinedAppointmentPage.selectDropdown("Location");
+    await combinedAppointmentPage.selectDropdown("Vehicle");
 
     await combinedAppointmentPage.fillStudentDetails(1, studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
@@ -48,8 +45,9 @@ test("Mark created Combined Appointment as no show", async ({page}) => {
     await combinedAppointmentPage.submitAppointment();
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student1.name.replace(" ", ", "));
+    await combinedAppointmentPage.verifyAppointmentIsMarkedAsNoShowSuccessfully();
     await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student2.name.replace(" ", ", "));
-    await instructorPage.deleteAppointment();
+    await combinedAppointmentPage.verifyAppointmentIsMarkedAsNoShowSuccessfully();
 
 });
