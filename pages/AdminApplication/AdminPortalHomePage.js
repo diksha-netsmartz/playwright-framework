@@ -96,21 +96,11 @@ class AdminPortalHomePage extends BasePage {
         await this.click(this.confirmButton);
         await this.click(this.yesConfirmationButton);
         await this.page.getByText(' File has been confirmed', {exact: true})
-        await expect(
-            this.page.getByText(
-                ' File has been confirmed',
-                {exact: true}
-            )
-        ).toBeVisible();
+        await expect(this.page.getByText(' File has been confirmed', {exact: true})).toBeVisible();
         await this.click(this.sendButton);
 
         await this.page.getByText('Email sent successfully.', {exact: true})
-        await expect(
-            this.page.getByText(
-                'Email sent successfully.',
-                {exact: true}
-            )
-        ).toBeVisible();
+        await expect(this.page.getByText('Email sent successfully.', {exact: true})).toBeVisible();
     }
 
 
