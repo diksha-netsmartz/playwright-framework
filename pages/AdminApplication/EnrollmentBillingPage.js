@@ -214,7 +214,7 @@ export class EnrollmentBillingPage extends BasePage {
         await this.showAllCheckbox.click();
         await this.filterButton.click();
         await this.selectButton.click();
-        await this.addButton.click();
+        // await this.addButton.click();
         await this.addButtonForAdditionalDetails.click();
         await this.addToCartButton.click();
     }
@@ -345,7 +345,7 @@ export class EnrollmentBillingPage extends BasePage {
 
 
         await this.closeButton.click();
-        await this.page.waitForLoadState('networkidle');
+        // await this.page.waitForLoadState('networkidleidle');
         await this.waitForLoaders();
         await this.addNewBilling.waitFor({state: 'visible'});
 

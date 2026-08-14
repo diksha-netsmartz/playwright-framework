@@ -6,7 +6,7 @@ import HomePage from '../../pages/AdminApplication/AdminPortalHomePage'
 import login from "../../test-data/login.json";
 import studentData from "../../test-data/studentData.json"
 
-test('Add CR and RT package and delete enrollment', async ({page}) => {
+test('Add , edit and delete packages', async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
