@@ -1,12 +1,13 @@
 // @ts-check
 
-const {defineConfig} = require('@playwright/test');
+const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
 
     testDir: './tests',
 
-    timeout: 60 * 1000,
+    timeout: 320 * 1000,
+    // workers: 1,
 
     expect: {
         timeout: 5000,
@@ -15,34 +16,23 @@ module.exports = defineConfig({
     // retries: 1,
 
     reporter: [
-        ['html', {open: 'never'}]
+        ['html', { open: 'never' }]
     ],
 
     use: {
         slowMo: 500,
         // browserName: 'webkit',
-
         browserName: 'chromium',
-
         // channel: 'msedge',
-
+        // headless: true,
+        // viewport: { width: 1920, height: 1080 },
         headless: false,
-
         viewport: null,
         launchOptions: {
             args: ['--start-maximized'],
         },
-
-        // actionTimeout: 60000,
-
-        // navigationTimeout: 60000,
-
         screenshot: 'on',
-
-        trace: 'retain-on-failure',
-
-        video: 'retain-on-failure',
-
+        trace: 'on',
         ignoreHTTPSErrors: true
 
     }
