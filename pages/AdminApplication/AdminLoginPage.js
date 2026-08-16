@@ -55,6 +55,7 @@ class AdminLoginPage extends BasePage {
         }
 
         await this.click(this.loginBtn);
+        await this.verifyTitle("Home Page");
     }
 
     /**

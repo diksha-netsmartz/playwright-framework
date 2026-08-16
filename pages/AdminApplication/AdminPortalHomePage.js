@@ -27,13 +27,9 @@ class AdminPortalHomePage extends BasePage {
                 name: "Single Instructor"
             });
 
-        this.studentAccount = page.getByRole('link', {
-            name: 'Student Account '
-        });
-
-        this.enrollmentBilling = page.getByRole('link', {
-            name: 'Enrollment/Billing'
-        });
+        this.studentAccount = page.getByRole('link', { name: /Student Account/i });
+        this.profileLink = page.locator('#li_StudentAccount_Profile')
+        this.enrollmentBilling = page.getByRole('link', { name: 'Enrollment/Billing' });
 
         // Manage Time Slots
         this.manageTimeSlotsLink = page.locator('b').filter({ hasText: 'Manage Time Slots' })
@@ -91,6 +87,14 @@ class AdminPortalHomePage extends BasePage {
     **/
     async navigateToNewStudentEnrollment() {
         await this.click(this.newStudentEnrollment);
+    }
+
+    /**
+     * Opens the Student Account menu and navigates to the Student Profile page.
+    **/
+    async openStudentProfile() {
+        await this.studentAccount.click();
+        await this.profileLink.click();
     }
 
     /**
