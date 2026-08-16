@@ -1,17 +1,27 @@
 import BasePage from "../../../../utils/BasePage";
-import {expect} from "@playwright/test";
+import { expect } from "@playwright/test";
 
+/**
+ * Page Object representing the Single Instructor Scheduler View in Admin Portal.
+ * Handles selecting instructors, finding unoccupied calendar slots, creating, editing, copying/pasting,
+ * deleting active appointments, and managing cancelled/no-show appointment records.
+ **/
 export default class SingleInstructorPage extends BasePage {
 
+    /**
+     * Initializes locators for the Single Instructor Scheduler Page.
+     * @param {import('@playwright/test').Page} page - Playwright Page instance.
+     **/
     constructor(page) {
         super(page);
+
 
         this.submitButtonPopup = page.getByRole("button", {
             name: "Yes, Submit",
         });
 
-        this.editAppointmentLink = page.getByRole('link', {name: 'Edit Appointment'});
-        this.copyAppointmentLink = page.getByRole('link', {name: 'Copy Appointment'});
+        this.editAppointmentLink = page.getByRole('link', { name: 'Edit Appointment' });
+        this.copyAppointmentLink = page.getByRole('link', { name: 'Copy Appointment' });
 
         // Buttons
         this.getScheduleBtn = page.getByRole("button", {
@@ -32,7 +42,7 @@ export default class SingleInstructorPage extends BasePage {
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
         // this.deletionSuccessToast = page.getByText('Appointment deleted successfully.', { exact: true });
 
-        this.calendarPrevBtn = page.getByRole('group').filter({hasText: 'Single Instructor View:'}).getByLabel('Previous').first();
+        this.calendarPrevBtn = page.getByRole('group').filter({ hasText: 'Single Instructor View:' }).getByLabel('Previous').first();
         this.listMenuOfANoShowAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='No Show']//span[@data-types='Appointment']//img)[1]");
         this.listMenuOfCancelledAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//span[@data-types='Appointment']//img)[1]");
 
@@ -41,41 +51,88 @@ export default class SingleInstructorPage extends BasePage {
 
     }
 
+    /**
+     * Returns locator for the action menu 3-dots icon on an active/confirmed appointment matching specific notes.
+     * @param {string} notesValue - Unique note string contained in the appointment.
+     * @returns {import('@playwright/test').Locator} 3-dots icon locator.
+     **/
     listMenuOfCreatedAppointment(notesValue) {
         return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img)[last()]`);
     }
 
+    /**
+     * Returns locator for all action menu 3-dots icons on active/confirmed appointments matching specific notes.
+     * @param {string} notesValue - Unique note string contained in the appointment.
+     * @returns {import('@playwright/test').Locator} All matching action menu icons locator.
+     **/
+    allListMenusOfCreatedAppointments(notesValue) {
+        return this.page.locator(`xpath=//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img`);
+    }
+
+    /**
+     * Returns locator for all action menu icons matching an appointment with specified notes.
+     * @param {string} notesValue - Unique note string contained in the appointment.
+     * @returns {import('@playwright/test').Locator} Action menu locator.
+     **/
     listMenuInAppointment(notesValue) {
         return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
     }
 
+    /**
+     * Returns locator for the action menu icon on a No Show appointment matching specific notes.
+     * @param {string} notesValue - Unique note string contained in the appointment.
+     * @returns {import('@playwright/test').Locator} Action menu icon locator.
+     **/
     listMenuOfNoShowAppointment(notesValue) {
         return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
     }
 
+    /**
+     * Returns locator for the delete appointment action link for an appointment matching specific notes.
+     * @param {string} notesValue - Unique note string contained in the appointment.
+     * @returns {import('@playwright/test').Locator} Delete appointment link locator.
+     **/
     deleteAppointmentButton(notesValue) {
         return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//a[@href='cancelAppt'])[last()]`);
     }
 
-
+    /**
+     * Returns locator for a dropdown button container by name.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     * @returns {import('@playwright/test').Locator} Dropdown button locator.
+     **/
     getDropdownButton(dropdownName) {
         return this.page.locator(
             `xpath=(//button[contains(@data-id,'${dropdownName}')]//parent::div//span[contains(@class,'filter-option pull-left')])[1]`
         );
     }
 
+    /**
+     * Returns locator for the context menu option that appears on right clicking a scheduler slot.
+     * @param {string} appointmentType - Appointment menu option label.
+     * @returns {import('@playwright/test').Locator} Context menu item link locator.
+     **/
     createAppointmentOnRightClick(appointmentType) {
         return this.page.getByRole("link", {
             name: appointmentType
         });
     }
 
+    /**
+     * Returns locator for the last option item in the specified dropdown.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     * @returns {import('@playwright/test').Locator} Last dropdown list item locator.
+     **/
     getLastDropdownOption(dropdownName) {
         return this.page.locator(
             `xpath=(//button[contains(@data-id,'${dropdownName}')]//parent::div//li)[last()]`
         );
     }
 
+
+    /**
+     * Verifies page title and selects the last instructor from the Single Instructor dropdown.
+     **/
     async selectInstructor() {
         await this.verifyTitle("Single Instructor Scheduler");
         await this.click(this.getDropdownButton("SingleInst"));
@@ -83,12 +140,18 @@ export default class SingleInstructorPage extends BasePage {
 
     }
 
+    /**
+     * Clicks the 'Get Schedule' button to load the selected instructor's timetable grid.
+     **/
     async getSchedule() {
         await this.click(this.getScheduleBtn);
         // await this.page.waitForLoadState("networkidle")
 
     }
 
+    /**
+     * Waits for all background loader overlays (`.load-area`) on the page to hide.
+     **/
     async waitForLoaders() {
         await this.page.waitForFunction(() =>
             [...document.querySelectorAll('.load-area')].every(
@@ -97,6 +160,9 @@ export default class SingleInstructorPage extends BasePage {
         );
     }
 
+    /**
+     * Calculates target calendar date (7 days prior, non-Sunday), navigates previous months if needed, and clicks the date.
+     **/
     async selectDateInCalendar() {
         const today = new Date();
         const targetDate = new Date(today);
@@ -125,13 +191,30 @@ export default class SingleInstructorPage extends BasePage {
         await this.page.locator(`xpath=//a[@data-value="${dataValue}"]`).first().click();
     }
 
+    /**
+     * Evaluates in-browser whether a scheduler grid cell is currently overlapped by an existing appointment block.
+     * @param {import('@playwright/test').Locator} cell - Scheduler gridcell locator.
+     * @returns {Promise<boolean>} True if the slot is occupied, false otherwise.
+     **/
     async isSlotOccupied(cell) {
         const handle = await cell.elementHandle();
         return this.page.evaluate((cellEl) => {
             const cellBox = cellEl.getBoundingClientRect();
-            const appointments = document.querySelectorAll("div[data-types='Appointment']");
+            if (cellBox.width === 0 || cellBox.height === 0) return true;
+
+            const centerX = cellBox.left + cellBox.width / 2;
+            const centerY = cellBox.top + cellBox.height / 2;
+            const elAtCenter = document.elementFromPoint(centerX, centerY);
+            if (elAtCenter && !cellEl.contains(elAtCenter) && elAtCenter !== cellEl) {
+                return true;
+            }
+
+            const appointments = Array.from(
+                document.querySelectorAll("div.k-event, div[data-types='Appointment']")
+            );
             for (const appt of appointments) {
                 const apptBox = appt.getBoundingClientRect();
+                if (apptBox.width === 0 || apptBox.height === 0) continue;
                 const overlaps =
                     apptBox.left < cellBox.right &&
                     apptBox.right > cellBox.left &&
@@ -143,6 +226,11 @@ export default class SingleInstructorPage extends BasePage {
         }, handle);
     }
 
+    /**
+     * Evaluates the scheduler DOM to find an unoccupied, visible grid slot in the viewport.
+     * @param {number} [skipCount=0] - Number of free slots to skip before returning.
+     * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell.
+     **/
     async findAvailableSlot(skipCount = 0) {
         const freeIndex = await this.page.evaluate((skip) => {
             const cells = Array.from(
@@ -151,19 +239,30 @@ export default class SingleInstructorPage extends BasePage {
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
             );
-            const {innerHeight, innerWidth} = window;
+            const { innerHeight, innerWidth } = window;
             let skipped = 0;
-            for (let i = 0; i < cells.length; i++) {
-                const cellBox = cells[i].getBoundingClientRect();
 
-                // Skip cells not fully visible in the current viewport to avoid scrolling
-                if (cellBox.top < 0 || cellBox.bottom > innerHeight ||
+            for (let i = 0; i < cells.length; i++) {
+                const cell = cells[i];
+                const cellBox = cell.getBoundingClientRect();
+
+                // Skip cells not fully visible in the current viewport or without dimensions
+                if (cellBox.width === 0 || cellBox.height === 0 ||
+                    cellBox.top < 0 || cellBox.bottom > innerHeight ||
                     cellBox.left < 0 || cellBox.right > innerWidth) {
                     continue;
                 }
 
-                const occupied = appointments.some(appt => {
+                // Check if the center point of the cell is intercepted by an appointment/overlay element
+                const centerX = cellBox.left + cellBox.width / 2;
+                const centerY = cellBox.top + cellBox.height / 2;
+                const elAtCenter = document.elementFromPoint(centerX, centerY);
+                const isPointBlocked = elAtCenter && !cell.contains(elAtCenter) && elAtCenter !== cell;
+
+                // Check bounding box overlap with all existing appointments
+                const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
+                    if (apptBox.width === 0 || apptBox.height === 0) return false;
                     return (
                         apptBox.left < cellBox.right &&
                         apptBox.right > cellBox.left &&
@@ -171,7 +270,8 @@ export default class SingleInstructorPage extends BasePage {
                         apptBox.bottom > cellBox.top
                     );
                 });
-                if (!occupied) {
+
+                if (!hasApptOverlap && !isPointBlocked) {
                     if (skipped === skip) return i;
                     skipped++;
                 }
@@ -184,27 +284,37 @@ export default class SingleInstructorPage extends BasePage {
         return this.page.locator("#scheduler td[role='gridcell']:not(.k-nonwork-hour)").nth(freeIndex);
     }
 
+    /**
+     * Selects date in calendar, right clicks an unoccupied slot, and selects the given appointment creation option.
+     * @param {string} appointmentType - Context menu label for appointment type.
+     **/
     async selectCreateAppointment(appointmentType) {
         await this.selectDateInCalendar();
-        await this.page.waitForLoadState("domcontentloaded");
+        await this.waitForLoaders().catch(() => {
+        });
+        await this.page.waitForTimeout(1000);
 
-        const slot = await this.findAvailableSlot(1);
-        await slot.click({button: "right"});
+        const slot = await this.findAvailableSlot(0);
+        await slot.click({ button: "right" });
         await this.page.waitForTimeout(2500);
         try {
-            await this.createAppointmentOnRightClick(appointmentType).waitFor({state: "visible", timeout: 3000,});
+            await this.createAppointmentOnRightClick(appointmentType).waitFor({ state: "visible", timeout: 3000, });
         } catch {
             console.log("right click menu options not visible, right clicking again");
-            await slot.click({button: "right"});
-            await this.createAppointmentOnRightClick(appointmentType).waitFor({state: "visible", timeout: 3000,});
+            await slot.click({ button: "right" });
+            await this.createAppointmentOnRightClick(appointmentType).waitFor({ state: "visible", timeout: 3000, });
         }
         await this.click(this.createAppointmentOnRightClick(appointmentType));
     }
 
+    /**
+     * Opens the action menu on an appointment matching specific notes and clicks 'Edit Appointment'.
+     * @param notesValue - Unique notes value identifying the appointment.
+     **/
     async editAppointment(notesValue) {
         await this.listMenuOfCreatedAppointment(notesValue).isVisible();
         // await this.listMenuOfCreatedAppointment(notesValue).click();
-        await this.listMenuOfCreatedAppointment(notesValue).click({force: true});
+        await this.listMenuOfCreatedAppointment(notesValue).click({ force: true });
 
         try {
             await this.editAppointmentLink.waitFor({
@@ -215,11 +325,57 @@ export default class SingleInstructorPage extends BasePage {
             console.log("edit appointment link was not visible. Re-clicking the list menu...");
 
             await this.listMenuOfCreatedAppointment(notesValue).click();
-            await this.editAppointmentLink.waitFor({state: "visible", timeout: 3000});
+            await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
         }
         await this.editAppointmentLink.click();
     }
 
+    /**
+     * Iterates through all visible created appointments matching specific notes, opens each one by one via 'Edit Appointment', and verifies the appointment values.
+     * @param {Object|string|number} combinedAppointmentPageOrNotes - CombinedAppointmentPage instance or unique notes value.
+     * @param {Object} [combinedAppointmentPage] - CombinedAppointmentPage instance (if notes was passed as first argument).
+     **/
+    async editAndVerifyDetailsForAllAppointments(combinedAppointmentPageOrNotes, combinedAppointmentPage) {
+        let pageObj = combinedAppointmentPage;
+        let notesValue = combinedAppointmentPageOrNotes;
+
+        if (combinedAppointmentPageOrNotes && typeof combinedAppointmentPageOrNotes === 'object' && combinedAppointmentPageOrNotes.uniqueId) {
+            pageObj = combinedAppointmentPageOrNotes;
+            notesValue = combinedAppointmentPageOrNotes.uniqueId;
+        }
+
+        const menus = this.allListMenusOfCreatedAppointments(notesValue);
+        const count = await menus.count();
+        console.log(`Found ${count} appointment(s) matching notes: "${notesValue}"`);
+
+        for (let i = 0; i < count; i++) {
+            console.log(`Opening and verifying appointment ${i + 1} of ${count}...`);
+            const menu = menus.nth(i);
+            await menu.waitFor({ state: "visible", timeout: 5000 });
+            await menu.click({ force: true });
+
+            try {
+                await this.editAppointmentLink.waitFor({
+                    state: "visible",
+                    timeout: 3000,
+                });
+            } catch {
+                console.log(`Edit appointment link was not visible for appointment ${i + 1}. Re-clicking the list menu...`);
+                await menu.click({ force: true });
+                await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
+            }
+
+            await this.editAppointmentLink.click();
+            if (pageObj) {
+                await pageObj.verifyCombinedAppointmentCreatedValues();
+            }
+        }
+    }
+
+    /**
+     * Deletes an appointment via its action menu, confirms deletion in modal, and verifies success toast.
+     * @param notesValue - Unique notes value identifying the appointment.
+     **/
     async deleteAppointment(notesValue) {
         await this.listMenuOfCreatedAppointment(notesValue).hover();
         await this.deleteAppointmentButton(notesValue).isVisible();
@@ -233,22 +389,25 @@ export default class SingleInstructorPage extends BasePage {
         await expect(toast).toHaveText('Appointment deleted successfully.');
     }
 
-
+    /**
+     * Copies an existing appointment, finds available slots, pastes it via context menu, confirms modal, and verifies success toast.
+     * @param notesValue - Unique notes value identifying the appointment.
+     **/
     async copyAppointment(notesValue) {
-        await this.appointmentConfirmed.waitFor({state: "visible"});
-        await this.listMenuOfCreatedAppointment(notesValue).waitFor({state: "visible"});
+        await this.appointmentConfirmed.waitFor({ state: "visible" });
+        await this.listMenuOfCreatedAppointment(notesValue).waitFor({ state: "visible" });
         await this.page.waitForTimeout(2500);
 
         try {
-            await this.copyAppointmentLink.waitFor({state: "visible", timeout: 3000,});
+            await this.copyAppointmentLink.waitFor({ state: "visible", timeout: 3000, });
         } catch {
             console.log("Copy appointment link was not visible. Re-clicking the list menu...");
             await this.listMenuOfCreatedAppointment(notesValue).click();
-            await this.copyAppointmentLink.waitFor({state: "visible", timeout: 3000});
+            await this.copyAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
         }
         await this.copyAppointmentLink.click();
 
-        const maxRetries = 10;
+        const maxRetries = 20;
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             // Wait for any lingering toasts from previous steps to clear
@@ -257,15 +416,15 @@ export default class SingleInstructorPage extends BasePage {
                 return !container || Array.from(container.children).every(
                     c => !c.offsetParent || getComputedStyle(c).display === 'none'
                 );
-            }, {timeout: 8000}).catch(() => {
+            }, { timeout: 8000 }).catch(() => {
             });
 
             const slot = await this.findAvailableSlot(attempt);
-            await slot.click({button: "right"});
+            await slot.click({ button: "right" });
             await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
 
             try {
-                await this.submitButtonPopup.waitFor({state: "visible", timeout: 2000,});
+                await this.submitButtonPopup.waitFor({ state: "visible", timeout: 2000, });
                 await this.submitButtonPopup.click();
 
             } catch {
@@ -277,7 +436,7 @@ export default class SingleInstructorPage extends BasePage {
 
             let message = '';
             try {
-                await toastLocator.waitFor({state: "visible", timeout: 5000});
+                await toastLocator.waitFor({ state: "visible", timeout: 5000 });
                 message = (await toastLocator.textContent())?.trim() || '';
             } catch {
                 console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
@@ -302,11 +461,18 @@ export default class SingleInstructorPage extends BasePage {
         throw new Error("Could not paste appointment: student not available in any of the tried slots");
     }
 
+    /**
+     * Verifies that the appointment was duplicated into 2 distinct instances in the scheduler with matching notes.
+     * @param notesValue - Unique notes value identifying the appointment.
+     **/
     async verifyAppointmentIsCopied(notesValue) {
         await expect(await this.listMenuInAppointment(notesValue)).toHaveCount(2);
         await this.page.waitForLoadState("networkidle");
     }
 
+    /**
+     * Deletes an open/cancelled appointment slot and verifies success toast.
+     **/
     async deleteCancelledAppointment() {
         await this.listMenuOfCancelledAppointment.isVisible();
         await this.listMenuOfCancelledAppointment.hover();
@@ -321,6 +487,9 @@ export default class SingleInstructorPage extends BasePage {
         await expect(toast).toHaveText('Appointment deleted successfully.');
     }
 
+    /**
+     * Opens the edit modal for a cancelled appointment from its action menu.
+     **/
     async editCancelledAppointment() {
         await this.listMenuOfCancelledAppointment.isVisible();
         await this.listMenuOfCancelledAppointment.click();
@@ -334,11 +503,15 @@ export default class SingleInstructorPage extends BasePage {
             console.log("edit appointment link was not visible. Re-clicking the list menu...");
 
             await this.listMenuOfCancelledAppointment.click();
-            await this.editAppointmentLink.waitFor({state: "visible", timeout: 3000});
+            await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
         }
         await this.editAppointmentLink.click();
     }
 
+    /**
+     * Opens the edit modal for a No Show appointment from its action menu.
+     * @param notesValue - Unique notes value identifying the appointment.
+     **/
     async editNoShowAppointment(notesValue) {
         const listMenu = this.listMenuOfNoShowAppointment(notesValue);
         await listMenu.isVisible();
@@ -353,7 +526,7 @@ export default class SingleInstructorPage extends BasePage {
             console.log("edit appointment link was not visible. Re-clicking the list menu...");
 
             await listMenu.click();
-            await this.editAppointmentLink.waitFor({state: "visible", timeout: 3000});
+            await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
         }
         await this.editAppointmentLink.click();
     }

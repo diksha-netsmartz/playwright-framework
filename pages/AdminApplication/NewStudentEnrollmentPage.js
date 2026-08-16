@@ -1,9 +1,18 @@
-import {expect} from '@playwright/test';
+import { expect } from '@playwright/test';
 import BasePage from "../../utils/BasePage";
 
 
+/**
+ * Page Object representing the New Student Enrollment Page in Admin Portal.
+ * Handles package selection (BTW, CR, RT), location, student demographic & contact information,
+ * parent/emergency details, terms agreement, and enrollment completion.
+  **/
 class NewStudentEnrollmentPage extends BasePage {
 
+    /**
+     * Initializes locators for the New Student Enrollment Page.
+     * @param {import('@playwright/test').Page} page - Playwright Page instance.
+      **/
     constructor(page) {
         super(page);
 
@@ -56,9 +65,9 @@ class NewStudentEnrollmentPage extends BasePage {
             name: 'Address'
         });
 
-        this.city = page.locator('div').filter({hasText: 'Los Angeles CountyCA, USA'}).first();
+        this.city = page.locator('div').filter({ hasText: 'Los Angeles CountyCA, USA' }).first();
         this.stateDropdown = page.locator("xpath=//button[@data-id='State']");
-        this.stateOptionValue = page.locator('a').filter({hasText: 'AK'})
+        this.stateOptionValue = page.locator('a').filter({ hasText: 'AK' })
 
         this.zipCode = page.getByRole('textbox', {
             name: 'Zip Code'
@@ -141,7 +150,10 @@ class NewStudentEnrollmentPage extends BasePage {
         this.dobYear = page.locator("xpath=//button[@data-id='int_DOB_Year']//following-sibling::div//a//span[text()='2006']");
     }
 
-
+    /**
+     * Opens the package selection modal and selects the specified package by exact name.
+     * @param {string} packageName - Name of the package to select.
+    **/
     async selectPackage(packageName) {
         await this.packageSelectionButton.click();
 
@@ -150,13 +162,18 @@ class NewStudentEnrollmentPage extends BasePage {
         }).click();
     }
 
-
+    /**
+     * Opens location dropdown and checks the Show All option.
+    **/
     async selectLocation() {
         await this.selectLocationDropdown.click();
         await this.showAllCheckbox.click();
 
     }
 
+    /**
+     * Enters default DOB (12/12/2000), filters available slots, selects, and adds to cart.
+    **/
     async selectDOB() {
         await this.page.getByRole('textbox', {
             name: 'MM/DD/YYYY'
@@ -168,12 +185,18 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.addToCartButton.click();
     }
 
+    /**
+     * Adds additional fee details and confirms adding to cart.
+    **/
     async addAdditionalDetails() {
         await this.addButtonForAdditionalDetails.click();
         await this.addToCartButton.click();
     }
 
-
+    /**
+     * Selects and configures a package based on package type ('BTW and CR Package', 'CR Package', 'RT PAckage 1', 'BTW Package').
+     * @param {string} packageName - The package name to configure and add.
+    **/
     async addPackage(packageName) {
 
         await this.selectPackage(packageName);
@@ -209,7 +232,10 @@ class NewStudentEnrollmentPage extends BasePage {
         }
     }
 
-
+    /**
+     * Selects the student information category type (e.g. 'Teen', 'Adult').
+     * @param {string} studentType - Student type label.
+    **/
     async selectStudentType(studentType) {
         await this.studentInformationType.click();
 
@@ -218,46 +244,34 @@ class NewStudentEnrollmentPage extends BasePage {
         }).click();
     }
 
+    /**
+     * Fills the complete student personal, address, parent/guardian, emergency contact, notes, permit, and terms details.
+     * @param {Object} data - Student test data object.
+    **/
     async fillStudentInformation(data) {
 
         await this.firstName.fill(data.firstName);
         await this.middleName.fill(data.middleName);
         await this.lastName.fill(data.lastName);
-
-        await this.address.pressSequentially(data.address, {delay: 100});
+        await this.address.pressSequentially(data.address, { delay: 100 });
         await this.click(this.city);
         await this.click(this.stateDropdown);
         await this.click(this.stateOptionValue);
-
         await this.address.fill(data.address);
         await this.zipCode.fill(data.zipCode);
-
-
         await this.studentCellPhone.fill(data.studentCellPhone);
-
-
         await this.studentEmail.fill(data.studentEmail);
-
         await this.parentName.fill(data.parentName);
-
-
         await this.parentCellPhone.fill(data.parentCellPhone);
-
-
         await this.parentEmail.fill(data.parentEmail);
-
         await this.parentName2.fill(data.parentName2);
-
         if (data.parentPhone2) {
             await this.parentPhone2.fill(
                 data.parentPhone2
             );
         }
-
         await this.parentEmail2.fill(data.parentEmail2);
-
         await this.emergencyName.fill(data.emergencyName);
-
         await this.emergencyRelationship.fill(
             data.emergencyRelationship
         );
@@ -268,7 +282,7 @@ class NewStudentEnrollmentPage extends BasePage {
             );
         }
 
-        await this.maleCheckbox.check({force: true});
+        await this.maleCheckbox.check({ force: true });
         await this.permitNumber.fill(data.permitNumber);
 
         await this.medicalConditions.fill(
@@ -282,9 +296,12 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.drivingNotes.fill(
             data.drivingNotes
         );
-        await this.termsConditionsCheckbox.check({force: true});
+        await this.termsConditionsCheckbox.check({ force: true });
     }
 
+    /**
+     * Selects Month, Day, and Year from the student details Date of Birth dropdown controls.
+    **/
     async selectDOBInStudentDetails() {
 
         await this.click(this.dobMonthDropdown);
@@ -297,15 +314,18 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.click(this.dobYear);
     }
 
+    /**
+     * Saves the new student enrollment, confirms the confirmation prompt, and verifies enrollment completion message.
+    **/
     async save() {
         await this.saveButton.click();
         await this.click(this.yesConfirmationButton);
-        await this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', {exact: true})
+        await this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true })
 
         await expect(
             this.page.getByText(
                 'Your enrollment has been completed and a confirmation email has been sent.',
-                {exact: true}
+                { exact: true }
             )
         ).toBeVisible();
     }

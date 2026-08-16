@@ -1,8 +1,17 @@
-import {expect} from "@playwright/test";
+import { expect } from "@playwright/test";
 import BasePage from "../../../../utils/BasePage";
 import studentData from "../../../../test-data/studentData.json";
 
+/**
+ * Page Object representing the Combined Appointment Creation and Management Page in Single Instructor Scheduler.
+ * Handles creating combined appointments for Driver and Observer students, filling student & service details,
+ * verifying appointment values, cancelling, and marking appointments as No Show.
+ **/
 export default class CombinedAppointmentPage extends BasePage {
+    /**
+     * Initializes locators and state for the Combined Appointment Page.
+     * @param {import('@playwright/test').Page} page - Playwright Page instance.
+     **/
     constructor(page) {
         super(page);
 
@@ -77,103 +86,187 @@ export default class CombinedAppointmentPage extends BasePage {
         this.noShowYesButton = page.locator("#btnDeleteMakeFullAppointment");
     }
 
-
+    /**
+     * Returns locator for a dropdown button element by matching data-id attribute substring.
+     * @param {string} dataId - Substring contained in data-id attribute.
+     * @returns {import('@playwright/test').Locator} Dropdown button locator.
+     **/
     getDropdownTitle(dataId) {
         return this.page.locator(`button[data-id*="${dataId}"]`).first();
     }
 
+    /**
+     * Returns locator for a dropdown trigger button container by name.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     * @returns {import('@playwright/test').Locator} Dropdown trigger button locator.
+     **/
     getDropdownButton(dropdownName) {
         return this.page.locator(
             `xpath=(//button[contains(@data-id,'${dropdownName}')]//parent::div//span[contains(@class,'filter-option pull-left')])[1]`
         );
     }
 
+    /**
+     * Returns locator for the first option item in the specified dropdown.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     * @returns {import('@playwright/test').Locator} First dropdown list item locator.
+     **/
     getFirstDropdownOption(dropdownName) {
         return this.page.locator(
             `xpath=(//button[contains(@data-id,'${dropdownName}')]//parent::div//li[@data-original-index='1'])[1]`
         );
     }
 
+    /**
+     * Returns locator for the End Time option corresponding to the given Start Time.
+     * @param {string} startTime - The selected start time string.
+     * @returns {import('@playwright/test').Locator} End time option locator.
+     **/
     getEndTimeDropdownValue(startTime) {
         return this.page.locator(
             `xpath=(//button[contains(@data-id,'EndTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1]//following-sibling::li[2])[1]`
         );
     }
 
+    /**
+     * Returns locator for the Mid Time option corresponding to the given Start Time.
+     * @param {string} startTime - The selected start time string.
+     * @returns {import('@playwright/test').Locator} Mid time option locator.
+     **/
     getMidTimeDropdownValue(startTime) {
         return this.page.locator(
             `xpath=(//button[contains(@data-id,'MidTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1]//following-sibling::li[1])[1]`
         );
     }
 
+    /**
+     * Returns locator for the Cancel Appointment button for a specific student name.
+     * @param {string} studentName - Student name.
+     * @returns {import('@playwright/test').Locator} Cancel appointment link locator.
+     **/
     cancelAppointmentButton(studentName) {
         return this.page.locator(
             `xpath=(//a[text()='Cancel Appointment' and @data-sname1='${studentName}' or @data-sname2='${studentName}'])[1]`
         );
     }
 
+    /**
+     * Returns locator for the No Show button for a specific student name.
+     * @param {string} studentName - Student name.
+     * @returns {import('@playwright/test').Locator} No show link locator.
+     **/
     noShowAppointmentButton(studentName) {
         return this.page.locator(
             `xpath=(//a[text()='No Show' and @data-sname1='${studentName}' or @data-sname2='${studentName}'])[1]`
         );
     }
 
-
+    /**
+     * Returns text input locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Student name input locator.
+     **/
     getStudentTextbox(studentNo) {
         return studentNo === 1
             ? this.student1Textbox
             : this.student2Textbox;
     }
 
+    /**
+     * Returns pickup location input locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Pickup input locator.
+     **/
     getPickup(studentNo) {
         return studentNo === 1
             ? this.student1Pickup
             : this.student2Pickup;
     }
 
+    /**
+     * Returns notes input locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Notes input locator.
+     **/
     getNotes(studentNo) {
         return studentNo === 1
             ? this.student1Notes
             : this.student2Notes;
     }
 
+    /**
+     * Returns service dropdown button locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Service dropdown button locator.
+     **/
     clickServiceDropdown(studentNo) {
         return studentNo === 1
             ? this.getDropdownButton("Product_Id")
             : this.getDropdownButton("Product_Id_Student2");
     }
 
+    /**
+     * Returns the first service dropdown option locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Service option locator.
+     **/
     selectServiceDropdownValue(studentNo) {
         return studentNo === 1
             ? this.getFirstDropdownOption("Product_Id")
             : this.getFirstDropdownOption("Product_Id_Student2");
     }
 
+    /**
+     * Returns instruction 1 dropdown button locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Instruction 1 dropdown button locator.
+     **/
     clickInstruction1Dropdown(studentNo) {
         return studentNo === 1
             ? this.getDropdownButton("Instructions")
             : this.getDropdownButton("InstructionsStudent2");
     }
 
+    /**
+     * Returns instruction 1 dropdown first option locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Instruction 1 option locator.
+     **/
     getInstruction1DropdownValue(studentNo) {
         return studentNo === 1
             ? this.getFirstDropdownOption("Instructions")
             : this.getFirstDropdownOption("InstructionsStudent2");
     }
 
+    /**
+     * Returns instruction 2 dropdown button locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Instruction 2 dropdown button locator.
+     **/
     clickInstruction2Dropdown(studentNo) {
         return studentNo === 1
             ? this.getDropdownButton("Instructions1")
             : this.getDropdownButton("Instructions1Student2");
     }
 
+    /**
+     * Returns instruction 2 dropdown first option locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Instruction 2 option locator.
+     **/
     getInstruction2DropdownValue(studentNo) {
         return studentNo === 1
             ? this.getFirstDropdownOption("Instructions1")
             : this.getFirstDropdownOption("Instructions1Student2");
     }
 
-
+    /**
+     * Helper to verify an element attribute value against an expected string and log the result.
+     * @param {import('@playwright/test').Locator} locator - Element locator.
+     * @param {string} attribute - Attribute name.
+     * @param {string} expected - Expected attribute value.
+     * @param {string} label - Log label for reporting.
+     **/
     async verifyAttribute(locator, attribute, expected, label) {
         const actual = await locator.getAttribute(attribute);
 
@@ -185,6 +278,13 @@ export default class CombinedAppointmentPage extends BasePage {
         await expect(locator).toHaveAttribute(attribute, expected);
     }
 
+    /**
+     * Helper to verify an element attribute against an expected regex pattern.
+     * @param {import('@playwright/test').Locator} locator - Element locator.
+     * @param {string} attribute - Attribute name.
+     * @param {string} expected - Expected string to match via regex.
+     * @param {string} label - Log label for reporting.
+     **/
     async verifyRegexAttribute(locator, attribute, expected, label) {
         const actual = await locator.getAttribute(attribute);
 
@@ -201,6 +301,12 @@ export default class CombinedAppointmentPage extends BasePage {
         );
     }
 
+    /**
+     * Helper to verify that an element text contains the expected substring and log the result.
+     * @param {import('@playwright/test').Locator} locator - Element locator.
+     * @param {string} expected - Expected text substring.
+     * @param {string} label - Log label for reporting.
+     **/
     async verifyText(locator, expected, label) {
         const actual = await locator.textContent();
 
@@ -212,17 +318,27 @@ export default class CombinedAppointmentPage extends BasePage {
         await expect(locator).toContainText(expected);
     }
 
+    /**
+     * Verifies that the Combined Appointment popup dialog title is displayed.
+     **/
     async verifyPopup() {
         await expect(this.popupTitle).toContainText(
             "Create Combined Appointment (Driver and Observer)"
         );
     }
 
+    /**
+     * Selects the first option in the specified dropdown.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     **/
     async selectDropdown(dropdownName) {
         await this.click(this.getDropdownButton(dropdownName));
         await this.click(this.getFirstDropdownOption(dropdownName));
     }
 
+    /**
+     * Selects the Mid Time slot based on the currently selected Start Time.
+     **/
     async selectMidTimeDropdown() {
         const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
         console.log("start time : " + startTime);
@@ -230,6 +346,9 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.click(this.getMidTimeDropdownValue(startTime));
     }
 
+    /**
+     * Selects the End Time slot based on the currently selected Start Time.
+     **/
     async selectEndTimeDropdown() {
         const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
         console.log("start time : " + startTime);
@@ -237,10 +356,18 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.click(this.getEndTimeDropdownValue(startTime));
     }
 
+    /**
+     * Checks the 15 Minutes duration radio button.
+     **/
     async selectDuration() {
-        await this.duration15Minutes.check({force: true});
+        await this.duration15Minutes.check({ force: true });
     }
 
+    /**
+     * Fills student details (name, service, instructions, pickup, notes) for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @param {Object} student - Student test data object.
+     **/
     async fillStudentDetails(studentNo, student) {
         await this.getStudentTextbox(studentNo).fill(student.name);
 
@@ -266,6 +393,9 @@ export default class CombinedAppointmentPage extends BasePage {
         );
     }
 
+    /**
+     * Captures and stores current appointment field values (staff, location, vehicle, services, instructions) for later assertion.
+     **/
     async storeAppointmentValues() {
         this.expectedValues.staff = await this.getDropdownTitle("InstID")
             .getAttribute("title");
@@ -311,6 +441,10 @@ export default class CombinedAppointmentPage extends BasePage {
         console.log(this.expectedValues);
     }
 
+    /**
+     * Submits the combined appointment form, confirms confirmation prompts, and verifies the success toast message.
+     * If an error toast appears, prints the error message in the console and fails the test.
+     **/
     async submitAppointment() {
 
         await this.click(this.submitButton);
@@ -318,10 +452,9 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.click(this.confirmYesButton);
 
         try {
-
             await this.submitButtonPopup.waitFor({
                 state: "visible",
-                timeout: 10000,
+                timeout: 2000,
             });
 
             await this.submitButtonPopup.click();
@@ -332,13 +465,31 @@ export default class CombinedAppointmentPage extends BasePage {
 
         }
 
-        const toast = this.page.locator('#toast-container .toast-success .toast-message').last();
-        await toast.waitFor();
-        await expect(toast).toBeVisible();
-        await expect(toast).toHaveText('Appointment created successfully.');
+        const toastLocator = this.page.locator('#toast-container .toast-message').last();
+        await toastLocator.waitFor({
+            state: "visible",
+            timeout: 10000,
+        });
+
+        const errorToast = this.page.locator('#toast-container .toast-error').last();
+        if (await errorToast.isVisible()) {
+            const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
+            console.log(`Appointment creation failed with error: "${errorMessage}"`);
+            throw new Error(`Appointment creation failed with error: "${errorMessage}"`);
+        } else {
+            const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
+            await expect(successToast).toBeVisible();
+            await expect(successToast).toHaveText('Appointment created successfully.');
+            console.log(`Appointment created with message: Appointment created successfully.`);
+        }
 
     }
 
+    /**
+     * Verifies that fields for a created student in the appointment match the expected stored values.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @param {Object} student - Student test data object.
+     **/
     async verifyStudent(studentNo, student) {
 
         const suffix = studentNo === 1 ? "" : "_Student2";
@@ -379,22 +530,24 @@ export default class CombinedAppointmentPage extends BasePage {
 
     }
 
+    /**
+     * Verifies all stored appointment values (staff, location, vehicle, students 1 & 2, duration) in the appointment popup.
+     **/
     async verifyCombinedAppointmentCreatedValues() {
 
         await this.verifyAttribute(this.getDropdownTitle("InstID"), "title", this.expectedValues.staff, "Staff");
-
         await this.verifyAttribute(this.getDropdownTitle("Location_ID"), "title", this.expectedValues.location, "Location");
-
         await this.verifyAttribute(this.getDropdownTitle("VehicleID"), "title", this.expectedValues.vehicle, "Vehicle");
-
         await this.verifyStudent(1, studentData.student1);
-
         await this.verifyStudent(2, studentData.student2);
         await expect(this.duration15Minutes).toBeChecked();
         await this.click(this.closePopup);
     }
 
-
+    /**
+     * Cancels the appointment for the specified student name and confirms the cancellation modal.
+     * @param {string} studentName - Student's name.
+     **/
     async cancelAppointment(studentName) {
         await this.cancelAppointmentButton(studentName).isVisible();
         await this.click(this.cancelAppointmentButton(studentName));
@@ -405,6 +558,10 @@ export default class CombinedAppointmentPage extends BasePage {
 
     }
 
+    /**
+     * Marks the appointment as No Show for the specified student name and confirms the dialog.
+     * @param {string} studentName - Student's name.
+     **/
     async markAppointmentAsNoShow(studentName) {
         await this.noShowAppointmentButton(studentName).isVisible();
         await this.click(this.noShowAppointmentButton(studentName));
@@ -413,7 +570,7 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.click(this.noShowAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton)
         try {
-            if (await this.noShowYesButton.isVisible({timeout: 2000})) {
+            if (await this.noShowYesButton.isVisible({ timeout: 2000 })) {
                 await this.click(this.noShowYesButton);
             }
         } catch (e) {
@@ -422,6 +579,9 @@ export default class CombinedAppointmentPage extends BasePage {
 
     }
 
+    /**
+     * Verifies that the appointment cancelled success toast message is displayed.
+     **/
     async verifyAppointmentIsCancelledSuccessfully() {
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await toast.waitFor();
@@ -429,6 +589,9 @@ export default class CombinedAppointmentPage extends BasePage {
         await expect(toast).toHaveText('Appointment cancelled successfully.');
     }
 
+    /**
+     * Verifies that the appointment marked No Show success toast message is displayed.
+     **/
     async verifyAppointmentIsMarkedAsNoShowSuccessfully() {
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await toast.waitFor();
@@ -436,6 +599,9 @@ export default class CombinedAppointmentPage extends BasePage {
         await expect(toast).toHaveText('Appointment marked No Show successfully.');
     }
 
+    /**
+     * Closes the appointment popup dialog.
+     **/
     async closeTheDialogPopup() {
         await this.click(this.closePopup);
 

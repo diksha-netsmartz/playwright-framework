@@ -1,8 +1,17 @@
 const BasePage = require("../../utils/BasePage");
-const {expect} = require("@playwright/test");
+const { expect } = require("@playwright/test");
 
+/**
+ * Page Object representing the Admin Portal Dashboard / Home Page.
+ * Handles side navigation menus (Scheduling, Report Center, Student Account, New Student Enrollment)
+ * and the Uploaded Files confirmation widget workflow.
+  **/
 class AdminPortalHomePage extends BasePage {
 
+    /**
+     * Initializes locators for the Admin Portal Home Page.
+     * @param {import('@playwright/test').Page} page - Playwright Page instance.
+      **/
     constructor(page) {
         super(page);
 
@@ -27,17 +36,17 @@ class AdminPortalHomePage extends BasePage {
         });
 
         // Manage Time Slots
-        this.manageTimeSlotsLink = page.locator('b').filter({hasText: 'Manage Time Slots'})
-        this.bulkAppointmentLink = page.getByRole('link', {name: 'Bulk Appointment'});
+        this.manageTimeSlotsLink = page.locator('b').filter({ hasText: 'Manage Time Slots' })
+        this.bulkAppointmentLink = page.getByRole('link', { name: 'Bulk Appointment' });
 
         // Non Graphical
-        this.nonGraphicalLink = page.getByRole('link', {name: 'Non Graphical'});
+        this.nonGraphicalLink = page.getByRole('link', { name: 'Non Graphical' });
 
         // Uploaded Files widget
-        this.uploadedFilesWidget = page.getByText('Uploaded Files', {exact: true});
-        this.showFilesToConfirmBtn = page.getByRole('button', {name: 'Show Files to Confirm'});
-        this.filePreviewIcon = page.getByTitle('File Preview', {exact: true}).first();
-        this.selectCategoryButton = page.getByRole('button', {name: 'Select Category'});
+        this.uploadedFilesWidget = page.getByText('Uploaded Files', { exact: true });
+        this.showFilesToConfirmBtn = page.getByRole('button', { name: 'Show Files to Confirm' });
+        this.filePreviewIcon = page.getByTitle('File Preview', { exact: true }).first();
+        this.selectCategoryButton = page.getByRole('button', { name: 'Select Category' });
         this.selectCategoryDropdownCheckbox = page.locator("xpath=//input[@type='checkbox' and contains(@class,'Document')]//following-sibling::ins[1]");
         this.confirmButton = page.locator('#btnConfirmFile:visible');
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
@@ -45,13 +54,21 @@ class AdminPortalHomePage extends BasePage {
 
     }
 
-    // Dynamic Locator
+    /**
+     * Returns a dynamic locator for a specific report category link in the Report Center.
+     * @param {string} sectionName - The report category name.
+     * @returns {import('@playwright/test').Locator} Locator for the report category element.
+      **/
     getReportSection(sectionName) {
         return this.page.locator(
             `.ReportCenter_${sectionName.replaceAll(" ", "")}`
         );
     }
 
+    /**
+     * Navigates to a specific section within the Report Center.
+     * @param {string} sectionName - The name of the report section to navigate to.
+    **/
     async navigateToReportSection(sectionName) {
         await this.click(this.reportCenter);
 
@@ -61,32 +78,49 @@ class AdminPortalHomePage extends BasePage {
         await this.click(reportSection);
     }
 
+    /**
+     * Navigates to the Single Instructor scheduling page via Scheduling menu.
+    **/
     async navigateToSingleInstructor() {
         await this.click(this.schedulingMenu);
         await this.click(this.singleInstructorLink);
     }
 
+    /**
+     * Navigates to the New Student Enrollment page.
+    **/
     async navigateToNewStudentEnrollment() {
         await this.click(this.newStudentEnrollment);
     }
 
+    /**
+     * Opens the Student Account menu and navigates to the Enrollment/Billing page.
+    **/
     async openEnrollmentBilling() {
         await this.studentAccount.click();
         await this.enrollmentBilling.click();
     }
 
+    /**
+     * Navigates to the Bulk Appointment scheduling page via Scheduling -> Manage Time Slots.
+    **/
     async navigateToBulkAppointment() {
         await this.click(this.schedulingMenu);
         await this.click(this.manageTimeSlotsLink);
         await this.click(this.bulkAppointmentLink);
     }
 
+    /**
+     * Navigates to the Non Graphical scheduling page via Scheduling menu.
+    **/
     async navigateToNonGraphical() {
         await this.click(this.schedulingMenu);
         await this.click(this.nonGraphicalLink);
     }
 
-
+    /**
+     * Confirms uploaded student documents in the Uploaded Files dashboard widget and sends a confirmation email.
+    **/
     async clickShowFilesToConfirm() {
         await this.verifyVisible(this.uploadedFilesWidget);
         await this.click(this.showFilesToConfirmBtn);
@@ -95,12 +129,11 @@ class AdminPortalHomePage extends BasePage {
         await this.click(this.selectCategoryDropdownCheckbox);
         await this.click(this.confirmButton);
         await this.click(this.yesConfirmationButton);
-        await this.page.getByText(' File has been confirmed', {exact: true})
-        await expect(this.page.getByText(' File has been confirmed', {exact: true})).toBeVisible();
+        await this.page.getByText(' File has been confirmed', { exact: true })
+        await expect(this.page.getByText(' File has been confirmed', { exact: true })).toBeVisible();
         await this.click(this.sendButton);
-
-        await this.page.getByText('Email sent successfully.', {exact: true})
-        await expect(this.page.getByText('Email sent successfully.', {exact: true})).toBeVisible();
+        await this.page.getByText('Email sent successfully.', { exact: true })
+        await expect(this.page.getByText('Email sent successfully.', { exact: true })).toBeVisible();
     }
 
 
