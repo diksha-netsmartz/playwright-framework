@@ -17,6 +17,7 @@ class StudentLoginPage extends BasePage {
         this.usernameTxt = page.getByRole('textbox', { name: 'Username' });
         this.passwordTxt = page.getByRole('textbox', { name: 'Password' });
         this.loginBtn = page.getByRole('button', { name: 'Login' });
+        this.profileDropdownOnHomepage = page.locator("#userprofileSettings");
     }
 
     /**
@@ -36,6 +37,8 @@ class StudentLoginPage extends BasePage {
         await this.fill(this.usernameTxt, username);
         await this.fill(this.passwordTxt, password);
         await this.click(this.loginBtn);
+        await this.verifyTitle("Student Home");
+        await this.verifyVisible(this.profileDropdownOnHomepage);
     }
 
 }
