@@ -20,6 +20,7 @@ class NewStudentEnrollmentPage extends BasePage {
         this.packageSelectionButton = page.getByRole('button', {
             name: 'Package Selection'
         });
+        this.rtPackageOption = page.locator("xpath=//a[@data-packtype='RT']");
 
         this.addPackageButton = page.getByRole('button', {
             name: 'Add Package'
@@ -36,7 +37,6 @@ class NewStudentEnrollmentPage extends BasePage {
         });
 
         this.selectButton = page.locator("xpath=//a[text()='Select' and @onclick='showAddButton(this);']").first();
-
         this.addButton = page.locator("xpath=//button[text()='Add' and contains(@onclick,'showSelect(this);')]").first();
         this.addButtonForAdditionalDetails = page.locator("xpath=//td[text()='Fee']//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')]").first();
 
@@ -72,6 +72,8 @@ class NewStudentEnrollmentPage extends BasePage {
         this.zipCode = page.getByRole('textbox', {
             name: 'Zip Code'
         });
+
+        this.homePhone = page.getByRole('textbox', { name: 'Home Phone' });
 
         this.studentCellPhone = page.getByRole('textbox', {
             name: 'Student Cell Phone'
@@ -148,6 +150,18 @@ class NewStudentEnrollmentPage extends BasePage {
         this.dobYearDropdown = page.locator("xpath=//button[@data-id='int_DOB_Year']");
 
         this.dobYear = page.locator("xpath=//button[@data-id='int_DOB_Year']//following-sibling::div//a//span[text()='2006']");
+
+        this.highSchoolDropdown = page.locator("xpath=//button[contains(@data-id,'HighSchool')]//span[text()='Please Select']");
+        this.highSchoolDropdownSelection = page.locator("xpath=(//button[contains(@data-id,'HighSchool')]//parent::div//span[contains(text(),'High')])[1]");
+        this.wearGlassesDropdown = page.locator("xpath=//button[contains(@data-id,'WearGlasses')]//span[text()='Please Select']");
+        this.wearGlassesDropdownSelection = page.locator("xpath=//button[contains(@data-id,'WearGlasses')]//parent::div//span[text()='Yes']");
+        this.leadDropdown = page.locator("xpath=//button[contains(@data-id,'Lead')]//span[text()='Please Select']");
+        this.leadDropdownSelection = page.locator("xpath=(//button[contains(@data-id,'Lead')]//parent::div//span[contains(text(),'Lead')])[1]");
+        this.permitIssuedDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Issued Date']");
+        this.permitIssueDateSelectInCalendar = page.locator("xpath=(//div[contains(@class,'datepicker-days')]//td)[1]");
+        this.permitExpirationDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Expiration Date']")
+        this.permitExpireDateSelectInCalendar = page.locator("xpath=(//div[contains(@class,'datepicker-days')]//td)[last()]");
+
     }
 
     /**
@@ -156,10 +170,11 @@ class NewStudentEnrollmentPage extends BasePage {
     **/
     async selectPackage(packageName) {
         await this.packageSelectionButton.click();
-
-        await this.page.getByRole('link', {
-            name: packageName, exact: true
-        }).click();
+        if (packageName === 'RT Package') {
+            await this.click(this.rtPackageOption);
+        }
+        else
+            await this.page.getByRole('link', { name: packageName, exact: true }).click();
     }
 
     /**
@@ -212,7 +227,7 @@ class NewStudentEnrollmentPage extends BasePage {
                 await this.selectStudentType("Teen");
                 break;
 
-            case 'RT PAckage 1':
+            case 'RT Package':
                 await this.selectButton.click();
                 await this.addButton.click();
                 await this.addToCartButton.click();
@@ -259,43 +274,33 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.click(this.stateOptionValue);
         await this.address.fill(data.address);
         await this.zipCode.fill(data.zipCode);
+        await this.homePhone.fill(data.homePhone);
         await this.studentCellPhone.fill(data.studentCellPhone);
         await this.studentEmail.fill(data.studentEmail);
         await this.parentName.fill(data.parentName);
         await this.parentCellPhone.fill(data.parentCellPhone);
         await this.parentEmail.fill(data.parentEmail);
         await this.parentName2.fill(data.parentName2);
-        if (data.parentPhone2) {
-            await this.parentPhone2.fill(
-                data.parentPhone2
-            );
-        }
+        await this.parentPhone2.fill(data.parentPhone2);
         await this.parentEmail2.fill(data.parentEmail2);
         await this.emergencyName.fill(data.emergencyName);
-        await this.emergencyRelationship.fill(
-            data.emergencyRelationship
-        );
-
-        if (data.emergencyPhone) {
-            await this.emergencyPhone.fill(
-                data.emergencyPhone
-            );
-        }
-
+        await this.emergencyRelationship.fill(data.emergencyRelationship);
+        await this.emergencyPhone.fill(data.emergencyPhone);
+        await this.click(this.highSchoolDropdown);
+        await this.click(this.highSchoolDropdownSelection);
+        await this.click(this.wearGlassesDropdown);
+        await this.click(this.wearGlassesDropdownSelection);
         await this.maleCheckbox.check({ force: true });
         await this.permitNumber.fill(data.permitNumber);
-
-        await this.medicalConditions.fill(
-            data.medicalConditions
-        );
-
-        await this.studentNotes.fill(
-            data.studentNotes
-        );
-
-        await this.drivingNotes.fill(
-            data.drivingNotes
-        );
+        await this.click(this.permitIssuedDateCalendarIcon);
+        await this.click(this.permitIssueDateSelectInCalendar);
+        await this.click(this.permitExpirationDateCalendarIcon);
+        await this.click(this.permitExpireDateSelectInCalendar);
+        await this.medicalConditions.fill(data.medicalConditions);
+        await this.studentNotes.fill(data.studentNotes);
+        await this.drivingNotes.fill(data.drivingNotes);
+        await this.click(this.leadDropdown);
+        await this.click(this.leadDropdownSelection);
         await this.termsConditionsCheckbox.check({ force: true });
     }
 
