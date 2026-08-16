@@ -197,12 +197,12 @@ export class EnrollmentBillingPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Delete enrollment link locator.
       **/
     deleteLink(databaseID) {
-        return this.page.locator(`xpath=//a[@data-toggle='confirmationDeleteEnrollment' and @data-enrollmentid='${databaseID}']`);
+        return this.page.locator(`xpath=(//a[@data-toggle='confirmationDeleteEnrollment' and @data-enrollmentid='${databaseID}'])[1]`);
     }
 
     /**
      * Returns locator for the student autocomplete list item matching the specified name.
-     * @param {string} studentName - Student name.
+     * @param {string} studentName - Student name. 
      * @returns {import('@playwright/test').Locator} Student dropdown item locator.
       **/
     studentDropdownValue(studentName) {
@@ -262,6 +262,7 @@ export class EnrollmentBillingPage extends BasePage {
 
         await this.editButton.click();
         const packageId = await this.getText(this.getLatestPackageID);
+        console.log("package id : " + packageId);
         await this.editDetailsTab(packageId).click();
         try {
             await this.skipSelectionButton.waitFor({ state: 'visible', timeout: 5000 });
@@ -415,7 +416,7 @@ export class EnrollmentBillingPage extends BasePage {
         ).toBeVisible();
 
         await this.closeButton.click();
-        await this.page.waitForLoadState('networkidle');
+        // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
         await this.addNewBilling.waitFor({ state: 'visible' });
 
@@ -450,7 +451,7 @@ export class EnrollmentBillingPage extends BasePage {
         ).toBeVisible();
 
         await this.closeButton.click();
-        await this.page.waitForLoadState('networkidle');
+        // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
         await this.addNewBilling.waitFor({ state: 'visible' });
 
@@ -493,7 +494,7 @@ export class EnrollmentBillingPage extends BasePage {
             )
         ).toBeVisible();
         await this.closeButton.click();
-        await this.page.waitForLoadState('networkidle');
+        // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
         await this.addNewBilling.waitFor({ state: 'visible' });
         const amountAfter = await this.getBillingAmount();

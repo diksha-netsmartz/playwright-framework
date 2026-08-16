@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import EnrollmentBillingPage from '../../pages/AdminApplication/EnrollmentBillingPage';
@@ -6,7 +6,7 @@ import HomePage from '../../pages/AdminApplication/AdminPortalHomePage'
 import login from "../../test-data/login.json";
 import studentData from "../../test-data/studentData.json"
 
-test('Add , edit and delete packages', async ({page}) => {
+test('Add , edit and delete packages', async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -21,19 +21,10 @@ test('Add , edit and delete packages', async ({page}) => {
     );
 
     await homePage.openEnrollmentBilling();
-
-
     await enrollmentBillingPage.selectStudent(studentData.student1.name);
-
     await enrollmentBillingPage.clickAddNew();
-
     await enrollmentBillingPage.addCRPackage();
-
-
     await enrollmentBillingPage.enroll();
-
     await enrollmentBillingPage.editAndUpdateNotes();
-
-
     await enrollmentBillingPage.editAndDelete();
 });

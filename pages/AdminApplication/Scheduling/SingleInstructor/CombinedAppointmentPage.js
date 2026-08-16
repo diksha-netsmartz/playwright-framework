@@ -369,14 +369,8 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {Object} student - Student test data object.
      **/
     async fillStudentDetails(studentNo, student) {
-        await this.getStudentTextbox(studentNo).fill(student.name);
-
-        await this.page
-            .getByRole("option", {
-                name: student.option,
-            })
-            .click();
-
+        await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 200 });
+        await this.page.getByRole("option", { name: student.option, }).first().click();
         await this.clickServiceDropdown(studentNo).click();
         await this.selectServiceDropdownValue(studentNo).click();
 

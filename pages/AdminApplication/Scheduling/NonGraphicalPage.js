@@ -21,6 +21,7 @@ export default class NonGraphicalPage extends BasePage {
 
         // Slot selection
         this.firstSlotCheckbox = page.locator("xpath=(//input[contains(@id,'BookSlot')]//following-sibling::span)[1]");
+        this.noRecordsFound = page.locator("xpath=//td[text()='No records found.']");
         this.appointmentTypeDropdown = page.locator('#drp_OpenSlotBookAppointment_product_0');
         this.statusTypeDropdown = page.locator('#drp_OpenSlotBookAppointment_AppointmentStatus_0');
 
@@ -67,11 +68,36 @@ export default class NonGraphicalPage extends BasePage {
     }
 
     /**
-     * Selects the first available/highlighted date in the date picker calendar.
+     * Iterates through available/highlighted dates in the date picker calendar until a date with open time slots is found.
+     * If 'No records found.' is displayed, it clicks the next available highlighted date.
     **/
     async selectFirstAvailableDate() {
-        const firstGreenDate = this.page.locator('td.ui-highlight:not(.ui-datepicker-current-day) a').first();
-        await this.click(firstGreenDate);
+        const availableDates = this.page.locator('td.ui-highlight:not(.ui-datepicker-current-day) a');
+        const count = await availableDates.count();
+
+        if (count === 0) {
+            throw new Error('No highlighted dates found in the calendar.');
+        }
+
+        for (let i = 0; i < count; i++) {
+            const dateToClick = availableDates.nth(i);
+            await this.click(dateToClick);
+
+            // Wait for the slots table to refresh after selecting the date
+            await this.page.waitForTimeout(1000);
+
+            const hasNoRecords = await this.noRecordsFound.isVisible();
+            const hasSlot = await this.firstSlotCheckbox.isVisible();
+
+            if (!hasNoRecords && hasSlot) {
+                console.log(`Found available slots on highlighted date #${i + 1}`);
+                return;
+            }
+
+            console.log(`'No records found.' on date #${i + 1}. Trying next available date...`);
+        }
+
+        throw new Error('No open slots found for any of the highlighted dates in the calendar.');
     }
 
     /**
@@ -83,22 +109,49 @@ export default class NonGraphicalPage extends BasePage {
     }
 
     /**
-     * Selects the last available appointment product type from the appointment type dropdown.
+     * Selects an available appointment product type from the appointment type dropdown (excluding 'Please select').
     **/
     async selectAppointmentType() {
         await this.appointmentTypeDropdown.waitFor({ state: 'visible' });
 
+        // Wait until dropdown is populated with at least one valid option (not 'Please select' or empty)
         await this.page.waitForFunction(() => {
             const select = document.querySelector('#drp_OpenSlotBookAppointment_product_0');
-            return select && Array.from(select.options).filter(o => o.value !== '').length > 0;
+            if (!select) return false;
+            return Array.from(select.options).some(opt => {
+                const text = (opt.text || '').trim().toLowerCase();
+                const value = (opt.value || '').trim().toLowerCase();
+                return (
+                    value !== '' &&
+                    value !== '0' &&
+                    !value.includes('please select') &&
+                    !text.includes('please select') &&
+                    text !== 'select'
+                );
+            });
+        }, { timeout: 10000 });
+
+        const validOptionValue = await this.appointmentTypeDropdown.evaluate(select => {
+            const validOptions = Array.from(select.options).filter(opt => {
+                const text = (opt.text || '').trim().toLowerCase();
+                const value = (opt.value || '').trim().toLowerCase();
+                return (
+                    value !== '' &&
+                    value !== '0' &&
+                    !value.includes('please select') &&
+                    !text.includes('please select') &&
+                    text !== 'select'
+                );
+            });
+            return validOptions.length > 0 ? validOptions.at(-1).value : null;
         });
 
-        const lastOptionValue = await this.appointmentTypeDropdown.evaluate(select =>
-            Array.from(select.options).filter(o => o.value !== '').at(-1).value
-        );
+        if (!validOptionValue) {
+            throw new Error("No valid appointment product type found in dropdown (only 'Please select' present).");
+        }
 
-        console.log("Last appointment type option value:", lastOptionValue);
-        await this.appointmentTypeDropdown.selectOption(lastOptionValue);
+        console.log("Selected appointment type option value:", validOptionValue);
+        await this.appointmentTypeDropdown.selectOption(validOptionValue);
     }
 
     /**
