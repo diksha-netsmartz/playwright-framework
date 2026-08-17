@@ -188,7 +188,7 @@ export class EnrollmentBillingPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Edit details tab locator.
       **/
     editDetailsTab(databaseID) {
-        return this.page.locator(`xpath=//a[@onclick='GetEnrollmentDetail(${databaseID})']`);
+        return this.page.locator(`xpath=(//a[@onclick='GetEnrollmentDetail(${databaseID})'])[last()]`);
     }
 
     /**
@@ -267,7 +267,11 @@ export class EnrollmentBillingPage extends BasePage {
         }
         await this.fill(this.notesTextbox, "updating package notes");
         await this.click(this.updateButton);
-        await this.click(this.yesConfirmationButton);
+        await this.page.waitForTimeout(2000);
+        if (await this.isVisible(this.yesConfirmationButton)) {
+            await this.click(this.yesConfirmationButton);
+            await this.waitForLoaders();
+        }
     }
 
     /**
@@ -286,6 +290,7 @@ export class EnrollmentBillingPage extends BasePage {
     **/
     async selectStudent(studentName) {
         await this.click(this.studentNotSelected);
+        await this.verifyVisible(this.studentSearch);
         await this.pressSequentially(this.studentSearch, studentName);
         await this.click(this.studentDropdownValue(studentName.replace(" ", ", ")));
         await this.click(this.goButton);
