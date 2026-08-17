@@ -1,4 +1,4 @@
-import {test} from "@playwright/test";
+import { test } from "@playwright/test";
 
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
@@ -13,7 +13,7 @@ import login from "../../test-data/login.json";
  * Precondition: Create new appt using TC_001 (Appointment should be created for past date to verify this test case)
  * Expected Result: Appointment slot should become empty
  **/
-test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled", async ({page}) => {
+test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled", async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -59,5 +59,5 @@ test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled",
     await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
 
     // Cleanup: Delete remaining appointment slot
-    await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
+    // await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
 });
