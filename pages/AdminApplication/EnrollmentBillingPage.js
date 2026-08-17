@@ -213,7 +213,7 @@ export class EnrollmentBillingPage extends BasePage {
      * Clicks the 'Add New' button in the enrollment section.
     **/
     async clickAddNew() {
-        await this.addNewButton.click();
+        await this.click(this.addNewButton);
     }
 
     /**
@@ -221,37 +221,33 @@ export class EnrollmentBillingPage extends BasePage {
      * @param {string} packageName - Name of the package to select.
     **/
     async selectPackage(packageName) {
-
-        await this.packageSelectionButton.click();
-
-        await this.page.getByRole('link', {
+        await this.click(this.packageSelectionButton);
+        await this.click(this.page.getByRole('link', {
             name: packageName,
             exact: true
-        }).click();
+        }));
     }
 
     /**
      * Completes the entire workflow to add a CR Package to cart (location, filter, select slot, additional details).
     **/
     async addCRPackage() {
-
         await this.selectPackage('CR Package');
-        await this.addPackageButton.click();
-        await this.selectLocationDropdown.click();
-        await this.showAllCheckbox.click();
-        await this.filterButton.click();
-        await this.selectButton.click();
-        // await this.addButton.click();
-        await this.addButtonForAdditionalDetails.click();
-        await this.addToCartButton.click();
+        await this.click(this.addPackageButton);
+        await this.click(this.selectLocationDropdown);
+        await this.click(this.showAllCheckbox);
+        await this.click(this.filterButton);
+        await this.click(this.selectButton);
+        // await this.click(this.addButton);
+        await this.click(this.addButtonForAdditionalDetails);
+        await this.click(this.addToCartButton);
     }
 
     /**
      * Clicks the Enroll button and confirms the confirmation dialog.
     **/
     async enroll() {
-
-        await this.enrollButton.click();
+        await this.click(this.enrollButton);
         await this.click(this.yesConfirmationButton);
     }
 
@@ -259,30 +255,29 @@ export class EnrollmentBillingPage extends BasePage {
      * Edits the latest CR package enrollment, updates notes, saves, and confirms.
     **/
     async editAndUpdateNotes() {
-
-        await this.editButton.click();
+        await this.click(this.editButton);
         const packageId = await this.getText(this.getLatestPackageID);
         console.log("package id : " + packageId);
-        await this.editDetailsTab(packageId).click();
+        await this.click(this.editDetailsTab(packageId));
         try {
-            await this.skipSelectionButton.waitFor({ state: 'visible', timeout: 5000 });
-            await this.skipSelectionButton.click();
+            await this.waitForVisible(this.skipSelectionButton);
+            await this.click(this.skipSelectionButton);
         } catch {
             // Button not present, continue
         }
-        await this.notesTextbox.fill("updating package notes");
-        await this.updateButton.click();
-        await this.yesConfirmationButton.click();
+        await this.fill(this.notesTextbox, "updating package notes");
+        await this.click(this.updateButton);
+        await this.click(this.yesConfirmationButton);
     }
 
     /**
      * Deletes the latest CR Package enrollment and confirms the action.
     **/
     async editAndDelete() {
-        await this.editButton.click();
+        await this.click(this.editButton);
         const packageId = await this.getText(this.getLatestPackageID);
-        await this.deleteLink(packageId).click();
-        await this.yesConfirmationButton.click();
+        await this.click(this.deleteLink(packageId));
+        await this.click(this.yesConfirmationButton);
     }
 
     /**
@@ -290,15 +285,10 @@ export class EnrollmentBillingPage extends BasePage {
      * @param {string} studentName - Student's name to search.
     **/
     async selectStudent(studentName) {
-
-        await this.studentNotSelected.click();
-        await this.studentSearch.isVisible();
+        await this.click(this.studentNotSelected);
         await this.studentSearch.pressSequentially(studentName, { delay: 100 });
-
-
-        await this.studentDropdownValue(studentName.replace(" ", ", ")).click();
-
-        await this.goButton.click();
+        await this.click(this.studentDropdownValue(studentName.replace(" ", ", ")));
+        await this.click(this.goButton);
     }
 
     /**
@@ -317,7 +307,7 @@ export class EnrollmentBillingPage extends BasePage {
      * @returns {Promise<number|null>} Parsed float amount or null.
       **/
     async getBillingAmount() {
-        const text = await this.billingAmountCaption.textContent();
+        const text = await this.getText(this.billingAmountCaption);
         // console.log("billing amount : " + text);
         const match = text.match(/\$([\d,]+\.?\d*)/);
         return match ? parseFloat(match[1].replace(',', '')) : null;
@@ -329,31 +319,24 @@ export class EnrollmentBillingPage extends BasePage {
     async addSwipedTransaction() {
         const amountBefore = await this.getBillingAmount();
 
-        await this.addNewBilling.click();
-        await this.swipedTransaction.click();
+        await this.click(this.addNewBilling);
+        await this.click(this.swipedTransaction);
         await this.swipeAmountTextbox.clear();
-        await this.swipeAmountTextbox.fill(paymentData.swipedTransaction.amount);
-        await this.last4Digits.fill(paymentData.swipedTransaction.last4Digits);
-        await this.cardTypeSelectDropdown.click();
-        await this.discover.click();
-        await this.transactionNumber.fill(paymentData.swipedTransaction.transactionNumber);
-        await this.receiptNumber.fill(paymentData.swipedTransaction.receiptNumber);
-        await this.cashNotesTextbox.fill(paymentData.swipedTransaction.notes)
-        await this.saveButton.click();
-        await this.yesConfirmationButton.click();
-        await this.page.getByText('Payment Entered', { exact: true })
+        await this.fill(this.swipeAmountTextbox, paymentData.swipedTransaction.amount);
+        await this.fill(this.last4Digits, paymentData.swipedTransaction.last4Digits);
+        await this.click(this.cardTypeSelectDropdown);
+        await this.click(this.discover);
+        await this.fill(this.transactionNumber, paymentData.swipedTransaction.transactionNumber);
+        await this.fill(this.receiptNumber, paymentData.swipedTransaction.receiptNumber);
+        await this.fill(this.cashNotesTextbox, paymentData.swipedTransaction.notes);
+        await this.click(this.saveButton);
+        await this.click(this.yesConfirmationButton);
+        await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
 
-        await expect(
-            this.page.getByText(
-                'Payment Entered',
-                { exact: true }
-            )
-        ).toBeVisible();
-
-        await this.closeButton.click();
+        await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
-        // await this.addNewBilling.waitFor({state: 'visible'});
+        // await this.waitForVisible(this.addNewBilling);
 
         const amountAfter = await this.getBillingAmount();
         expect(amountAfter).not.toEqual(amountBefore);
@@ -365,30 +348,22 @@ export class EnrollmentBillingPage extends BasePage {
     async addCheckPayment() {
         const amountBefore = await this.getBillingAmount();
 
-        await this.addNewBilling.click();
-        await this.checkPayment.click();
+        await this.click(this.addNewBilling);
+        await this.click(this.checkPayment);
         await this.checkAmount.clear();
-        await this.checkAmount.fill(paymentData.checkPayment.amount);
-        await this.checkNumber.fill(paymentData.checkPayment.checkNumber);
-        await this.receiptNumber.fill(paymentData.checkPayment.receiptNumber);
-        await this.chequeNotesTextbox.fill(paymentData.checkPayment.notes);
-        await this.chequeDeposited.click();
-        await this.saveButton.click();
-        await this.yesConfirmationButton.click();
-        await this.page.getByText('Payment Entered', { exact: true })
+        await this.fill(this.checkAmount, paymentData.checkPayment.amount);
+        await this.fill(this.checkNumber, paymentData.checkPayment.checkNumber);
+        await this.fill(this.receiptNumber, paymentData.checkPayment.receiptNumber);
+        await this.fill(this.chequeNotesTextbox, paymentData.checkPayment.notes);
+        await this.click(this.chequeDeposited);
+        await this.click(this.saveButton);
+        await this.click(this.yesConfirmationButton);
+        await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
 
-        await expect(
-            this.page.getByText(
-                'Payment Entered',
-                { exact: true }
-            )
-        ).toBeVisible();
-
-
-        await this.closeButton.click();
+        await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidleidle');
         await this.waitForLoaders();
-        await this.addNewBilling.waitFor({ state: 'visible' });
+        await this.waitForVisible(this.addNewBilling);
         const amountAfter = await this.getBillingAmount();
         expect(amountAfter).not.toEqual(amountBefore);
     }
@@ -399,26 +374,20 @@ export class EnrollmentBillingPage extends BasePage {
     async addCashPayment() {
         const amountBefore = await this.getBillingAmount();
 
-        await this.addNewBilling.click();
-        await this.cashPayment.click();
+        await this.click(this.addNewBilling);
+        await this.click(this.cashPayment);
         await this.cashAmountTextbox.clear();
-        await this.cashAmountTextbox.fill(paymentData.cashPayment.amount);
-        await this.receiptNumber.fill(paymentData.cashPayment.receiptNumber);
-        await this.cashNotesTextbox.fill(paymentData.cashPayment.notes);
-        await this.saveButton.click();
-        await this.yesConfirmationButton.click();
-        await this.page.getByText('Payment Entered', { exact: true })
-        await expect(
-            this.page.getByText(
-                'Payment Entered',
-                { exact: true }
-            )
-        ).toBeVisible();
+        await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
+        await this.fill(this.receiptNumber, paymentData.cashPayment.receiptNumber);
+        await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
+        await this.click(this.saveButton);
+        await this.click(this.yesConfirmationButton);
+        await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
 
-        await this.closeButton.click();
+        await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
-        await this.addNewBilling.waitFor({ state: 'visible' });
+        await this.waitForVisible(this.addNewBilling);
 
         const amountAfter = await this.getBillingAmount();
         expect(amountAfter).not.toEqual(amountBefore);
@@ -430,30 +399,22 @@ export class EnrollmentBillingPage extends BasePage {
     async addAdjustment() {
         const amountBefore = await this.getBillingAmount();
 
-        await this.addNewBilling.click();
-
-        await this.adjustment.click();
+        await this.click(this.addNewBilling);
+        await this.click(this.adjustment);
         await this.cashAmountTextbox.clear();
-        await this.cashAmountTextbox.fill(paymentData.adjustment.amount);
-        await this.selectButton.click();
-        await this.refundAddToBalance.click();
-        await this.receiptNumber.fill(paymentData.adjustment.receiptNumber);
-        await this.cashNotesTextbox.fill(paymentData.adjustment.notes);
-        await this.saveButton.click();
-        await this.yesConfirmationButton.click();
-        await this.page.getByText('Adjustment Entered', { exact: true })
+        await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
+        await this.click(this.selectButton);
+        await this.click(this.refundAddToBalance);
+        await this.fill(this.receiptNumber, paymentData.adjustment.receiptNumber);
+        await this.fill(this.cashNotesTextbox, paymentData.adjustment.notes);
+        await this.click(this.saveButton);
+        await this.click(this.yesConfirmationButton);
+        await this.verifyVisible(this.page.getByText('Adjustment Entered', { exact: true }));
 
-        await expect(
-            this.page.getByText(
-                'Adjustment Entered',
-                { exact: true }
-            )
-        ).toBeVisible();
-
-        await this.closeButton.click();
+        await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
-        await this.addNewBilling.waitFor({ state: 'visible' });
+        await this.waitForVisible(this.addNewBilling);
 
         const amountAfter = await this.getBillingAmount();
         expect(amountAfter).not.toEqual(amountBefore);
@@ -465,38 +426,30 @@ export class EnrollmentBillingPage extends BasePage {
     async processCreditCardPayment() {
         const amountBefore = await this.getBillingAmount();
 
-        await this.addNewBilling.click();
+        await this.click(this.addNewBilling);
+        await this.click(this.processCreditCard);
 
-        await this.processCreditCard.click();
+        // await this.click(this.amount);
+        // await this.click(this.sameAddress);
 
-        // await this.amount.click();
-        // await this.sameAddress.click();
-
-        await this.cardNumber.fill(paymentData.processCreditCard.cardNumber);
-        await this.expiryDate.fill(paymentData.processCreditCard.expiryDate);
-        await this.cvv.fill(paymentData.processCreditCard.cvv);
-        await this.nameOnCard.fill(paymentData.processCreditCard.nameOnCard);
-        await this.receiptNumber.fill(paymentData.processCreditCard.receiptNumber);
-        await this.nameOnCard.fill(paymentData.processCreditCard.nameOnCard);
-        await this.billingAddress.fill(paymentData.processCreditCard.billingAddress);
-        await this.billingCity.fill(paymentData.processCreditCard.billingCity);
-        await this.billStateDropdown.click();
-        await this.billStateDropdownValue.click();
-        await this.billingZipCode.fill(paymentData.processCreditCard.billingZipCode);
-        await this.cashNotesTextbox.fill(paymentData.processCreditCard.notes);
-        await this.saveButton.click();
-        await this.yesConfirmationButton.click();
-        await this.page.getByText('Payment Approved', { exact: true })
-        await expect(
-            this.page.getByText(
-                'Payment Approved',
-                { exact: true }
-            )
-        ).toBeVisible();
-        await this.closeButton.click();
+        await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
+        await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
+        await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+        await this.fill(this.nameOnCard, paymentData.processCreditCard.nameOnCard);
+        await this.fill(this.receiptNumber, paymentData.processCreditCard.receiptNumber);
+        await this.fill(this.billingAddress, paymentData.processCreditCard.billingAddress);
+        await this.fill(this.billingCity, paymentData.processCreditCard.billingCity);
+        await this.click(this.billStateDropdown);
+        await this.click(this.billStateDropdownValue);
+        await this.fill(this.billingZipCode, paymentData.processCreditCard.billingZipCode);
+        await this.fill(this.cashNotesTextbox, paymentData.processCreditCard.notes);
+        await this.click(this.saveButton);
+        await this.click(this.yesConfirmationButton);
+        await this.verifyVisible(this.page.getByText('Payment Approved', { exact: true }));
+        await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
-        await this.addNewBilling.waitFor({ state: 'visible' });
+        await this.waitForVisible(this.addNewBilling);
         const amountAfter = await this.getBillingAmount();
         expect(amountAfter).not.toEqual(amountBefore);
     }

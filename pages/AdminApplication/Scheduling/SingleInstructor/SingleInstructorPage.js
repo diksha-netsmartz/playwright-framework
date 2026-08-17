@@ -184,11 +184,11 @@ export default class SingleInstructorPage extends BasePage {
         const monthDiff = (todayYear - year) * 12 + (todayMonth - month);
 
         for (let i = 0; i < monthDiff; i++) {
-            await this.calendarPrevBtn.click();
+            await this.click(this.calendarPrevBtn);
             await this.page.waitForTimeout(300);
         }
 
-        await this.page.locator(`xpath=//a[@data-value="${dataValue}"]`).first().click();
+        await this.click(this.page.locator(`xpath=//a[@data-value="${dataValue}"]`).first());
     }
 
     /**
@@ -298,11 +298,11 @@ export default class SingleInstructorPage extends BasePage {
         await slot.click({ button: "right" });
         await this.page.waitForTimeout(2500);
         try {
-            await this.createAppointmentOnRightClick(appointmentType).waitFor({ state: "visible", timeout: 3000, });
+            await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
         } catch {
             console.log("right click menu options not visible, right clicking again");
             await slot.click({ button: "right" });
-            await this.createAppointmentOnRightClick(appointmentType).waitFor({ state: "visible", timeout: 3000, });
+            await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
         }
         await this.click(this.createAppointmentOnRightClick(appointmentType));
     }
@@ -312,22 +312,18 @@ export default class SingleInstructorPage extends BasePage {
      * @param notesValue - Unique notes value identifying the appointment.
      **/
     async editAppointment(notesValue) {
-        await this.listMenuOfCreatedAppointment(notesValue).isVisible();
-        // await this.listMenuOfCreatedAppointment(notesValue).click();
+        await this.isVisible(this.listMenuOfCreatedAppointment(notesValue));
         await this.listMenuOfCreatedAppointment(notesValue).click({ force: true });
 
         try {
-            await this.editAppointmentLink.waitFor({
-                state: "visible",
-                timeout: 3000,
-            });
+            await this.waitForVisible(this.editAppointmentLink);
         } catch {
             console.log("edit appointment link was not visible. Re-clicking the list menu...");
 
-            await this.listMenuOfCreatedAppointment(notesValue).click();
-            await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
+            await this.click(this.listMenuOfCreatedAppointment(notesValue));
+            await this.waitForVisible(this.editAppointmentLink);
         }
-        await this.editAppointmentLink.click();
+        await this.click(this.editAppointmentLink);
     }
 
     /**
@@ -351,21 +347,18 @@ export default class SingleInstructorPage extends BasePage {
         for (let i = 0; i < count; i++) {
             console.log(`Opening and verifying appointment ${i + 1} of ${count}...`);
             const menu = menus.nth(i);
-            await menu.waitFor({ state: "visible", timeout: 5000 });
+            await this.waitForVisible(menu);
             await menu.click({ force: true });
 
             try {
-                await this.editAppointmentLink.waitFor({
-                    state: "visible",
-                    timeout: 3000,
-                });
+                await this.waitForVisible(this.editAppointmentLink);
             } catch {
                 console.log(`Edit appointment link was not visible for appointment ${i + 1}. Re-clicking the list menu...`);
                 await menu.click({ force: true });
-                await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
+                await this.waitForVisible(this.editAppointmentLink);
             }
 
-            await this.editAppointmentLink.click();
+            await this.click(this.editAppointmentLink);
             if (pageObj) {
                 await pageObj.verifyCombinedAppointmentCreatedValues();
             }
@@ -378,15 +371,14 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async deleteAppointment(notesValue) {
         await this.listMenuOfCreatedAppointment(notesValue).hover();
-        await this.deleteAppointmentButton(notesValue).isVisible();
-        await this.deleteAppointmentButton(notesValue).click();
-        await this.deleteButtonInPopup.click();
+        await this.isVisible(this.deleteAppointmentButton(notesValue));
+        await this.click(this.deleteAppointmentButton(notesValue));
+        await this.click(this.deleteButtonInPopup);
         await this.deleteButtonInPopup.isHidden();
         await this.waitForLoaders();
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await toast.waitFor();
-        await expect(toast).toBeVisible();
-        await expect(toast).toHaveText('Appointment deleted successfully.');
+        await this.verifyVisible(toast);
+        await this.verifyText(toast, 'Appointment deleted successfully.');
     }
 
     /**
@@ -394,18 +386,18 @@ export default class SingleInstructorPage extends BasePage {
      * @param notesValue - Unique notes value identifying the appointment.
      **/
     async copyAppointment(notesValue) {
-        await this.appointmentConfirmed.waitFor({ state: "visible" });
-        await this.listMenuOfCreatedAppointment(notesValue).waitFor({ state: "visible" });
+        await this.waitForVisible(this.appointmentConfirmed);
+        await this.waitForVisible(this.listMenuOfCreatedAppointment(notesValue));
         await this.page.waitForTimeout(2500);
 
         try {
-            await this.copyAppointmentLink.waitFor({ state: "visible", timeout: 3000, });
+            await this.waitForVisible(this.copyAppointmentLink);
         } catch {
             console.log("Copy appointment link was not visible. Re-clicking the list menu...");
-            await this.listMenuOfCreatedAppointment(notesValue).click();
-            await this.copyAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
+            await this.click(this.listMenuOfCreatedAppointment(notesValue));
+            await this.waitForVisible(this.copyAppointmentLink);
         }
-        await this.copyAppointmentLink.click();
+        await this.click(this.copyAppointmentLink);
 
         const maxRetries = 20;
 
@@ -424,8 +416,8 @@ export default class SingleInstructorPage extends BasePage {
             await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
 
             try {
-                await this.submitButtonPopup.waitFor({ state: "visible", timeout: 2000, });
-                await this.submitButtonPopup.click();
+                await this.waitForVisible(this.submitButtonPopup);
+                await this.click(this.submitButtonPopup);
 
             } catch {
                 console.log("Submit confirmation popup did not appear.");
@@ -436,8 +428,8 @@ export default class SingleInstructorPage extends BasePage {
 
             let message = '';
             try {
-                await toastLocator.waitFor({ state: "visible", timeout: 5000 });
-                message = (await toastLocator.textContent())?.trim() || '';
+                await this.waitForVisible(toastLocator);
+                message = (await this.getText(toastLocator))?.trim() || '';
             } catch {
                 console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
             }
@@ -474,38 +466,34 @@ export default class SingleInstructorPage extends BasePage {
      * Deletes an open/cancelled appointment slot and verifies success toast.
      **/
     async deleteCancelledAppointment() {
-        await this.listMenuOfCancelledAppointment.isVisible();
+        await this.isVisible(this.listMenuOfCancelledAppointment);
         await this.listMenuOfCancelledAppointment.hover();
-        await this.deleteCancelledAppointmentButton.isVisible();
-        await this.deleteCancelledAppointmentButton.click();
-        await this.deleteButtonInPopup.click();
+        await this.isVisible(this.deleteCancelledAppointmentButton);
+        await this.click(this.deleteCancelledAppointmentButton);
+        await this.click(this.deleteButtonInPopup);
         await this.deleteButtonInPopup.isHidden();
         await this.waitForLoaders();
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await toast.waitFor();
-        await expect(toast).toBeVisible();
-        await expect(toast).toHaveText('Appointment deleted successfully.');
+        await this.verifyVisible(toast);
+        await this.verifyText(toast, 'Appointment deleted successfully.');
     }
 
     /**
      * Opens the edit modal for a cancelled appointment from its action menu.
      **/
     async editCancelledAppointment() {
-        await this.listMenuOfCancelledAppointment.isVisible();
-        await this.listMenuOfCancelledAppointment.click();
+        await this.isVisible(this.listMenuOfCancelledAppointment);
+        await this.click(this.listMenuOfCancelledAppointment);
 
         try {
-            await this.editAppointmentLink.waitFor({
-                state: "visible",
-                timeout: 3000,
-            });
+            await this.waitForVisible(this.editAppointmentLink);
         } catch {
             console.log("edit appointment link was not visible. Re-clicking the list menu...");
 
-            await this.listMenuOfCancelledAppointment.click();
-            await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
+            await this.click(this.listMenuOfCancelledAppointment);
+            await this.waitForVisible(this.editAppointmentLink);
         }
-        await this.editAppointmentLink.click();
+        await this.click(this.editAppointmentLink);
     }
 
     /**
@@ -514,21 +502,18 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async editNoShowAppointment(notesValue) {
         const listMenu = this.listMenuOfNoShowAppointment(notesValue);
-        await listMenu.isVisible();
-        await listMenu.click();
+        await this.isVisible(listMenu);
+        await this.click(listMenu);
 
         try {
-            await this.editAppointmentLink.waitFor({
-                state: "visible",
-                timeout: 3000,
-            });
+            await this.waitForVisible(this.editAppointmentLink);
         } catch {
             console.log("edit appointment link was not visible. Re-clicking the list menu...");
 
-            await listMenu.click();
-            await this.editAppointmentLink.waitFor({ state: "visible", timeout: 3000 });
+            await this.click(listMenu);
+            await this.waitForVisible(this.editAppointmentLink);
         }
-        await this.editAppointmentLink.click();
+        await this.click(this.editAppointmentLink);
     }
 
 

@@ -47,7 +47,7 @@ class AdminLoginPage extends BasePage {
 
         try {
             if (await captcha.isVisible({ timeout: 3000 })) {
-                await captcha.click();
+                await this.click(captcha);
                 await expect(captcha).toHaveAttribute("aria-checked", "true");
             }
         } catch (e) {

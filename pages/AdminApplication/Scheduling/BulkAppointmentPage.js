@@ -81,11 +81,14 @@ export default class BulkAppointmentPage extends BasePage {
     /**
      * Selects a date range spanning from the 1st of current month to the 25th of next month and applies the filter.
     **/
+    /**
+     * Selects a date range spanning from the 1st of current month to the 25th of next month and applies the filter.
+    **/
     async applyFilter() {
-        await this.selectDate.click();
-        await this.currentMonthFirstDay.click();
-        await this.nextMonthDay.click();
-        await this.filterButton.click();
+        await this.click(this.selectDate);
+        await this.click(this.currentMonthFirstDay);
+        await this.click(this.nextMonthDay);
+        await this.click(this.filterButton);
         await this.waitForLoaders();
     }
 
@@ -94,9 +97,9 @@ export default class BulkAppointmentPage extends BasePage {
      * @param {string} statusName - Name of the status to filter by.
     **/
     async filterByStatus(statusName) {
-        await this.selectStatusDropdown.click();
-        await this.statusMenuOption(statusName).click();
-        await this.filterButton.click();
+        await this.click(this.selectStatusDropdown);
+        await this.click(this.statusMenuOption(statusName));
+        await this.click(this.filterButton);
         await this.waitForLoaders();
     }
 
@@ -105,7 +108,7 @@ export default class BulkAppointmentPage extends BasePage {
     **/
     async selectAppointment() {
         await this.page.waitForTimeout(5000);
-        await this.selectAppointmentCheckbox.click();
+        await this.click(this.selectAppointmentCheckbox);
     }
 
     /**
@@ -113,12 +116,12 @@ export default class BulkAppointmentPage extends BasePage {
     **/
     async editAppointment() {
         await this.selectAppointment();
-        await this.editAppointmentsLink.click();
-        await this.notesTextbox.fill("updating appointment");
-        await this.updateButton.click();
-        await this.yesConfirmationButton.click();
+        await this.click(this.editAppointmentsLink);
+        await this.fill(this.notesTextbox, "updating appointment");
+        await this.click(this.updateButton);
+        await this.click(this.yesConfirmationButton);
         await this.waitForLoaders();
-        await expect(this.page.getByText('Appointments updated successfully.', { exact: true })).toBeVisible();
+        await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
 
     }
 
@@ -127,10 +130,10 @@ export default class BulkAppointmentPage extends BasePage {
     **/
     async deleteAppointment() {
         await this.selectAppointment();
-        await this.deleteAppointmentsLink.click();
-        await this.deleteYesButton.click();
+        await this.click(this.deleteAppointmentsLink);
+        await this.click(this.deleteYesButton);
         await this.waitForLoaders();
-        await expect(this.page.getByText('Appointments deleted successfully.', { exact: true })).toBeVisible();
+        await this.verifyVisible(this.page.getByText('Appointments deleted successfully.', { exact: true }));
 
 
     }
@@ -140,10 +143,10 @@ export default class BulkAppointmentPage extends BasePage {
     **/
     async cancelAppointment() {
         await this.selectAppointment();
-        await this.cancelAppointmentsLink.click();
-        await this.cancelYesButton.click();
+        await this.click(this.cancelAppointmentsLink);
+        await this.click(this.cancelYesButton);
         await this.waitForLoaders();
-        await expect(this.page.getByText('Appointments cancelled successfully.', { exact: true })).toBeVisible();
+        await this.verifyVisible(this.page.getByText('Appointments cancelled successfully.', { exact: true }));
 
 
     }
@@ -153,24 +156,24 @@ export default class BulkAppointmentPage extends BasePage {
     **/
     async shiftAppointment() {
         await this.selectAppointment();
-        await this.shiftAppointmentsLink.click();
+        await this.click(this.shiftAppointmentsLink);
         await this.byDateRadio.check();
-        await this.shiftDateInput.click();
-        await this.selectDateInCalendar.click();
-        await this.staffAvailabilityToggle.click();
-        await this.vehicleAvailabilityToggle.click();
-        await this.shiftBulkUpdateButton.click();
-        await this.yesConfirmationButton.click();
+        await this.click(this.shiftDateInput);
+        await this.click(this.selectDateInCalendar);
+        await this.click(this.staffAvailabilityToggle);
+        await this.click(this.vehicleAvailabilityToggle);
+        await this.click(this.shiftBulkUpdateButton);
+        await this.click(this.yesConfirmationButton);
         try {
-            await this.continueRegardlessButton.waitFor({ state: 'visible', timeout: 5000 });
-            await this.continueRegardlessButton.click();
-            await this.yesConfirmationButton.click();
+            await this.waitForVisible(this.continueRegardlessButton);
+            await this.click(this.continueRegardlessButton);
+            await this.click(this.yesConfirmationButton);
         } catch {
             // Button not present, continue
         }
 
         await this.waitForLoaders();
-        await expect(this.page.getByText('Appointments updated successfully.', { exact: true })).toBeVisible();
+        await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
 
 
     }

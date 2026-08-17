@@ -36,7 +36,7 @@ class StudentPortalHomePage extends BasePage {
     **/
     async verifyUploadSuccess() {
         await this.isVisible(this.chooseFileBtn);
-        await expect(this.page.getByText('Success! Upload has been completed.', { exact: true }).first()).toBeVisible();
+        await this.verifyVisible(this.page.getByText('Success! Upload has been completed.', { exact: true }).first());
     }
 
     /**

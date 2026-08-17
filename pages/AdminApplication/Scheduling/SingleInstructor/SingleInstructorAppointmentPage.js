@@ -70,7 +70,7 @@ export default class AppointmentPage extends BasePage {
      * Verifies that the appointment modal popup title is visible.
     **/
     async verifyPopup() {
-        await expect(this.popupTitle).toBeVisible();
+        await this.verifyVisible(this.popupTitle);
     }
 
     /**

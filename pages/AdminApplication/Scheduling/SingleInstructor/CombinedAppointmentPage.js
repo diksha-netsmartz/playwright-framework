@@ -368,18 +368,24 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {number} studentNo - Student slot index (1 or 2).
      * @param {Object} student - Student test data object.
      **/
+    /**
+     * Fills student details (name, service, instructions, pickup, notes) for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @param {Object} student - Student test data object.
+     **/
     async fillStudentDetails(studentNo, student) {
         await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 200 });
         await this.page.waitForTimeout(2000);
-        await this.page.getByRole("option", { name: student.option, }).first().click();
-        await this.clickServiceDropdown(studentNo).click();
-        await this.selectServiceDropdownValue(studentNo).click();
-        await this.clickInstruction1Dropdown(studentNo).click();
-        await this.getInstruction1DropdownValue(studentNo).click();
-        await this.clickInstruction2Dropdown(studentNo).click();
-        await this.getInstruction2DropdownValue(studentNo).click();
-        await this.getPickup(studentNo).fill(student.pickup);
-        await this.getNotes(studentNo).fill(
+        await this.click(this.page.getByRole("option", { name: student.option }).first());
+        await this.click(this.clickServiceDropdown(studentNo));
+        await this.click(this.selectServiceDropdownValue(studentNo));
+        await this.click(this.clickInstruction1Dropdown(studentNo));
+        await this.click(this.getInstruction1DropdownValue(studentNo));
+        await this.click(this.clickInstruction2Dropdown(studentNo));
+        await this.click(this.getInstruction2DropdownValue(studentNo));
+        await this.fill(this.getPickup(studentNo), student.pickup);
+        await this.fill(
+            this.getNotes(studentNo),
             `${student.notes}_${this.uniqueId}`
         );
     }
@@ -441,26 +447,23 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.click(this.confirmYesButton);
         await this.page.waitForTimeout(2000);
 
-        if (await this.submitButtonPopup.isVisible()) {
-            await this.submitButtonPopup.click();
+        if (await this.isVisible(this.submitButtonPopup)) {
+            await this.click(this.submitButtonPopup);
             await this.waitForLoaders();
         }
         await this.page.waitForTimeout(1000);
         const toastLocator = this.page.locator('#toast-container .toast-message').last();
-        await toastLocator.waitFor({
-            state: "visible",
-            timeout: 10000,
-        });
+        await this.waitForVisible(toastLocator);
 
         const errorToast = this.page.locator('#toast-container .toast-error').last();
-        if (await errorToast.isVisible()) {
+        if (await this.isVisible(errorToast)) {
             const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
             console.log(`Appointment creation failed with error: "${errorMessage}"`);
             throw new Error(`Appointment creation failed with error: "${errorMessage}"`);
         } else {
             const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
-            await expect(successToast).toBeVisible();
-            await expect(successToast).toHaveText('Appointment created successfully.');
+            await this.verifyVisible(successToast);
+            await this.verifyText(successToast, 'Appointment created successfully.');
             console.log(`Appointment created with message: Appointment created successfully.`);
         }
 
@@ -527,10 +530,10 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {string} studentName - Student's name.
      **/
     async cancelAppointment(studentName) {
-        await this.cancelAppointmentButton(studentName).isVisible();
+        await this.isVisible(this.cancelAppointmentButton(studentName));
         await this.click(this.cancelAppointmentButton(studentName));
         this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
-        await this.cancelAppointmentTextbox.fill(this.cancelledNotes);
+        await this.fill(this.cancelAppointmentTextbox, this.cancelledNotes);
         await this.click(this.cancelAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton)
 
@@ -541,25 +544,17 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {string} studentName - Student's name.
      **/
     async markAppointmentAsNoShow(studentName) {
-        await this.noShowAppointmentButton(studentName).isVisible();
+        await this.isVisible(this.noShowAppointmentButton(studentName));
         await this.click(this.noShowAppointmentButton(studentName));
         this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
-        await this.noShowAppointmentTextbox.fill(this.noShowNotes);
+        await this.fill(this.noShowAppointmentTextbox, this.noShowNotes);
         await this.click(this.noShowAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton);
 
-        if (await this.noShowYesButton.isVisible()) {
+        if (await this.isVisible(this.noShowYesButton)) {
             await this.click(this.noShowYesButton);
             await this.waitForLoaders();
         }
-
-        // try {
-        //     if (await this.noShowYesButton.isVisible({ timeout: 2000 })) {
-        //         await this.click(this.noShowYesButton);
-        //     }
-        // } catch (e) {
-        //     console.log('Captcha not present. Continuing login...');
-        // }
 
     }
 
@@ -568,9 +563,8 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     async verifyAppointmentIsCancelledSuccessfully() {
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await toast.waitFor();
-        await expect(toast).toBeVisible();
-        await expect(toast).toHaveText('Appointment cancelled successfully.');
+        await this.verifyVisible(toast);
+        await this.verifyText(toast, 'Appointment cancelled successfully.');
     }
 
     /**
@@ -578,9 +572,8 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     async verifyAppointmentIsMarkedAsNoShowSuccessfully() {
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await toast.waitFor();
-        await expect(toast).toBeVisible();
-        await expect(toast).toHaveText('Appointment marked No Show successfully.');
+        await this.verifyVisible(toast);
+        await this.verifyText(toast, 'Appointment marked No Show successfully.');
     }
 
     /**

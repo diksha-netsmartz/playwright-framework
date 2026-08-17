@@ -43,10 +43,14 @@ export default class NonGraphicalPage extends BasePage {
      * Searches for a student by sequentially typing the student name into the search input.
      * @param {string} studentName - Name of student to search.
     **/
+    /**
+     * Searches for a student by sequentially typing the student name into the search input.
+     * @param {string} studentName - Name of student to search.
+    **/
     async searchStudent(studentName) {
-        await this.studentSearchInput.waitFor({ state: 'visible' });
+        await this.waitForVisible(this.studentSearchInput);
         await expect(this.studentSearchInput).toBeEnabled();
-        await this.studentSearchInput.click();
+        await this.click(this.studentSearchInput);
         await expect(this.studentSearchInput).toBeFocused();
         await this.studentSearchInput.pressSequentially(studentName, { delay: 100 });
     }
@@ -56,8 +60,9 @@ export default class NonGraphicalPage extends BasePage {
      * @param {string} optionText - Option text to select.
     **/
     async selectStudentOption(optionText) {
-        await this.studentDropdownOption(optionText).waitFor({ state: 'visible' });
-        await this.click(this.studentDropdownOption(optionText));
+        const option = this.studentDropdownOption(optionText);
+        await this.waitForVisible(option);
+        await this.click(option);
     }
 
     /**
@@ -86,8 +91,8 @@ export default class NonGraphicalPage extends BasePage {
             // Wait for the slots table to refresh after selecting the date
             await this.page.waitForTimeout(1000);
 
-            const hasNoRecords = await this.noRecordsFound.isVisible();
-            const hasSlot = await this.firstSlotCheckbox.isVisible();
+            const hasNoRecords = await this.isVisible(this.noRecordsFound);
+            const hasSlot = await this.isVisible(this.firstSlotCheckbox);
 
             if (!hasNoRecords && hasSlot) {
                 console.log(`Found available slots on highlighted date #${i + 1}`);
@@ -104,15 +109,15 @@ export default class NonGraphicalPage extends BasePage {
      * Checks the first available slot checkbox.
     **/
     async selectSlot() {
-        await this.firstSlotCheckbox.waitFor({ state: 'visible' });
-        await this.firstSlotCheckbox.click();
+        await this.waitForVisible(this.firstSlotCheckbox);
+        await this.click(this.firstSlotCheckbox);
     }
 
     /**
      * Selects an available appointment product type from the appointment type dropdown (excluding 'Please select').
     **/
     async selectAppointmentType() {
-        await this.appointmentTypeDropdown.waitFor({ state: 'visible' });
+        await this.waitForVisible(this.appointmentTypeDropdown);
 
         // Wait until dropdown is populated with at least one valid option (not 'Please select' or empty)
         await this.page.waitForFunction(() => {
@@ -158,7 +163,7 @@ export default class NonGraphicalPage extends BasePage {
      * Selects 'Confirmed' status from the appointment status type dropdown.
     **/
     async selectStatusType() {
-        await this.statusTypeDropdown.waitFor({ state: 'visible' });
+        await this.waitForVisible(this.statusTypeDropdown);
         await this.statusTypeDropdown.selectOption({ label: 'Confirmed' });
     }
 
@@ -176,7 +181,7 @@ export default class NonGraphicalPage extends BasePage {
     async verifyToastMessageSuccessful() {
         const toast = this.page.locator('#toast-container .toast-success .toast-message');
 
-        await expect(toast).toBeVisible();
-        await expect(toast).toHaveText('Appointment(s) scheduled successfully.');
+        await this.verifyVisible(toast);
+        await this.verifyText(toast, 'Appointment(s) scheduled successfully.');
     }
 }

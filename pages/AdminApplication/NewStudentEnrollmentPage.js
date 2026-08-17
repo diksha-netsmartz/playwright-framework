@@ -168,44 +168,47 @@ class NewStudentEnrollmentPage extends BasePage {
      * Opens the package selection modal and selects the specified package by exact name.
      * @param {string} packageName - Name of the package to select.
     **/
+    /**
+     * Opens the package selection modal and selects the specified package by exact name.
+     * @param {string} packageName - Name of the package to select.
+    **/
     async selectPackage(packageName) {
-        await this.packageSelectionButton.click();
+        await this.click(this.packageSelectionButton);
         if (packageName === 'RT Package') {
             await this.click(this.rtPackageOption);
         }
         else
-            await this.page.getByRole('link', { name: packageName, exact: true }).click();
+            await this.click(this.page.getByRole('link', { name: packageName, exact: true }));
     }
 
     /**
      * Opens location dropdown and checks the Show All option.
     **/
     async selectLocation() {
-        await this.selectLocationDropdown.click();
-        await this.showAllCheckbox.click();
-
+        await this.click(this.selectLocationDropdown);
+        await this.click(this.showAllCheckbox);
     }
 
     /**
      * Enters default DOB (12/12/2000), filters available slots, selects, and adds to cart.
     **/
     async selectDOB() {
-        await this.page.getByRole('textbox', {
+        await this.fill(this.page.getByRole('textbox', {
             name: 'MM/DD/YYYY'
-        }).fill("12/12/2000");
+        }), "12/12/2000");
 
-        await this.filterButton.click();
-        await this.selectButton.click();
-        await this.addButton.click();
-        await this.addToCartButton.click();
+        await this.click(this.filterButton);
+        await this.click(this.selectButton);
+        await this.click(this.addButton);
+        await this.click(this.addToCartButton);
     }
 
     /**
      * Adds additional fee details and confirms adding to cart.
     **/
     async addAdditionalDetails() {
-        await this.addButtonForAdditionalDetails.click();
-        await this.addToCartButton.click();
+        await this.click(this.addButtonForAdditionalDetails);
+        await this.click(this.addToCartButton);
     }
 
     /**
@@ -228,9 +231,9 @@ class NewStudentEnrollmentPage extends BasePage {
                 break;
 
             case 'RT Package':
-                await this.selectButton.click();
-                await this.addButton.click();
-                await this.addToCartButton.click();
+                await this.click(this.selectButton);
+                await this.click(this.addButton);
+                await this.click(this.addToCartButton);
                 await this.addAdditionalDetails();
                 await this.selectStudentType("Teen");
                 break;
@@ -252,11 +255,10 @@ class NewStudentEnrollmentPage extends BasePage {
      * @param {string} studentType - Student type label.
     **/
     async selectStudentType(studentType) {
-        await this.studentInformationType.click();
-
-        await this.page.getByRole('link', {
+        await this.click(this.studentInformationType);
+        await this.click(this.page.getByRole('link', {
             name: studentType
-        }).click();
+        }));
     }
 
     /**
@@ -265,40 +267,40 @@ class NewStudentEnrollmentPage extends BasePage {
     **/
     async fillStudentInformation(data) {
 
-        await this.firstName.fill(data.firstName);
-        await this.middleName.fill(data.middleName);
-        await this.lastName.fill(data.lastName);
+        await this.fill(this.firstName, data.firstName);
+        await this.fill(this.middleName, data.middleName);
+        await this.fill(this.lastName, data.lastName);
         await this.address.pressSequentially(data.address, { delay: 100 });
         await this.click(this.city);
         await this.click(this.stateDropdown);
         await this.click(this.stateOptionValue);
-        await this.address.fill(data.address);
-        await this.zipCode.fill(data.zipCode);
-        await this.homePhone.fill(data.homePhone);
-        await this.studentCellPhone.fill(data.studentCellPhone);
-        await this.studentEmail.fill(data.studentEmail);
-        await this.parentName.fill(data.parentName);
-        await this.parentCellPhone.fill(data.parentCellPhone);
-        await this.parentEmail.fill(data.parentEmail);
-        await this.parentName2.fill(data.parentName2);
-        await this.parentPhone2.fill(data.parentPhone2);
-        await this.parentEmail2.fill(data.parentEmail2);
-        await this.emergencyName.fill(data.emergencyName);
-        await this.emergencyRelationship.fill(data.emergencyRelationship);
-        await this.emergencyPhone.fill(data.emergencyPhone);
+        await this.fill(this.address, data.address);
+        await this.fill(this.zipCode, data.zipCode);
+        await this.fill(this.homePhone, data.homePhone);
+        await this.fill(this.studentCellPhone, data.studentCellPhone);
+        await this.fill(this.studentEmail, data.studentEmail);
+        await this.fill(this.parentName, data.parentName);
+        await this.fill(this.parentCellPhone, data.parentCellPhone);
+        await this.fill(this.parentEmail, data.parentEmail);
+        await this.fill(this.parentName2, data.parentName2);
+        await this.fill(this.parentPhone2, data.parentPhone2);
+        await this.fill(this.parentEmail2, data.parentEmail2);
+        await this.fill(this.emergencyName, data.emergencyName);
+        await this.fill(this.emergencyRelationship, data.emergencyRelationship);
+        await this.fill(this.emergencyPhone, data.emergencyPhone);
         await this.click(this.highSchoolDropdown);
         await this.click(this.highSchoolDropdownSelection);
         await this.click(this.wearGlassesDropdown);
         await this.click(this.wearGlassesDropdownSelection);
         await this.maleCheckbox.check({ force: true });
-        await this.permitNumber.fill(data.permitNumber);
+        await this.fill(this.permitNumber, data.permitNumber);
         await this.click(this.permitIssuedDateCalendarIcon);
         await this.click(this.permitIssueDateSelectInCalendar);
         await this.click(this.permitExpirationDateCalendarIcon);
         await this.click(this.permitExpireDateSelectInCalendar);
-        await this.medicalConditions.fill(data.medicalConditions);
-        await this.studentNotes.fill(data.studentNotes);
-        await this.drivingNotes.fill(data.drivingNotes);
+        await this.fill(this.medicalConditions, data.medicalConditions);
+        await this.fill(this.studentNotes, data.studentNotes);
+        await this.fill(this.drivingNotes, data.drivingNotes);
         await this.click(this.leadDropdown);
         await this.click(this.leadDropdownSelection);
         await this.termsConditionsCheckbox.check({ force: true });
@@ -323,16 +325,9 @@ class NewStudentEnrollmentPage extends BasePage {
      * Saves the new student enrollment, confirms the confirmation prompt, and verifies enrollment completion message.
     **/
     async save() {
-        await this.saveButton.click();
+        await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
-        await this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true })
-
-        await expect(
-            this.page.getByText(
-                'Your enrollment has been completed and a confirmation email has been sent.',
-                { exact: true }
-            )
-        ).toBeVisible();
+        await this.verifyVisible(this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true }));
     }
 }
 

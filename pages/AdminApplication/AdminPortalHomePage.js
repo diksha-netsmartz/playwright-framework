@@ -93,16 +93,16 @@ class AdminPortalHomePage extends BasePage {
      * Opens the Student Account menu and navigates to the Student Profile page.
     **/
     async openStudentProfile() {
-        await this.studentAccount.click();
-        await this.profileLink.click();
+        await this.click(this.studentAccount);
+        await this.click(this.profileLink);
     }
 
     /**
      * Opens the Student Account menu and navigates to the Enrollment/Billing page.
     **/
     async openEnrollmentBilling() {
-        await this.studentAccount.click();
-        await this.enrollmentBilling.click();
+        await this.click(this.studentAccount);
+        await this.click(this.enrollmentBilling);
     }
 
     /**
@@ -133,11 +133,9 @@ class AdminPortalHomePage extends BasePage {
         await this.click(this.selectCategoryDropdownCheckbox);
         await this.click(this.confirmButton);
         await this.click(this.yesConfirmationButton);
-        await this.page.getByText(' File has been confirmed', { exact: true })
-        await expect(this.page.getByText(' File has been confirmed', { exact: true })).toBeVisible();
+        await this.verifyVisible(this.page.getByText(' File has been confirmed', { exact: true }));
         await this.click(this.sendButton);
-        await this.page.getByText('Email sent successfully.', { exact: true })
-        await expect(this.page.getByText('Email sent successfully.', { exact: true })).toBeVisible();
+        await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
     }
 
 
