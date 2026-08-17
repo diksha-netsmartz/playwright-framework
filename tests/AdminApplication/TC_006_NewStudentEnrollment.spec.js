@@ -5,15 +5,31 @@ import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 import login from "../../test-data/login.json";
 import studentData from "../../test-data/studentData.json";
 
-// Define the packages and their specific requirements
+// Define the packages, their student information type, and specific requirements
 const packageScenarios = [
-    { packageName: 'BTW and CR Package', selectDOBInDetails: false },
-    { packageName: 'CR Package', selectDOBInDetails: false },
-    { packageName: 'RT Package', selectDOBInDetails: true },
-    { packageName: 'BTW Package', selectDOBInDetails: true },
+    {
+        packageName: 'BTW and CR Package',
+        selectDOBInDetails: false,
+        fillInfoMethod: 'fillTeenStudentInformation',
+    },
+    {
+        packageName: 'CR Package',
+        selectDOBInDetails: false,
+        fillInfoMethod: 'fillRoadTestStudentInformation',
+    },
+    {
+        packageName: 'RT Package',
+        selectDOBInDetails: true,
+        fillInfoMethod: 'fillAdultStudentInformation',
+    },
+    {
+        packageName: 'BTW Package',
+        selectDOBInDetails: true,
+        fillInfoMethod: 'fillKnowledgeTestStudentInformation',
+    },
 ];
 
-for (const { packageName, selectDOBInDetails } of packageScenarios) {
+for (const { packageName, selectDOBInDetails, fillInfoMethod } of packageScenarios) {
     /**
      * TC_006: C-admin > New student enrollment
      * Test Case Title: Verify new student getting created and Packages are Enrolled.
@@ -38,7 +54,7 @@ for (const { packageName, selectDOBInDetails } of packageScenarios) {
         await enrollmentPage.addPackage(packageName);
 
         // Step 4: Select student information Type and fill student details
-        await enrollmentPage.fillStudentInformation(studentData.student1);
+        await enrollmentPage[fillInfoMethod](studentData.student1);
         if (selectDOBInDetails) {
             await enrollmentPage.selectDOBInStudentDetails();
         }

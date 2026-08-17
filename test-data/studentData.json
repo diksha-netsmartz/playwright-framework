@@ -21,9 +21,9 @@
     "emergencyRelationship": "siblings",
     "emergencyPhone": "1111111111",
     "permitNumber": "222222222",
-    "medicalConditions": "meddd conditions",
-    "studentNotes": "studentttt",
-    "drivingNotes": "111111"
+    "medicalConditions": "no medical conditions",
+    "studentNotes": "student notes",
+    "drivingNotes": "student driving notes"
   },
   "student2": {
     "name": "test student2",
