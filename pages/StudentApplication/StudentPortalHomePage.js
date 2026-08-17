@@ -17,7 +17,7 @@ class StudentPortalHomePage extends BasePage {
         this.fileInput = page.locator('input[type="file"]').first();
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
         this.chooseFileBtn = page.locator("#uploadimageChoose").first()
-        this.enrollNavLink = page.locator("//a[@href='/CentralizeSP/StudentMP/MarketPlace']");
+        this.enrollNavLink = page.locator('#Marketplace_li');
 
     }
 
