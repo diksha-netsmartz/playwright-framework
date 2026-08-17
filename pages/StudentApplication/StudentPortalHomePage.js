@@ -15,7 +15,7 @@ class StudentPortalHomePage extends BasePage {
         super(page);
 
         this.fileInput = page.locator('input[type="file"]').first();
-        this.uploadBtn = page.locator('#uploadimage');
+        this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
         this.chooseFileBtn = page.locator("#uploadimageChoose").first()
         this.enrollNavLink = page.locator("//a[@href='/CentralizeSP/StudentMP/MarketPlace']");
 
@@ -35,8 +35,9 @@ class StudentPortalHomePage extends BasePage {
      * Verifies that the file upload success message is visible and the choose file button is displayed.
     **/
     async verifyUploadSuccess() {
+        await this.waitForLoaders();
         await this.isVisible(this.chooseFileBtn);
-        await this.verifyVisible(this.page.getByText('Success! Upload has been completed.', { exact: true }).first());
+        await this.verifyVisible(this.page.getByText('Success! Upload has been completed.', { exact: true }).first(), 20000);
     }
 
     /**

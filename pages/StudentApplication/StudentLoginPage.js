@@ -38,6 +38,7 @@ class StudentLoginPage extends BasePage {
         await this.fill(this.passwordTxt, password);
         await this.click(this.loginBtn);
         await this.verifyTitle("Student Home");
+        await this.waitForLoaders();
         await this.verifyVisible(this.profileDropdownOnHomepage);
     }
 
