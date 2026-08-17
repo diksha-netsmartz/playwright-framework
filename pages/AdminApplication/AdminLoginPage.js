@@ -44,14 +44,9 @@ class AdminLoginPage extends BasePage {
         await this.fill(this.usernameTxt, username);
         await this.fill(this.passwordTxt, password);
         const captcha = this.captchaFrame.locator('#recaptcha-anchor');
-
-        try {
-            if (await this.isVisible(captcha)) {
-                await this.click(captcha);
-                await this.verifyAttribute(captcha, "aria-checked", "true");
-            }
-        } catch (e) {
-            console.log('Captcha not present. Continuing login...');
+        if (await this.isVisible(captcha)) {
+            await this.click(captcha);
+            await this.verifyAttribute(captcha, "aria-checked", "true");
         }
 
         await this.click(this.loginBtn);

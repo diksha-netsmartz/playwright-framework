@@ -150,12 +150,10 @@ export default class BulkAppointmentPage extends BasePage {
         await this.click(this.vehicleAvailabilityToggle);
         await this.click(this.shiftBulkUpdateButton);
         await this.click(this.yesConfirmationButton);
-        try {
-            await this.waitForVisible(this.continueRegardlessButton);
+
+        if (await this.isVisible(this.continueRegardlessButton)) {
             await this.click(this.continueRegardlessButton);
             await this.click(this.yesConfirmationButton);
-        } catch {
-            // Button not present, continue
         }
 
         await this.waitForLoaders();

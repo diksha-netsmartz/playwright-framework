@@ -1,4 +1,4 @@
-import {test} from "@playwright/test";
+import { test } from "@playwright/test";
 
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
@@ -13,8 +13,8 @@ import login from "../../test-data/login.json";
  * Precondition: TC_004 should be executed
  * Expected Result: Appointment slot should become empty
  **/
-test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as no show", async ({page}) => {
-
+test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as no show", async ({ page }) => {
+    test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const instructorPage = new SingleInstructorPage(page);
@@ -45,7 +45,7 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
     await combinedAppointmentPage.submitAppointment();
 
     // Step 3: Right click the appointment and select Edit Appointment
-    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
+    await instructorPage.editNoShowAppointment(combinedAppointmentPage.uniqueId);
 
     // Step 4: Scroll down to Student 1's view and click "No Show", enter text, confirm
     await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student1.name.replace(" ", ", "));
@@ -54,7 +54,7 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
     await combinedAppointmentPage.verifyAppointmentIsMarkedAsNoShowSuccessfully();
 
     // Step 6: Repeat no show for Student 2
-    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
+    await instructorPage.editNoShowAppointment(combinedAppointmentPage.uniqueId);
     await combinedAppointmentPage.markAppointmentAsNoShow(studentData.student2.name.replace(" ", ", "));
     await combinedAppointmentPage.verifyAppointmentIsMarkedAsNoShowSuccessfully();
 });

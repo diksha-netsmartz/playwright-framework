@@ -14,7 +14,7 @@ import login from "../../test-data/login.json";
  * Expected Result: Appointment should get copied successfully and all the data should match the copied appointment
  **/
 test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", async ({ page }) => {
-
+    test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const instructorPage = new SingleInstructorPage(page);

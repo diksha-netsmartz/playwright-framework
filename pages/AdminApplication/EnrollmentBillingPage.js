@@ -280,6 +280,7 @@ export class EnrollmentBillingPage extends BasePage {
     async editAndDelete() {
         await this.click(this.editButton);
         const packageId = await this.getText(this.getLatestPackageID);
+        await this.waitForVisible(this.deleteLink(packageId));
         await this.click(this.deleteLink(packageId));
         await this.click(this.yesConfirmationButton);
     }

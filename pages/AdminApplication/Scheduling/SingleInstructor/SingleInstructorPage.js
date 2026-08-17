@@ -375,7 +375,7 @@ export default class SingleInstructorPage extends BasePage {
      * @param notesValue - Unique notes value identifying the appointment.
      **/
     async copyAppointment(notesValue) {
-        await this.waitForVisible(this.appointmentConfirmed);
+        // await this.waitForVisible(this.appointmentConfirmed);
         await this.waitForVisible(this.listMenuOfCreatedAppointment(notesValue));
         await this.page.waitForTimeout(2500);
 

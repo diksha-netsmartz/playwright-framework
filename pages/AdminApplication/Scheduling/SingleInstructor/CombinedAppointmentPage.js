@@ -536,6 +536,8 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.fill(this.cancelAppointmentTextbox, this.cancelledNotes);
         await this.click(this.cancelAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton)
+        await this.waitForLoaders();
+        await this.waitForHidden(this.cancelAppointmentTextbox);
 
     }
 

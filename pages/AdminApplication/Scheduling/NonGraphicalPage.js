@@ -173,11 +173,22 @@ export default class NonGraphicalPage extends BasePage {
 
     /**
      * Verifies that the toast success message 'Appointment(s) scheduled successfully.' is visible.
+     * If an error toast appears, extracts the error message and fails the test immediately.
     **/
     async verifyToastMessageSuccessful() {
-        const toast = this.page.locator('#toast-container .toast-success .toast-message');
+        const toastLocator = this.page.locator('#toast-container .toast-message').last();
+        await this.waitForVisible(toastLocator);
 
-        await this.verifyVisible(toast);
-        await this.verifyText(toast, 'Appointment(s) scheduled successfully.');
+        const errorToast = this.page.locator('#toast-container .toast-error').last();
+        if (await this.isVisible(errorToast)) {
+            const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
+            console.log(`Scheduling failed with error toast: "${errorMessage}"`);
+            throw new Error(`Scheduling failed with error toast: "${errorMessage}"`);
+        } else {
+            const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
+            await this.verifyVisible(successToast);
+            await this.verifyText(successToast, 'Appointment(s) scheduled successfully.');
+            console.log('Appointment(s) scheduled successfully.');
+        }
     }
 }
