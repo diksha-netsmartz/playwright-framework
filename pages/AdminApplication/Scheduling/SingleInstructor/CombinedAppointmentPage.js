@@ -370,18 +370,15 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     async fillStudentDetails(studentNo, student) {
         await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 200 });
+        await this.page.waitForTimeout(2000);
         await this.page.getByRole("option", { name: student.option, }).first().click();
         await this.clickServiceDropdown(studentNo).click();
         await this.selectServiceDropdownValue(studentNo).click();
-
         await this.clickInstruction1Dropdown(studentNo).click();
         await this.getInstruction1DropdownValue(studentNo).click();
-
         await this.clickInstruction2Dropdown(studentNo).click();
         await this.getInstruction2DropdownValue(studentNo).click();
-
         await this.getPickup(studentNo).fill(student.pickup);
-
         await this.getNotes(studentNo).fill(
             `${student.notes}_${this.uniqueId}`
         );
@@ -440,25 +437,15 @@ export default class CombinedAppointmentPage extends BasePage {
      * If an error toast appears, prints the error message in the console and fails the test.
      **/
     async submitAppointment() {
-
         await this.click(this.submitButton);
-
         await this.click(this.confirmYesButton);
+        await this.page.waitForTimeout(2000);
 
-        try {
-            await this.submitButtonPopup.waitFor({
-                state: "visible",
-                timeout: 2000,
-            });
-
+        if (await this.submitButtonPopup.isVisible()) {
             await this.submitButtonPopup.click();
-
-        } catch {
-
-            console.log("Submit confirmation popup did not appear.");
-
+            await this.waitForLoaders();
         }
-
+        await this.page.waitForTimeout(1000);
         const toastLocator = this.page.locator('#toast-container .toast-message').last();
         await toastLocator.waitFor({
             state: "visible",
@@ -515,11 +502,8 @@ export default class CombinedAppointmentPage extends BasePage {
             this.getDropdownTitle(`Product_Id${suffix}`), "title", expected.product, `Student ${studentNo} Product`);
 
         await this.verifyAttribute(this.getDropdownTitle(instruction1Id), "title", expected.instruction1, `Student ${studentNo} Instruction 1`);
-
         await this.verifyAttribute(this.getDropdownTitle(instruction2Id), "title", expected.instruction2, `Student ${studentNo} Instruction 2`);
-
         await this.verifyAttribute(this.getPickup(studentNo), "oldval", student.pickup, `Student ${studentNo} Pickup`);
-
         await this.verifyAttribute(this.getNotes(studentNo), "oldval", `${student.notes}_${this.uniqueId}`, `Student ${studentNo} Notes`);
 
     }
@@ -562,14 +546,20 @@ export default class CombinedAppointmentPage extends BasePage {
         this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
         await this.noShowAppointmentTextbox.fill(this.noShowNotes);
         await this.click(this.noShowAppointmentPopupButton);
-        await this.click(this.deleteConfirmationButton)
-        try {
-            if (await this.noShowYesButton.isVisible({ timeout: 2000 })) {
-                await this.click(this.noShowYesButton);
-            }
-        } catch (e) {
-            console.log('Captcha not present. Continuing login...');
+        await this.click(this.deleteConfirmationButton);
+
+        if (await this.noShowYesButton.isVisible()) {
+            await this.click(this.noShowYesButton);
+            await this.waitForLoaders();
         }
+
+        // try {
+        //     if (await this.noShowYesButton.isVisible({ timeout: 2000 })) {
+        //         await this.click(this.noShowYesButton);
+        //     }
+        // } catch (e) {
+        //     console.log('Captcha not present. Continuing login...');
+        // }
 
     }
 
@@ -599,6 +589,17 @@ export default class CombinedAppointmentPage extends BasePage {
     async closeTheDialogPopup() {
         await this.click(this.closePopup);
 
+    }
+
+    /**
+  * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
+ **/
+    async waitForLoaders() {
+        await this.page.waitForFunction(() =>
+            [...document.querySelectorAll('.load-area')].every(
+                el => el.style.display === 'none'
+            )
+        );
     }
 
 

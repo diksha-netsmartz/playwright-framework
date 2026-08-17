@@ -44,7 +44,7 @@ npx playwright install
 npx playwright test
 
 2. Run a specific test file:
-npx playwright test tests/AdminApplication/AddEditorOrDeletePackage.spec.js
+npx playwright test tests/AdminApplication/TC_007_AddEditOrDeletePackage.spec.js
 
 3. Run tests in debug mode (Playwright Inspector):
 npx playwright test --debug
