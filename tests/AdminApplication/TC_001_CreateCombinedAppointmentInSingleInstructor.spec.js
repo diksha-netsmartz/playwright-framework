@@ -1,4 +1,4 @@
-import {test} from "@playwright/test";
+import { test } from "@playwright/test";
 
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
@@ -7,46 +7,55 @@ import CombinedAppointmentPage from "../../pages/AdminApplication/Scheduling/Sin
 import studentData from "../../test-data/studentData.json";
 import login from "../../test-data/login.json";
 
-test("Cancel created Combined Appointment", async ({page}) => {
+
+/**
+ * TC_001: C-admin > Scheduling
+ * Test Case Title: Verify that the appt is getting created
+ * Expected Result: Appointment should be created successfully and all the fields should have the value selected during creation
+ **/
+test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const instructorPage = new SingleInstructorPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
-    // Login
+    // Step 1: On C-admin, login with valid credentials
     await loginPage.navigateToLoginPage();
-
     await loginPage.login(
         login.validUser.username,
         login.validUser.password
     );
 
+    // Step 2: Navigate to Scheduling > Single Instructor
     await homePage.navigateToSingleInstructor();
 
+    // Step 3: Select staff from left dropdown
     await instructorPage.selectInstructor();
 
+    // Step 4: Click on Get Schedule
     await instructorPage.getSchedule();
 
+    // Step 5: Right click on page, select -- Create Combined Appointment (Driver and Observer)
     await instructorPage.selectCreateAppointment(" Create Combined Appointment (Driver and Observer)");
 
+    // Step 6: Select all the fields (Location, Vehicle, Students, Duration)
     await combinedAppointmentPage.verifyPopup();
-
     await combinedAppointmentPage.selectMidTimeDropdown();
     await combinedAppointmentPage.selectEndTimeDropdown();
     await combinedAppointmentPage.selectDropdown("Location");
     await combinedAppointmentPage.selectDropdown("Vehicle");
-
     await combinedAppointmentPage.fillStudentDetails(1, studentData.student1);
     await combinedAppointmentPage.fillStudentDetails(2, studentData.student2);
     await combinedAppointmentPage.selectDuration();
-    await combinedAppointmentPage.submitAppointment();
-    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
-    await combinedAppointmentPage.cancelAppointment(studentData.student1.name.replace(" ", ", "));
-    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
-    await combinedAppointmentPage.cancelAppointment(studentData.student2.name.replace(" ", ", "));
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
-    await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
 
+    // Step 7: Store values and click Submit
+    await combinedAppointmentPage.storeAppointmentValues();
+    await combinedAppointmentPage.submitAppointment();
+
+    // Step 8: Verify appointment is created successfully and values match
+    await instructorPage.editAppointment(combinedAppointmentPage.uniqueId);
+    await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues();
+
+    // await instructorPage.deleteAppointment(combinedAppointmentPage.uniqueId);
 });

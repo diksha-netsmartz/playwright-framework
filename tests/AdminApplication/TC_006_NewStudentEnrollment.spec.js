@@ -14,29 +14,36 @@ const packageScenarios = [
 ];
 
 for (const { packageName, selectDOBInDetails } of packageScenarios) {
-    test(`Create student with ${packageName}`, async ({ page }) => {
+    /**
+     * TC_006: C-admin > New student enrollment
+     * Test Case Title: Verify new student getting created and Packages are Enrolled.
+     * Expected Result: New student should get created Enrollements should be done
+     **/
+    test(`TC_006: C-admin > New student enrollment - Verify new student getting created and Packages are Enrolled (${packageName})`, async ({ page }) => {
         const loginPage = new LoginPage(page);
         const enrollmentPage = new NewStudentEnrollmentPage(page);
         const homePage = new HomePage(page);
 
-        // Login
+        // Step 1: Login to C-admin
         await loginPage.navigateToLoginPage();
         await loginPage.login(
             login.validUser.username,
             login.validUser.password
         );
 
-        // Navigate & Add Package
+        // Step 2: Click on New student enrollment in Left Navigation
         await homePage.navigateToNewStudentEnrollment();
+
+        // Step 3: Select Package in package selection dropdown and add it
         await enrollmentPage.addPackage(packageName);
 
-        // Fill Student Details
+        // Step 4: Select student information Type and fill student details
         await enrollmentPage.fillStudentInformation(studentData.student1);
         if (selectDOBInDetails) {
             await enrollmentPage.selectDOBInStudentDetails();
         }
 
-        // Save
+        // Step 5: Click on Save button and verify student enrollment
         await enrollmentPage.save();
     });
 }
