@@ -46,9 +46,9 @@ class AdminLoginPage extends BasePage {
         const captcha = this.captchaFrame.locator('#recaptcha-anchor');
 
         try {
-            if (await captcha.isVisible({ timeout: 3000 })) {
+            if (await this.isVisible(captcha)) {
                 await this.click(captcha);
-                await expect(captcha).toHaveAttribute("aria-checked", "true");
+                await this.verifyAttribute(captcha, "aria-checked", "true");
             }
         } catch (e) {
             console.log('Captcha not present. Continuing login...');

@@ -26,7 +26,7 @@ class StudentPortalHomePage extends BasePage {
      * @param {string} filePath - Absolute or relative path to the file to upload.
     **/
     async uploadFile(filePath) {
-        await this.fileInput.setInputFiles(filePath);
+        await this.setInputFiles(this.fileInput, filePath);
         await this.click(this.uploadBtn);
         await this.waitForLoaders();
     }
@@ -45,18 +45,6 @@ class StudentPortalHomePage extends BasePage {
     async navigateToEnroll() {
         await this.click(this.enrollNavLink);
     }
-
-    /**
-     * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
-    **/
-    async waitForLoaders() {
-        await this.page.waitForFunction(() =>
-            [...document.querySelectorAll('.load-area')].every(
-                el => el.style.display === 'none'
-            )
-        );
-    }
-
 }
 
 module.exports = StudentPortalHomePage;

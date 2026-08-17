@@ -68,20 +68,6 @@ export default class BulkAppointmentPage extends BasePage {
     }
 
     /**
-     * Waits for all background loader overlays (`.load-area`) on the page to hide.
-    **/
-    async waitForLoaders() {
-        await this.page.waitForFunction(() =>
-            [...document.querySelectorAll('.load-area')].every(
-                el => el.style.display === 'none'
-            )
-        );
-    }
-
-    /**
-     * Selects a date range spanning from the 1st of current month to the 25th of next month and applies the filter.
-    **/
-    /**
      * Selects a date range spanning from the 1st of current month to the 25th of next month and applies the filter.
     **/
     async applyFilter() {
@@ -157,7 +143,7 @@ export default class BulkAppointmentPage extends BasePage {
     async shiftAppointment() {
         await this.selectAppointment();
         await this.click(this.shiftAppointmentsLink);
-        await this.byDateRadio.check();
+        await this.check(this.byDateRadio);
         await this.click(this.shiftDateInput);
         await this.click(this.selectDateInCalendar);
         await this.click(this.staffAvailabilityToggle);

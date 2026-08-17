@@ -150,17 +150,6 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Waits for all background loader overlays (`.load-area`) on the page to hide.
-     **/
-    async waitForLoaders() {
-        await this.page.waitForFunction(() =>
-            [...document.querySelectorAll('.load-area')].every(
-                el => el.style.display === 'none'
-            )
-        );
-    }
-
-    /**
      * Calculates target calendar date (7 days prior, non-Sunday), navigates previous months if needed, and clicks the date.
      **/
     async selectDateInCalendar() {
@@ -370,11 +359,11 @@ export default class SingleInstructorPage extends BasePage {
      * @param notesValue - Unique notes value identifying the appointment.
      **/
     async deleteAppointment(notesValue) {
-        await this.listMenuOfCreatedAppointment(notesValue).hover();
+        await this.hover(this.listMenuOfCreatedAppointment(notesValue));
         await this.isVisible(this.deleteAppointmentButton(notesValue));
         await this.click(this.deleteAppointmentButton(notesValue));
         await this.click(this.deleteButtonInPopup);
-        await this.deleteButtonInPopup.isHidden();
+        await this.waitForHidden(this.deleteButtonInPopup);
         await this.waitForLoaders();
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await this.verifyVisible(toast);
@@ -467,11 +456,11 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async deleteCancelledAppointment() {
         await this.isVisible(this.listMenuOfCancelledAppointment);
-        await this.listMenuOfCancelledAppointment.hover();
+        await this.hover(this.listMenuOfCancelledAppointment);
         await this.isVisible(this.deleteCancelledAppointmentButton);
         await this.click(this.deleteCancelledAppointmentButton);
         await this.click(this.deleteButtonInPopup);
-        await this.deleteButtonInPopup.isHidden();
+        await this.waitForHidden(this.deleteButtonInPopup);
         await this.waitForLoaders();
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await this.verifyVisible(toast);

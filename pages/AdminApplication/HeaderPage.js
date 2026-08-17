@@ -23,8 +23,7 @@ class HeaderPage extends BasePage {
      * Logs out of the Admin Portal by hovering over the user menu and clicking the Log Out link.
     **/
     async logout() {
-
-        await this.userMenu.hover();
+        await this.hover(this.userMenu);
         await this.click(this.logoutBtn);
     }
 

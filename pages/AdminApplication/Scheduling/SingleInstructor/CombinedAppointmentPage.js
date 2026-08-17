@@ -360,7 +360,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * Checks the 15 Minutes duration radio button.
      **/
     async selectDuration() {
-        await this.duration15Minutes.check({ force: true });
+        await this.check(this.duration15Minutes);
     }
 
     /**
@@ -521,7 +521,7 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.verifyAttribute(this.getDropdownTitle("VehicleID"), "title", this.expectedValues.vehicle, "Vehicle");
         await this.verifyStudent(1, studentData.student1);
         await this.verifyStudent(2, studentData.student2);
-        await expect(this.duration15Minutes).toBeChecked();
+        await this.verifyChecked(this.duration15Minutes);
         await this.click(this.closePopup);
     }
 
@@ -583,17 +583,5 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.click(this.closePopup);
 
     }
-
-    /**
-  * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
- **/
-    async waitForLoaders() {
-        await this.page.waitForFunction(() =>
-            [...document.querySelectorAll('.load-area')].every(
-                el => el.style.display === 'none'
-            )
-        );
-    }
-
 
 }

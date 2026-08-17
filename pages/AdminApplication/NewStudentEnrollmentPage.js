@@ -270,7 +270,7 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.fill(this.firstName, data.firstName);
         await this.fill(this.middleName, data.middleName);
         await this.fill(this.lastName, data.lastName);
-        await this.address.pressSequentially(data.address, { delay: 100 });
+        await this.pressSequentially(this.address, data.address);
         await this.click(this.city);
         await this.click(this.stateDropdown);
         await this.click(this.stateOptionValue);
@@ -292,7 +292,7 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.click(this.highSchoolDropdownSelection);
         await this.click(this.wearGlassesDropdown);
         await this.click(this.wearGlassesDropdownSelection);
-        await this.maleCheckbox.check({ force: true });
+        await this.check(this.maleCheckbox);
         await this.fill(this.permitNumber, data.permitNumber);
         await this.click(this.permitIssuedDateCalendarIcon);
         await this.click(this.permitIssueDateSelectInCalendar);
@@ -303,7 +303,7 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.fill(this.drivingNotes, data.drivingNotes);
         await this.click(this.leadDropdown);
         await this.click(this.leadDropdownSelection);
-        await this.termsConditionsCheckbox.check({ force: true });
+        await this.check(this.termsConditionsCheckbox);
     }
 
     /**

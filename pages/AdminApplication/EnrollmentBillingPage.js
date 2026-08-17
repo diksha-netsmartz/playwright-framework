@@ -286,20 +286,9 @@ export class EnrollmentBillingPage extends BasePage {
     **/
     async selectStudent(studentName) {
         await this.click(this.studentNotSelected);
-        await this.studentSearch.pressSequentially(studentName, { delay: 100 });
+        await this.pressSequentially(this.studentSearch, studentName);
         await this.click(this.studentDropdownValue(studentName.replace(" ", ", ")));
         await this.click(this.goButton);
-    }
-
-    /**
-     * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
-    **/
-    async waitForLoaders() {
-        await this.page.waitForFunction(() =>
-            [...document.querySelectorAll('.load-area')].every(
-                el => el.style.display === 'none'
-            )
-        );
     }
 
     /**
@@ -321,7 +310,7 @@ export class EnrollmentBillingPage extends BasePage {
 
         await this.click(this.addNewBilling);
         await this.click(this.swipedTransaction);
-        await this.swipeAmountTextbox.clear();
+        await this.clear(this.swipeAmountTextbox);
         await this.fill(this.swipeAmountTextbox, paymentData.swipedTransaction.amount);
         await this.fill(this.last4Digits, paymentData.swipedTransaction.last4Digits);
         await this.click(this.cardTypeSelectDropdown);
@@ -350,7 +339,7 @@ export class EnrollmentBillingPage extends BasePage {
 
         await this.click(this.addNewBilling);
         await this.click(this.checkPayment);
-        await this.checkAmount.clear();
+        await this.clear(this.checkAmount);
         await this.fill(this.checkAmount, paymentData.checkPayment.amount);
         await this.fill(this.checkNumber, paymentData.checkPayment.checkNumber);
         await this.fill(this.receiptNumber, paymentData.checkPayment.receiptNumber);
@@ -376,7 +365,7 @@ export class EnrollmentBillingPage extends BasePage {
 
         await this.click(this.addNewBilling);
         await this.click(this.cashPayment);
-        await this.cashAmountTextbox.clear();
+        await this.clear(this.cashAmountTextbox);
         await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
         await this.fill(this.receiptNumber, paymentData.cashPayment.receiptNumber);
         await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
@@ -401,7 +390,7 @@ export class EnrollmentBillingPage extends BasePage {
 
         await this.click(this.addNewBilling);
         await this.click(this.adjustment);
-        await this.cashAmountTextbox.clear();
+        await this.clear(this.cashAmountTextbox);
         await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
         await this.click(this.selectButton);
         await this.click(this.refundAddToBalance);

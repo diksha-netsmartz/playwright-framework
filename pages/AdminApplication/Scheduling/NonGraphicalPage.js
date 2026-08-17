@@ -43,16 +43,12 @@ export default class NonGraphicalPage extends BasePage {
      * Searches for a student by sequentially typing the student name into the search input.
      * @param {string} studentName - Name of student to search.
     **/
-    /**
-     * Searches for a student by sequentially typing the student name into the search input.
-     * @param {string} studentName - Name of student to search.
-    **/
     async searchStudent(studentName) {
         await this.waitForVisible(this.studentSearchInput);
         await expect(this.studentSearchInput).toBeEnabled();
         await this.click(this.studentSearchInput);
         await expect(this.studentSearchInput).toBeFocused();
-        await this.studentSearchInput.pressSequentially(studentName, { delay: 100 });
+        await this.pressSequentially(this.studentSearchInput, studentName);
     }
 
     /**
@@ -156,7 +152,7 @@ export default class NonGraphicalPage extends BasePage {
         }
 
         console.log("Selected appointment type option value:", validOptionValue);
-        await this.appointmentTypeDropdown.selectOption(validOptionValue);
+        await this.selectOption(this.appointmentTypeDropdown, validOptionValue);
     }
 
     /**
@@ -164,7 +160,7 @@ export default class NonGraphicalPage extends BasePage {
     **/
     async selectStatusType() {
         await this.waitForVisible(this.statusTypeDropdown);
-        await this.statusTypeDropdown.selectOption({ label: 'Confirmed' });
+        await this.selectOption(this.statusTypeDropdown, { label: 'Confirmed' });
     }
 
     /**
