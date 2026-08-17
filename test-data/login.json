@@ -7,8 +7,16 @@
         "username": "tes1",
         "password": "Student@123123"
     },
+    "resetStudent": {
+        "username": "rachel",
+        "email": "rachel.greene1227@gmail.com"
+    },
     "staffUser": {
         "username": "instructor6",
+        "password": "123456Aa#"
+    },
+    "classroomInstructor": {
+        "username": "instructor3",
         "password": "123456Aa#"
     }
 }

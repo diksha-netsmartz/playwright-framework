@@ -2,7 +2,6 @@ import { test } from '@playwright/test';
 import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
 import StudentEnrollPage from '../../pages/StudentApplication/StudentEnrollPage';
 import login from '../../test-data/login.json';
-import studentData from '../../test-data/studentData.json';
 import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage'
 
 /**
