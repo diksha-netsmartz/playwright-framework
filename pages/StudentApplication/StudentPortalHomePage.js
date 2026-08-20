@@ -18,7 +18,19 @@ class StudentPortalHomePage extends BasePage {
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
         this.chooseFileBtn = page.locator("#uploadimageChoose").first()
         this.enrollNavLink = page.locator('#Marketplace_li');
+        this.myAccountNavLink = page.getByRole('link', { name: ' My Account ' });
+        this.profileNavLink = page.locator("xpath=//li[contains(@id,'Profile')]");
+    }
 
+    /**
+     * Navigates to the student profile page by clicking 'My Account' and then 'Profile' in the left navigation.
+    **/
+    async navigateToProfile() {
+        if (!await this.isVisible(this.profileNavLink)) {
+            await this.click(this.myAccountNavLink);
+        }
+        await this.click(this.profileNavLink);
+        await this.waitForLoaders();
     }
 
     /**
@@ -29,6 +41,7 @@ class StudentPortalHomePage extends BasePage {
         await this.setInputFiles(this.fileInput, filePath);
         await this.click(this.uploadBtn);
         await this.waitForLoaders();
+        await this.page.waitForLoadState('networkidle')
     }
 
     /**
