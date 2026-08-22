@@ -49,7 +49,7 @@ class StudentProfilePage extends BasePage {
         await this.click(studentOption);
 
         await this.click(this.goButton);
-        await this.page.waitForLoadState('networkidle');
+        // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
 
     }

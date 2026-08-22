@@ -135,6 +135,8 @@ class AdminPortalHomePage extends BasePage {
         await this.click(this.yesConfirmationButton);
         await this.verifyVisible(this.page.getByText(' File has been confirmed', { exact: true }));
         await this.click(this.sendButton);
+        await this.waitForHidden(this.sendButton);
+        await this.waitForLoaders();
         await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
     }
 

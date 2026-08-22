@@ -119,6 +119,7 @@ class ClassroomAttendancePage extends BasePage {
     async saveAttendance() {
         await this.click(this.saveBtn);
         await this.click(this.confirmYesBtn);
+        await this.waitForLoaders();
     }
 
     /**

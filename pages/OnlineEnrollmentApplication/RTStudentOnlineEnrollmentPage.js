@@ -97,6 +97,7 @@ class RTStudentOnlineEnrollmentPage extends BasePage {
     async selectRTPackage() {
         // await this.click(this.rtPackageBtn);
         await this.click(this.showAppointmentButton);
+        await this.waitForVisible(this.selectButton);
         await this.click(this.selectButton);
         await this.click(this.continueButton);
 

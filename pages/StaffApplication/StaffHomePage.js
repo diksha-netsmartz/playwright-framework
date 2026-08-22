@@ -57,6 +57,8 @@ class StaffHomePage extends BasePage {
         await this.waitForVisible(this.needsAttentionWidget);
         await this.click(this.actionDropdownBtn);
         await this.click(this.cancelLink);
+        await this.waitForLoaders();
+        await this.waitForVisible(this.cancelTextbox)
         await this.fill(this.cancelTextbox, "cancel appointment");
         await this.click(this.cancelButton);
         await this.click(this.yesConfirmationButton);
