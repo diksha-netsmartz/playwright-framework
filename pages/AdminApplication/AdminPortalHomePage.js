@@ -126,6 +126,7 @@ export default class AdminPortalHomePage extends BasePage {
      * Confirms uploaded student documents in the Uploaded Files dashboard widget and sends a confirmation email.
     **/
     async clickShowFilesToConfirm() {
+        await this.waitForLoaders();
         await this.verifyVisible(this.uploadedFilesWidget);
         await this.click(this.showFilesToConfirmBtn);
         await this.click(this.filePreviewIcon);

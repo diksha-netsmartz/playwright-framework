@@ -61,13 +61,9 @@ export default class StudentProfilePage extends BasePage {
     async sendUsernamePasswordEmail() {
         await this.verifyVisible(this.sendUsernamePasswordEmailBtn);
         await this.click(this.sendUsernamePasswordEmailBtn);
-
-        // Select the student email checkbox (handles iCheck / standard ins)
         await this.click(this.studentEmailCheckbox);
-
         await this.click(this.submitButton);
-
-        // Verify success message
+        await this.waitForVisible(this.page.getByText('Email sent successfully.'));
         await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
     }
 

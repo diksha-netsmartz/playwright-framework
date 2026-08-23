@@ -44,9 +44,12 @@ export default class StaffHomePage extends BasePage {
         await this.waitForVisible(this.needsAttentionWidget);
         await this.click(this.actionDropdownBtn);
         await this.click(this.noShowLink);
+        await this.waitForVisible(this.noShowTextbox);
         await this.fill(this.noShowTextbox, "no show appointment");
         await this.click(this.noShowButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForLoaders();
         await this.verifyVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
     }
 
@@ -62,6 +65,8 @@ export default class StaffHomePage extends BasePage {
         await this.fill(this.cancelTextbox, "cancel appointment");
         await this.click(this.cancelButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForLoaders();
         await this.verifyVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
 
 

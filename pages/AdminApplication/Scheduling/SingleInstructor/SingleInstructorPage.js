@@ -456,7 +456,7 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async verifyAppointmentIsCopied(notesValue) {
         await expect(await this.listMenuInAppointment(notesValue)).toHaveCount(2);
-        await this.page.waitForLoadState("networkidle");
+        await this.waitForLoaders();
     }
 
     /**

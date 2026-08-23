@@ -180,11 +180,19 @@ export default class BasePage {
      * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
      */
     async waitForLoaders() {
-        await this.page.waitForFunction(() =>
-            [...document.querySelectorAll('.load-area')].every(
-                el => el.style.display === 'none'
-            )
-        );
+        await this.page.waitForFunction(() => {
+            const loaders = document.querySelectorAll('.load-area');
+            if (loaders.length === 0) return true;
+            return Array.from(loaders).every(el => {
+                const style = window.getComputedStyle(el);
+                return (
+                    style.display === 'none' ||
+                    style.visibility === 'hidden' ||
+                    el.offsetParent === null ||
+                    el.style.display === 'none'
+                );
+            });
+        });
     }
 
     /**

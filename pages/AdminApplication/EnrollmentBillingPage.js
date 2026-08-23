@@ -278,6 +278,7 @@ export default class EnrollmentBillingPage extends BasePage {
      * Deletes the latest CR Package enrollment and confirms the action.
     **/
     async editAndDelete() {
+        await this.waitForVisible(this.editButton);
         await this.click(this.editButton);
         const packageId = await this.getText(this.getLatestPackageID);
         await this.waitForVisible(this.deleteLink(packageId));

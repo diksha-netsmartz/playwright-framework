@@ -13,13 +13,15 @@ module.exports = defineConfig({
         timeout: 5000,
     },
 
-    // retries: 1,
+    retries: 1,
 
     reporter: [
-        ['html', { open: 'never' }]
+        ['html', { open: 'always' }]
     ],
 
     use: {
+        actionTimeout: 15000,
+        navigationTimeout: 30000,
         slowMo: 500,
         // browserName: 'webkit',
         browserName: 'chromium',
@@ -34,7 +36,6 @@ module.exports = defineConfig({
         screenshot: 'on',
         trace: 'on',
         ignoreHTTPSErrors: true
-
-    }
+    },
 
 });

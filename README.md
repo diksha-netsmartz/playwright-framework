@@ -43,17 +43,15 @@ npx playwright install
 ### 1. Using NPM Scripts (Cross-Platform: Mac, Linux & Windows)
 
 ```bash
-# Run all tests in Headless mode with 1920x1080 viewport
+# Run all tests (TC001-TC005, TC017, TC018 run sequentially; all other tests run in parallel)
 npm run test:headless
 
-# Run tests in Headed (Browser visible) mode
+# Run in Headed (Browser visible) mode
 npm run test:headed
 
-# Run tests in Playwright Interactive UI Mode
-npm run test:ui
-
-# Run tests in Debug mode (Playwright Inspector)
-npm run test:debug
+# Interactive UI Mode & Debugger
+npm run test:ui        # Playwright Interactive UI Mode
+npm run test:debug     # Step-by-step Playwright Debugger
 ```
 
 ---

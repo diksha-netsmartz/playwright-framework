@@ -23,12 +23,12 @@ export default class EmailHelper {
         }
 
         const client = new ImapFlow({
-            host: gmailAccount.imap.host,
-            port: gmailAccount.imap.port,
-            secure: gmailAccount.imap.secure,
+            host: 'imap.gmail.com',
+            port: 993,
+            secure: true,
             auth: {
-                user: gmailAccount.imap.auth.user,
-                pass: gmailAccount.imap.auth.pass
+                user: gmailAccount.user,
+                pass: gmailAccount.pass
             },
             logger: false
         });
