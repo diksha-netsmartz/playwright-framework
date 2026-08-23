@@ -7,7 +7,7 @@ import paymentData from "../../test-data/paymentData.json";
  * Handles package enrollment, package modification/deletion, student selection, and various payment types
  * (Swiped Card, Check, Cash, Adjustments, and Credit Card processing).
   **/
-export class EnrollmentBillingPage extends BasePage {
+export default class EnrollmentBillingPage extends BasePage {
 
     /**
      * Initializes locators for the Enrollment & Billing Page.
@@ -326,8 +326,9 @@ export class EnrollmentBillingPage extends BasePage {
         await this.fill(this.cashNotesTextbox, paymentData.swipedTransaction.notes);
         await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForVisible(this.closeButton);
         await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
-
         await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
@@ -353,8 +354,9 @@ export class EnrollmentBillingPage extends BasePage {
         await this.click(this.chequeDeposited);
         await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForVisible(this.closeButton);
         await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
-
         await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidleidle');
         await this.waitForLoaders();
@@ -377,8 +379,9 @@ export class EnrollmentBillingPage extends BasePage {
         await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
         await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForVisible(this.closeButton);
         await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
-
         await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
@@ -404,8 +407,9 @@ export class EnrollmentBillingPage extends BasePage {
         await this.fill(this.cashNotesTextbox, paymentData.adjustment.notes);
         await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForVisible(this.closeButton);
         await this.verifyVisible(this.page.getByText('Adjustment Entered', { exact: true }));
-
         await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
         await this.waitForLoaders();
@@ -440,6 +444,8 @@ export class EnrollmentBillingPage extends BasePage {
         await this.fill(this.cashNotesTextbox, paymentData.processCreditCard.notes);
         await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForVisible(this.closeButton);
         await this.verifyVisible(this.page.getByText('Payment Approved', { exact: true }));
         await this.click(this.closeButton);
         // await this.page.waitForLoadState('networkidle');
@@ -449,5 +455,3 @@ export class EnrollmentBillingPage extends BasePage {
         expect(amountAfter).not.toEqual(amountBefore);
     }
 }
-
-module.exports = EnrollmentBillingPage;

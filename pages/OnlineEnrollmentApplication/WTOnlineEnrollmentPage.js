@@ -1,13 +1,13 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
-const config = require('../../config/config');
-const oeData = require('../../test-data/onlineEnrollmentData.json');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
+import config from '../../config/config';
+import oeData from '../../test-data/onlineEnrollmentData.json';
 
 /**
  * Page Object representing the Written Test (WT / Knowledge Test) Online Enrollment Page.
  * Handles package selection, student registration form, address autocomplete, DOB, payment, and SMS opt-in.
  */
-class TeenOnlineEnrollmentPage extends BasePage {
+export default class WTOnlineEnrollmentPage extends BasePage {
     /**
      * Initializes locators and state for the Written Test Online Enrollment Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
@@ -208,5 +208,3 @@ class TeenOnlineEnrollmentPage extends BasePage {
     }
 
 }
-
-module.exports = TeenOnlineEnrollmentPage;

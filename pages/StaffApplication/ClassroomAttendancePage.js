@@ -1,12 +1,12 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
 
 /**
  * Page Object representing the Classroom Attendance Page in Staff Portal.
  * Handles viewing schedule, filtering classes by date range, marking student attendance,
  * drawing instructor digital signatures on canvas, and saving attendance records.
-  **/
-class ClassroomAttendancePage extends BasePage {
+ **/
+export default class ClassroomAttendancePage extends BasePage {
 
     /**
      * Initializes locators for the Classroom Attendance Page.
@@ -130,5 +130,3 @@ class ClassroomAttendancePage extends BasePage {
     }
 
 }
-
-module.exports = ClassroomAttendancePage;

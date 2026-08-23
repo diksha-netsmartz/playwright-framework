@@ -1,11 +1,11 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
 
 /**
  * Page Object representing the Staff Portal Home / Dashboard Page.
  * Handles the 'Needs Attention' widget, processing lessons, marking appointments as No Show, and cancelling appointments.
-  **/
-class StaffHomePage extends BasePage {
+ **/
+export default class StaffHomePage extends BasePage {
 
     /**
      * Initializes locators for the Staff Home Page.
@@ -68,5 +68,3 @@ class StaffHomePage extends BasePage {
     }
 
 }
-
-module.exports = StaffHomePage;

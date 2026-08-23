@@ -1,12 +1,12 @@
-const BasePage = require('../../utils/BasePage');
-const config = require('../../config/config');
-const { expect } = require("@playwright/test");
+import BasePage from '../../utils/BasePage';
+import config from '../../config/config';
+import { expect } from "@playwright/test";
 
 /**
  * Page Object representing the Admin Portal Login Page.
  * Handles navigation to admin portal, credential entry, captcha resolution, mobile popups, and login verification.
-  **/
-class AdminLoginPage extends BasePage {
+ **/
+export default class AdminLoginPage extends BasePage {
 
     /**
      * Initializes locators for the Admin Login Page.
@@ -71,5 +71,3 @@ class AdminLoginPage extends BasePage {
     }
 
 }
-
-module.exports = AdminLoginPage;

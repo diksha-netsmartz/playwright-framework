@@ -1,4 +1,4 @@
-class TestDataGenerator {
+export default class TestDataGenerator {
     /**
      * Generates a random secure password meeting complexity rules:
      * - Contains Uppercase, Lowercase, Number, and Special Character
@@ -63,5 +63,3 @@ class TestDataGenerator {
         };
     }
 }
-
-module.exports = TestDataGenerator;

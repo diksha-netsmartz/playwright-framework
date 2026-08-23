@@ -1,8 +1,8 @@
-const { ImapFlow } = require('imapflow');
-const { simpleParser } = require('mailparser');
-const gmailAccount = require('../test-data/gmailAccount.json');
+import { ImapFlow } from 'imapflow';
+import { simpleParser } from 'mailparser';
+import gmailAccount from '../test-data/gmailAccount.json';
 
-class EmailHelper {
+export default class EmailHelper {
     /**
      * Polls the inbox for the latest email and extracts the Reset Password link.
      * @param {string|object} options - Recipient email string OR options object { recipientEmail, subject, timeoutMs }
@@ -23,25 +23,24 @@ class EmailHelper {
         }
 
         const client = new ImapFlow({
-            host: 'imap.gmail.com',
-            port: 993,
-            secure: true,
+            host: gmailAccount.imap.host,
+            port: gmailAccount.imap.port,
+            secure: gmailAccount.imap.secure,
             auth: {
-                user: gmailAccount.user,
-                pass: gmailAccount.pass
+                user: gmailAccount.imap.auth.user,
+                pass: gmailAccount.imap.auth.pass
             },
             logger: false
         });
 
-        console.log(`[EmailHelper] Connecting to IMAP server...`);
-        const startTime = Date.now();
-        await client.connect();
-
         try {
+            await client.connect();
+            const startTime = Date.now();
+
             while (Date.now() - startTime < maxWaitTime) {
                 const lock = await client.getMailboxLock('INBOX');
                 try {
-                    // Build flexible search criteria
+                    // Search criteria: filter by recipient and optional subject
                     const searchCriteria = { seen: false };
                     if (recipientEmail) {
                         searchCriteria.to = recipientEmail;
@@ -103,5 +102,3 @@ class EmailHelper {
         }
     }
 }
-
-module.exports = EmailHelper;

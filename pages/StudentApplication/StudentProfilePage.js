@@ -1,10 +1,10 @@
-const BasePage = require('../../utils/BasePage');
+import BasePage from '../../utils/BasePage';
 
 /**
  * Page Object representing the Student Profile Page in the Student Portal (CSP).
  * Handles updating student profile information and asserting update status.
  **/
-class StudentProfilePage extends BasePage {
+export default class StudentProfilePage extends BasePage {
 
     /**
      * Initializes locators for the Student Profile Page.
@@ -97,5 +97,3 @@ class StudentProfilePage extends BasePage {
     }
 
 }
-
-module.exports = StudentProfilePage;

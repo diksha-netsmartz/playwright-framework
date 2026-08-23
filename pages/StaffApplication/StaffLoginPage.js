@@ -1,11 +1,11 @@
-const BasePage = require('../../utils/BasePage');
-const config = require('../../config/config');
+import BasePage from '../../utils/BasePage';
+import config from '../../config/config';
 
 /**
  * Page Object representing the Staff Portal Login Page.
  * Handles navigation to staff login URL and user authentication.
-  **/
-class StaffLoginPage extends BasePage {
+ **/
+export default class StaffLoginPage extends BasePage {
 
     /**
      * Initializes locators for the Staff Login Page.
@@ -41,5 +41,3 @@ class StaffLoginPage extends BasePage {
     }
 
 }
-
-module.exports = StaffLoginPage;

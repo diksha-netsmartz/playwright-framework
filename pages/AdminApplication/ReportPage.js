@@ -1,10 +1,10 @@
-const BasePage = require('../../utils/BasePage');
+import BasePage from '../../utils/BasePage';
 
 /**
  * Page Object representing the Report Center Page in Admin Portal.
  * Handles selecting reports, searching/filtering students by last name, and downloading student report files.
-  **/
-class ReportCenterPage extends BasePage {
+ **/
+export default class ReportCenterPage extends BasePage {
 
     /**
      * Initializes locators for the Report Center Page.
@@ -66,5 +66,3 @@ class ReportCenterPage extends BasePage {
     }
 
 }
-
-module.exports = ReportCenterPage;

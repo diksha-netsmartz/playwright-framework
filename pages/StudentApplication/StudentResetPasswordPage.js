@@ -1,11 +1,11 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
 
 /**
  * Page Object representing the Student Reset Password Page.
  * Handles entering new credentials, submitting the reset request, and verifying confirmation.
  **/
-class StudentResetPasswordPage extends BasePage {
+export default class StudentResetPasswordPage extends BasePage {
 
     /**
      * Initializes locators for the Student Reset Password Page.
@@ -48,5 +48,3 @@ class StudentResetPasswordPage extends BasePage {
         await this.verifyVisible(this.resetPasswordSuccessIcon);
     }
 }
-
-module.exports = StudentResetPasswordPage;

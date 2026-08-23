@@ -7,7 +7,7 @@ import BasePage from "../../utils/BasePage";
  * Handles package selection (BTW, CR, RT), location, student demographic & contact information,
  * parent/emergency details, terms agreement, and enrollment completion.
   **/
-class NewStudentEnrollmentPage extends BasePage {
+export default class NewStudentEnrollmentPage extends BasePage {
 
     /**
      * Initializes locators for the New Student Enrollment Page.
@@ -444,5 +444,3 @@ class NewStudentEnrollmentPage extends BasePage {
         await this.save();
     }
 }
-
-module.exports = NewStudentEnrollmentPage;

@@ -1,12 +1,12 @@
-const BasePage = require("../../utils/BasePage");
-const { expect } = require("@playwright/test");
+import BasePage from "../../utils/BasePage";
+import { expect } from "@playwright/test";
 
 /**
  * Page Object representing the Admin Portal Dashboard / Home Page.
  * Handles side navigation menus (Scheduling, Report Center, Student Account, New Student Enrollment)
  * and the Uploaded Files confirmation widget workflow.
-  **/
-class AdminPortalHomePage extends BasePage {
+ **/
+export default class AdminPortalHomePage extends BasePage {
 
     /**
      * Initializes locators for the Admin Portal Home Page.
@@ -140,7 +140,4 @@ class AdminPortalHomePage extends BasePage {
         await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
     }
 
-
 }
-
-module.exports = AdminPortalHomePage;

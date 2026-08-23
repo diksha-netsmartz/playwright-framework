@@ -1,13 +1,13 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
-const config = require('../../config/config');
-const oeData = require('../../test-data/onlineEnrollmentData.json');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
+import config from '../../config/config';
+import oeData from '../../test-data/onlineEnrollmentData.json';
 
 /**
  * Page Object representing the Teen Online Enrollment Page.
  * Handles package selection, student and parent details, payment options, SMS opt-in, and registration verification.
-  **/
-class TeenOnlineEnrollmentPage extends BasePage {
+ **/
+export default class TeenOnlineEnrollmentPage extends BasePage {
     /**
      * Initializes locators and state for the Teen Online Enrollment Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
@@ -207,5 +207,3 @@ class TeenOnlineEnrollmentPage extends BasePage {
     }
 
 }
-
-module.exports = TeenOnlineEnrollmentPage;

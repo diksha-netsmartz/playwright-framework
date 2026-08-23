@@ -1,12 +1,12 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
 
 /**
  * Page Object representing the Lesson Evaluation Page in Staff Portal.
  * Handles completing lesson evaluations, answering evaluation rubrics (Q1-Q20),
  * selecting travel time, adding public/private notes, digital signatures, and lesson finalization.
-  **/
-class LessonEvaluationPage extends BasePage {
+ **/
+export default class LessonEvaluationPage extends BasePage {
 
     /**
      * Initializes locators for the Lesson Evaluation Page.
@@ -158,5 +158,3 @@ class LessonEvaluationPage extends BasePage {
     }
 
 }
-
-module.exports = LessonEvaluationPage;

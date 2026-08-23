@@ -1,10 +1,10 @@
-const BasePage = require('../../utils/BasePage');
+import BasePage from '../../utils/BasePage';
 
 /**
  * Page Object representing the Admin Portal Global Header.
  * Handles top navigation bar actions such as logging out and verifying logout redirection.
-  **/
-class HeaderPage extends BasePage {
+ **/
+export default class HeaderPage extends BasePage {
 
     /**
      * Initializes locators for the Admin Header Page.
@@ -36,5 +36,3 @@ class HeaderPage extends BasePage {
     }
 
 }
-
-module.exports = HeaderPage;

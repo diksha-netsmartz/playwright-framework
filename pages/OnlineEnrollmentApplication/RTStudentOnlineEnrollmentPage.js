@@ -1,13 +1,13 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
-const config = require('../../config/config');
-const oeData = require('../../test-data/onlineEnrollmentData.json');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
+import config from '../../config/config';
+import oeData from '../../test-data/onlineEnrollmentData.json';
 
 /**
  * Page Object representing the Road Test (RT) Student Online Enrollment Page.
  * Handles package selection, student registration form, appointment selection, DOB, payment, and SMS opt-in.
-  **/
-class RTStudentOnlineEnrollmentPage extends BasePage {
+ **/
+export default class RTStudentOnlineEnrollmentPage extends BasePage {
     /**
      * Initializes locators and state for the Road Test Student Online Enrollment Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
@@ -220,5 +220,3 @@ class RTStudentOnlineEnrollmentPage extends BasePage {
     }
 
 }
-
-module.exports = RTStudentOnlineEnrollmentPage;

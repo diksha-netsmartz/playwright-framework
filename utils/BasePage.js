@@ -1,10 +1,10 @@
-const { expect } = require('@playwright/test');
+import { expect } from '@playwright/test';
 
 /**
  * Base Page Object Model class providing common reusable browser actions,
  * waits, assertions, and utilities across all application pages.
  */
-class BasePage {
+export default class BasePage {
 
     /**
      * Initializes BasePage with the Playwright Page instance.
@@ -277,5 +277,3 @@ class BasePage {
     }
 
 }
-
-module.exports = BasePage;

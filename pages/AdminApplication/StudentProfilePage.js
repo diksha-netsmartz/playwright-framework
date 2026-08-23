@@ -1,11 +1,11 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
 
 /**
  * Page Object representing the Student Profile Page in Admin Portal.
  * Handles selecting students, viewing their profiles, and sending username/password reset emails.
  **/
-class StudentProfilePage extends BasePage {
+export default class StudentProfilePage extends BasePage {
 
     /**
      * Initializes locators for the Student Profile Page.
@@ -102,5 +102,3 @@ class StudentProfilePage extends BasePage {
         await this.updateEmailIfDifferent(specifiedEmail);
     }
 }
-
-module.exports = StudentProfilePage;

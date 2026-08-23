@@ -1,11 +1,11 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
 
 /**
  * Page Object representing the Student Portal Home Page.
  * Handles student document uploads, navigation to marketplace enrollment, and loading state management.
-  **/
-class StudentPortalHomePage extends BasePage {
+ **/
+export default class StudentPortalHomePage extends BasePage {
 
     /**
      * Initializes locators for the Student Portal Home Page.
@@ -60,5 +60,3 @@ class StudentPortalHomePage extends BasePage {
         await this.click(this.enrollNavLink);
     }
 }
-
-module.exports = StudentPortalHomePage;

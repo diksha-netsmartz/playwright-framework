@@ -1,11 +1,11 @@
-const BasePage = require('../../utils/BasePage');
-const { expect } = require('@playwright/test');
+import BasePage from '../../utils/BasePage';
+import { expect } from '@playwright/test';
 
 /**
  * Page Object representing the Student Enrollment and Receipt Page.
  * Handles package selection, Pay Later enrollment, success verification, and popup receipt handling.
-  **/
-class StudentEnrollPage extends BasePage {
+ **/
+export default class StudentEnrollPage extends BasePage {
 
     /**
      * Initializes locators for the Student Enrollment Page.
@@ -67,5 +67,3 @@ class StudentEnrollPage extends BasePage {
     }
 
 }
-
-module.exports = StudentEnrollPage;

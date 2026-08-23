@@ -1,11 +1,11 @@
-const BasePage = require('../../utils/BasePage');
-const config = require('../../config/config');
+import BasePage from '../../utils/BasePage';
+import config from '../../config/config';
 
 /**
  * Page Object representing the Student Portal Login Page.
  * Handles navigation to student login page and credential submission.
-  **/
-class StudentLoginPage extends BasePage {
+ **/
+export default class StudentLoginPage extends BasePage {
 
     /**
      * Initializes locators for the Student Login Page.
@@ -43,5 +43,3 @@ class StudentLoginPage extends BasePage {
     }
 
 }
-
-module.exports = StudentLoginPage;
