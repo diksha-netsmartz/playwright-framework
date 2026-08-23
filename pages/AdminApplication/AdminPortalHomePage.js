@@ -87,6 +87,7 @@ export default class AdminPortalHomePage extends BasePage {
     **/
     async navigateToNewStudentEnrollment() {
         await this.waitForLoaders();
+        await this.page.waitForTimeout(5000);
         await this.waitForVisible(this.newStudentEnrollment);
         await this.click(this.newStudentEnrollment);
     }

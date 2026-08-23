@@ -52,48 +52,69 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Returns locator for the action menu 3-dots icon on an active/confirmed appointment matching specific notes.
-     * @param {string} notesValue - Unique note string contained in the appointment.
+     * Helper to normalize a student object, name string, or identifier into a string for xpath matching.
+     * @param {Object|string} studentOrIdentifier - Student data object or string identifier.
+     * @returns {string}
+     */
+    getStudentSearchText(studentOrIdentifier) {
+        if (!studentOrIdentifier) return '';
+        if (typeof studentOrIdentifier === 'object') {
+            if (studentOrIdentifier.firstName && studentOrIdentifier.lastName) {
+                return `${studentOrIdentifier.lastName}, ${studentOrIdentifier.firstName}`;
+            }
+            return studentOrIdentifier.name || String(studentOrIdentifier);
+        }
+        return String(studentOrIdentifier);
+    }
+
+    /**
+     * Returns locator for the action menu 3-dots icon on an active/confirmed appointment matching student name or notes.
+     * @param {Object|string} studentOrNotes - Student object, name, or note string.
      * @returns {import('@playwright/test').Locator} 3-dots icon locator.
      **/
-    listMenuOfCreatedAppointment(notesValue) {
-        return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img)[last()]`);
+    listMenuOfCreatedAppointment(studentOrNotes) {
+        const text = this.getStudentSearchText(studentOrNotes);
+        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img)[last()]`);
     }
 
     /**
-     * Returns locator for all action menu 3-dots icons on active/confirmed appointments matching specific notes.
-     * @param {string} notesValue - Unique note string contained in the appointment.
+     * Returns locator for all action menu 3-dots icons on active/confirmed appointments matching student name or notes.
+     * @param {Object|string} studentOrNotes - Student object, name, or note string.
      * @returns {import('@playwright/test').Locator} All matching action menu icons locator.
      **/
-    allListMenusOfCreatedAppointments(notesValue) {
-        return this.page.locator(`xpath=//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
+    allListMenusOfCreatedAppointments(studentOrNotes) {
+        const text = this.getStudentSearchText(studentOrNotes);
+        return this.page.locator(`xpath=//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
     }
 
     /**
-     * Returns locator for all action menu icons matching an appointment with specified notes.
-     * @param {string} notesValue - Unique note string contained in the appointment.
+     * Returns locator for all action menu icons matching an appointment with specified student name or notes.
+     * @param {Object|string} studentOrNotes - Student object, name, or note string.
      * @returns {import('@playwright/test').Locator} Action menu locator.
      **/
-    listMenuInAppointment(notesValue) {
-        return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
+    listMenuInAppointment(studentOrNotes) {
+        const text = this.getStudentSearchText(studentOrNotes);
+        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
     }
 
     /**
      * Returns locator for the action menu icon on an appointment matching student name.
-     * @param {Object|string} student - Student object or student name string.
+     * @param {Object|string} studentOrName - Student object or student name string.
      * @returns {import('@playwright/test').Locator} Action menu icon locator.
      **/
-    listMenuOfNoShowAppointment(studentName) {
-        return this.page.locator(`xpath=(//p[contains(text(),'${studentName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
+    listMenuOfNoShowAppointment(studentOrName) {
+        const text = this.getStudentSearchText(studentOrName);
+        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
     }
 
     /**
-     * Returns locator for the delete appointment action link for an appointment matching specific notes.
-     * @param {string} notesValue - Unique note string contained in the appointment.
+     * Returns locator for the delete appointment action link for an appointment matching student name or notes.
+     * @param {Object|string} studentOrNotes - Student object, name, or note string.
      * @returns {import('@playwright/test').Locator} Delete appointment link locator.
      **/
-    deleteAppointmentButton(notesValue) {
-        return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//a[@href='cancelAppt'])[last()]`);
+    deleteAppointmentButton(studentOrNotes) {
+        const text = this.getStudentSearchText(studentOrNotes);
+        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//a[@href='cancelAppt'])[last()]`);
     }
 
     /**
@@ -156,7 +177,7 @@ export default class SingleInstructorPage extends BasePage {
     async selectDateInCalendar() {
         const today = new Date();
         const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() - 15);
+        targetDate.setDate(today.getDate() - 7);
 
         // If Sunday (0), go one more day back to Saturday
         if (targetDate.getDay() === 0) {
@@ -280,8 +301,7 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async selectCreateAppointment(appointmentType) {
         await this.selectDateInCalendar();
-        await this.waitForLoaders().catch(() => {
-        });
+        await this.waitForLoaders().catch(() => { });
         await this.page.waitForTimeout(1000);
 
         const slot = await this.findAvailableSlot(0);
@@ -298,19 +318,19 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Opens the action menu on an appointment matching specific notes and clicks 'Edit Appointment'.
-     * @param notesValue - Unique notes value identifying the appointment.
+     * Opens the action menu on an appointment matching student name or notes and clicks 'Edit Appointment'.
+     * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
-    async editAppointment(notesValue) {
-        await this.isVisible(this.listMenuOfCreatedAppointment(notesValue));
-        await this.listMenuOfCreatedAppointment(notesValue).click({ force: true });
+    async editAppointment(studentOrNotes) {
+        await this.isVisible(this.listMenuOfCreatedAppointment(studentOrNotes));
+        await this.listMenuOfCreatedAppointment(studentOrNotes).click({ force: true });
 
         try {
             await this.waitForVisible(this.editAppointmentLink);
         } catch {
             console.log("edit appointment link was not visible. Re-clicking the list menu...");
 
-            await this.click(this.listMenuOfCreatedAppointment(notesValue));
+            await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
             await this.waitForVisible(this.editAppointmentLink);
         }
         await this.click(this.editAppointmentLink);
@@ -323,19 +343,11 @@ export default class SingleInstructorPage extends BasePage {
      * @param {Object} [student1] - Student 1 data object.
      * @param {Object} [student2] - Student 2 data object.
      **/
-    async editAndVerifyDetailsForAllAppointments(combinedAppointmentPageOrNotes, combinedAppointmentPage, student1, student2) {
-        let pageObj = combinedAppointmentPage;
-        let notesValue = combinedAppointmentPageOrNotes;
-
-        if (combinedAppointmentPageOrNotes && typeof combinedAppointmentPageOrNotes === 'object' && combinedAppointmentPageOrNotes.uniqueId) {
-            pageObj = combinedAppointmentPageOrNotes;
-            notesValue = combinedAppointmentPageOrNotes.uniqueId;
-        }
-
-        const menus = this.allListMenusOfCreatedAppointments(notesValue);
+    async editAndVerifyDetailsForAllAppointments(studentOrNotes, combinedAppointmentPage, student1, student2) {
+        const menus = this.allListMenusOfCreatedAppointments(studentOrNotes);
         await this.waitForVisible(menus.first());
         const count = await menus.count();
-        console.log(`Found ${count} appointment(s) matching notes: "${notesValue}"`);
+        console.log(`Found ${count} appointment(s) matching: "${this.getStudentSearchText(studentOrNotes)}"`);
 
         for (let i = 0; i < count; i++) {
             console.log(`Opening and verifying appointment ${i + 1} of ${count}...`);
@@ -363,12 +375,12 @@ export default class SingleInstructorPage extends BasePage {
 
     /**
      * Deletes an appointment via its action menu, confirms deletion in modal, and verifies success toast.
-     * @param notesValue - Unique notes value identifying the appointment.
+     * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
-    async deleteAppointment(notesValue) {
-        await this.hover(this.listMenuOfCreatedAppointment(notesValue));
-        await this.isVisible(this.deleteAppointmentButton(notesValue));
-        await this.click(this.deleteAppointmentButton(notesValue));
+    async deleteAppointment(studentOrNotes) {
+        await this.hover(this.listMenuOfCreatedAppointment(studentOrNotes));
+        await this.isVisible(this.deleteAppointmentButton(studentOrNotes));
+        await this.click(this.deleteAppointmentButton(studentOrNotes));
         await this.click(this.deleteButtonInPopup);
         await this.waitForHidden(this.deleteButtonInPopup);
         await this.waitForLoaders();
@@ -379,19 +391,19 @@ export default class SingleInstructorPage extends BasePage {
 
     /**
      * Copies an existing appointment, finds available slots, pastes it via context menu, confirms modal, and verifies success toast.
-     * @param notesValue - Unique notes value identifying the appointment.
+     * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
-    async copyAppointment(notesValue) {
+    async copyAppointment(studentOrNotes) {
         // await this.waitForVisible(this.appointmentConfirmed);
-        await this.waitForVisible(this.listMenuOfCreatedAppointment(notesValue));
-        await this.click(this.listMenuOfCreatedAppointment(notesValue));
+        await this.waitForVisible(this.listMenuOfCreatedAppointment(studentOrNotes));
+        await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
         await this.page.waitForTimeout(2500);
 
         try {
             await this.waitForVisible(this.copyAppointmentLink);
         } catch {
             console.log("Copy appointment link was not visible. Re-clicking the list menu...");
-            await this.click(this.listMenuOfCreatedAppointment(notesValue));
+            await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
             await this.waitForVisible(this.copyAppointmentLink);
         }
         await this.click(this.copyAppointmentLink);
@@ -451,11 +463,21 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Verifies that the appointment was duplicated into 2 distinct instances in the scheduler with matching notes.
-     * @param notesValue - Unique notes value identifying the appointment.
+     * Verifies that the appointment was duplicated into 2 distinct instances in the scheduler matching student name or notes.
+     * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
-    async verifyAppointmentIsCopied(notesValue) {
-        await expect(await this.listMenuInAppointment(notesValue)).toHaveCount(2);
+    async verifyAppointmentIsCopied(studentOrNotes) {
+        let studentName = '';
+        if (studentOrNotes && typeof studentOrNotes === 'object') {
+            studentName = (studentOrNotes.firstName && studentOrNotes.lastName)
+                ? `${studentOrNotes.lastName}, ${studentOrNotes.firstName}`
+                : (studentOrNotes.name || String(studentOrNotes));
+        } else {
+            studentName = String(studentOrNotes);
+        }
+
+        const locator = this.page.locator(`xpath=//p[contains(text(),'${studentName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
+        await expect(locator).toHaveCount(2);
         await this.waitForLoaders();
     }
 

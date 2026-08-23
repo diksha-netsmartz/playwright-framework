@@ -414,6 +414,8 @@ export default class NewStudentEnrollmentPage extends BasePage {
     async save() {
         await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
+        await this.waitForHidden(this.yesConfirmationButton);
+        await this.waitForLoaders();
         await this.verifyVisible(this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true }));
     }
 

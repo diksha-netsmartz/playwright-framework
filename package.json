@@ -7,6 +7,8 @@
     "test": "npx playwright test",
     "test:headless": "cross-env HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test",
     "test:headed": "cross-env HEADLESS=false npx playwright test",
+    "test:failed": "cross-env HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test --last-failed",
+    "test:failed:headed": "cross-env HEADLESS=false npx playwright test --last-failed",
     "test:ui": "npx playwright test --ui",
     "test:debug": "npx playwright test --debug"
   },

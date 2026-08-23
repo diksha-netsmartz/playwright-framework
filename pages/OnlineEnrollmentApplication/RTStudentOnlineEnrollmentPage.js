@@ -96,6 +96,7 @@ export default class RTStudentOnlineEnrollmentPage extends BasePage {
     **/
     async selectRTPackage() {
         // await this.click(this.rtPackageBtn);
+        await this.waitForVisible(this.showAppointmentButton)
         await this.click(this.showAppointmentButton);
         await this.waitForVisible(this.selectButton);
         await this.click(this.selectButton);

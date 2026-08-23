@@ -43,11 +43,15 @@ npx playwright install
 ### 1. Using NPM Scripts (Cross-Platform: Mac, Linux & Windows)
 
 ```bash
-# Run all tests (TC001-TC005, TC017, TC018 run sequentially; all other tests run in parallel)
+# Run all tests (Headless with 1920x1080 resolution)
 npm run test:headless
 
 # Run in Headed (Browser visible) mode
 npm run test:headed
+
+# Run ONLY the failed tests from the previous test run
+npm run test:failed            # Headless mode
+npm run test:failed:headed     # Headed (browser visible) mode
 
 # Interactive UI Mode & Debugger
 npm run test:ui        # Playwright Interactive UI Mode
@@ -82,7 +86,41 @@ npm run test:debug     # Step-by-step Playwright Debugger
 
 ---
 
-#### **B. Headed & UI Modes**
+#### **B. Re-running ONLY Failed Tests (`--last-failed`)**
+
+- **Universal (via `cross-env`):**
+  ```bash
+  npx cross-env HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test --last-failed
+  ```
+
+- **Mac / Linux / Git Bash:**
+  ```bash
+  HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test --last-failed
+  ```
+
+- **Windows PowerShell:**
+  ```powershell
+  $env:HEADLESS="true"; $env:VIEWPORT_WIDTH="1920"; $env:VIEWPORT_HEIGHT="1080"; npx playwright test --last-failed
+  ```
+
+- **Windows Command Prompt (CMD):**
+  ```cmd
+  set HEADLESS=true && set VIEWPORT_WIDTH=1920 && set VIEWPORT_HEIGHT=1080 && npx playwright test --last-failed
+  ```
+
+- **Run Failed Tests in Headed Mode:**
+  ```bash
+  npx cross-env HEADLESS=false npx playwright test --last-failed
+  ```
+
+- **Run Failed Tests in UI Mode:**
+  ```bash
+  npx playwright test --last-failed --ui
+  ```
+
+---
+
+#### **C. Headed & UI Modes**
 
 - **Playwright Interactive UI Mode (Full GUI Runner with time travel, watch mode, and locators):**
   ```bash
@@ -101,11 +139,11 @@ npm run test:debug     # Step-by-step Playwright Debugger
 
 ---
 
-#### **C. Running Specific Tests**
+#### **D. Running Specific Tests**
 
 - **Run a specific test file:**
   ```bash
-  npx playwright test tests/AdminApplication/TC_001_CreateCombinedAppointmentInSingleInstructor.spec.js
+  npx playwright test tests/AdminApplication/TC_001_to_005_CombinedAppointmentsInSingleInstructor.spec.js
   ```
 
 - **Run a specific directory:**

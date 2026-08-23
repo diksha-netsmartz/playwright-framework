@@ -428,7 +428,7 @@ export default class CombinedAppointmentPage extends BasePage {
     async submitAppointment() {
         await this.click(this.submitButton);
         await this.click(this.confirmYesButton);
-        await this.page.waitForTimeout(2000);
+        await this.page.waitForTimeout(2500);
 
         if (await this.isVisible(this.submitButtonPopup)) {
             await this.click(this.submitButtonPopup);

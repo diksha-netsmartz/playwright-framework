@@ -41,6 +41,7 @@ export default class StaffHomePage extends BasePage {
      * Marks an appointment in the 'Needs Attention' widget as No Show with notes and confirms the action.
     **/
     async markAppointmentAsNoShow() {
+        await this.waitForLoaders();
         await this.waitForVisible(this.needsAttentionWidget);
         await this.click(this.actionDropdownBtn);
         await this.click(this.noShowLink);
@@ -49,7 +50,8 @@ export default class StaffHomePage extends BasePage {
         await this.click(this.noShowButton);
         await this.click(this.yesConfirmationButton);
         await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
+        // await this.waitForLoaders();
+        // await this.waitForVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
         await this.verifyVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
     }
 
@@ -57,6 +59,7 @@ export default class StaffHomePage extends BasePage {
      * Cancels an appointment in the 'Needs Attention' widget with cancellation notes and confirms the action.
     **/
     async markAppointmentAsCancel() {
+        await this.waitForLoaders();
         await this.waitForVisible(this.needsAttentionWidget);
         await this.click(this.actionDropdownBtn);
         await this.click(this.cancelLink);
@@ -66,7 +69,8 @@ export default class StaffHomePage extends BasePage {
         await this.click(this.cancelButton);
         await this.click(this.yesConfirmationButton);
         await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
+        // await this.waitForLoaders();
+        // await this.waitForVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
         await this.verifyVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
 
 
