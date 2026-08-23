@@ -24,10 +24,10 @@ module.exports = defineConfig({
         // browserName: 'webkit',
         browserName: 'chromium',
         // channel: 'msedge',
-        // headless: true,
-        // viewport: { width: 1920, height: 1080 },
-        headless: false,
-        viewport: null,
+        headless: process.env.HEADLESS !== undefined ? process.env.HEADLESS === 'true' : false,
+        viewport: process.env.VIEWPORT_WIDTH && process.env.VIEWPORT_HEIGHT
+            ? { width: Number(process.env.VIEWPORT_WIDTH), height: Number(process.env.VIEWPORT_HEIGHT) }
+            : null,
         launchOptions: {
             args: ['--start-maximized'],
         },

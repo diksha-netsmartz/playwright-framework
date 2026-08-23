@@ -38,50 +38,116 @@ npm install
 npx playwright install
 
 
-🧪 Running Tests
+## 🧪 Running Tests
 
-1. Run all tests
-npx playwright test
+### 1. Using NPM Scripts (Cross-Platform: Mac, Linux & Windows)
 
-2. Run a specific test file:
-npx playwright test tests/AdminApplication/TC_007_AddEditOrDeletePackage.spec.js
+```bash
+# Run all tests in Headless mode with 1920x1080 viewport
+npm run test:headless
 
-3. Run tests in debug mode (Playwright Inspector):
-npx playwright test --debug
+# Run tests in Headed (Browser visible) mode
+npm run test:headed
 
-4. Run tests using Playwright UI Mode:
-npx playwright test --ui
+# Run tests in Playwright Interactive UI Mode
+npm run test:ui
 
-⚙️ Configuration & Execution Settings
+# Run tests in Debug mode (Playwright Inspector)
+npm run test:debug
+```
 
-To change the default browser, headless mode, or timeouts, update your `playwright.config.js` file:
+---
 
-1. Headless vs Headed Mode:
-  Inside `use: { ... }`, set `headless`:
-  ```javascript
-  use: {
-    headless: true, // Set to false to see the browser UI while running tests
-  }
-  
-2. Default Browser Selection:
-Under projects: [ ... ], uncomment or prioritize your target browser:
+### 2. Using Direct CLI Commands
 
-projects: [
-  {
-    name: 'chromium', // Options: 'chromium', 'firefox', 'webkit'
-    use: { ...devices['Desktop Chrome'] },
-  },
-]
+#### **A. Headless Mode with Viewport Dimensions**
 
-📊 Viewing Test Reports
+- **Universal (Mac / Linux / Windows via `cross-env`):**
+  ```bash
+  npx cross-env HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test
+  ```
 
-1. CLI Command : 
-npx playwright show-report
+- **Mac / Linux / Git Bash:**
+  ```bash
+  HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test
+  ```
 
-2. Manual Navigation : 
-Navigate to the playwright-report/ folder in your project directory.
-Right-click index.html and select Open with Live Server (or open it directly in any web browser).
+- **Windows PowerShell:**
+  ```powershell
+  $env:HEADLESS="true"; $env:VIEWPORT_WIDTH="1920"; $env:VIEWPORT_HEIGHT="1080"; npx playwright test
+  ```
 
-3. To view traces for debugging failed tests:
-If a test fails, trace files and screenshots are saved in the test-results/ folder
-npx playwright show-trace test-results/<path-to-trace.zip>
+- **Windows Command Prompt (CMD):**
+  ```cmd
+  set HEADLESS=true && set VIEWPORT_WIDTH=1920 && set VIEWPORT_HEIGHT=1080 && npx playwright test
+  ```
+
+---
+
+#### **B. Headed & UI Modes**
+
+- **Playwright Interactive UI Mode (Full GUI Runner with time travel, watch mode, and locators):**
+  ```bash
+  npx playwright test --ui
+  ```
+
+- **Run in Headed mode (Browser window opens):**
+  ```bash
+  npx playwright test --headed
+  ```
+
+- **Run in Debug mode (Step-by-step debugger with Playwright Inspector):**
+  ```bash
+  npx playwright test --debug
+  ```
+
+---
+
+#### **C. Running Specific Tests**
+
+- **Run a specific test file:**
+  ```bash
+  npx playwright test tests/AdminApplication/TC_001_CreateCombinedAppointmentInSingleInstructor.spec.js
+  ```
+
+- **Run a specific directory:**
+  ```bash
+  npx playwright test tests/AdminApplication/
+  ```
+
+- **Run tests matching a title/keyword:**
+  ```bash
+  npx playwright test -g "TC_001"
+  ```
+
+- **Run sequentially with a single worker:**
+  ```bash
+  npx playwright test --workers=1
+  ```
+
+---
+
+## ⚙️ Configuration & Execution Settings
+
+Configuration settings are managed in [`playwright.config.js`](./playwright.config.js):
+
+- **Headless & Viewport:** Automatically reads `HEADLESS`, `VIEWPORT_WIDTH`, and `VIEWPORT_HEIGHT` environment variables or defaults to headed mode with maximized window.
+- **Browser:** Configured to use `chromium` by default.
+- **SlowMo:** `slowMo: 500` is enabled for smoother visual execution and stability during UI interaction.
+
+---
+
+## 📊 Viewing Test Reports
+
+1. **Open HTML Test Report:**
+   ```bash
+   npx playwright show-report
+   ```
+
+2. **Manual Report Viewing:**
+   Open `playwright-report/index.html` directly in any web browser.
+
+3. **View Traces for Failed Tests:**
+   ```bash
+   npx playwright show-trace test-results/<path-to-trace.zip>
+   ```
