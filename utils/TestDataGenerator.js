@@ -38,6 +38,30 @@ class TestDataGenerator {
         const last = Math.floor(1000 + Math.random() * 9000);
         return `(${areaCode})${mid}-${last}`;
     }
+
+    /**
+     * Generates runtime student details with dynamic name (prefix 'automation student', Date.now(), and random number) and unique identifiers.
+     * @param {Object} baseData - Base student details template from JSON
+     * @returns {Object} Student details object with dynamic name, email, permit number, and template values.
+     */
+    static generateStudentData(baseData = {}) {
+        const timestamp = Date.now();
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const firstName = "automation";
+        const lastName = `student ${timestamp} ${randomNum}`;
+        const fullName = `${firstName} ${lastName}`;
+        const uniqueEmail = `automation_${timestamp}_${randomNum}@test.com`;
+        const permitNumber = `${Math.floor(100000000 + Math.random() * 900000000)}`;
+
+        return {
+            ...baseData,
+            firstName,
+            lastName,
+            name: fullName,
+            studentEmail: baseData.studentEmail || uniqueEmail,
+            permitNumber: baseData.permitNumber || permitNumber,
+        };
+    }
 }
 
 module.exports = TestDataGenerator;
