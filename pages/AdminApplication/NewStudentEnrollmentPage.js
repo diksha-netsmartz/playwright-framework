@@ -203,9 +203,9 @@ class NewStudentEnrollmentPage extends BasePage {
      * @param {Object} data - Student test data object.
     **/
     async fillTeenStudentInformation(data) {
-
+        await this.waitForLoaders();
         await this.selectStudentType("Teen");
-        await this.verifyVisible(this.firstName);
+        await this.waitForVisible(this.firstName);
         await this.fill(this.firstName, data.firstName);
         await this.fill(this.middleName, data.middleName);
         await this.fill(this.lastName, data.lastName);

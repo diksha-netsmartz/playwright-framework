@@ -37,6 +37,7 @@ class StaffLoginPage extends BasePage {
         await this.fill(this.passwordTxt, password);
         await this.click(this.loginBtn);
         await this.verifyTitle("Staff Home");
+        await this.waitForLoaders();
     }
 
 }
