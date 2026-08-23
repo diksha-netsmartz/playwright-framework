@@ -204,6 +204,7 @@ export default class WTOnlineEnrollmentPage extends BasePage {
      * Verifies that the registration receipt page is displayed with confirmation heading.
     **/
     async verifyReceiptPage() {
+        await this.waitForVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
         await this.verifyVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
     }
 

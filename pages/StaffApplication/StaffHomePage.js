@@ -49,7 +49,7 @@ export default class StaffHomePage extends BasePage {
         await this.click(this.noShowButton);
         await this.click(this.yesConfirmationButton);
         await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForLoaders();
+        await this.waitForVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
         await this.verifyVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
     }
 
@@ -66,7 +66,7 @@ export default class StaffHomePage extends BasePage {
         await this.click(this.cancelButton);
         await this.click(this.yesConfirmationButton);
         await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForLoaders();
+        await this.waitForVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
         await this.verifyVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
 
 

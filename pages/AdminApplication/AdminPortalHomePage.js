@@ -21,11 +21,9 @@ export default class AdminPortalHomePage extends BasePage {
         this.newStudentEnrollment = page.locator('strong:has-text("New Student Enrollment")')
 
         // Scheduling
-        this.singleInstructorLink = page
-            .locator("#scheduling_SingleInstructor_li")
-            .getByRole("link", {
-                name: "Single Instructor"
-            });
+        this.singleInstructorLink = page.locator("#scheduling_SingleInstructor_li").getByRole("link", {
+            name: "Single Instructor"
+        });
 
         this.studentAccount = page.getByRole('link', { name: /Student Account/i });
         this.profileLink = page.locator('#li_StudentAccount_Profile')
@@ -78,6 +76,8 @@ export default class AdminPortalHomePage extends BasePage {
      * Navigates to the Single Instructor scheduling page via Scheduling menu.
     **/
     async navigateToSingleInstructor() {
+        await this.waitForLoaders();
+        await this.waitForVisible(this.schedulingMenu);
         await this.click(this.schedulingMenu);
         await this.click(this.singleInstructorLink);
     }
@@ -86,6 +86,8 @@ export default class AdminPortalHomePage extends BasePage {
      * Navigates to the New Student Enrollment page.
     **/
     async navigateToNewStudentEnrollment() {
+        await this.waitForLoaders();
+        await this.waitForVisible(this.newStudentEnrollment);
         await this.click(this.newStudentEnrollment);
     }
 
@@ -93,6 +95,8 @@ export default class AdminPortalHomePage extends BasePage {
      * Opens the Student Account menu and navigates to the Student Profile page.
     **/
     async openStudentProfile() {
+        await this.waitForLoaders();
+        await this.waitForVisible(this.studentAccount);
         await this.click(this.studentAccount);
         await this.click(this.profileLink);
     }
@@ -101,6 +105,8 @@ export default class AdminPortalHomePage extends BasePage {
      * Opens the Student Account menu and navigates to the Enrollment/Billing page.
     **/
     async openEnrollmentBilling() {
+        await this.waitForLoaders();
+        await this.waitForVisible(this.studentAccount)
         await this.click(this.studentAccount);
         await this.click(this.enrollmentBilling);
     }
@@ -109,6 +115,8 @@ export default class AdminPortalHomePage extends BasePage {
      * Navigates to the Bulk Appointment scheduling page via Scheduling -> Manage Time Slots.
     **/
     async navigateToBulkAppointment() {
+        await this.waitForLoaders();
+        await this.waitForVisible(this.schedulingMenu);
         await this.click(this.schedulingMenu);
         await this.click(this.manageTimeSlotsLink);
         await this.click(this.bulkAppointmentLink);
@@ -118,6 +126,8 @@ export default class AdminPortalHomePage extends BasePage {
      * Navigates to the Non Graphical scheduling page via Scheduling menu.
     **/
     async navigateToNonGraphical() {
+        await this.waitForLoaders();
+        await this.waitForVisible(this.schedulingMenu);
         await this.click(this.schedulingMenu);
         await this.click(this.nonGraphicalLink);
     }
