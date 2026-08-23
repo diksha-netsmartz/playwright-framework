@@ -1,5 +1,4 @@
 import { test } from "@playwright/test";
-
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnrollmentPage";
@@ -16,7 +15,7 @@ import login from "../../test-data/login.json";
  * Expected Result: Appointment should be created successfully and all the fields should have the value selected during creation
  **/
 test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", async ({ page }) => {
-    test.setTimeout(480000);
+    // test.setTimeout(480000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);

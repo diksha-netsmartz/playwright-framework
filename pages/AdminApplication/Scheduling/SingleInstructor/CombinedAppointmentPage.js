@@ -532,10 +532,14 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     /**
-     * Cancels the appointment for the specified student name and confirms the cancellation modal.
-     * @param {string} studentName - Student's name.
+     * Cancels the appointment for the specified student (object or name string) and confirms the cancellation modal.
+     * @param {Object|string} studentOrName - Student object or student's name string.
      **/
-    async cancelAppointment(studentName) {
+    async cancelAppointment(studentOrName) {
+        const studentName = typeof studentOrName === 'object'
+            ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
+            : studentOrName;
+
         await this.isVisible(this.cancelAppointmentButton(studentName));
         await this.click(this.cancelAppointmentButton(studentName));
         this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
@@ -548,10 +552,14 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     /**
-     * Marks the appointment as No Show for the specified student name and confirms the dialog.
-     * @param {string} studentName - Student's name.
+     * Marks the appointment as No Show for the specified student (object or name string) and confirms the dialog.
+     * @param {Object|string} studentOrName - Student object or student's name string.
      **/
-    async markAppointmentAsNoShow(studentName) {
+    async markAppointmentAsNoShow(studentOrName) {
+        const studentName = typeof studentOrName === 'object'
+            ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
+            : studentOrName;
+
         await this.isVisible(this.noShowAppointmentButton(studentName));
         await this.click(this.noShowAppointmentButton(studentName));
         this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
