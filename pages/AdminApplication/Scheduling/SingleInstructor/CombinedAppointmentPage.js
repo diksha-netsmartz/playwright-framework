@@ -465,6 +465,8 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.verifyVisible(successToast);
             await this.verifyText(successToast, 'Appointment created successfully.');
             console.log(`Appointment created with message: Appointment created successfully.`);
+            await this.waitForHidden(successToast);
+            await this.waitForLoaders();
         }
 
     }
@@ -560,12 +562,14 @@ export default class CombinedAppointmentPage extends BasePage {
             ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
             : studentOrName;
 
-        await this.isVisible(this.noShowAppointmentButton(studentName));
+        // await this.isVisible(this.noShowAppointmentButton(studentName));
+        await this.waitForVisible(this.noShowAppointmentButton(studentName));
         await this.click(this.noShowAppointmentButton(studentName));
         this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
         await this.fill(this.noShowAppointmentTextbox, this.noShowNotes);
         await this.click(this.noShowAppointmentPopupButton);
         await this.click(this.deleteConfirmationButton);
+        await this.waitForLoaders();
 
         if (await this.isVisible(this.noShowYesButton)) {
             await this.click(this.noShowYesButton);
@@ -590,6 +594,8 @@ export default class CombinedAppointmentPage extends BasePage {
         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
         await this.verifyVisible(toast);
         await this.verifyText(toast, 'Appointment marked No Show successfully.');
+        await this.waitForHidden(toast);
+        await this.waitForLoaders();
     }
 
     /**

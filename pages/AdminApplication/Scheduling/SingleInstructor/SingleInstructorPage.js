@@ -79,12 +79,12 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Returns locator for the action menu icon on a No Show appointment matching specific notes.
-     * @param {string} notesValue - Unique note string contained in the appointment.
+     * Returns locator for the action menu icon on an appointment matching student name.
+     * @param {Object|string} student - Student object or student name string.
      * @returns {import('@playwright/test').Locator} Action menu icon locator.
      **/
-    listMenuOfNoShowAppointment(notesValue) {
-        return this.page.locator(`xpath=(//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
+    listMenuOfNoShowAppointment(studentName) {
+        return this.page.locator(`xpath=(//p[contains(text(),'${studentName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
     }
 
     /**
@@ -487,11 +487,14 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Opens the edit modal for a No Show appointment from its action menu.
-     * @param notesValue - Unique notes value identifying the appointment.
+     * Opens the edit modal for an appointment matching student name from its action menu.
+     * @param {Object|string} studentOrName - Student object or student name string.
      **/
-    async editNoShowAppointment(notesValue) {
-        const listMenu = this.listMenuOfNoShowAppointment(notesValue);
+    async editNoShowAppointment(studentOrName) {
+        const studentName = typeof studentOrName === 'object'
+            ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
+            : studentOrName;
+        const listMenu = this.listMenuOfNoShowAppointment(studentName);
         await this.isVisible(listMenu);
         await this.click(listMenu);
 
