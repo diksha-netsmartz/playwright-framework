@@ -66,7 +66,7 @@ export default class SingleInstructorPage extends BasePage {
      * @returns {import('@playwright/test').Locator} All matching action menu icons locator.
      **/
     allListMenusOfCreatedAppointments(notesValue) {
-        return this.page.locator(`xpath=//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img`);
+        return this.page.locator(`xpath=//p[contains(text(),'${notesValue}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
     }
 
     /**
@@ -320,8 +320,10 @@ export default class SingleInstructorPage extends BasePage {
      * Iterates through all visible created appointments matching specific notes, opens each one by one via 'Edit Appointment', and verifies the appointment values.
      * @param {Object|string|number} combinedAppointmentPageOrNotes - CombinedAppointmentPage instance or unique notes value.
      * @param {Object} [combinedAppointmentPage] - CombinedAppointmentPage instance (if notes was passed as first argument).
+     * @param {Object} [student1] - Student 1 data object.
+     * @param {Object} [student2] - Student 2 data object.
      **/
-    async editAndVerifyDetailsForAllAppointments(combinedAppointmentPageOrNotes, combinedAppointmentPage) {
+    async editAndVerifyDetailsForAllAppointments(combinedAppointmentPageOrNotes, combinedAppointmentPage, student1, student2) {
         let pageObj = combinedAppointmentPage;
         let notesValue = combinedAppointmentPageOrNotes;
 
@@ -331,6 +333,7 @@ export default class SingleInstructorPage extends BasePage {
         }
 
         const menus = this.allListMenusOfCreatedAppointments(notesValue);
+        await this.waitForVisible(menus.first());
         const count = await menus.count();
         console.log(`Found ${count} appointment(s) matching notes: "${notesValue}"`);
 
@@ -338,19 +341,22 @@ export default class SingleInstructorPage extends BasePage {
             console.log(`Opening and verifying appointment ${i + 1} of ${count}...`);
             const menu = menus.nth(i);
             await this.waitForVisible(menu);
-            await menu.click({ force: true });
+            await menu.scrollIntoViewIfNeeded();
+            await menu.click({ button: "middle" });
+            await this.page.waitForTimeout(1000);
 
             try {
                 await this.waitForVisible(this.editAppointmentLink);
             } catch {
                 console.log(`Edit appointment link was not visible for appointment ${i + 1}. Re-clicking the list menu...`);
-                await menu.click({ force: true });
+                await menu.click({ button: "middle" });
                 await this.waitForVisible(this.editAppointmentLink);
             }
 
             await this.click(this.editAppointmentLink);
             if (pageObj) {
-                await pageObj.verifyCombinedAppointmentCreatedValues();
+                await pageObj.verifyCombinedAppointmentCreatedValues(student1, student2);
+                await this.page.waitForTimeout(1000);
             }
         }
     }
@@ -378,6 +384,7 @@ export default class SingleInstructorPage extends BasePage {
     async copyAppointment(notesValue) {
         // await this.waitForVisible(this.appointmentConfirmed);
         await this.waitForVisible(this.listMenuOfCreatedAppointment(notesValue));
+        await this.click(this.listMenuOfCreatedAppointment(notesValue));
         await this.page.waitForTimeout(2500);
 
         try {

@@ -189,9 +189,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Notes input locator.
      **/
     getNotes(studentNo) {
-        return studentNo === 1
-            ? this.student1Notes
-            : this.student2Notes;
+        return studentNo === 1 ? this.student1Notes : this.student2Notes;
     }
 
     /**
@@ -200,9 +198,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Service dropdown button locator.
      **/
     clickServiceDropdown(studentNo) {
-        return studentNo === 1
-            ? this.getDropdownButton("Product_Id")
-            : this.getDropdownButton("Product_Id_Student2");
+        return studentNo === 1 ? this.getDropdownButton("Product_Id") : this.getDropdownButton("Product_Id_Student2");
     }
 
     /**
@@ -211,9 +207,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Service option locator.
      **/
     selectServiceDropdownValue(studentNo) {
-        return studentNo === 1
-            ? this.getFirstDropdownOption("Product_Id")
-            : this.getFirstDropdownOption("Product_Id_Student2");
+        return studentNo === 1 ? this.getFirstDropdownOption("Product_Id") : this.getFirstDropdownOption("Product_Id_Student2");
     }
 
     /**
@@ -222,9 +216,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Instruction 1 dropdown button locator.
      **/
     clickInstruction1Dropdown(studentNo) {
-        return studentNo === 1
-            ? this.getDropdownButton("Instructions")
-            : this.getDropdownButton("InstructionsStudent2");
+        return studentNo === 1 ? this.getDropdownButton("Instructions") : this.getDropdownButton("InstructionsStudent2");
     }
 
     /**
@@ -233,9 +225,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Instruction 1 option locator.
      **/
     getInstruction1DropdownValue(studentNo) {
-        return studentNo === 1
-            ? this.getFirstDropdownOption("Instructions")
-            : this.getFirstDropdownOption("InstructionsStudent2");
+        return studentNo === 1 ? this.getFirstDropdownOption("Instructions") : this.getFirstDropdownOption("InstructionsStudent2");
     }
 
     /**
@@ -244,9 +234,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Instruction 2 dropdown button locator.
      **/
     clickInstruction2Dropdown(studentNo) {
-        return studentNo === 1
-            ? this.getDropdownButton("Instructions1")
-            : this.getDropdownButton("Instructions1Student2");
+        return studentNo === 1 ? this.getDropdownButton("Instructions1") : this.getDropdownButton("Instructions1Student2");
     }
 
     /**
@@ -255,9 +243,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @returns {import('@playwright/test').Locator} Instruction 2 option locator.
      **/
     getInstruction2DropdownValue(studentNo) {
-        return studentNo === 1
-            ? this.getFirstDropdownOption("Instructions1")
-            : this.getFirstDropdownOption("Instructions1Student2");
+        return studentNo === 1 ? this.getFirstDropdownOption("Instructions1") : this.getFirstDropdownOption("Instructions1Student2");
     }
 
     /**
@@ -384,10 +370,7 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.click(this.clickInstruction2Dropdown(studentNo));
         await this.click(this.getInstruction2DropdownValue(studentNo));
         await this.fill(this.getPickup(studentNo), student.pickup);
-        await this.fill(
-            this.getNotes(studentNo),
-            `${student.notes}_${this.uniqueId}`
-        );
+        await this.fill(this.getNotes(studentNo), `${student.notes}_${this.uniqueId}`);
     }
 
     /**
