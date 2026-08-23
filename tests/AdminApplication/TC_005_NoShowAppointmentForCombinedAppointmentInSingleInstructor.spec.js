@@ -1,5 +1,4 @@
 import { test } from "@playwright/test";
-
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnrollmentPage";
