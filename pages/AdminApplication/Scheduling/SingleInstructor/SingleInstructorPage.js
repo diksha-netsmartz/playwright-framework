@@ -145,6 +145,7 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async getSchedule() {
         await this.click(this.getScheduleBtn);
+        await this.waitForLoaders();
         // await this.page.waitForLoadState("networkidle")
 
     }
@@ -155,7 +156,7 @@ export default class SingleInstructorPage extends BasePage {
     async selectDateInCalendar() {
         const today = new Date();
         const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() - 7);
+        targetDate.setDate(today.getDate() - 15);
 
         // If Sunday (0), go one more day back to Saturday
         if (targetDate.getDay() === 0) {

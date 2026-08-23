@@ -68,7 +68,7 @@ class NewStudentEnrollmentPage extends BasePage {
         this.saveButton = page.getByRole('button', { name: 'Save' }).first();
         this.termsConditionsCheckbox = page.locator("xpath=//input[@id='TermsConditions']//parent::label//span");
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
-
+        this.closePopup = page.locator("xpath=//p[contains(text(),'enrollment')]//ancestor::div[@class='modal-body']//button[text()='Close']")
 
         // Student DOB
         this.dobMonthDropdown = page.locator("xpath=//button[@data-id='int_DOB_Month']");
@@ -412,10 +412,36 @@ class NewStudentEnrollmentPage extends BasePage {
      * Saves the new student enrollment, confirms the confirmation prompt, and verifies enrollment completion message.
     **/
     async save() {
-        await this.page.pause();
         await this.click(this.saveButton);
         await this.click(this.yesConfirmationButton);
         await this.verifyVisible(this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true }));
+    }
+
+    /**
+     * Closes the enrollment completion popup.
+    **/
+    async closeEnrollmentConfirmationPopup() {
+        await this.waitForVisible(this.closePopup);
+        await this.click(this.closePopup);
+        await this.waitForHidden(this.closePopup);
+        await this.waitForLoaders();
+    }
+
+    /**
+     * Executes the complete student enrollment sequence: adding package, filling info, selecting DOB if needed, and saving.
+     * @param {Object} config - Enrollment options.
+     * @param {string} config.packageName - Name of package.
+     * @param {string} [config.fillInfoMethod='fillTeenStudentInformation'] - Method to fill student details.
+     * @param {Object} config.studentData - Student details.
+     * @param {boolean} [config.selectDOBInDetails=false] - Whether to select DOB in student details.
+     */
+    async enrollNewStudent({ packageName = 'BTW and CR Package', fillInfoMethod = 'fillTeenStudentInformation', studentData, selectDOBInDetails = false }) {
+        await this.addPackage(packageName);
+        await this[fillInfoMethod](studentData);
+        if (selectDOBInDetails) {
+            await this.selectDOBInStudentDetails();
+        }
+        await this.save();
     }
 }
 

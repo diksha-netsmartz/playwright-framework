@@ -493,11 +493,15 @@ export default class CombinedAppointmentPage extends BasePage {
                 ? this.expectedValues.student1
                 : this.expectedValues.student2;
 
+        const expectedStudentName = (student.firstName && student.lastName)
+            ? `${student.lastName}, ${student.firstName}`
+            : student.name.replace(" ", ", ");
+
         await this.verifyText(
             this.page.locator(
                 `#FirstTypeAppointment_Student${studentNo}Name`
             ),
-            student.name.replace(" ", ", "),
+            expectedStudentName,
             `Student ${studentNo} Name`
         );
 
@@ -513,14 +517,16 @@ export default class CombinedAppointmentPage extends BasePage {
 
     /**
      * Verifies all stored appointment values (staff, location, vehicle, students 1 & 2, duration) in the appointment popup.
+     * @param {Object} [student1=studentData.student1] - Student 1 data object.
+     * @param {Object} [student2=studentData.student2] - Student 2 data object.
      **/
-    async verifyCombinedAppointmentCreatedValues() {
+    async verifyCombinedAppointmentCreatedValues(student1 = studentData.student1, student2 = studentData.student2) {
 
         await this.verifyAttribute(this.getDropdownTitle("InstID"), "title", this.expectedValues.staff, "Staff");
         await this.verifyAttribute(this.getDropdownTitle("Location_ID"), "title", this.expectedValues.location, "Location");
         await this.verifyAttribute(this.getDropdownTitle("VehicleID"), "title", this.expectedValues.vehicle, "Vehicle");
-        await this.verifyStudent(1, studentData.student1);
-        await this.verifyStudent(2, studentData.student2);
+        await this.verifyStudent(1, student1);
+        await this.verifyStudent(2, student2);
         await this.verifyChecked(this.duration15Minutes);
         await this.click(this.closePopup);
     }

@@ -1,0 +1,53 @@
+{
+  "packageConfig": {
+    "packageName": "BTW and CR Package",
+    "fillInfoMethod": "fillTeenStudentInformation",
+    "selectDOBInDetails": false
+  },
+  "student1": {
+    "pickup": "test PU1231",
+    "notes": "note student1",
+    "middleName": "test1",
+    "address": "los angeles",
+    "zipCode": "10020",
+    "homePhone": "3333333333",
+    "studentCellPhone": "2222222222",
+    "parentName": "rachel",
+    "parentEmail": "rachel@gmail.com",
+    "parentCellPhone": "4444444444",
+    "parentName2": "ross",
+    "parentEmail2": "ross@gmail.com",
+    "parentPhone2": "1111111111",
+    "emergencyName": "monica",
+    "emergencyRelationship": "siblings",
+    "emergencyPhone": "1111111111",
+    "medicalConditions": "no medical conditions",
+    "studentNotes": "student notes",
+    "drivingNotes": "student driving notes"
+  },
+  "student2": {
+    "pickup": "test PU123e",
+    "notes": "note student2",
+    "middleName": "test2",
+    "address": "los angeles",
+    "zipCode": "10020",
+    "homePhone": "3333333333",
+    "studentCellPhone": "2222222222",
+    "parentName": "monica",
+    "parentEmail": "monica@gmail.com",
+    "parentCellPhone": "4444444444",
+    "parentName2": "chandler",
+    "parentEmail2": "chandler@gmail.com",
+    "parentPhone2": "1111111111",
+    "emergencyName": "phoebe",
+    "emergencyRelationship": "siblings",
+    "emergencyPhone": "1111111111",
+    "medicalConditions": "no medical conditions",
+    "studentNotes": "student notes",
+    "drivingNotes": "student driving notes"
+  },
+  "appointmentDetails": {
+    "appointmentType": " Create Combined Appointment (Driver and Observer)",
+    "duration": "15 Minutes"
+  }
+}
