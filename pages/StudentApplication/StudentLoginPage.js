@@ -40,6 +40,7 @@ export default class StudentLoginPage extends BasePage {
         await this.verifyTitle("Student Home");
         await this.waitForLoaders();
         await this.verifyVisible(this.profileDropdownOnHomepage);
+        await this.page.waitForLoadState('load', { timeout: 75000 })
     }
 
 }

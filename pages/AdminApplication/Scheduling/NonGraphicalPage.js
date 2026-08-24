@@ -173,7 +173,7 @@ export default class NonGraphicalPage extends BasePage {
 
     /**
      * Verifies that the toast success message 'Appointment(s) scheduled successfully.' is visible.
-     * If an error toast appears, extracts the error message and fails the test immediately.
+     * If an error toast appears, extracts the error message and slot warning tooltip (data-original-title) and fails the test immediately.
     **/
     async verifyToastMessageSuccessful() {
         const toastLocator = this.page.locator('#toast-container .toast-message').last();
@@ -182,8 +182,20 @@ export default class NonGraphicalPage extends BasePage {
         const errorToast = this.page.locator('#toast-container .toast-error').last();
         if (await this.isVisible(errorToast)) {
             const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
+
+            // Extract error message from data-original-title on the slot warning icon (e.g. #iErrorOpenSlotGrid_0)
+            const warningIcon = this.page.locator("xpath=(//i[@data-toggle='tooltip' and contains(@id,'ErrorOpenSlot')])[1]");
+            let tooltipError = '';
+            if (await warningIcon.count() > 0) {
+                tooltipError = await warningIcon.getAttribute('data-original-title');
+            }
+
+            const detailedError = tooltipError ? `${errorMessage} (Reason: ${tooltipError})` : errorMessage;
             console.log(`Scheduling failed with error toast: "${errorMessage}"`);
-            throw new Error(`Scheduling failed with error toast: "${errorMessage}"`);
+            if (tooltipError) {
+                console.log(`Error detail from data-original-title: "${tooltipError}"`);
+            }
+            throw new Error(`Scheduling failed with error: "${detailedError}"`);
         } else {
             const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
             await this.verifyVisible(successToast);

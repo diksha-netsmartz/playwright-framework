@@ -77,7 +77,7 @@ test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", as
     await instructorPage.verifyAppointmentIsCopied(student2);
 
     // Step 8: Verify appointment is copied successfully and all data matches
-    await instructorPage.editAndVerifyDetailsForAllAppointments(student1, combinedAppointmentPage, student1, student2);
+    await instructorPage.editAndVerifyDetailsForAllAppointments(student1, student2);
 
     // Cleanup: Delete created and copied appointments
     await instructorPage.deleteAppointment(student1);

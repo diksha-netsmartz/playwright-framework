@@ -38,6 +38,7 @@ export default class StaffLoginPage extends BasePage {
         await this.click(this.loginBtn);
         await this.verifyTitle("Staff Home");
         await this.waitForLoaders();
+        await this.page.waitForLoadState('load', { timeout: 75000 })
     }
 
 }

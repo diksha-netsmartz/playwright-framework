@@ -48,11 +48,12 @@ export default class StaffHomePage extends BasePage {
         await this.waitForVisible(this.noShowTextbox);
         await this.fill(this.noShowTextbox, "no show appointment");
         await this.click(this.noShowButton);
+        // await this.verifyVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
+
+        const noShowMsg = this.page.getByText('Appointment marked No Show successfully.', { exact: true })
         await this.click(this.yesConfirmationButton);
-        await this.waitForHidden(this.yesConfirmationButton);
-        // await this.waitForLoaders();
-        // await this.waitForVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
-        await this.verifyVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
+        await expect(noShowMsg).toBeAttached({ timeout: 5000 });
+        await this.waitForLoaders();
     }
 
     /**
@@ -64,16 +65,15 @@ export default class StaffHomePage extends BasePage {
         await this.click(this.actionDropdownBtn);
         await this.click(this.cancelLink);
         await this.waitForLoaders();
-        await this.waitForVisible(this.cancelTextbox)
+        await this.waitForVisible(this.cancelTextbox);
         await this.fill(this.cancelTextbox, "cancel appointment");
         await this.click(this.cancelButton);
+        // await this.verifyVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
+
+        const cancelMsg = this.page.getByText('Appointment cancelled successfully.', { exact: true })
         await this.click(this.yesConfirmationButton);
-        await this.waitForHidden(this.yesConfirmationButton);
-        // await this.waitForLoaders();
-        // await this.waitForVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
-        await this.verifyVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
-
-
+        await expect(cancelMsg).toBeAttached({ timeout: 5000 });
+        await this.waitForLoaders();
     }
 
 }

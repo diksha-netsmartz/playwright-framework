@@ -8,6 +8,11 @@ import studentData from "../../../../test-data/studentData.json";
  * verifying appointment values, cancelling, and marking appointments as No Show.
  **/
 export default class CombinedAppointmentPage extends BasePage {
+    static storedState = {
+        uniqueId: null,
+        expectedValues: {}
+    };
+
     /**
      * Initializes locators and state for the Combined Appointment Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
@@ -16,6 +21,7 @@ export default class CombinedAppointmentPage extends BasePage {
         super(page);
 
         this.uniqueId = Date.now();
+        CombinedAppointmentPage.storedState.uniqueId = this.uniqueId;
 
         this.expectedValues = {};
 
@@ -417,6 +423,9 @@ export default class CombinedAppointmentPage extends BasePage {
                 .getAttribute("title"),
         };
 
+        CombinedAppointmentPage.storedState.expectedValues = this.expectedValues;
+        CombinedAppointmentPage.storedState.uniqueId = this.uniqueId;
+
         console.log("Expected Values");
         console.log(this.expectedValues);
     }
@@ -473,10 +482,16 @@ export default class CombinedAppointmentPage extends BasePage {
                 ? "Instructions1"
                 : "Instructions1Student2";
 
+        const expectedState = (this.expectedValues && this.expectedValues.staff)
+            ? this.expectedValues
+            : CombinedAppointmentPage.storedState.expectedValues;
+
+        const currentUniqueId = this.uniqueId || CombinedAppointmentPage.storedState.uniqueId;
+
         const expected =
             studentNo === 1
-                ? this.expectedValues.student1
-                : this.expectedValues.student2;
+                ? expectedState.student1
+                : expectedState.student2;
 
         const expectedStudentName = (student.firstName && student.lastName)
             ? `${student.lastName}, ${student.firstName}`
@@ -496,7 +511,7 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.verifyAttribute(this.getDropdownTitle(instruction1Id), "title", expected.instruction1, `Student ${studentNo} Instruction 1`);
         await this.verifyAttribute(this.getDropdownTitle(instruction2Id), "title", expected.instruction2, `Student ${studentNo} Instruction 2`);
         await this.verifyAttribute(this.getPickup(studentNo), "oldval", student.pickup, `Student ${studentNo} Pickup`);
-        await this.verifyAttribute(this.getNotes(studentNo), "oldval", `${student.notes}_${this.uniqueId}`, `Student ${studentNo} Notes`);
+        await this.verifyAttribute(this.getNotes(studentNo), "oldval", `${student.notes}_${currentUniqueId}`, `Student ${studentNo} Notes`);
 
     }
 
@@ -507,9 +522,13 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     async verifyCombinedAppointmentCreatedValues(student1 = studentData.student1, student2 = studentData.student2) {
 
-        await this.verifyAttribute(this.getDropdownTitle("InstID"), "title", this.expectedValues.staff, "Staff");
-        await this.verifyAttribute(this.getDropdownTitle("Location_ID"), "title", this.expectedValues.location, "Location");
-        await this.verifyAttribute(this.getDropdownTitle("VehicleID"), "title", this.expectedValues.vehicle, "Vehicle");
+        const expectedState = (this.expectedValues && this.expectedValues.staff)
+            ? this.expectedValues
+            : CombinedAppointmentPage.storedState.expectedValues;
+
+        await this.verifyAttribute(this.getDropdownTitle("InstID"), "title", expectedState.staff, "Staff");
+        await this.verifyAttribute(this.getDropdownTitle("Location_ID"), "title", expectedState.location, "Location");
+        await this.verifyAttribute(this.getDropdownTitle("VehicleID"), "title", expectedState.vehicle, "Vehicle");
         await this.verifyStudent(1, student1);
         await this.verifyStudent(2, student2);
         await this.verifyChecked(this.duration15Minutes);

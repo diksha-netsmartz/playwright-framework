@@ -282,7 +282,8 @@ export default class EnrollmentBillingPage extends BasePage {
         await this.click(this.editButton);
         const packageId = await this.getText(this.getLatestPackageID);
         await this.waitForVisible(this.deleteLink(packageId));
-        await this.click(this.deleteLink(packageId));
+        await this.deleteLink(packageId).click({ force: true });
+        // await this.click(this.deleteLink(packageId));
         await this.click(this.yesConfirmationButton);
     }
 

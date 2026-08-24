@@ -1,5 +1,6 @@
 import BasePage from "../../../../utils/BasePage";
 import { expect } from "@playwright/test";
+import CombinedAppointmentPage from "./CombinedAppointmentPage";
 
 /**
  * Page Object representing the Single Instructor Scheduler View in Admin Portal.
@@ -14,6 +15,8 @@ export default class SingleInstructorPage extends BasePage {
      **/
     constructor(page) {
         super(page);
+
+        this.combinedAppointmentPage = new CombinedAppointmentPage(page);
 
 
         this.submitButtonPopup = page.getByRole("button", {
@@ -337,17 +340,15 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Iterates through all visible created appointments matching specific notes, opens each one by one via 'Edit Appointment', and verifies the appointment values.
-     * @param {Object|string|number} combinedAppointmentPageOrNotes - CombinedAppointmentPage instance or unique notes value.
-     * @param {Object} [combinedAppointmentPage] - CombinedAppointmentPage instance (if notes was passed as first argument).
-     * @param {Object} [student1] - Student 1 data object.
+     * Iterates through all visible created appointments matching student details, opens each one by one via 'Edit Appointment', and verifies the appointment values.
+     * @param {Object|string} student1 - Student 1 data object or identifier.
      * @param {Object} [student2] - Student 2 data object.
      **/
-    async editAndVerifyDetailsForAllAppointments(studentOrNotes, combinedAppointmentPage, student1, student2) {
-        const menus = this.allListMenusOfCreatedAppointments(studentOrNotes);
+    async editAndVerifyDetailsForAllAppointments(student1, student2) {
+        const menus = this.allListMenusOfCreatedAppointments(student1);
         await this.waitForVisible(menus.first());
         const count = await menus.count();
-        console.log(`Found ${count} appointment(s) matching: "${this.getStudentSearchText(studentOrNotes)}"`);
+        console.log(`Found ${count} appointment(s) matching: "${this.getStudentSearchText(student1)}"`);
 
         for (let i = 0; i < count; i++) {
             console.log(`Opening and verifying appointment ${i + 1} of ${count}...`);
@@ -366,10 +367,8 @@ export default class SingleInstructorPage extends BasePage {
             }
 
             await this.click(this.editAppointmentLink);
-            if (pageObj) {
-                await pageObj.verifyCombinedAppointmentCreatedValues(student1, student2);
-                await this.page.waitForTimeout(1000);
-            }
+            await this.combinedAppointmentPage.verifyCombinedAppointmentCreatedValues(student1, student2);
+            await this.page.waitForTimeout(1000);
         }
     }
 

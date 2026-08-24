@@ -52,6 +52,7 @@ export default class AdminLoginPage extends BasePage {
         await this.click(this.loginBtn);
         await this.verifyTitle("Home Page");
         await this.waitForLoaders();
+        await this.page.waitForLoadState('load', { timeout: 75000 })
     }
 
     /**
