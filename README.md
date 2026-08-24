@@ -1,7 +1,153 @@
 # Playwright Automation Framework
 
-End-to-end test automation framework built using [Playwright](https://playwright.dev/) and JavaScript, structured around
-the Page Object Model (POM) pattern.
+End-to-end test automation framework built using [Playwright](https://playwright.dev/) and JavaScript, structured around the **Page Object Model (POM)** pattern.
+
+---
+
+## 🚀 Complete Setup Guide (From Scratch)
+
+Follow these steps if you are setting up this project on a brand-new computer:
+
+### Step 1: Install Git
+- **macOS:** Open Terminal and run:
+  ```bash
+  xcode-select --install
+  ```
+- **Windows:** Download and install Git from [git-scm.com](https://git-scm.com/download/win).
+- **Linux (Ubuntu/Debian):**
+  ```bash
+  sudo apt update && sudo apt install git -y
+  ```
+
+### Step 2: Install Node.js
+- Download and install **Node.js (LTS v18 or higher)** from [nodejs.org](https://nodejs.org/).
+- Verify installation by opening a terminal and checking versions:
+  ```bash
+  node -v
+  npm -v
+  ```
+
+### Step 3: Clone the Repository
+```bash
+git clone https://github.com/diksha-netsmartz/playwright-framework.git
+cd playwright-framework
+```
+
+### Step 4: Install Project Dependencies
+```bash
+npm install
+```
+
+### Step 5: Install Playwright Browsers & OS Dependencies
+```bash
+npx playwright install --with-deps
+```
+
+### Step 6: Verify Installation
+Run a quick test to verify your setup:
+```bash
+npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js
+```
+
+---
+
+## 🔄 Syncing & Managing Dependencies
+
+Since `node_modules` is not stored in Git, follow these rules whenever updating the project:
+
+### 1. Whenever you pull updates from Git:
+Always run `npm install` after pulling so any newly added packages (e.g. `imapflow`, `mailparser`, `pdf-to-img`) are installed automatically:
+```bash
+git pull && npm install
+```
+
+### 2. Clean Install (Exact `package-lock.json` match):
+If you get errors like `Cannot find module '<package>'` or dependency version conflicts:
+```bash
+npm ci
+```
+*`npm ci` wipes `node_modules` and performs a clean, rapid installation strictly matching `package-lock.json`.*
+
+### 3. Adding a new library to the framework:
+Always save the package to `package.json`:
+```bash
+# Runtime dependency:
+npm install <package-name>
+
+# Development dependency:
+npm install -D <package-name>
+```
+*Always commit and push both `package.json` and `package-lock.json` to GitHub so other team members get the update.*
+
+---
+
+## 🧪 Universal Test Execution Commands
+
+These commands use `npx cross-env` to work universally across **macOS, Linux, Windows Command Prompt (CMD), and PowerShell**.
+
+- **Headless Mode:** Runs in the background with a fixed **1920x1080 desktop viewport**.
+- **UI / Headed Mode:** Opens a visible browser in **true full-screen (maximized)** mode.
+
+---
+
+### 1. Whole Batch (Run All Tests)
+
+| Mode | Universal Command | NPM Shortcut |
+|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test` | `npm run test:headless` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test` | `npm run test:headed` |
+
+---
+
+### 2. Last Failed (Re-run Only Failed Tests)
+
+| Mode | Universal Command | NPM Shortcut |
+|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test --last-failed` | `npm run test:failed:headless` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test --last-failed` | `npm run test:failed:headed` |
+
+---
+
+### 3. Specific Test Case (Single File)
+
+| Mode | Universal Command |
+|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` |
+
+---
+
+### 4. By Folder / Module (e.g., `AdminApplication`, `StaffApplication`, `StudentApplication`)
+
+| Mode | Universal Command |
+|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test tests/AdminApplication/` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/` |
+
+---
+
+### 5. Interactive UI Dashboard
+
+Playwright's interactive runner with live DOM inspection, time travel, and watch mode:
+```bash
+npx playwright test --ui
+```
+
+---
+
+## 📊 Viewing Test Reports & Traces
+
+### 1. View HTML Report
+The HTML report opens automatically after execution, but can also be opened manually:
+```bash
+npx playwright show-report
+```
+
+### 2. Inspect Failure Traces
+Inspect step-by-step DOM snapshots and network logs for a failed test:
+```bash
+npx playwright show-trace test-results/<path-to-trace.zip>
+```
 
 ---
 
@@ -9,181 +155,17 @@ the Page Object Model (POM) pattern.
 
 ```text
 ClientPlaywrightFramework/
-├── config/                  # Global setup & environment configuration
+├── config/                  # Global environment variables and base URLs
 ├── pages/                   # Page Object Models
-│   ├── AdminApplication/       # Admin portal pages (Scheduling, Billing, etc.)
+│   ├── AdminApplication/       # Admin portal pages (Scheduling, Billing, Classroom, etc.)
 │   ├── OnlineEnrollmentApplication/ # Public enrollment flows (Adult, Teen, etc.)
-│   ├── StaffApplication/       # Staff portal pages (Attendance, Evaluations)
-│   └── StudentApplication/     # Student portal pages (Login, Dashboard)
-├── test-data/               # JSON data fixtures & test assets
-├── tests/                   # Test specifications grouped by application module
-├── screenshots/             # Captured failure/debug screenshots
+│   ├── StaffApplication/       # Staff portal pages (Attendance, Evaluations, Home)
+│   └── StudentApplication/     # Student portal pages (Login, Profile, Password Reset)
+├── test-data/               # JSON fixtures and test assets
+├── tests/                   # Test specifications grouped by module
+├── screenshots/             # Captured screenshots
 ├── playwright-report/       # Generated HTML test reports
-└── test-results/            # Test execution artifacts (traces, videos)
-
-
-⚙️ Prerequisites
-Node.js: v18.x or higher
-npm: v9.x or higher
-
-🚀 Setup & Installation
-1. Clone the repository:
-git clone <repository-url>
-cd ClientPlaywrightFramework
-
-2. Install project dependencies:
-npm install
-
-3. Install required Playwright browser binaries:
-npx playwright install
-
-
-## 🧪 Running Tests
-
-### 1. Using NPM Scripts (Cross-Platform: Mac, Linux & Windows)
-
-```bash
-# Run all tests (Headless with 1920x1080 resolution)
-npm run test:headless
-
-# Run in Headed (Browser visible) mode
-npm run test:headed
-
-# Run ONLY the failed tests from the previous test run
-npm run test:failed            # Headless mode
-npm run test:failed:headed     # Headed (browser visible) mode
-
-# Interactive UI Mode & Debugger
-npm run test:ui        # Playwright Interactive UI Mode
-npm run test:debug     # Step-by-step Playwright Debugger
+├── test-results/            # Execution artifacts (traces, error logs)
+├── playwright.config.js     # Global Playwright configuration
+└── package.json             # NPM package scripts and dependencies
 ```
-
----
-
-### 2. Using Direct CLI Commands
-
-#### **A. Headless Mode with Viewport Dimensions**
-
-- **Universal (Mac / Linux / Windows via `cross-env`):**
-  ```bash
-  npx cross-env HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test
-  ```
-
-- **Mac / Linux / Git Bash:**
-  ```bash
-  HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test
-  ```
-
-- **Windows PowerShell:**
-  ```powershell
-  $env:HEADLESS="true"; $env:VIEWPORT_WIDTH="1920"; $env:VIEWPORT_HEIGHT="1080"; npx playwright test
-  ```
-
-- **Windows Command Prompt (CMD):**
-  ```cmd
-  set HEADLESS=true && set VIEWPORT_WIDTH=1920 && set VIEWPORT_HEIGHT=1080 && npx playwright test
-  ```
-
----
-
-#### **B. Re-running ONLY Failed Tests (`--last-failed`)**
-
-- **Universal (via `cross-env`):**
-  ```bash
-  npx cross-env HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test --last-failed
-  ```
-
-- **Mac / Linux / Git Bash:**
-  ```bash
-  HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test --last-failed
-  ```
-
-- **Windows PowerShell:**
-  ```powershell
-  $env:HEADLESS="true"; $env:VIEWPORT_WIDTH="1920"; $env:VIEWPORT_HEIGHT="1080"; npx playwright test --last-failed
-  ```
-
-- **Windows Command Prompt (CMD):**
-  ```cmd
-  set HEADLESS=true && set VIEWPORT_WIDTH=1920 && set VIEWPORT_HEIGHT=1080 && npx playwright test --last-failed
-  ```
-
-- **Run Failed Tests in Headed Mode:**
-  ```bash
-  npx cross-env HEADLESS=false npx playwright test --last-failed
-  ```
-
-- **Run Failed Tests in UI Mode:**
-  ```bash
-  npx playwright test --last-failed --ui
-  ```
-
----
-
-#### **C. Headed & UI Modes**
-
-- **Playwright Interactive UI Mode (Full GUI Runner with time travel, watch mode, and locators):**
-  ```bash
-  npx playwright test --ui
-  ```
-
-- **Run in Headed mode (Browser window opens):**
-  ```bash
-  npx playwright test --headed
-  ```
-
-- **Run in Debug mode (Step-by-step debugger with Playwright Inspector):**
-  ```bash
-  npx playwright test --debug
-  ```
-
----
-
-#### **D. Running Specific Tests**
-
-- **Run a specific test file:**
-  ```bash
-  npx playwright test tests/AdminApplication/TC_001_to_005_CombinedAppointmentsInSingleInstructor.spec.js
-  ```
-
-- **Run a specific directory:**
-  ```bash
-  npx playwright test tests/AdminApplication/
-  ```
-
-- **Run tests matching a title/keyword:**
-  ```bash
-  npx playwright test -g "TC_001"
-  ```
-
-- **Run sequentially with a single worker:**
-  ```bash
-  npx playwright test --workers=1
-  ```
-
----
-
-## ⚙️ Configuration & Execution Settings
-
-Configuration settings are managed in [`playwright.config.js`](./playwright.config.js):
-
-- **Headless & Viewport:** Automatically reads `HEADLESS`, `VIEWPORT_WIDTH`, and `VIEWPORT_HEIGHT` environment variables or defaults to headed mode with maximized window.
-- **Browser:** Configured to use `chromium` by default.
-- **SlowMo:** `slowMo: 500` is enabled for smoother visual execution and stability during UI interaction.
-
----
-
-## 📊 Viewing Test Reports
-
-1. **Open HTML Test Report:**
-   ```bash
-   npx playwright show-report
-   ```
-
-2. **Manual Report Viewing:**
-   Open `playwright-report/index.html` directly in any web browser.
-
-3. **View Traces for Failed Tests:**
-   ```bash
-   npx playwright show-trace test-results/<path-to-trace.zip>
-   ```
