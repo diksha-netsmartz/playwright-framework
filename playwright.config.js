@@ -83,7 +83,7 @@ module.exports = defineConfig({
      * Why: Automatically opens an interactive HTML test report in the browser with screenshots, video, and logs after execution.
      */
     reporter: [
-        ['html', { open: 'always' }],
+        ['html', { open: 'never' }],
         ['allure-playwright', {
             outputFolder: 'allure-results',
             detail: true,

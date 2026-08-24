@@ -85,44 +85,56 @@ npm install -D <package-name>
 
 These commands use `npx cross-env` to work universally across **macOS, Linux, Windows Command Prompt (CMD), and PowerShell**.
 
-- **Headless Mode:** Runs in the background with a fixed **1920x1080 desktop viewport**.
-- **UI / Headed Mode:** Opens a visible browser in **true full-screen (maximized)** mode.
+- **Environment Selection (`ENV`):** Defaults to **`coreServer2`** (Server 2) automatically if no `ENV` variable is passed in CLI.
+- **Headless Mode (`HEADLESS`):** Runs in the background with a fixed **1920x1080 desktop viewport**.
+- **UI / Headed Mode (`HEADLESS`):** Opens a visible browser in **true full-screen (maximized)** mode.
+
+---
+
+### 🌐 Environment Variable (`ENV`) Options
+
+| Environment | Key | CLI Command Example |
+|---|---|---|
+| **Core Server 2 (Default)** | `coreServer2` | `npx cross-env HEADLESS=false npx playwright test` *(or `ENV=coreServer2`)* |
+| **Staging** | `staging` | `npx cross-env ENV=staging HEADLESS=false npx playwright test` |
+| **UAT** | `uat` | `npx cross-env ENV=uat HEADLESS=false npx playwright test` |
+| **Core Server 1** | `coreServer1` | `npx cross-env ENV=coreServer1 HEADLESS=false npx playwright test` |
 
 ---
 
 ### 1. Whole Batch (Run All Tests)
 
-| Mode | Universal Command | NPM Shortcut |
-|---|---|---|
-| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test` | `npm run test:headless` |
-| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test` | `npm run test:headed` |
+| Mode | Universal Command (Default: Server 2) | With Specific Environment (e.g. Staging) | NPM Shortcut |
+|---|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test` | `npx cross-env ENV=staging HEADLESS=true npx playwright test` | `npm run test:headless` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test` | `npx cross-env ENV=staging HEADLESS=false npx playwright test` | `npm run test:headed` |
 
 ---
 
 ### 2. Last Failed (Re-run Only Failed Tests)
 
-| Mode | Universal Command | NPM Shortcut |
-|---|---|---|
-| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test --last-failed` | `npm run test:failed:headless` |
-| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test --last-failed` | `npm run test:failed:headed` |
+| Mode | Universal Command (Default: Server 2) | With Specific Environment | NPM Shortcut |
+|---|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test --last-failed` | `npx cross-env ENV=uat HEADLESS=true npx playwright test --last-failed` | `npm run test:failed:headless` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test --last-failed` | `npx cross-env ENV=uat HEADLESS=false npx playwright test --last-failed` | `npm run test:failed:headed` |
 
 ---
 
 ### 3. Specific Test Case (Single File)
 
-| Mode | Universal Command |
-|---|---|
-| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` |
-| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` |
+| Mode | Universal Command (Default: Server 2) | With Specific Environment (e.g. Core Server 1) |
+|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` | `npx cross-env ENV=coreServer1 HEADLESS=true npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` | `npx cross-env ENV=coreServer1 HEADLESS=false npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js` |
 
 ---
 
 ### 4. By Folder / Module (e.g., `AdminApplication`, `StaffApplication`, `StudentApplication`)
 
-| Mode | Universal Command |
-|---|---|
-| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test tests/AdminApplication/` |
-| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/` |
+| Mode | Universal Command (Default: Server 2) | With Specific Environment |
+|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test tests/AdminApplication/` | `npx cross-env ENV=staging HEADLESS=true npx playwright test tests/AdminApplication/` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/` | `npx cross-env ENV=staging HEADLESS=false npx playwright test tests/AdminApplication/` |
 
 ---
 
