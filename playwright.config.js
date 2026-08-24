@@ -12,6 +12,20 @@ const isHeadless = process.env.HEADLESS === 'true';
 module.exports = defineConfig({
 
     /**
+     * globalSetup: Path to a module that runs once before all tests run.
+     * Value: './utils/global-setup.js'
+     * Why: Automatically cleans 'allure-results' so only the current execution appears in the report.
+     */
+    globalSetup: require.resolve('./utils/global-setup.js'),
+
+    /**
+     * globalTeardown: Path to a module that runs once after all tests finish.
+     * Value: './utils/global-teardown.js'
+     * Why: Automatically generates the Allure HTML report and opens both Playwright & Allure reports in the browser.
+     */
+    globalTeardown: require.resolve('./utils/global-teardown.js'),
+
+    /**
      * testDir: Specifies the root directory where Playwright searches for test files (*.spec.js).
      * Current Value: './tests'
      * Possible Values: Any valid directory path string (e.g. './tests', './e2e', './src/specs').
@@ -57,7 +71,7 @@ module.exports = defineConfig({
      *   - 1, 2, 3 (number of retry attempts).
      * Why: Helps eliminate false negatives caused by intermittent network glitches or slow server responses.
      */
-    retries: 1,
+    // retries: 1,
 
     /**
      * reporter: Defines test execution reporting format and behavior.
@@ -69,7 +83,12 @@ module.exports = defineConfig({
      * Why: Automatically opens an interactive HTML test report in the browser with screenshots, video, and logs after execution.
      */
     reporter: [
-        ['html', { open: 'always' }]
+        ['html', { open: 'always' }],
+        ['allure-playwright', {
+            outputFolder: 'allure-results',
+            detail: true,
+            suiteTitle: true,
+        }]
     ],
 
     /**

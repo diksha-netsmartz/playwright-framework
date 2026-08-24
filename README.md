@@ -137,13 +137,37 @@ npx playwright test --ui
 
 ## 📊 Viewing Test Reports & Traces
 
-### 1. View HTML Report
+### 1. View Playwright HTML Report
 The HTML report opens automatically after execution, but can also be opened manually:
 ```bash
 npx playwright show-report
 ```
 
-### 2. Inspect Failure Traces
+### 2. View Allure Reports
+Allure results are automatically generated in `allure-results/` during every test execution.
+
+- **Generate and open Allure HTML Report in one step (Live Server):**
+  ```bash
+  npm run allure:serve
+  # or
+  npx allure serve allure-results
+  ```
+
+- **Generate static Allure Report folder:**
+  ```bash
+  npm run allure:generate
+  # or
+  npx allure generate allure-results --clean -o allure-report
+  ```
+
+- **Open previously generated static Allure Report:**
+  ```bash
+  npm run allure:open
+  # or
+  npx allure open allure-report
+  ```
+
+### 3. Inspect Failure Traces
 Inspect step-by-step DOM snapshots and network logs for a failed test:
 ```bash
 npx playwright show-trace test-results/<path-to-trace.zip>
