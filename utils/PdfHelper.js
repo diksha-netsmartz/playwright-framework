@@ -38,30 +38,14 @@ export default class PdfHelper {
     }
 
     /**
-     * Verifies receipt page heading/text in the open tab, generates/downloads the PDF document,
-     * verifies the text inside the PDF document, prints the extracted PDF text to the console, and attaches it to reports.
-     * @param {import('@playwright/test').Page} page - The Playwright Page instance (current or popup receipt tab).
-     * @param {string} expectedText - Text to verify on the open page tab and inside the PDF.
+     * Downloads/generates a PDF from the page, extracts & verifies the text inside the PDF,
+     * prints the PDF text to console, and attaches it to the report.
+     * @param {import('@playwright/test').Page} page - The Playwright Page instance.
+     * @param {string} expectedText - Text expected inside the PDF document.
      * @param {string} attachmentName - Filename for the attached PDF in reports.
      */
-    static async verifyAndAttachReceipt(page, expectedText, attachmentName) {
-        // Step 1: Verify the expected text in the newly opened browser page / tab
-        await test.step(`Verify "${expectedText}" on the opened page tab`, async () => {
-            if (page.pdfText) {
-                expect(page.pdfText).toMatch(new RegExp(expectedText, 'i'));
-            } else {
-                // Wait for any loading masks or spinners to disappear
-                await page.locator('.k-loading-mask, .loading-image, #divLoader, .blockUI, div[id*="loading"]').waitFor({
-                    state: 'hidden',
-                    timeout: 30000
-                }).catch(() => {});
-
-                await expect(page.getByText(new RegExp(expectedText, 'i')).first()).toBeVisible({ timeout: 30000 });
-                await page.waitForTimeout(1000);
-            }
-        });
-
-        // Step 2: Download / generate the PDF document from the page
+    static async downloadVerifyAndAttach(page, expectedText, attachmentName) {
+        // Step 1: Obtain or generate PDF document from the page
         let pdfBuffer = page.pdfBuffer;
 
         if (!pdfBuffer) {
@@ -75,7 +59,7 @@ export default class PdfHelper {
             }
         }
 
-        // Step 3: Extract and verify the text inside the downloaded / captured PDF document
+        // Step 2: Extract text from PDF, log to console, and verify expected text
         await test.step(`Extract and verify text in PDF document: ${attachmentName}`, async () => {
             let pdfText = page.pdfText;
             if (!pdfText && pdfBuffer && pdfBuffer.length > 0) {
@@ -91,7 +75,7 @@ export default class PdfHelper {
             }
         });
 
-        // Step 4: Attach the PDF document to Playwright HTML and Allure Reports
+        // Step 3: Attach the PDF document to Playwright HTML and Allure Reports
         if (pdfBuffer) {
             try {
                 await test.info().attach(attachmentName, {
@@ -105,6 +89,9 @@ export default class PdfHelper {
         }
     }
 }
+
+
+
 
 
 

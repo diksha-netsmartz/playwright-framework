@@ -208,7 +208,7 @@ export default class RTStudentOnlineEnrollmentPage extends BasePage {
     async clickPayLater() {
         await test.step('Click Pay Later button', async () => {
             await this.click(this.payLaterBtn);
-            await this.waitForLoaders().catch(() => {});
+            await this.waitForLoaders().catch(() => { });
         });
     }
 
@@ -222,7 +222,7 @@ export default class RTStudentOnlineEnrollmentPage extends BasePage {
             await this.fill(this.smsNumber, data.smsNumber);
             await this.click(this.addButton);
             await this.click(this.optInButton);
-            await this.waitForLoaders().catch(() => {});
+            await this.waitForLoaders().catch(() => { });
         });
     }
 
@@ -233,9 +233,16 @@ export default class RTStudentOnlineEnrollmentPage extends BasePage {
      * @param {string} [attachmentName='RT_Registration_Receipt.pdf'] - Filename for the attached PDF in reports.
     **/
     async verifyReceiptPage(expectedText = 'REGISTRATION COMPLETED', attachmentName = 'RT_Registration_Receipt.pdf') {
-        await PdfHelper.verifyAndAttachReceipt(this.page, expectedText, attachmentName);
+        await test.step(`Verify "${expectedText}" on receipt page`, async () => {
+            await this.waitForLoaders().catch(() => { });
+            await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')));
+            await this.verifyVisible(this.page.getByText(new RegExp(expectedText, 'i')));
+        });
+        await PdfHelper.downloadVerifyAndAttach(this.page, expectedText, attachmentName);
     }
 }
+
+
 
 
 
