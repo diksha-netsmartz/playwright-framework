@@ -3,21 +3,46 @@ const fs = require('fs');
 const path = require('path');
 
 /**
+ * Generates a timestamp string in format: YYYY-MM-DD_HH-mm-ss
+ */
+function getTimestamp() {
+    const now = new Date();
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = now.getFullYear();
+    const month = pad(now.getMonth() + 1);
+    const day = pad(now.getDate());
+    const hours = pad(now.getHours());
+    const minutes = pad(now.getMinutes());
+    const seconds = pad(now.getSeconds());
+    return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+}
+
+/**
  * Global Teardown hook executed once after all Playwright tests finish.
- * Automatically generates the Allure HTML report and launches it in the browser,
- * while ensuring any previous Allure server instances are cleanly closed first.
+ * Automatically generates a timestamped Allure HTML report in 'allure-reports/'
+ * and launches it in the browser, while ensuring any previous Allure server instances
+ * are cleanly closed first.
  */
 async function globalTeardown() {
     const rootDir = path.resolve(__dirname, '..');
     const allureResultsDir = path.join(rootDir, 'allure-results');
+    const baseReportsDir = path.join(rootDir, 'allure-reports');
 
     if (fs.existsSync(allureResultsDir)) {
         try {
-            console.log('\n[Reporting] Generating Allure Report...');
+            const timestamp = getTimestamp();
+            const reportRelativeFolder = path.join('allure-reports', `report_${timestamp}`);
+            const reportFullPath = path.join(rootDir, reportRelativeFolder);
+
+            if (!fs.existsSync(baseReportsDir)) {
+                fs.mkdirSync(baseReportsDir, { recursive: true });
+            }
+
+            console.log(`\n[Reporting] Generating Allure Report in '${reportRelativeFolder}'...`);
             const isWindows = process.platform === 'win32';
             const cmd = isWindows ? 'npx.cmd' : 'npx';
 
-            execSync(`${cmd} allure generate allure-results --clean -o allure-report`, {
+            execSync(`${cmd} allure generate allure-results --clean -o "${reportFullPath}"`, {
                 cwd: rootDir,
                 stdio: 'inherit',
                 shell: true
@@ -40,9 +65,8 @@ async function globalTeardown() {
                 // Ignore if no existing process was running or command is unsupported
             }
 
-
-            console.log('[Reporting] Opening Allure Report in browser...');
-            const child = spawn(cmd, ['allure', 'open', 'allure-report'], {
+            console.log(`[Reporting] Opening latest Allure Report (${reportRelativeFolder}) in browser...`);
+            const child = spawn(cmd, ['allure', 'open', reportFullPath], {
                 cwd: rootDir,
                 detached: !isWindows,
                 stdio: 'ignore',
@@ -56,4 +80,5 @@ async function globalTeardown() {
 }
 
 module.exports = globalTeardown;
+
 

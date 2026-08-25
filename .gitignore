@@ -5,3 +5,5 @@ screenshots/
 node_modules/
 allure-results/
 allure-report/
+allure-reports/
+playwright/.auth/

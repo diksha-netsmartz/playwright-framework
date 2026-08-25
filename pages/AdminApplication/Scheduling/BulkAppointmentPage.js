@@ -1,5 +1,5 @@
 import BasePage from "../../../utils/BasePage";
-import { expect } from "@playwright/test";
+import { test } from "@playwright/test";
 
 /**
  * Page Object representing the Bulk Appointment Management Page in Admin Portal.

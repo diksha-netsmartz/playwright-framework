@@ -11,7 +11,7 @@
     "test:ui": "npx playwright test --ui",
     "test:debug": "npx playwright test --debug",
     "allure:generate": "allure generate allure-results --clean -o allure-report",
-    "allure:open": "allure open allure-report",
+    "allure:open": "node scripts/open-latest-allure.js",
     "allure:serve": "allure serve allure-results"
   },
   "keywords": [],

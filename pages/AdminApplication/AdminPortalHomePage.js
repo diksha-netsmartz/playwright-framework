@@ -49,11 +49,17 @@ export default class AdminPortalHomePage extends BasePage {
         this.showFilesToConfirmBtn = page.getByRole('button', { name: 'Show Files to Confirm' });
         this.filePreviewIcon = page.getByTitle('File Preview', { exact: true }).first();
         this.selectCategoryButton = page.getByRole('button', { name: 'Select Category' });
-        this.selectCategoryDropdownCheckbox = page.locator("xpath=//input[@type='checkbox' and contains(@class,'Document')]//following-sibling::ins[1]");
+        this.selectCategoryDropdownCheckbox = page.locator("xpath=(//div[@class='selectCategorFromImagePreViewModal']//input[@type='checkbox' and contains(@class,'Document')]//following-sibling::ins)[1]");
         this.confirmButton = page.locator('#btnConfirmFile:visible');
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.sendButton = page.locator("xpath=//button[@onclick='SendFileConfirmedEmail()' and text()='SEND']");
+
+        // Account Management
+        this.accountManagementMenu = page.getByRole('link', { name: /Account Management/i });
+        this.servicesSubMenu = page.locator("xpath=//li[@id='li_SetupSettings']//strong[text()='Services']");
+        this.componentsProductsLink = page.locator('a').filter({ hasText: 'Components (Products)' });
     }
+
 
     /**
      * Navigates directly to the Admin Home/Dashboard URL (using captured session URL).
@@ -100,6 +106,8 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForVisible(this.schedulingMenu);
             await this.click(this.schedulingMenu);
             await this.click(this.singleInstructorLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 });
         });
     }
 
@@ -226,7 +234,25 @@ export default class AdminPortalHomePage extends BasePage {
             await this.click(this.sendButton);
             await this.waitForHidden(this.sendButton);
             await this.waitForLoaders();
-            await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+            await this.waitForVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+        });
+    }
+
+    /**
+     * Navigates to Account Management > Services > Components (Products) page.
+     **/
+    async navigateToComponents() {
+        await test.step('Navigate to Account Management -> Services -> Components (Products)', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.accountManagementMenu);
+            await this.click(this.accountManagementMenu);
+
+            await this.waitForVisible(this.servicesSubMenu);
+            await this.click(this.servicesSubMenu);
+
+            await this.waitForVisible(this.componentsProductsLink);
+            await this.click(this.componentsProductsLink);
+            await this.waitForLoaders();
         });
     }
 }
