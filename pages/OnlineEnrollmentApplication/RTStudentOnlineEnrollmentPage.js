@@ -1,6 +1,7 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import config from '../../config/config';
+
 import oeData from '../../test-data/onlineEnrollmentData.json';
 
 /**
@@ -88,21 +89,22 @@ export default class RTStudentOnlineEnrollmentPage extends BasePage {
      * Navigates to the Road Test Online Enrollment page using the configured RT OE URL.
     **/
     async navigateToRTOEPage() {
-        await this.navigate(config.rtOEURL);
+        await test.step('Navigate to Road Test Online Enrollment Page', async () => {
+            await this.navigate(config.rtOEURL);
+        });
     }
 
     /**
      * Selects the Road Test package, opens available classes, selects the first available class slot, and continues.
     **/
     async selectRTPackage() {
-        // await this.click(this.rtPackageBtn);
-        await this.waitForVisible(this.showAppointmentButton)
-        await this.click(this.showAppointmentButton);
-        await this.waitForVisible(this.selectButton);
-        await this.click(this.selectButton);
-        await this.click(this.continueButton);
-
-
+        await test.step('Select Road Test package and appointment slot', async () => {
+            await this.waitForVisible(this.showAppointmentButton);
+            await this.click(this.showAppointmentButton);
+            await this.waitForVisible(this.selectButton);
+            await this.click(this.selectButton);
+            await this.click(this.continueButton);
+        });
     }
 
     /**
@@ -110,24 +112,28 @@ export default class RTStudentOnlineEnrollmentPage extends BasePage {
      * @param {string} address - The street address to enter.
     **/
     async fillAddress(address) {
-        await this.pressSequentially(this.addressTxt, address);
-        await this.waitForVisible(this.addressSelectionDropdown);
-        await this.click(this.addressSelectionDropdown);
+        await test.step(`Fill address: "${address}"`, async () => {
+            await this.pressSequentially(this.addressTxt, address);
+            await this.waitForVisible(this.addressSelectionDropdown);
+            await this.click(this.addressSelectionDropdown);
+        });
     }
 
     /**
      * Selects the Date of Birth (Year, Day, Month) from custom Kendo dropdown controls.
     **/
     async selectDOB() {
-        await this.click(this.dobYearDdl);
-        await this.waitForVisible(this.yearSelectionInDropdown);
-        await this.page.evaluate(el => el.click(), await this.yearSelectionInDropdown.elementHandle());
-        await this.click(this.dobDayDdl);
-        await this.waitForVisible(this.daySelectionInDropdown);
-        await this.page.evaluate(el => el.click(), await this.daySelectionInDropdown.elementHandle());
-        await this.click(this.dobMonthDdl);
-        await this.waitForVisible(this.monthSelectionInDropdown);
-        await this.page.evaluate(el => el.click(), await this.monthSelectionInDropdown.elementHandle());
+        await test.step('Select Date of Birth', async () => {
+            await this.click(this.dobYearDdl);
+            await this.waitForVisible(this.yearSelectionInDropdown);
+            await this.page.evaluate(el => el.click(), await this.yearSelectionInDropdown.elementHandle());
+            await this.click(this.dobDayDdl);
+            await this.waitForVisible(this.daySelectionInDropdown);
+            await this.page.evaluate(el => el.click(), await this.daySelectionInDropdown.elementHandle());
+            await this.click(this.dobMonthDdl);
+            await this.waitForVisible(this.monthSelectionInDropdown);
+            await this.page.evaluate(el => el.click(), await this.monthSelectionInDropdown.elementHandle());
+        });
     }
 
     /**
@@ -135,89 +141,95 @@ export default class RTStudentOnlineEnrollmentPage extends BasePage {
      * emergency contacts, school, gender, medical info, permit expiration & issued dates, terms, and signatures.
     **/
     async fillStudentInfo() {
-        const data = oeData.student;
+        await test.step('Fill RT Student Registration Form', async () => {
+            const data = oeData.student;
 
-        await this.fill(this.firstNameTxt, `${data.firstName}_${this.uniqueId}`);
-        await this.fill(this.middlenameTxt, data.middleName);
-        await this.fill(this.lastNameTxt, data.lastName);
-        await this.fillAddress(data.address);
-        await this.fill(this.homePhoneTxt, data.homePhone);
-        await this.fill(this.cellPhoneTxt, data.cellPhone);
-        await this.fill(this.emailTxt, data.email);
-        await this.fill(this.parentGuardianNameTxt, data.parentGuardianName);
-        await this.fill(this.parentGuardianCellTxt, data.parentGuardianCell);
-        await this.fill(this.parentGuardianEmailTxt, data.parentGuardianEmail);
-        await this.fill(this.parentNameTxt, data.parentName);
-        await this.fill(this.parentPhoneTxt, data.parentPhone);
-        await this.fill(this.parentEmailTxt, data.parentEmail);
-        await this.fill(this.emergencyNameTxt, data.emergencyName);
-        await this.fill(this.emergencyRelationshipTxt, data.emergencyRelationship);
-        await this.fill(this.emergencyPhoneTxt, data.emergencyPhone);
-        await this.selectDOB();
-        await this.click(this.highSchoolDropdown);
-        await this.page.evaluate(el => el.click(), await this.highSchoolDropdownSelection.elementHandle());
-        await this.click(this.wearGlassesDropdown);
-        await this.page.evaluate(el => el.click(), await this.wearGlassesDropdownSelection.elementHandle());
-        await this.page.evaluate(el => el.click(), await this.femaleRadioButton.elementHandle());
-        await this.fill(this.medicalConditionsTxt, data.medicalConditions);
-        await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
-        await this.page.waitForTimeout(1000);
-        try {
-            await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        } catch {
-            console.log("calendar not opened, opening again");
+            await this.fill(this.firstNameTxt, `${data.firstName}_${this.uniqueId}`);
+            await this.fill(this.middlenameTxt, data.middleName);
+            await this.fill(this.lastNameTxt, data.lastName);
+            await this.fillAddress(data.address);
+            await this.fill(this.homePhoneTxt, data.homePhone);
+            await this.fill(this.cellPhoneTxt, data.cellPhone);
+            await this.fill(this.emailTxt, data.email);
+            await this.fill(this.parentGuardianNameTxt, data.parentGuardianName);
+            await this.fill(this.parentGuardianCellTxt, data.parentGuardianCell);
+            await this.fill(this.parentGuardianEmailTxt, data.parentGuardianEmail);
+            await this.fill(this.parentNameTxt, data.parentName);
+            await this.fill(this.parentPhoneTxt, data.parentPhone);
+            await this.fill(this.parentEmailTxt, data.parentEmail);
+            await this.fill(this.emergencyNameTxt, data.emergencyName);
+            await this.fill(this.emergencyRelationshipTxt, data.emergencyRelationship);
+            await this.fill(this.emergencyPhoneTxt, data.emergencyPhone);
+            await this.selectDOB();
+            await this.click(this.highSchoolDropdown);
+            await this.page.evaluate(el => el.click(), await this.highSchoolDropdownSelection.elementHandle());
+            await this.click(this.wearGlassesDropdown);
+            await this.page.evaluate(el => el.click(), await this.wearGlassesDropdownSelection.elementHandle());
+            await this.page.evaluate(el => el.click(), await this.femaleRadioButton.elementHandle());
+            await this.fill(this.medicalConditionsTxt, data.medicalConditions);
             await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
-            await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        }
-        await this.click(this.permitExpireDateSelectInCalendar);
-        await this.click(this.howDidYouHearAbtUsDropdown);
-        await this.page.evaluate(el => el.click(), await this.howDidYouHearAbtUsDropdownSelection.elementHandle());
-        await this.fill(this.permitNumberTxt, data.permitNumber);
-        await this.fill(this.collegeIdTxt, data.collegeId);
-        await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
-        await this.page.waitForTimeout(1000);
-        try {
-            await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        } catch {
-            console.log("calendar not opened, opening again");
+            await this.page.waitForTimeout(1000);
+            try {
+                await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            } catch {
+                console.log("calendar not opened, opening again");
+                await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
+                await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            }
+            await this.click(this.permitExpireDateSelectInCalendar);
+            await this.click(this.howDidYouHearAbtUsDropdown);
+            await this.page.evaluate(el => el.click(), await this.howDidYouHearAbtUsDropdownSelection.elementHandle());
+            await this.fill(this.permitNumberTxt, data.permitNumber);
+            await this.fill(this.collegeIdTxt, data.collegeId);
             await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
-            await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        }
-        await this.click(this.permitIssueDateSelectInCalendar);
+            await this.page.waitForTimeout(1000);
+            try {
+                await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            } catch {
+                console.log("calendar not opened, opening again");
+                await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
+                await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            }
+            await this.click(this.permitIssueDateSelectInCalendar);
 
-        await this.page.evaluate(el => el.click(), await this.termsConditionsCheckbox.elementHandle());
-        await this.fill(this.addressTxt, "ny");
-        await this.fill(this.zipCodeTxt, data.zipCode);
-        await this.fill(this.studentSignature, data.firstName);
-        await this.fill(this.parentSignature, data.parentName);
-        await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
-
+            await this.page.evaluate(el => el.click(), await this.termsConditionsCheckbox.elementHandle());
+            await this.fill(this.addressTxt, "ny");
+            await this.fill(this.zipCodeTxt, data.zipCode);
+            await this.fill(this.studentSignature, data.firstName);
+            await this.fill(this.parentSignature, data.parentName);
+            await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
+        });
     }
 
     /**
      * Clicks the 'Pay Later' button to complete the enrollment without immediate online payment.
     **/
     async clickPayLater() {
-        await this.click(this.payLaterBtn);
+        await test.step('Click Pay Later button', async () => {
+            await this.click(this.payLaterBtn);
+        });
     }
 
     /**
      * Handles the SMS notification popup by entering the phone number, adding it, and opting in.
     **/
     async smsPopup() {
-        const data = oeData.student;
-        await this.waitForVisible(this.smsNumber);
-        await this.fill(this.smsNumber, data.smsNumber);
-        await this.click(this.addButton);
-        await this.click(this.optInButton);
-
+        await test.step('Handle SMS notification popup', async () => {
+            const data = oeData.student;
+            await this.waitForVisible(this.smsNumber);
+            await this.fill(this.smsNumber, data.smsNumber);
+            await this.click(this.addButton);
+            await this.click(this.optInButton);
+        });
     }
 
     /**
      * Verifies that the registration receipt page is displayed with confirmation heading.
     **/
     async verifyReceiptPage() {
-        await this.verifyVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
+        await test.step('Verify REGISTRATION COMPLETED receipt page', async () => {
+            await this.verifyVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
+        });
     }
-
 }
+

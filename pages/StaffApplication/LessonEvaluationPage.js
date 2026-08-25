@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Lesson Evaluation Page in Staff Portal.
@@ -19,13 +19,12 @@ export default class LessonEvaluationPage extends BasePage {
         this.selectEvaluationBtn = page.locator("xpath=//button[@title='Select Evaluation']");
         this.selectEvalutionDropdownValue = page.locator("xpath=(//button[@title='Select Evaluation']//parent::div//li)[last()]");
         this.travelTime = page.locator("xpath=//input[@name='travel' and @value='15']//following-sibling::ins");
-        // this.firstSelectBtn = page.getByRole('button', {name: 'Select'}).first();
         this.publicNotesTxt = page.locator('#txtAreaLessonNotes');
         this.privateNotesTxt = page.locator('#txtAreaPrivateLesson');
         this.studentSignatureCanvas = page.locator('#canvasStudentSignature');
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
         this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
-        this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']")
+        this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.successMessage = page.getByText('Success! Lesson completed and');
         this.successMessageDiv = page.locator('#GlobalErrorSuccessDiv');
     }
@@ -34,15 +33,19 @@ export default class LessonEvaluationPage extends BasePage {
      * Clicks the Process button to open the lesson evaluation view.
     **/
     async clickProcess() {
-        await this.click(this.processBtn);
+        await test.step('Click PROCESS button', async () => {
+            await this.click(this.processBtn);
+        });
     }
 
     /**
      * Opens the evaluation dropdown and selects the last evaluation type.
     **/
     async selectEvaluation() {
-        await this.click(this.selectEvaluationBtn);
-        await this.click(this.selectEvalutionDropdownValue);
+        await test.step('Select evaluation template from dropdown', async () => {
+            await this.click(this.selectEvaluationBtn);
+            await this.click(this.selectEvalutionDropdownValue);
+        });
     }
 
     /**
@@ -61,47 +64,55 @@ export default class LessonEvaluationPage extends BasePage {
      * Fills out answers for all evaluation questions (Q1 through Q20) with predefined rubric ratings.
     **/
     async answerAllEvaluationQuestions() {
-        await this.selectQuestionByText(1, '0-Safety Risk');         // Q1
-        await this.selectQuestionByText(2, '1-Improvement Needed');  // Q2
-        await this.selectQuestionByText(3, '0-Safety Risk');         // Q3
-        await this.selectQuestionByText(4, '1-Improvement Needed');  // Q4
-        await this.selectQuestionByText(5, '1-Improvement Needed');  // Q5
-        await this.selectQuestionByText(6, '2-Beginning');           // Q6
-        await this.selectQuestionByText(7, '4-Competent');           // Q7
-        await this.selectQuestionByText(8, '5-Exemplary');           // Q8
-        await this.selectQuestionByText(9, '5-Exemplary');           // Q9
-        await this.selectQuestionByText(10, '4-Competent');          // Q10
-        await this.selectQuestionByText(11, '2-Beginning');          // Q11
-        await this.selectQuestionByText(12, '3-Progressing');        // Q12
-        await this.selectQuestionByText(13, '2-Beginning');          // Q13
-        await this.selectQuestionByText(14, '3-Progressing');
-        await this.selectQuestionByText(15, '3-Progressing');        // Q14
-        await this.selectQuestionByText(16, '0-Safety Risk');        // Q16
-        await this.selectQuestionByText(17, '3-Progressing');        // Q17
-        await this.selectQuestionByText(18, '2-Beginning');          // Q18
-        await this.selectQuestionByText(19, '4-Competent');          // Q19
-        await this.selectQuestionByText(20, '1-Improvement Needed'); // Q20
+        await test.step('Answer all evaluation questions (Q1 - Q20)', async () => {
+            await this.selectQuestionByText(1, '0-Safety Risk');         // Q1
+            await this.selectQuestionByText(2, '1-Improvement Needed');  // Q2
+            await this.selectQuestionByText(3, '0-Safety Risk');         // Q3
+            await this.selectQuestionByText(4, '1-Improvement Needed');  // Q4
+            await this.selectQuestionByText(5, '1-Improvement Needed');  // Q5
+            await this.selectQuestionByText(6, '2-Beginning');           // Q6
+            await this.selectQuestionByText(7, '4-Competent');           // Q7
+            await this.selectQuestionByText(8, '5-Exemplary');           // Q8
+            await this.selectQuestionByText(9, '5-Exemplary');           // Q9
+            await this.selectQuestionByText(10, '4-Competent');          // Q10
+            await this.selectQuestionByText(11, '2-Beginning');          // Q11
+            await this.selectQuestionByText(12, '3-Progressing');        // Q12
+            await this.selectQuestionByText(13, '2-Beginning');          // Q13
+            await this.selectQuestionByText(14, '3-Progressing');
+            await this.selectQuestionByText(15, '3-Progressing');        // Q14
+            await this.selectQuestionByText(16, '0-Safety Risk');        // Q16
+            await this.selectQuestionByText(17, '3-Progressing');        // Q17
+            await this.selectQuestionByText(18, '2-Beginning');          // Q18
+            await this.selectQuestionByText(19, '4-Competent');          // Q19
+            await this.selectQuestionByText(20, '1-Improvement Needed'); // Q20
+        });
     }
 
     /**
      * Selects the 15-minute travel time option.
     **/
     async selectTravelTime() {
-        await this.check(this.travelTime);
+        await test.step('Select 15 min travel time option', async () => {
+            await this.check(this.travelTime);
+        });
     }
 
     /**
      * Enters public notes visible to student and parents in the evaluation form.
     **/
     async enterPublicNotes() {
-        await this.fill(this.publicNotesTxt, 'public notes');
+        await test.step('Enter public notes', async () => {
+            await this.fill(this.publicNotesTxt, 'public notes');
+        });
     }
 
     /**
      * Enters private staff-only notes in the evaluation form.
     **/
     async enterPrivateNotes() {
-        await this.fill(this.privateNotesTxt, 'private notes');
+        await test.step('Enter private notes', async () => {
+            await this.fill(this.privateNotesTxt, 'private notes');
+        });
     }
 
     /**
@@ -126,35 +137,45 @@ export default class LessonEvaluationPage extends BasePage {
      * Draws the student signature on the student signature canvas.
     **/
     async signStudentSignature() {
-        await this.#drawSignature(this.studentSignatureCanvas);
+        await test.step('Sign student digital signature', async () => {
+            await this.#drawSignature(this.studentSignatureCanvas);
+        });
     }
 
     /**
      * Draws the instructor signature on the instructor signature canvas.
     **/
     async signInstructorSignature() {
-        await this.#drawSignature(this.instructorSignatureCanvas);
+        await test.step('Sign instructor digital signature', async () => {
+            await this.#drawSignature(this.instructorSignatureCanvas);
+        });
     }
 
     /**
      * Clicks the 'Complete Lesson (Send Email)' button to finalize the lesson.
     **/
     async completeLesson() {
-        await this.click(this.completeLessonBtn);
+        await test.step('Click Complete Lesson (Send Email) button', async () => {
+            await this.click(this.completeLessonBtn);
+        });
     }
 
     /**
      * Confirms the lesson completion popup by clicking 'Yes'.
     **/
     async confirmLessonCompletion() {
-        await this.click(this.confirmYesBtn);
+        await test.step('Confirm lesson completion popup', async () => {
+            await this.click(this.confirmYesBtn);
+        });
     }
 
     /**
      * Verifies that the success alert 'Success! Lesson completed and evaluation saved.' is visible.
     **/
     async verifyLessonCompletedSuccessfully() {
-        await this.verifyVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', { exact: true }));
+        await test.step('Verify "Success! Lesson completed and evaluation saved." message', async () => {
+            await this.verifyVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', { exact: true }));
+        });
     }
-
 }
+

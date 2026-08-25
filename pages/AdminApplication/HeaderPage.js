@@ -1,4 +1,5 @@
 import BasePage from '../../utils/BasePage';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Admin Portal Global Header.
@@ -23,16 +24,19 @@ export default class HeaderPage extends BasePage {
      * Logs out of the Admin Portal by hovering over the user menu and clicking the Log Out link.
     **/
     async logout() {
-        await this.hover(this.userMenu);
-        await this.click(this.logoutBtn);
+        await test.step('Log out from Admin Portal', async () => {
+            await this.hover(this.userMenu);
+            await this.click(this.logoutBtn);
+        });
     }
 
     /**
      * Verifies that the user has successfully logged out by asserting the login screen headings are visible.
     **/
     async verifyLogoutSuccessful() {
-        await this.verifyVisible(this.loginHeading);
-        await this.verifyVisible(this.helpHeading);
+        await test.step('Verify logout redirected to Login Page', async () => {
+            await this.verifyVisible(this.loginHeading);
+            await this.verifyVisible(this.helpHeading);
+        });
     }
-
 }

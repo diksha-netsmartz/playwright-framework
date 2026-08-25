@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Student Profile Page in Admin Portal.
@@ -15,7 +15,6 @@ export default class StudentProfilePage extends BasePage {
         super(page);
 
         // Student selection locators
-
         this.studentNotSelected = page.getByRole('link', { name: 'STUDENT NOT SELECTED. CLICK' });
         this.studentSearch = page.locator('#studentList');
         this.goButton = page.getByRole('button', { name: 'GO' });
@@ -40,18 +39,18 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} studentName - Student's name to search.
      **/
     async selectStudent(studentName) {
-        await this.click(this.studentNotSelected);
-        await this.waitForVisible(this.studentSearch);
-        await this.pressSequentially(this.studentSearch, studentName);
+        await test.step(`Search and select student: "${studentName}"`, async () => {
+            await this.click(this.studentNotSelected);
+            await this.waitForVisible(this.studentSearch);
+            await this.pressSequentially(this.studentSearch, studentName);
 
-        const studentOption = this.page.getByText(studentName).first();
-        await this.waitForVisible(studentOption);
-        await this.click(studentOption);
+            const studentOption = this.page.getByText(studentName).first();
+            await this.waitForVisible(studentOption);
+            await this.click(studentOption);
 
-        await this.click(this.goButton);
-        // await this.page.waitForLoadState('networkidle');
-        await this.waitForLoaders();
-
+            await this.click(this.goButton);
+            await this.waitForLoaders();
+        });
     }
 
     /**
@@ -59,12 +58,14 @@ export default class StudentProfilePage extends BasePage {
      * Verifies that the success message 'Email sent successfully.' appears.
      **/
     async sendUsernamePasswordEmail() {
-        await this.verifyVisible(this.sendUsernamePasswordEmailBtn);
-        await this.click(this.sendUsernamePasswordEmailBtn);
-        await this.click(this.studentEmailCheckbox);
-        await this.click(this.submitButton);
-        await this.waitForVisible(this.page.getByText('Email sent successfully.'));
-        await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+        await test.step('Send Username/Password email to student', async () => {
+            await this.verifyVisible(this.sendUsernamePasswordEmailBtn);
+            await this.click(this.sendUsernamePasswordEmailBtn);
+            await this.click(this.studentEmailCheckbox);
+            await this.click(this.submitButton);
+            await this.waitForVisible(this.page.getByText('Email sent successfully.'));
+            await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+        });
     }
 
     /**
@@ -73,21 +74,23 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} specifiedEmail - The required email address to set.
      **/
     async updateEmailIfDifferent(specifiedEmail) {
-        await this.verifyVisible(this.emailInput);
-        const currentEmail = (await this.getInputValue(this.emailInput)).trim();
+        await test.step(`Update student email if different from: "${specifiedEmail}"`, async () => {
+            await this.verifyVisible(this.emailInput);
+            const currentEmail = (await this.getInputValue(this.emailInput)).trim();
 
-        if (currentEmail.toLowerCase() !== specifiedEmail.trim().toLowerCase()) {
-            await this.click(this.openEmailPopupBtn);
-            await this.waitForVisible(this.popupStudentEmailInput);
-            await this.clear(this.popupStudentEmailInput);
-            await this.fill(this.popupStudentEmailInput, specifiedEmail);
-            await this.click(this.updateStudentEmailBtn);
-            await this.verifyVisible(this.page.getByText('Updated successfully.', { exact: true }));
-            await this.click(this.closePopup);
-            await this.waitForHidden(this.popupStudentEmailInput);
-            await this.reload();
-            await this.waitForLoaders();
-        }
+            if (currentEmail.toLowerCase() !== specifiedEmail.trim().toLowerCase()) {
+                await this.click(this.openEmailPopupBtn);
+                await this.waitForVisible(this.popupStudentEmailInput);
+                await this.clear(this.popupStudentEmailInput);
+                await this.fill(this.popupStudentEmailInput, specifiedEmail);
+                await this.click(this.updateStudentEmailBtn);
+                await this.verifyVisible(this.page.getByText('Updated successfully.', { exact: true }));
+                await this.click(this.closePopup);
+                await this.waitForHidden(this.popupStudentEmailInput);
+                await this.reload();
+                await this.waitForLoaders();
+            }
+        });
     }
 
     /**
@@ -98,3 +101,4 @@ export default class StudentProfilePage extends BasePage {
         await this.updateEmailIfDifferent(specifiedEmail);
     }
 }
+

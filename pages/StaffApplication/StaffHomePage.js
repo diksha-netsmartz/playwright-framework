@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Staff Portal Home / Dashboard Page.
@@ -24,56 +24,58 @@ export default class StaffHomePage extends BasePage {
         this.cancelLink = page.locator("xpath=(//a//strong[text()='Cancel'])[last()]");
         this.cancelTextbox = page.locator("#txtArea_CancelLesson");
         this.cancelButton = page.locator("#btnCancelLesson").first();
-
-
     }
 
     /**
      * Opens the action dropdown on the latest item in the 'Needs Attention' widget and clicks 'Process'.
     **/
     async clickProcess() {
-        await this.waitForVisible(this.needsAttentionWidget);
-        await this.click(this.actionDropdownBtn);
-        await this.click(this.processLink);
+        await test.step('Click Process in "Needs Attention" widget', async () => {
+            await this.waitForVisible(this.needsAttentionWidget);
+            await this.click(this.actionDropdownBtn);
+            await this.click(this.processLink);
+        });
     }
 
     /**
      * Marks an appointment in the 'Needs Attention' widget as No Show with notes and confirms the action.
     **/
     async markAppointmentAsNoShow() {
-        await this.waitForLoaders();
-        await this.waitForVisible(this.needsAttentionWidget);
-        await this.click(this.actionDropdownBtn);
-        await this.click(this.noShowLink);
-        await this.waitForVisible(this.noShowTextbox);
-        await this.fill(this.noShowTextbox, "no show appointment");
-        await this.click(this.noShowButton);
-        // await this.verifyVisible(this.page.getByText('Appointment marked No Show successfully.', { exact: true }));
+        await test.step('Mark appointment as No Show and confirm', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.needsAttentionWidget);
+            await this.click(this.actionDropdownBtn);
+            await this.click(this.noShowLink);
+            await this.waitForVisible(this.noShowTextbox);
+            await this.fill(this.noShowTextbox, "no show appointment");
+            await this.click(this.noShowButton);
 
-        const noShowMsg = this.page.getByText('Appointment marked No Show successfully.', { exact: true })
-        await this.click(this.yesConfirmationButton);
-        await expect(noShowMsg).toBeAttached({ timeout: 5000 });
-        await this.waitForLoaders();
+            const noShowMsg = this.page.getByText('Appointment marked No Show successfully.', { exact: true });
+            await this.click(this.yesConfirmationButton);
+            await expect(noShowMsg).toBeAttached({ timeout: 5000 });
+            await this.waitForLoaders();
+        });
     }
 
     /**
      * Cancels an appointment in the 'Needs Attention' widget with cancellation notes and confirms the action.
     **/
     async markAppointmentAsCancel() {
-        await this.waitForLoaders();
-        await this.waitForVisible(this.needsAttentionWidget);
-        await this.click(this.actionDropdownBtn);
-        await this.click(this.cancelLink);
-        await this.waitForLoaders();
-        await this.waitForVisible(this.cancelTextbox);
-        await this.fill(this.cancelTextbox, "cancel appointment");
-        await this.click(this.cancelButton);
-        // await this.verifyVisible(this.page.getByText('Appointment cancelled successfully.', { exact: true }));
+        await test.step('Cancel appointment and confirm', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.needsAttentionWidget);
+            await this.click(this.actionDropdownBtn);
+            await this.click(this.cancelLink);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.cancelTextbox);
+            await this.fill(this.cancelTextbox, "cancel appointment");
+            await this.click(this.cancelButton);
 
-        const cancelMsg = this.page.getByText('Appointment cancelled successfully.', { exact: true })
-        await this.click(this.yesConfirmationButton);
-        await expect(cancelMsg).toBeAttached({ timeout: 5000 });
-        await this.waitForLoaders();
+            const cancelMsg = this.page.getByText('Appointment cancelled successfully.', { exact: true });
+            await this.click(this.yesConfirmationButton);
+            await expect(cancelMsg).toBeAttached({ timeout: 5000 });
+            await this.waitForLoaders();
+        });
     }
-
 }
+

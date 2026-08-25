@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Student Enrollment and Receipt Page.
@@ -16,33 +16,39 @@ export default class StudentEnrollPage extends BasePage {
 
         this.payLaterBtn = page.getByRole('button', { name: 'Pay Later' });
         this.printReceiptLink = page.getByRole('link', { name: 'Print Receipt' }).last();
-        this.getPackageSelectBtn = page.locator("xpath=(//button[contains(@class,'PriceTax')])[1]")
+        this.getPackageSelectBtn = page.locator("xpath=(//button[contains(@class,'PriceTax')])[1]");
     }
 
     /**
      * Selects the available package from the pricing list.
     **/
     async selectPackage() {
-        await this.click(this.getPackageSelectBtn);
+        await test.step('Select package from price table', async () => {
+            await this.click(this.getPackageSelectBtn);
+        });
     }
 
     /**
      * Clicks the 'Pay Later' button to proceed with enrollment without immediate payment.
     **/
     async clickPayLater() {
-        await this.click(this.payLaterBtn);
+        await test.step('Click Pay Later button', async () => {
+            await this.click(this.payLaterBtn);
+        });
     }
 
     /**
      * Verifies that the enrollment success message is visible on the page.
     **/
     async verifyEnrollmentSuccess() {
-        await this.verifyVisible(
-            this.page.getByText(
-                'You have been enrolled successfully.',
-                { exact: true }
-            ).first()
-        );
+        await test.step('Verify "You have been enrolled successfully." message', async () => {
+            await this.verifyVisible(
+                this.page.getByText(
+                    'You have been enrolled successfully.',
+                    { exact: true }
+                ).first()
+            );
+        });
     }
 
     /**
@@ -50,11 +56,13 @@ export default class StudentEnrollPage extends BasePage {
      * @returns {Promise<import('@playwright/test').Page>} The popup Page instance representing the receipt page.
       **/
     async clickPrintReceipt() {
-        const popupPromise = this.page.waitForEvent('popup');
-        await this.click(this.printReceiptLink);
-        const receiptPage = await popupPromise;
-        await receiptPage.waitForLoadState();
-        return receiptPage;
+        return await test.step('Click Print Receipt and wait for popup', async () => {
+            const popupPromise = this.page.waitForEvent('popup');
+            await this.click(this.printReceiptLink);
+            const receiptPage = await popupPromise;
+            await receiptPage.waitForLoadState();
+            return receiptPage;
+        });
     }
 
     /**
@@ -62,8 +70,9 @@ export default class StudentEnrollPage extends BasePage {
      * @param {import('@playwright/test').Page} receiptPage - The receipt popup Page instance.
     **/
     async verifyReceiptPage(receiptPage) {
-
-        await expect(receiptPage.getByRole('heading')).toContainText('Enrollment COMPLETED');
+        await test.step('Verify "Enrollment COMPLETED" on receipt page', async () => {
+            await expect(receiptPage.getByRole('heading')).toContainText('Enrollment COMPLETED');
+        });
     }
-
 }
+

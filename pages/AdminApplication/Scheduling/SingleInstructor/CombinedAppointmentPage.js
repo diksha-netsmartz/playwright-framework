@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import BasePage from "../../../../utils/BasePage";
 import studentData from "../../../../test-data/studentData.json";
 
@@ -46,48 +46,28 @@ export default class CombinedAppointmentPage extends BasePage {
         this.duration15Minutes = page.getByLabel("15 Minutes");
 
         // Student 1
-        this.student1Textbox = page.getByRole("textbox", {
-            name: "Student1: Enter at least two characters.",
-        });
+        this.student1Textbox = page.getByRole("textbox", { name: "Student1: Enter at least two characters.", });
 
-        this.student1Pickup = page.locator(
-            "#FirstTypeAppointment_p_str_PickupLocation"
-        );
+        this.student1Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocation");
 
-        this.student1Notes = page.getByRole("textbox", {
-            name: "Notes Student 1",
-        });
+        this.student1Notes = page.getByRole("textbox", { name: "Notes Student 1", });
 
         // Student 2
-        this.student2Textbox = page.getByRole("textbox", {
-            name: "Student2: Enter at least two characters.",
-        });
+        this.student2Textbox = page.getByRole("textbox", { name: "Student2: Enter at least two characters.", });
 
-        this.student2Pickup = page.locator(
-            "#FirstTypeAppointment_p_str_PickupLocationStudent2"
-        );
+        this.student2Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocationStudent2");
 
-        this.student2Notes = page.getByRole("textbox", {
-            name: "Notes Student 2",
-        });
+        this.student2Notes = page.getByRole("textbox", { name: "Notes Student 2", });
 
         // Misc
         this.deleteConfirmationButton = page.locator("#btnDeleteConfirmation");
-        this.cancelAppointmentPopupButton = page.getByRole("button", {
-            name: "YES, CANCEL LESSON",
-        });
+        this.cancelAppointmentPopupButton = page.getByRole("button", { name: "YES, CANCEL LESSON", });
 
-        this.cancelAppointmentTextbox = page.locator(
-            "#txtArea_CancelLesson"
-        ).nth(0);
+        this.cancelAppointmentTextbox = page.locator("#txtArea_CancelLesson").nth(0);
 
-        this.noShowAppointmentTextbox = page.locator(
-            "#txtnoShowNotes"
-        ).nth(0);
+        this.noShowAppointmentTextbox = page.locator("#txtnoShowNotes").nth(0);
 
-        this.noShowAppointmentPopupButton = page.getByRole("button", {
-            name: "Yes, No Show Lesson",
-        });
+        this.noShowAppointmentPopupButton = page.getByRole("button", { name: "Yes, No Show Lesson", });
 
         this.noShowYesButton = page.locator("#btnDeleteMakeFullAppointment");
     }
@@ -314,9 +294,11 @@ export default class CombinedAppointmentPage extends BasePage {
      * Verifies that the Combined Appointment popup dialog title is displayed.
      **/
     async verifyPopup() {
-        await expect(this.popupTitle).toContainText(
-            "Create Combined Appointment (Driver and Observer)"
-        );
+        await test.step('Verify Combined Appointment creation popup title', async () => {
+            await expect(this.popupTitle).toContainText(
+                "Create Combined Appointment (Driver and Observer)"
+            );
+        });
     }
 
     /**
@@ -324,110 +306,118 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {string} dropdownName - Dropdown data-id identifier.
      **/
     async selectDropdown(dropdownName) {
-        await this.click(this.getDropdownButton(dropdownName));
-        await this.click(this.getFirstDropdownOption(dropdownName));
+        await test.step(`Select dropdown option for: "${dropdownName}"`, async () => {
+            await this.click(this.getDropdownButton(dropdownName));
+            await this.click(this.getFirstDropdownOption(dropdownName));
+        });
     }
 
     /**
      * Selects the Mid Time slot based on the currently selected Start Time.
      **/
     async selectMidTimeDropdown() {
-        const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
-        console.log("start time : " + startTime);
-        await this.click(this.getDropdownButton("MidTime"));
-        await this.click(this.getMidTimeDropdownValue(startTime));
+        await test.step('Select Mid Time dropdown based on Start Time', async () => {
+            const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
+            console.log("start time : " + startTime);
+            await this.click(this.getDropdownButton("MidTime"));
+            await this.click(this.getMidTimeDropdownValue(startTime));
+        });
     }
 
     /**
      * Selects the End Time slot based on the currently selected Start Time.
      **/
     async selectEndTimeDropdown() {
-        const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
-        console.log("start time : " + startTime);
-        await this.click(this.getDropdownButton("EndTime"));
-        await this.click(this.getEndTimeDropdownValue(startTime));
+        await test.step('Select End Time dropdown based on Start Time', async () => {
+            const startTime = (await this.getDropdownButton("StartTime").innerText()).trim();
+            console.log("start time : " + startTime);
+            await this.click(this.getDropdownButton("EndTime"));
+            await this.click(this.getEndTimeDropdownValue(startTime));
+        });
     }
 
     /**
      * Checks the 15 Minutes duration radio button.
      **/
     async selectDuration() {
-        await this.check(this.duration15Minutes);
+        await test.step('Select 15 Minutes duration option', async () => {
+            await this.check(this.duration15Minutes);
+        });
     }
 
-    /**
-     * Fills student details (name, service, instructions, pickup, notes) for Student 1 or Student 2.
-     * @param {number} studentNo - Student slot index (1 or 2).
-     * @param {Object} student - Student test data object.
-     **/
     /**
      * Fills student details (name, service, instructions, pickup, notes) for Student 1 or Student 2.
      * @param {number} studentNo - Student slot index (1 or 2).
      * @param {Object} student - Student test data object.
      **/
     async fillStudentDetails(studentNo, student) {
-        await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 200 });
-        await this.page.waitForTimeout(2000);
-        await this.click(this.page.getByRole("option", { name: student.option }).first());
-        await this.click(this.clickServiceDropdown(studentNo));
-        await this.click(this.selectServiceDropdownValue(studentNo));
-        await this.click(this.clickInstruction1Dropdown(studentNo));
-        await this.click(this.getInstruction1DropdownValue(studentNo));
-        await this.click(this.clickInstruction2Dropdown(studentNo));
-        await this.click(this.getInstruction2DropdownValue(studentNo));
-        await this.fill(this.getPickup(studentNo), student.pickup);
-        await this.fill(this.getNotes(studentNo), `${student.notes}_${this.uniqueId}`);
+        const studentLabel = `Student ${studentNo} (${student.name})`;
+        await test.step(`Fill ${studentLabel} details: service "${student.service || 'Default'}", pickup "${student.pickup}", notes "${student.notes}"`, async () => {
+            await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 200 });
+            await this.page.waitForTimeout(2000);
+            await this.click(this.page.getByRole("option", { name: student.option }).first());
+            await this.click(this.clickServiceDropdown(studentNo));
+            await this.click(this.selectServiceDropdownValue(studentNo));
+            await this.click(this.clickInstruction1Dropdown(studentNo));
+            await this.click(this.getInstruction1DropdownValue(studentNo));
+            await this.click(this.clickInstruction2Dropdown(studentNo));
+            await this.click(this.getInstruction2DropdownValue(studentNo));
+            await this.fill(this.getPickup(studentNo), student.pickup);
+            await this.fill(this.getNotes(studentNo), `${student.notes}_${this.uniqueId}`);
+        });
     }
 
     /**
      * Captures and stores current appointment field values (staff, location, vehicle, services, instructions) for later assertion.
      **/
     async storeAppointmentValues() {
-        this.expectedValues.staff = await this.getDropdownTitle("InstID")
-            .getAttribute("title");
-
-        this.expectedValues.location = await this.getDropdownTitle("Location_ID")
-            .getAttribute("title");
-
-        this.expectedValues.vehicle = await this.getDropdownTitle("VehicleID")
-            .getAttribute("title");
-
-        let product1 =
-            await this.getDropdownTitle("Product_Id")
+        await test.step('Store configured appointment field values for verification', async () => {
+            this.expectedValues.staff = await this.getDropdownTitle("InstID")
                 .getAttribute("title");
 
-        this.expectedValues.student1 = {
-            product: product1
-                ? product1.split("&")[0].trim()
-                : "",
-            instruction1: await this.getDropdownTitle("Instructions")
-                .getAttribute("title"),
-
-            instruction2: await this.getDropdownTitle("Instructions1")
-                .getAttribute("title"),
-        };
-
-        let product2 =
-            await this.getDropdownTitle("Product_Id_Student2")
+            this.expectedValues.location = await this.getDropdownTitle("Location_ID")
                 .getAttribute("title");
 
-        this.expectedValues.student2 = {
-            product: product2
-                ? product2.split("&")[0].trim()
-                : "",
+            this.expectedValues.vehicle = await this.getDropdownTitle("VehicleID")
+                .getAttribute("title");
 
-            instruction1: await this.getDropdownTitle("InstructionsStudent2")
-                .getAttribute("title"),
+            let product1 =
+                await this.getDropdownTitle("Product_Id")
+                    .getAttribute("title");
 
-            instruction2: await this.getDropdownTitle("Instructions1Student2")
-                .getAttribute("title"),
-        };
+            this.expectedValues.student1 = {
+                product: product1
+                    ? product1.split("&")[0].trim()
+                    : "",
+                instruction1: await this.getDropdownTitle("Instructions")
+                    .getAttribute("title"),
 
-        CombinedAppointmentPage.storedState.expectedValues = this.expectedValues;
-        CombinedAppointmentPage.storedState.uniqueId = this.uniqueId;
+                instruction2: await this.getDropdownTitle("Instructions1")
+                    .getAttribute("title"),
+            };
 
-        console.log("Expected Values");
-        console.log(this.expectedValues);
+            let product2 =
+                await this.getDropdownTitle("Product_Id_Student2")
+                    .getAttribute("title");
+
+            this.expectedValues.student2 = {
+                product: product2
+                    ? product2.split("&")[0].trim()
+                    : "",
+
+                instruction1: await this.getDropdownTitle("InstructionsStudent2")
+                    .getAttribute("title"),
+
+                instruction2: await this.getDropdownTitle("Instructions1Student2")
+                    .getAttribute("title"),
+            };
+
+            CombinedAppointmentPage.storedState.expectedValues = this.expectedValues;
+            CombinedAppointmentPage.storedState.uniqueId = this.uniqueId;
+
+            console.log("Expected Values");
+            console.log(this.expectedValues);
+        });
     }
 
     /**
@@ -435,32 +425,33 @@ export default class CombinedAppointmentPage extends BasePage {
      * If an error toast appears, prints the error message in the console and fails the test.
      **/
     async submitAppointment() {
-        await this.click(this.submitButton);
-        await this.click(this.confirmYesButton);
-        await this.page.waitForTimeout(2500);
+        await test.step('Submit Combined Appointment and verify confirmation', async () => {
+            await this.click(this.submitButton);
+            await this.click(this.confirmYesButton);
+            await this.page.waitForTimeout(2500);
 
-        if (await this.isVisible(this.submitButtonPopup)) {
-            await this.click(this.submitButtonPopup);
-            await this.waitForLoaders();
-        }
-        await this.page.waitForTimeout(1000);
-        const toastLocator = this.page.locator('#toast-container .toast-message').last();
-        await this.waitForVisible(toastLocator);
+            if (await this.isVisible(this.submitButtonPopup)) {
+                await this.click(this.submitButtonPopup);
+                await this.waitForLoaders();
+            }
+            await this.page.waitForTimeout(1000);
+            const toastLocator = this.page.locator('#toast-container .toast-message').last();
+            await this.waitForVisible(toastLocator);
 
-        const errorToast = this.page.locator('#toast-container .toast-error').last();
-        if (await this.isVisible(errorToast)) {
-            const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
-            console.log(`Appointment creation failed with error: "${errorMessage}"`);
-            throw new Error(`Appointment creation failed with error: "${errorMessage}"`);
-        } else {
-            const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
-            await this.verifyVisible(successToast);
-            await this.verifyText(successToast, 'Appointment created successfully.');
-            console.log(`Appointment created with message: Appointment created successfully.`);
-            await this.waitForHidden(successToast);
-            await this.waitForLoaders();
-        }
-
+            const errorToast = this.page.locator('#toast-container .toast-error').last();
+            if (await this.isVisible(errorToast)) {
+                const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
+                console.log(`Appointment creation failed with error: "${errorMessage}"`);
+                throw new Error(`Appointment creation failed with error: "${errorMessage}"`);
+            } else {
+                const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
+                await this.verifyVisible(successToast);
+                await this.verifyText(successToast, 'Appointment created successfully.');
+                console.log(`Appointment created with message: Appointment created successfully.`);
+                await this.waitForHidden(successToast);
+                await this.waitForLoaders();
+            }
+        });
     }
 
     /**
@@ -469,7 +460,6 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {Object} student - Student test data object.
      **/
     async verifyStudent(studentNo, student) {
-
         const suffix = studentNo === 1 ? "" : "_Student2";
 
         const instruction1Id =
@@ -512,7 +502,6 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.verifyAttribute(this.getDropdownTitle(instruction2Id), "title", expected.instruction2, `Student ${studentNo} Instruction 2`);
         await this.verifyAttribute(this.getPickup(studentNo), "oldval", student.pickup, `Student ${studentNo} Pickup`);
         await this.verifyAttribute(this.getNotes(studentNo), "oldval", `${student.notes}_${currentUniqueId}`, `Student ${studentNo} Notes`);
-
     }
 
     /**
@@ -521,18 +510,19 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {Object} [student2=studentData.student2] - Student 2 data object.
      **/
     async verifyCombinedAppointmentCreatedValues(student1 = studentData.student1, student2 = studentData.student2) {
+        await test.step('Verify created Combined Appointment values in modal', async () => {
+            const expectedState = (this.expectedValues && this.expectedValues.staff)
+                ? this.expectedValues
+                : CombinedAppointmentPage.storedState.expectedValues;
 
-        const expectedState = (this.expectedValues && this.expectedValues.staff)
-            ? this.expectedValues
-            : CombinedAppointmentPage.storedState.expectedValues;
-
-        await this.verifyAttribute(this.getDropdownTitle("InstID"), "title", expectedState.staff, "Staff");
-        await this.verifyAttribute(this.getDropdownTitle("Location_ID"), "title", expectedState.location, "Location");
-        await this.verifyAttribute(this.getDropdownTitle("VehicleID"), "title", expectedState.vehicle, "Vehicle");
-        await this.verifyStudent(1, student1);
-        await this.verifyStudent(2, student2);
-        await this.verifyChecked(this.duration15Minutes);
-        await this.click(this.closePopup);
+            await this.verifyAttribute(this.getDropdownTitle("InstID"), "title", expectedState.staff, "Staff");
+            await this.verifyAttribute(this.getDropdownTitle("Location_ID"), "title", expectedState.location, "Location");
+            await this.verifyAttribute(this.getDropdownTitle("VehicleID"), "title", expectedState.vehicle, "Vehicle");
+            await this.verifyStudent(1, student1);
+            await this.verifyStudent(2, student2);
+            await this.verifyChecked(this.duration15Minutes);
+            await this.click(this.closePopup);
+        });
     }
 
     /**
@@ -544,15 +534,16 @@ export default class CombinedAppointmentPage extends BasePage {
             ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
             : studentOrName;
 
-        await this.isVisible(this.cancelAppointmentButton(studentName));
-        await this.click(this.cancelAppointmentButton(studentName));
-        this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
-        await this.fill(this.cancelAppointmentTextbox, this.cancelledNotes);
-        await this.click(this.cancelAppointmentPopupButton);
-        await this.click(this.deleteConfirmationButton)
-        await this.waitForLoaders();
-        await this.waitForHidden(this.cancelAppointmentTextbox);
-
+        await test.step(`Cancel appointment for: "${studentName}"`, async () => {
+            await this.isVisible(this.cancelAppointmentButton(studentName));
+            await this.click(this.cancelAppointmentButton(studentName));
+            this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
+            await this.fill(this.cancelAppointmentTextbox, this.cancelledNotes);
+            await this.click(this.cancelAppointmentPopupButton);
+            await this.click(this.deleteConfirmationButton);
+            await this.waitForLoaders();
+            await this.waitForHidden(this.cancelAppointmentTextbox);
+        });
     }
 
     /**
@@ -564,48 +555,52 @@ export default class CombinedAppointmentPage extends BasePage {
             ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
             : studentOrName;
 
-        // await this.isVisible(this.noShowAppointmentButton(studentName));
-        await this.waitForVisible(this.noShowAppointmentButton(studentName));
-        await this.click(this.noShowAppointmentButton(studentName));
-        this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
-        await this.fill(this.noShowAppointmentTextbox, this.noShowNotes);
-        await this.click(this.noShowAppointmentPopupButton);
-        await this.click(this.deleteConfirmationButton);
-        await this.waitForLoaders();
-
-        if (await this.isVisible(this.noShowYesButton)) {
-            await this.click(this.noShowYesButton);
+        await test.step(`Mark appointment as No Show for: "${studentName}"`, async () => {
+            await this.waitForVisible(this.noShowAppointmentButton(studentName));
+            await this.click(this.noShowAppointmentButton(studentName));
+            this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
+            await this.fill(this.noShowAppointmentTextbox, this.noShowNotes);
+            await this.click(this.noShowAppointmentPopupButton);
+            await this.click(this.deleteConfirmationButton);
             await this.waitForLoaders();
-        }
 
+            if (await this.isVisible(this.noShowYesButton)) {
+                await this.click(this.noShowYesButton);
+                await this.waitForLoaders();
+            }
+        });
     }
 
     /**
      * Verifies that the appointment cancelled success toast message is displayed.
      **/
     async verifyAppointmentIsCancelledSuccessfully() {
-        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await this.verifyVisible(toast);
-        await this.verifyText(toast, 'Appointment cancelled successfully.');
+        await test.step('Verify "Appointment cancelled successfully." message', async () => {
+            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
+            await this.verifyVisible(toast);
+            await this.verifyText(toast, 'Appointment cancelled successfully.');
+        });
     }
 
     /**
      * Verifies that the appointment marked No Show success toast message is displayed.
      **/
     async verifyAppointmentIsMarkedAsNoShowSuccessfully() {
-        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await this.verifyVisible(toast);
-        await this.verifyText(toast, 'Appointment marked No Show successfully.');
-        await this.waitForHidden(toast);
-        await this.waitForLoaders();
+        await test.step('Verify "Appointment marked No Show successfully." message', async () => {
+            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
+            await this.verifyVisible(toast);
+            await this.verifyText(toast, 'Appointment marked No Show successfully.');
+            await this.waitForHidden(toast);
+            await this.waitForLoaders();
+        });
     }
 
     /**
      * Closes the appointment popup dialog.
      **/
     async closeTheDialogPopup() {
-        await this.click(this.closePopup);
-
+        await test.step('Close appointment dialog popup', async () => {
+            await this.click(this.closePopup);
+        });
     }
-
 }

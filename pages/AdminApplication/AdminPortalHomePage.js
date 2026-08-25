@@ -1,5 +1,6 @@
 import BasePage from "../../utils/BasePage";
-import { expect } from "@playwright/test";
+import config from "../../config/config";
+import { test } from "@playwright/test";
 
 /**
  * Page Object representing the Admin Portal Dashboard / Home Page.
@@ -36,6 +37,13 @@ export default class AdminPortalHomePage extends BasePage {
         // Non Graphical
         this.nonGraphicalLink = page.getByRole('link', { name: 'Non Graphical' });
 
+        // Classroom
+        this.classroomMenu = page.getByRole('link', { name: /Classroom/i });
+        this.classListLink = page.locator('#Classroom_ClassList_li').getByRole('link', { name: 'Class List' });
+        this.newClassLink = page.locator('#Classroom_NewClass_li').getByRole('link', { name: 'New Class', exact: true });
+        this.attendanceLink = page.locator('.classroom_attendance').getByRole('link', { name: 'Attendance', exact: true })
+
+
         // Uploaded Files widget
         this.uploadedFilesWidget = page.getByText('Uploaded Files', { exact: true });
         this.showFilesToConfirmBtn = page.getByRole('button', { name: 'Show Files to Confirm' });
@@ -45,7 +53,18 @@ export default class AdminPortalHomePage extends BasePage {
         this.confirmButton = page.locator('#btnConfirmFile:visible');
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.sendButton = page.locator("xpath=//button[@onclick='SendFileConfirmedEmail()' and text()='SEND']");
+    }
 
+    /**
+     * Navigates directly to the Admin Home/Dashboard URL (using captured session URL).
+     **/
+    async navigateToHomePage() {
+        await test.step('Navigate to Admin Home/Dashboard', async () => {
+            const homeUrl = SessionHelper.getHomeUrl('admin') || config.baseURL;
+            await this.navigate(homeUrl);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 75000 });
+        });
     }
 
     /**
@@ -64,92 +83,150 @@ export default class AdminPortalHomePage extends BasePage {
      * @param {string} sectionName - The name of the report section to navigate to.
     **/
     async navigateToReportSection(sectionName) {
-        await this.click(this.reportCenter);
-
-        const reportSection = this.getReportSection(sectionName);
-
-        await this.verifyVisible(reportSection);
-        await this.click(reportSection);
+        await test.step(`Navigate to Report section: "${sectionName}"`, async () => {
+            await this.click(this.reportCenter);
+            const reportSection = this.getReportSection(sectionName);
+            await this.verifyVisible(reportSection);
+            await this.click(reportSection);
+        });
     }
 
     /**
      * Navigates to the Single Instructor scheduling page via Scheduling menu.
     **/
     async navigateToSingleInstructor() {
-        await this.waitForLoaders();
-        await this.waitForVisible(this.schedulingMenu);
-        await this.click(this.schedulingMenu);
-        await this.click(this.singleInstructorLink);
+        await test.step('Navigate to Scheduling -> Single Instructor', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schedulingMenu);
+            await this.click(this.schedulingMenu);
+            await this.click(this.singleInstructorLink);
+        });
     }
 
     /**
      * Navigates to the New Student Enrollment page.
     **/
     async navigateToNewStudentEnrollment() {
-        await this.waitForLoaders();
-        await this.page.waitForTimeout(5000);
-        await this.waitForVisible(this.newStudentEnrollment);
-        await this.click(this.newStudentEnrollment);
+        await test.step('Navigate to New Student Enrollment page', async () => {
+            await this.waitForLoaders();
+            await this.page.waitForTimeout(5000);
+            await this.waitForVisible(this.newStudentEnrollment);
+            await this.click(this.newStudentEnrollment);
+        });
     }
 
     /**
      * Opens the Student Account menu and navigates to the Student Profile page.
     **/
     async openStudentProfile() {
-        await this.waitForLoaders();
-        await this.waitForVisible(this.studentAccount);
-        await this.click(this.studentAccount);
-        await this.click(this.profileLink);
+        await test.step('Navigate to Student Account -> Profile', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.studentAccount);
+            await this.click(this.studentAccount);
+            await this.click(this.profileLink);
+        });
     }
 
     /**
      * Opens the Student Account menu and navigates to the Enrollment/Billing page.
     **/
     async openEnrollmentBilling() {
-        await this.waitForLoaders();
-        await this.waitForVisible(this.studentAccount)
-        await this.click(this.studentAccount);
-        await this.click(this.enrollmentBilling);
+        await test.step('Navigate to Student Account -> Enrollment/Billing', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.studentAccount)
+            await this.click(this.studentAccount);
+            await this.click(this.enrollmentBilling);
+        });
     }
 
     /**
      * Navigates to the Bulk Appointment scheduling page via Scheduling -> Manage Time Slots.
     **/
     async navigateToBulkAppointment() {
-        await this.waitForLoaders();
-        await this.waitForVisible(this.schedulingMenu);
-        await this.click(this.schedulingMenu);
-        await this.click(this.manageTimeSlotsLink);
-        await this.click(this.bulkAppointmentLink);
+        await test.step('Navigate to Scheduling -> Manage Time Slots -> Bulk Appointment', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schedulingMenu);
+            await this.click(this.schedulingMenu);
+            await this.click(this.manageTimeSlotsLink);
+            await this.click(this.bulkAppointmentLink);
+        });
     }
 
     /**
      * Navigates to the Non Graphical scheduling page via Scheduling menu.
     **/
     async navigateToNonGraphical() {
-        await this.waitForLoaders();
-        await this.waitForVisible(this.schedulingMenu);
-        await this.click(this.schedulingMenu);
-        await this.click(this.nonGraphicalLink);
+        await test.step('Navigate to Scheduling -> Non Graphical', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schedulingMenu);
+            await this.click(this.schedulingMenu);
+            await this.click(this.nonGraphicalLink);
+        });
+    }
+
+    /**
+     * Navigates to the Class List page via Classroom menu in the side navigation.
+    **/
+    async navigateToClassList() {
+        await test.step('Navigate to Classroom -> Class List', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.classroomMenu);
+            await this.click(this.classroomMenu);
+            await this.waitForVisible(this.classListLink);
+            await this.click(this.classListLink);
+            await this.waitForLoaders();
+            await this.verifyTitle("Classroom");
+        });
+    }
+
+    /**
+     * Navigates to the New Class page via Classroom menu in the side navigation.
+    **/
+    async navigateToNewClass() {
+        await test.step('Navigate to Classroom -> New Class', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.classroomMenu);
+            await this.click(this.classroomMenu);
+            await this.waitForVisible(this.newClassLink);
+            await this.click(this.newClassLink);
+            await this.waitForLoaders();
+            await this.verifyTitle("Classroom");
+        });
+    }
+
+    /**
+     * Clicks the Attendance link via Classroom menu in the side navigation.
+     **/
+    async navigateToAttendance() {
+        await test.step('Navigate to Classroom -> Attendance', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.classroomMenu);
+            await this.click(this.classroomMenu);
+            await this.waitForVisible(this.attendanceLink);
+            await this.click(this.attendanceLink);
+            await this.waitForLoaders();
+            await this.verifyTitle("Classroom");
+        });
     }
 
     /**
      * Confirms uploaded student documents in the Uploaded Files dashboard widget and sends a confirmation email.
     **/
     async clickShowFilesToConfirm() {
-        await this.waitForLoaders();
-        await this.verifyVisible(this.uploadedFilesWidget);
-        await this.click(this.showFilesToConfirmBtn);
-        await this.click(this.filePreviewIcon);
-        await this.click(this.selectCategoryButton);
-        await this.click(this.selectCategoryDropdownCheckbox);
-        await this.click(this.confirmButton);
-        await this.click(this.yesConfirmationButton);
-        await this.verifyVisible(this.page.getByText(' File has been confirmed', { exact: true }));
-        await this.click(this.sendButton);
-        await this.waitForHidden(this.sendButton);
-        await this.waitForLoaders();
-        await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+        await test.step('Confirm uploaded student documents and send email', async () => {
+            await this.waitForLoaders();
+            await this.verifyVisible(this.uploadedFilesWidget);
+            await this.click(this.showFilesToConfirmBtn);
+            await this.click(this.filePreviewIcon);
+            await this.click(this.selectCategoryButton);
+            await this.click(this.selectCategoryDropdownCheckbox);
+            await this.click(this.confirmButton);
+            await this.click(this.yesConfirmationButton);
+            await this.verifyVisible(this.page.getByText(' File has been confirmed', { exact: true }));
+            await this.click(this.sendButton);
+            await this.waitForHidden(this.sendButton);
+            await this.waitForLoaders();
+            await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+        });
     }
-
 }

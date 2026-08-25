@@ -1,11 +1,11 @@
 import BasePage from "../../../utils/BasePage";
-import { expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 /**
  * Page Object representing the Non Graphical Scheduler Page in Admin Portal.
  * Handles searching students, selecting available dates/slots, choosing appointment & status types,
  * scheduling appointments into slots, and verifying confirmation toast messages.
-  **/
+ **/
 export default class NonGraphicalPage extends BasePage {
 
     /**
@@ -44,11 +44,13 @@ export default class NonGraphicalPage extends BasePage {
      * @param {string} studentName - Name of student to search.
     **/
     async searchStudent(studentName) {
-        await this.waitForVisible(this.studentSearchInput);
-        await expect(this.studentSearchInput).toBeEnabled();
-        await this.click(this.studentSearchInput);
-        await expect(this.studentSearchInput).toBeFocused();
-        await this.pressSequentially(this.studentSearchInput, studentName);
+        await test.step(`Search student in Non-Graphical scheduler: "${studentName}"`, async () => {
+            await this.waitForVisible(this.studentSearchInput);
+            await expect(this.studentSearchInput).toBeEnabled();
+            await this.click(this.studentSearchInput);
+            await expect(this.studentSearchInput).toBeFocused();
+            await this.pressSequentially(this.studentSearchInput, studentName);
+        });
     }
 
     /**
@@ -56,16 +58,20 @@ export default class NonGraphicalPage extends BasePage {
      * @param {string} optionText - Option text to select.
     **/
     async selectStudentOption(optionText) {
-        const option = this.studentDropdownOption(optionText);
-        await this.waitForVisible(option);
-        await this.click(option);
+        await test.step(`Select student option: "${optionText}"`, async () => {
+            const option = this.studentDropdownOption(optionText);
+            await this.waitForVisible(option);
+            await this.click(option);
+        });
     }
 
     /**
      * Clicks the Select Student button to confirm the selected student.
     **/
     async clickSelectStudent() {
-        await this.click(this.selectStudentButton);
+        await test.step('Click Select Student button', async () => {
+            await this.click(this.selectStudentButton);
+        });
     }
 
     /**
@@ -73,102 +79,111 @@ export default class NonGraphicalPage extends BasePage {
      * If 'No records found.' is displayed, it clicks the next available highlighted date.
     **/
     async selectFirstAvailableDate() {
-        const availableDates = this.page.locator('td.ui-highlight:not(.ui-datepicker-current-day) a');
-        const count = await availableDates.count();
+        await test.step('Find and select first calendar date with available slots', async () => {
+            const availableDates = this.page.locator('td.ui-highlight:not(.ui-datepicker-current-day) a');
+            const count = await availableDates.count();
 
-        if (count === 0) {
-            throw new Error('No highlighted dates found in the calendar.');
-        }
-
-        for (let i = 0; i < count; i++) {
-            const dateToClick = availableDates.nth(i);
-            await this.click(dateToClick);
-
-            // Wait for the slots table to refresh after selecting the date
-            await this.page.waitForTimeout(1000);
-
-            const hasNoRecords = await this.isVisible(this.noRecordsFound);
-            const hasSlot = await this.isVisible(this.firstSlotCheckbox);
-
-            if (!hasNoRecords && hasSlot) {
-                console.log(`Found available slots on highlighted date #${i + 1}`);
-                return;
+            if (count === 0) {
+                throw new Error('No highlighted dates found in the calendar.');
             }
 
-            console.log(`'No records found.' on date #${i + 1}. Trying next available date...`);
-        }
+            for (let i = 0; i < count; i++) {
+                const dateToClick = availableDates.nth(i);
+                await this.click(dateToClick);
 
-        throw new Error('No open slots found for any of the highlighted dates in the calendar.');
+                // Wait for the slots table to refresh after selecting the date
+                await this.page.waitForTimeout(1000);
+
+                const hasNoRecords = await this.isVisible(this.noRecordsFound);
+                const hasSlot = await this.isVisible(this.firstSlotCheckbox);
+
+                if (!hasNoRecords && hasSlot) {
+                    console.log(`Found available slots on highlighted date #${i + 1}`);
+                    return;
+                }
+
+                console.log(`'No records found.' on date #${i + 1}. Trying next available date...`);
+            }
+
+            throw new Error('No open slots found for any of the highlighted dates in the calendar.');
+        });
     }
 
     /**
      * Checks the first available slot checkbox.
     **/
     async selectSlot() {
-        await this.waitForVisible(this.firstSlotCheckbox);
-        await this.click(this.firstSlotCheckbox);
+        await test.step('Select first available time slot', async () => {
+            await this.waitForVisible(this.firstSlotCheckbox);
+            await this.click(this.firstSlotCheckbox);
+        });
     }
 
     /**
      * Selects an available appointment product type from the appointment type dropdown (excluding 'Please select').
     **/
     async selectAppointmentType() {
-        await this.waitForVisible(this.appointmentTypeDropdown);
+        await test.step('Select available appointment type from dropdown', async () => {
+            await this.waitForVisible(this.appointmentTypeDropdown);
 
-        // Wait until dropdown is populated with at least one valid option (not 'Please select' or empty)
-        await this.page.waitForFunction(() => {
-            const select = document.querySelector('#drp_OpenSlotBookAppointment_product_0');
-            if (!select) return false;
-            return Array.from(select.options).some(opt => {
-                const text = (opt.text || '').trim().toLowerCase();
-                const value = (opt.value || '').trim().toLowerCase();
-                return (
-                    value !== '' &&
-                    value !== '0' &&
-                    !value.includes('please select') &&
-                    !text.includes('please select') &&
-                    text !== 'select'
-                );
-            });
-        }, { timeout: 10000 });
+            await this.page.waitForFunction(() => {
+                const select = document.querySelector('#drp_OpenSlotBookAppointment_product_0');
+                if (!select) return false;
+                return Array.from(select.options).some(opt => {
+                    const text = (opt.text || '').trim().toLowerCase();
+                    const value = (opt.value || '').trim().toLowerCase();
+                    return (
+                        value !== '' &&
+                        value !== '0' &&
+                        !value.includes('please select') &&
+                        !text.includes('please select') &&
+                        text !== 'select'
+                    );
+                });
+            }, { timeout: 10000 });
 
-        const validOptionValue = await this.appointmentTypeDropdown.evaluate(select => {
-            const validOptions = Array.from(select.options).filter(opt => {
-                const text = (opt.text || '').trim().toLowerCase();
-                const value = (opt.value || '').trim().toLowerCase();
-                return (
-                    value !== '' &&
-                    value !== '0' &&
-                    !value.includes('please select') &&
-                    !text.includes('please select') &&
-                    text !== 'select'
-                );
+            const validOptionValue = await this.appointmentTypeDropdown.evaluate(select => {
+                const validOptions = Array.from(select.options).filter(opt => {
+                    const text = (opt.text || '').trim().toLowerCase();
+                    const value = (opt.value || '').trim().toLowerCase();
+                    return (
+                        value !== '' &&
+                        value !== '0' &&
+                        !value.includes('please select') &&
+                        !text.includes('please select') &&
+                        text !== 'select'
+                    );
+                });
+                return validOptions.length > 0 ? validOptions.at(-1).value : null;
             });
-            return validOptions.length > 0 ? validOptions.at(-1).value : null;
+
+            if (!validOptionValue) {
+                throw new Error("No valid appointment product type found in dropdown (only 'Please select' present).");
+            }
+
+            console.log("Selected appointment type option value:", validOptionValue);
+            await this.selectOption(this.appointmentTypeDropdown, validOptionValue);
         });
-
-        if (!validOptionValue) {
-            throw new Error("No valid appointment product type found in dropdown (only 'Please select' present).");
-        }
-
-        console.log("Selected appointment type option value:", validOptionValue);
-        await this.selectOption(this.appointmentTypeDropdown, validOptionValue);
     }
 
     /**
      * Selects 'Confirmed' status from the appointment status type dropdown.
     **/
     async selectStatusType() {
-        await this.waitForVisible(this.statusTypeDropdown);
-        await this.selectOption(this.statusTypeDropdown, { label: 'Confirmed' });
+        await test.step('Select appointment status: "Confirmed"', async () => {
+            await this.waitForVisible(this.statusTypeDropdown);
+            await this.selectOption(this.statusTypeDropdown, { label: 'Confirmed' });
+        });
     }
 
     /**
      * Clicks the 'Schedule Student Into Slot(s)' button and confirms the action.
     **/
     async scheduleIntoSlot() {
-        await this.click(this.scheduleIntoSlotButton);
-        await this.click(this.confirmYesButton);
+        await test.step('Schedule student into slot and confirm', async () => {
+            await this.click(this.scheduleIntoSlotButton);
+            await this.click(this.confirmYesButton);
+        });
     }
 
     /**
@@ -176,31 +191,33 @@ export default class NonGraphicalPage extends BasePage {
      * If an error toast appears, extracts the error message and slot warning tooltip (data-original-title) and fails the test immediately.
     **/
     async verifyToastMessageSuccessful() {
-        const toastLocator = this.page.locator('#toast-container .toast-message').last();
-        await this.waitForVisible(toastLocator);
+        await test.step('Verify "Appointment(s) scheduled successfully." message', async () => {
+            const toastLocator = this.page.locator('#toast-container .toast-message').last();
+            await this.waitForVisible(toastLocator);
 
-        const errorToast = this.page.locator('#toast-container .toast-error').last();
-        if (await this.isVisible(errorToast)) {
-            const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
+            const errorToast = this.page.locator('#toast-container .toast-error').last();
+            if (await this.isVisible(errorToast)) {
+                const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
 
-            // Extract error message from data-original-title on the slot warning icon (e.g. #iErrorOpenSlotGrid_0)
-            const warningIcon = this.page.locator("xpath=(//i[@data-toggle='tooltip' and contains(@id,'ErrorOpenSlot')])[1]");
-            let tooltipError = '';
-            if (await warningIcon.count() > 0) {
-                tooltipError = await warningIcon.getAttribute('data-original-title');
+                const warningIcon = this.page.locator("xpath=(//i[@data-toggle='tooltip' and contains(@id,'ErrorOpenSlot')])[1]");
+                let tooltipError = '';
+                if (await warningIcon.count() > 0) {
+                    tooltipError = await warningIcon.getAttribute('data-original-title');
+                }
+
+                const detailedError = tooltipError ? `${errorMessage} (Reason: ${tooltipError})` : errorMessage;
+                console.log(`Scheduling failed with error toast: "${errorMessage}"`);
+                if (tooltipError) {
+                    console.log(`Error detail from data-original-title: "${tooltipError}"`);
+                }
+                throw new Error(`Scheduling failed with error: "${detailedError}"`);
+            } else {
+                const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
+                await this.verifyVisible(successToast);
+                await this.verifyText(successToast, 'Appointment(s) scheduled successfully.');
+                console.log('Appointment(s) scheduled successfully.');
             }
-
-            const detailedError = tooltipError ? `${errorMessage} (Reason: ${tooltipError})` : errorMessage;
-            console.log(`Scheduling failed with error toast: "${errorMessage}"`);
-            if (tooltipError) {
-                console.log(`Error detail from data-original-title: "${tooltipError}"`);
-            }
-            throw new Error(`Scheduling failed with error: "${detailedError}"`);
-        } else {
-            const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
-            await this.verifyVisible(successToast);
-            await this.verifyText(successToast, 'Appointment(s) scheduled successfully.');
-            console.log('Appointment(s) scheduled successfully.');
-        }
+        });
     }
 }
+

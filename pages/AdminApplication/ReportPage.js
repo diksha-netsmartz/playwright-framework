@@ -1,4 +1,5 @@
 import BasePage from '../../utils/BasePage';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Report Center Page in Admin Portal.
@@ -25,23 +26,24 @@ export default class ReportCenterPage extends BasePage {
      * @param {string} reportName - The name/title of the report to open.
     **/
     async selectReport(reportName) {
-
-        await this.verifyVisible(this.selectReportHeading);
-        const report = this.page.getByRole('link', { name: reportName });
-        await this.verifyVisible(report);
-        await this.click(report);
-
+        await test.step(`Select report: "${reportName}"`, async () => {
+            await this.verifyVisible(this.selectReportHeading);
+            const report = this.page.getByRole('link', { name: reportName });
+            await this.verifyVisible(report);
+            await this.click(report);
+        });
     }
 
     /**
      * Filters the student list by entering the student's last name and clicking Filter Students.
      * @param {string} lastName - Student's last name.
-    **/
+     **/
     async filterStudent(lastName) {
-        await this.verifyVisible(this.studentLastName);
-        await this.fill(this.studentLastName, lastName);
-        await this.click(this.filterStudents);
-
+        await test.step(`Filter students by last name: "${lastName}"`, async () => {
+            await this.verifyVisible(this.studentLastName);
+            await this.fill(this.studentLastName, lastName);
+            await this.click(this.filterStudents);
+        });
     }
 
     /**
@@ -49,9 +51,11 @@ export default class ReportCenterPage extends BasePage {
      * @param {string} studentName - Student's full name to select.
     **/
     async selectStudent(studentName) {
-        await this.click(this.selectStudentBtn);
-        const student = this.page.locator('a').filter({ hasText: studentName });
-        await this.click(student);
+        await test.step(`Select student: "${studentName}"`, async () => {
+            await this.click(this.selectStudentBtn);
+            const student = this.page.locator('a').filter({ hasText: studentName });
+            await this.click(student);
+        });
     }
 
     /**
@@ -59,10 +63,10 @@ export default class ReportCenterPage extends BasePage {
      * @returns {Promise<import('@playwright/test').Download>} The Playwright Download instance.
       **/
     async downloadReport() {
-
-        const downloadPromise = this.page.waitForEvent('download');
-        await this.click(this.downloadReportBtn);
-        return await downloadPromise;
+        return await test.step('Click Download Report and wait for file', async () => {
+            const downloadPromise = this.page.waitForEvent('download');
+            await this.click(this.downloadReportBtn);
+            return await downloadPromise;
+        });
     }
-
 }

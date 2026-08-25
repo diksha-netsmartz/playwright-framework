@@ -1,10 +1,10 @@
-import { expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import BasePage from "../../../../utils/BasePage";
 
 /**
  * Page Object representing the Single Instructor Appointment Creation Modal in Admin Portal.
  * Handles selecting students, choosing in-car services, selecting dropdowns, and submitting single instructor appointments.
-  **/
+ **/
 export default class AppointmentPage extends BasePage {
 
     /**
@@ -16,21 +16,13 @@ export default class AppointmentPage extends BasePage {
 
         this.popupTitle = page.locator("#window1_wnd_title");
 
-        this.studentTextbox = page.getByRole("textbox", {
-            name: "Student1: Enter at least two"
-        });
+        this.studentTextbox = page.getByRole("textbox", { name: "Student1: Enter at least two" });
 
-        this.serviceDropdown = page.getByRole("button", {
-            name: "Select In-Car Service"
-        });
+        this.serviceDropdown = page.getByRole("button", { name: "Select In-Car Service" });
 
-        this.submitButton = page.getByRole("button", {
-            name: "Submit"
-        });
+        this.submitButton = page.getByRole("button", { name: "Submit" });
 
-        this.confirmationYesButton = page.locator(
-            "xpath=//a[@data-apply='confirmation']"
-        );
+        this.confirmationYesButton = page.locator("xpath=//a[@data-apply='confirmation']");
     }
 
     /**
@@ -70,7 +62,9 @@ export default class AppointmentPage extends BasePage {
      * Verifies that the appointment modal popup title is visible.
     **/
     async verifyPopup() {
-        await this.verifyVisible(this.popupTitle);
+        await test.step('Verify Appointment creation popup is visible', async () => {
+            await this.verifyVisible(this.popupTitle);
+        });
     }
 
     /**
@@ -78,8 +72,10 @@ export default class AppointmentPage extends BasePage {
      * @param {string} dropdownName - Dropdown data-id identifier.
     **/
     async selectDropdown(dropdownName) {
-        await this.click(this.getDropdownButton(dropdownName));
-        await this.click(this.getFirstDropdownOption(dropdownName));
+        await test.step(`Select dropdown option for: "${dropdownName}"`, async () => {
+            await this.click(this.getDropdownButton(dropdownName));
+            await this.click(this.getFirstDropdownOption(dropdownName));
+        });
     }
 
     /**
@@ -87,13 +83,14 @@ export default class AppointmentPage extends BasePage {
      * @param {string} student - Student name string.
     **/
     async selectStudent(student) {
-        await this.fill(this.studentTextbox, student);
-
-        await this.click(
-            this.page.getByRole("option", {
-                name: `${student}, ${student}`
-            })
-        );
+        await test.step(`Search and select student: "${student}"`, async () => {
+            await this.fill(this.studentTextbox, student);
+            await this.click(
+                this.page.getByRole("option", {
+                    name: `${student}, ${student}`
+                })
+            );
+        });
     }
 
     /**
@@ -101,15 +98,19 @@ export default class AppointmentPage extends BasePage {
      * @param {string} service - Service name to select.
     **/
     async selectService(service) {
-        await this.click(this.serviceDropdown);
-        await this.click(this.getServiceOption(service));
+        await test.step(`Select in-car service: "${service}"`, async () => {
+            await this.click(this.serviceDropdown);
+            await this.click(this.getServiceOption(service));
+        });
     }
 
     /**
      * Submits the single instructor appointment form and confirms the action.
     **/
     async submitAppointment() {
-        await this.click(this.submitButton);
-        await this.click(this.confirmationYesButton);
+        await test.step('Submit appointment and confirm', async () => {
+            await this.click(this.submitButton);
+            await this.click(this.confirmationYesButton);
+        });
     }
 }

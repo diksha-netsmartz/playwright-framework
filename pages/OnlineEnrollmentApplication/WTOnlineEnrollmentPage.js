@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import config from '../../config/config';
 import oeData from '../../test-data/onlineEnrollmentData.json';
 
@@ -66,11 +66,11 @@ export default class WTOnlineEnrollmentPage extends BasePage {
         this.termsConditionsCheckbox = page.locator("xpath=//input[@id='TermsConditions']//following-sibling::span");
         this.permitIssuedDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Issued Date']//following-sibling::span//span");
         this.permitIssueDateSelectInCalendar = page.locator("xpath=(//div[contains(@id,'PermitIssue')]//td//a)[1]");
-        this.permitExpirationDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Expiration Date']//following-sibling::span//span")
+        this.permitExpirationDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Expiration Date']//following-sibling::span//span");
         this.permitExpireDateSelectInCalendar = page.locator("xpath=(//div[contains(@id,'ExpirePermit')]//td//a)[last()]");
         this.studentSignature = page.locator('#StudentSignature');
         this.parentSignature = page.locator("#ParentSignature");
-        this.last6DigitsParentsDriverLicense = page.locator('#Last6digitsofparentDriversLicense')
+        this.last6DigitsParentsDriverLicense = page.locator('#Last6digitsofparentDriversLicense');
 
         // Actions
         this.payLaterBtn = page.getByRole('button', { name: 'Pay Later' });
@@ -85,14 +85,18 @@ export default class WTOnlineEnrollmentPage extends BasePage {
      * Navigates to the Written Test (Knowledge Test) Online Enrollment page using the configured KT URL.
     **/
     async navigateToWTOEPage() {
-        await this.navigate(config.ktOEURL);
+        await test.step('Navigate to Written Test Online Enrollment Page', async () => {
+            await this.navigate(config.ktOEURL);
+        });
     }
 
     /**
      * Selects the Behind-The-Wheel (BTW) Package from the packages list.
     **/
     async selectBTWPackage() {
-        await this.click(this.btwPackageBtn);
+        await test.step('Select BTW Package', async () => {
+            await this.click(this.btwPackageBtn);
+        });
     }
 
     /**
@@ -100,24 +104,28 @@ export default class WTOnlineEnrollmentPage extends BasePage {
      * @param {string} address - The street address to enter.
     **/
     async fillAddress(address) {
-        await this.pressSequentially(this.addressTxt, address);
-        await this.waitForVisible(this.addressSelectionDropdown);
-        await this.click(this.addressSelectionDropdown);
+        await test.step(`Fill address: "${address}"`, async () => {
+            await this.pressSequentially(this.addressTxt, address);
+            await this.waitForVisible(this.addressSelectionDropdown);
+            await this.click(this.addressSelectionDropdown);
+        });
     }
 
     /**
      * Selects the Date of Birth (Year, Day, Month) from custom Kendo dropdown controls.
     **/
     async selectDOB() {
-        await this.click(this.dobYearDdl);
-        await this.waitForVisible(this.yearSelectionInDropdown);
-        await this.page.evaluate(el => el.click(), await this.yearSelectionInDropdown.elementHandle());
-        await this.click(this.dobDayDdl);
-        await this.waitForVisible(this.daySelectionInDropdown);
-        await this.page.evaluate(el => el.click(), await this.daySelectionInDropdown.elementHandle());
-        await this.click(this.dobMonthDdl);
-        await this.waitForVisible(this.monthSelectionInDropdown);
-        await this.page.evaluate(el => el.click(), await this.monthSelectionInDropdown.elementHandle());
+        await test.step('Select Date of Birth', async () => {
+            await this.click(this.dobYearDdl);
+            await this.waitForVisible(this.yearSelectionInDropdown);
+            await this.page.evaluate(el => el.click(), await this.yearSelectionInDropdown.elementHandle());
+            await this.click(this.dobDayDdl);
+            await this.waitForVisible(this.daySelectionInDropdown);
+            await this.page.evaluate(el => el.click(), await this.daySelectionInDropdown.elementHandle());
+            await this.click(this.dobMonthDdl);
+            await this.waitForVisible(this.monthSelectionInDropdown);
+            await this.page.evaluate(el => el.click(), await this.monthSelectionInDropdown.elementHandle());
+        });
     }
 
     /**
@@ -125,87 +133,98 @@ export default class WTOnlineEnrollmentPage extends BasePage {
      * emergency contacts, school, gender, medical info, permit dates, terms, and signatures.
     **/
     async fillStudentInfo() {
-        this.uniqueId = `${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
-        const data = oeData.student;
-        const random7 = String(Math.floor(1000000 + Math.random() * 9000000));
-        const phone = `(555)${random7.slice(0, 3)}-${random7.slice(3)}`;
+        await test.step('Fill Written Test Student Registration Form', async () => {
+            this.uniqueId = `${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+            const data = oeData.student;
+            const random7 = String(Math.floor(1000000 + Math.random() * 9000000));
+            const phone = `(555)${random7.slice(0, 3)}-${random7.slice(3)}`;
 
-        await this.fill(this.firstNameTxt, `${data.firstName}_${this.uniqueId}`);
-        await this.fill(this.middlenameTxt, data.middleName);
-        await this.fill(this.lastNameTxt, data.lastName);
-        await this.fillAddress(data.address);
-        await this.fill(this.homePhoneTxt, `(212)${random7.slice(0, 3)}-${random7.slice(3)}`);
-        await this.fill(this.cellPhoneTxt, phone);
-        await this.fill(this.emailTxt, `wt_${this.uniqueId}@gmail.com`);
-        await this.fill(this.parentGuardianNameTxt, data.parentGuardianName);
-        await this.fill(this.parentGuardianCellTxt, phone);
-        await this.fill(this.parentGuardianEmailTxt, `parent_${this.uniqueId}@gmail.com`);
-        await this.fill(this.parentNameTxt, data.parentName);
-        await this.fill(this.parentPhoneTxt, `(999)${random7.slice(0, 3)}-${random7.slice(3)}`);
-        await this.fill(this.parentEmailTxt, `parent2_${this.uniqueId}@gmail.com`);
-        await this.fill(this.emergencyNameTxt, data.emergencyName);
-        await this.fill(this.emergencyRelationshipTxt, data.emergencyRelationship);
-        await this.fill(this.emergencyPhoneTxt, `(333)${random7.slice(0, 3)}-${random7.slice(3)}`);
-        await this.selectDOB();
-        await this.click(this.highSchoolDropdown);
-        await this.page.evaluate(el => el.click(), await this.highSchoolDropdownSelection.elementHandle());
-        await this.page.evaluate(el => el.click(), await this.femaleRadioButton.elementHandle());
-        await this.fill(this.medicalConditionsTxt, data.medicalConditions);
-        await this.click(this.howDidYouHearAbtUsDropdown);
-        await this.page.evaluate(el => el.click(), await this.howDidYouHearAbtUsDropdownSelection.elementHandle());
-        await this.fill(this.permitNumberTxt, String(this.uniqueId));
-        await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
-        await this.page.waitForTimeout(1000);
-        try {
-            await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        } catch {
-            console.log("calendar not opened, opening again");
+            await this.fill(this.firstNameTxt, `${data.firstName}_${this.uniqueId}`);
+            await this.fill(this.middlenameTxt, data.middleName);
+            await this.fill(this.lastNameTxt, data.lastName);
+            await this.fillAddress(data.address);
+            await this.fill(this.homePhoneTxt, `(212)${random7.slice(0, 3)}-${random7.slice(3)}`);
+            await this.fill(this.cellPhoneTxt, phone);
+            await this.fill(this.emailTxt, `wt_${this.uniqueId}@gmail.com`);
+            await this.fill(this.parentGuardianNameTxt, data.parentGuardianName);
+            await this.fill(this.parentGuardianCellTxt, phone);
+            await this.fill(this.parentGuardianEmailTxt, `parent_${this.uniqueId}@gmail.com`);
+            await this.fill(this.parentNameTxt, data.parentName);
+            await this.fill(this.parentPhoneTxt, `(999)${random7.slice(0, 3)}-${random7.slice(3)}`);
+            await this.fill(this.parentEmailTxt, `parent2_${this.uniqueId}@gmail.com`);
+            await this.fill(this.emergencyNameTxt, data.emergencyName);
+            await this.fill(this.emergencyRelationshipTxt, data.emergencyRelationship);
+            await this.fill(this.emergencyPhoneTxt, `(333)${random7.slice(0, 3)}-${random7.slice(3)}`);
+            await this.selectDOB();
+            await this.click(this.highSchoolDropdown);
+            await this.page.evaluate(el => el.click(), await this.highSchoolDropdownSelection.elementHandle());
+            await this.click(this.wearGlassesDropdown);
+            await this.page.evaluate(el => el.click(), await this.wearGlassesDropdownSelection.elementHandle());
+            await this.page.evaluate(el => el.click(), await this.femaleRadioButton.elementHandle());
+            await this.fill(this.medicalConditionsTxt, data.medicalConditions);
+            await this.click(this.howDidYouHearAbtUsDropdown);
+            await this.page.evaluate(el => el.click(), await this.howDidYouHearAbtUsDropdownSelection.elementHandle());
+            await this.fill(this.permitNumberTxt, String(this.uniqueId));
+            await this.fill(this.collegeIdTxt, data.collegeId);
             await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
-            await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        }
-        await this.click(this.permitIssueDateSelectInCalendar);
-        await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
-        await this.page.waitForTimeout(1000);
-        try {
-            await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        } catch {
-            console.log("calendar not opened, opening again");
+            await this.page.waitForTimeout(1000);
+            try {
+                await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            } catch {
+                console.log("calendar not opened, opening again");
+                await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
+                await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            }
+            await this.click(this.permitIssueDateSelectInCalendar);
             await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
-            await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000, });
-        }
-        await this.click(this.permitExpireDateSelectInCalendar);
-        await this.page.evaluate(el => el.click(), await this.termsConditionsCheckbox.elementHandle());
-        await this.fill(this.addressTxt, "ny");
-        await this.fill(this.zipCodeTxt, data.zipCode);
-        await this.fill(this.studentSignature, data.firstName);
-        await this.fill(this.parentSignature, data.parentName);
-        await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
+            await this.page.waitForTimeout(1000);
+            try {
+                await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            } catch {
+                console.log("calendar not opened, opening again");
+                await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
+                await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
+            }
+            await this.click(this.permitExpireDateSelectInCalendar);
+            await this.page.evaluate(el => el.click(), await this.termsConditionsCheckbox.elementHandle());
+            await this.fill(this.addressTxt, "ny");
+            await this.fill(this.zipCodeTxt, data.zipCode);
+            await this.fill(this.studentSignature, data.firstName);
+            await this.fill(this.parentSignature, data.parentName);
+            await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
+        });
     }
 
     /**
      * Clicks the 'Pay Later' button to proceed without immediate online payment.
     **/
     async clickPayLater() {
-        await this.click(this.payLaterBtn);
+        await test.step('Click Pay Later button', async () => {
+            await this.click(this.payLaterBtn);
+        });
     }
 
     /**
      * Handles the SMS notification popup by entering the phone number, adding it, and opting in.
     **/
     async smsPopup() {
-        const data = oeData.student;
-        await this.waitForVisible(this.smsNumber);
-        await this.fill(this.smsNumber, data.smsNumber);
-        await this.click(this.addButton);
-        await this.click(this.optInButton);
+        await test.step('Handle SMS notification popup', async () => {
+            const data = oeData.student;
+            await this.waitForVisible(this.smsNumber);
+            await this.fill(this.smsNumber, data.smsNumber);
+            await this.click(this.addButton);
+            await this.click(this.optInButton);
+        });
     }
 
     /**
      * Verifies that the registration receipt page is displayed with confirmation heading.
     **/
     async verifyReceiptPage() {
-        await this.waitForVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
-        await this.verifyVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
+        await test.step('Verify REGISTRATION COMPLETED receipt page', async () => {
+            await this.waitForVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
+            await this.verifyVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
+        });
     }
 
 }

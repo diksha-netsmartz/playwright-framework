@@ -1,12 +1,12 @@
 import BasePage from "../../utils/BasePage";
-import { expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import paymentData from "../../test-data/paymentData.json";
 
 /**
  * Page Object representing the Student Enrollment and Billing Page in Admin Portal.
  * Handles package enrollment, package modification/deletion, student selection, and various payment types
  * (Swiped Card, Check, Cash, Adjustments, and Credit Card processing).
-  **/
+ **/
 export default class EnrollmentBillingPage extends BasePage {
 
     /**
@@ -16,123 +16,69 @@ export default class EnrollmentBillingPage extends BasePage {
     constructor(page) {
         super(page);
 
-        this.studentNotSelected = page.getByRole('link', {
-            name: 'STUDENT NOT SELECTED. CLICK'
-        });
+        this.studentNotSelected = page.getByRole('link', { name: 'STUDENT NOT SELECTED. CLICK' });
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
 
         this.studentSearch = page.locator('#studentList');
 
-        this.goButton = page.getByRole('button', {
-            name: 'GO'
-        });
+        this.goButton = page.getByRole('button', { name: 'GO' });
 
-        this.selectLocationDropdown = page.getByRole('link', {
-            name: 'Select Location'
-        });
+        this.selectLocationDropdown = page.getByRole('link', { name: 'Select Location' });
 
         this.showAllCheckbox = page.getByText('Show All').first();
 
-        this.filterButton = page.getByRole('button', {
-            name: 'Filter'
-        });
+        this.filterButton = page.getByRole('button', { name: 'Filter' });
 
         // Add New
-        this.addNewButton = page
-            .locator('#divEnrollmentGrid')
-            .getByRole('link', {
-                name: 'Add New'
-            });
+        this.addNewButton = page.locator('#divEnrollmentGrid').getByRole('link', { name: 'Add New' });
 
         // Package Selection
-        this.packageSelectionButton = page.getByRole('button', {
-            name: 'Package Selection'
-        });
+        this.packageSelectionButton = page.getByRole('button', { name: 'Package Selection' });
 
-        this.addPackageButton = page.getByRole('button', {
-            name: 'Add Package'
-        });
+        this.addPackageButton = page.getByRole('button', { name: 'Add Package' });
 
         // Location / Appointment
-        this.selectLocation = page.getByRole('link', {
-            name: 'Select Location'
-        });
-
-
-        this.filterButton = page.getByRole('button', {
-            name: 'Filter'
-        });
-
+        this.selectLocation = page.getByRole('link', { name: 'Select Location' });
         this.selectButton = page.locator("xpath=//a[text()='Select' and @onclick='showAddButton(this);']").first();
-
         this.addButton = page.locator("xpath=//button[text()='Add' and contains(@onclick,'showSelect(this);')]").first();
         this.addButtonForAdditionalDetails = page.locator("xpath=//td[text()='RT PRODUCT']//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')]").first();
 
-        this.addToCartButton = page.getByRole('button', {
-            name: 'Add To Cart'
-        });
-
+        this.addToCartButton = page.getByRole('button', { name: 'Add To Cart' });
 
         // Enroll
-        this.enrollButton = page.getByRole('button', {
-            name: 'Enroll'
-        });
-
+        this.enrollButton = page.getByRole('button', { name: 'Enroll' });
 
         // Edit
         this.editButton = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//ancestor::tr//a[@data-toggle='dropdown'])[1]");
         this.getLatestPackageID = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[4])[1]");
 
-
         // Update
         this.notesTextbox = page.locator('#txtpackageNotes');
 
-        this.updateButton = page.getByRole('button', {
-            name: 'Update'
-        }).first();
+        this.updateButton = page.getByRole('button', { name: 'Update' }).first();
 
         this.skipSelectionButton = page.getByRole('button', { name: 'Skip Selection' }).first();
 
         // Billing grid
         this.selectButton = page.getByRole('button', { name: 'Select' });
-        this.addNewBilling = page
-            .locator('#divBillingGrid')
-            .getByRole('link', { name: 'Add New' }).last();
+        this.addNewBilling = page.locator('#divBillingGrid').getByRole('link', { name: 'Add New' }).last();
 
         // Swiped Transaction
         this.swipedTransaction = page.locator('a').filter({ hasText: 'Swiped Transaction' }).last();
         this.swipeAmountTextbox = page.locator('#txtSwipeAmount');
-        this.last4Digits = page.getByRole('textbox', {
-            name: 'Last 4 Digits on Card'
-        });
-
+        this.last4Digits = page.getByRole('textbox', { name: 'Last 4 Digits on Card' });
         this.cardTypeSelectDropdown = page.locator("#btnSwipe_CardType");
-
         this.discover = page.locator("xpath=//ul[@id='ddlCardType']//li//span[text()='Discover']");
-
-        this.transactionNumber = page.getByRole('textbox', {
-            name: 'Transaction#'
-        });
-
-        this.receiptNumber = page.getByRole('textbox', {
-            name: 'Receipt#'
-        });
+        this.transactionNumber = page.getByRole('textbox', { name: 'Transaction#' });
+        this.receiptNumber = page.getByRole('textbox', { name: 'Receipt#' });
         this.cashNotesTextbox = page.locator("#txtCashNotes").first();
 
         // Check Payment
         this.checkPayment = page.locator('a').filter({ hasText: 'Check Payment' }).last();
-
         this.checkAmount = page.locator("#txtCheckAmount").first();
-
-        this.checkNumber = page.getByRole('textbox', {
-            name: 'Check#'
-        });
-
+        this.checkNumber = page.getByRole('textbox', { name: 'Check#' });
         this.chequeNotesTextbox = page.locator("#txtCheckNotes");
-
-
         this.chequeDeposited = page.locator("xpath=//input[@id='chb_ChequeDeposited']/following-sibling::ins");
-
 
         // Cash Payment
         this.cashPayment = page.locator('a').filter({ hasText: 'Cash Payment' }).last();
@@ -140,46 +86,27 @@ export default class EnrollmentBillingPage extends BasePage {
 
         // Adjustment
         this.adjustment = page.getByText('Adjustment', { exact: true }).last();
-
         this.refundAddToBalance = page.locator("xpath=//ul[@id='ddlAdjustmentTypeType']//li//span[text()='Refund (Add to balance)']");
 
         // Process Credit Card
-        this.processCreditCard = page.locator('a').filter({ hasText: 'Process Credit Card' }).last()
-
-        this.cardNumber = page.getByRole('textbox', {
-            name: 'Card Number'
-        });
-
-        this.expiryDate = page.getByRole('textbox', {
-            name: 'MM/YYYY'
-        });
-
-        this.cvv = page.getByRole('textbox', {
-            name: 'CVV'
-        });
-
-        this.nameOnCard = page.getByRole('textbox', {
-            name: 'Name on Card'
-        });
-
+        this.processCreditCard = page.locator('a').filter({ hasText: 'Process Credit Card' }).last();
+        this.cardNumber = page.getByRole('textbox', { name: 'Card Number' });
+        this.expiryDate = page.getByRole('textbox', { name: 'MM/YYYY' });
+        this.cvv = page.getByRole('textbox', { name: 'CVV' });
+        this.nameOnCard = page.getByRole('textbox', { name: 'Name on Card' });
         this.sameAddress = page.locator("xpath=//input[@id='chb_Same_Adddress']/following-sibling::ins");
         this.billingAddress = page.getByRole('textbox', { name: 'Billing Address' });
         this.billingCity = page.getByRole('textbox', { name: 'Billing City' });
         this.billStateDropdown = page.locator("xpath=//div[contains(@id,'ddlBillState')]");
         this.billStateDropdownValue = page.locator("xpath=//div[@role='option' and text()='AK']");
-        this.billingZipCode = page.getByRole('textbox', { name: 'Zip Code' })
+        this.billingZipCode = page.getByRole('textbox', { name: 'Zip Code' });
 
         // Billing amount caption (e.g. "Billing: $1275.00")
         this.billingAmountCaption = page.locator("//div[@id='divBillingGrid']//div[contains(@class,'caption')]");
 
         // Common buttons
-        this.saveButton = page.getByRole('button', {
-            name: 'Save'
-        });
-
-        this.closeButton = page.getByRole('button', {
-            name: 'Close'
-        });
+        this.saveButton = page.getByRole('button', { name: 'Save' });
+        this.closeButton = page.getByRole('button', { name: 'Close' });
     }
 
     /**
@@ -213,7 +140,9 @@ export default class EnrollmentBillingPage extends BasePage {
      * Clicks the 'Add New' button in the enrollment section.
     **/
     async clickAddNew() {
-        await this.click(this.addNewButton);
+        await test.step('Click Add New enrollment', async () => {
+            await this.click(this.addNewButton);
+        });
     }
 
     /**
@@ -221,70 +150,78 @@ export default class EnrollmentBillingPage extends BasePage {
      * @param {string} packageName - Name of the package to select.
     **/
     async selectPackage(packageName) {
-        await this.click(this.packageSelectionButton);
-        await this.click(this.page.getByRole('link', {
-            name: packageName,
-            exact: true
-        }));
+        await test.step(`Select package: "${packageName}"`, async () => {
+            await this.click(this.packageSelectionButton);
+            await this.click(this.page.getByRole('link', {
+                name: packageName,
+                exact: true
+            }));
+        });
     }
 
     /**
      * Completes the entire workflow to add a CR Package to cart (location, filter, select slot, additional details).
     **/
     async addCRPackage() {
-        await this.selectPackage('CR Package');
-        await this.click(this.addPackageButton);
-        await this.click(this.selectLocationDropdown);
-        await this.click(this.showAllCheckbox);
-        await this.click(this.filterButton);
-        await this.click(this.selectButton);
-        // await this.click(this.addButton);
-        await this.click(this.addButtonForAdditionalDetails);
-        await this.click(this.addToCartButton);
+        await test.step('Add CR Package to cart', async () => {
+            await this.selectPackage('CR Package');
+            await this.click(this.addPackageButton);
+            await this.click(this.selectLocationDropdown);
+            await this.click(this.showAllCheckbox);
+            await this.click(this.filterButton);
+            await this.click(this.selectButton);
+            await this.click(this.addButtonForAdditionalDetails);
+            await this.click(this.addToCartButton);
+        });
     }
 
     /**
      * Clicks the Enroll button and confirms the confirmation dialog.
     **/
     async enroll() {
-        await this.click(this.enrollButton);
-        await this.click(this.yesConfirmationButton);
+        await test.step('Enroll student in package', async () => {
+            await this.click(this.enrollButton);
+            await this.click(this.yesConfirmationButton);
+        });
     }
 
     /**
      * Edits the latest CR package enrollment, updates notes, saves, and confirms.
     **/
     async editAndUpdateNotes() {
-        await this.click(this.editButton);
-        const packageId = await this.getText(this.getLatestPackageID);
-        console.log("package id : " + packageId);
-        await this.click(this.editDetailsTab(packageId));
-        try {
-            await this.waitForVisible(this.skipSelectionButton);
-            await this.click(this.skipSelectionButton);
-        } catch {
-            // Button not present, continue
-        }
-        await this.fill(this.notesTextbox, "updating package notes");
-        await this.click(this.updateButton);
-        await this.page.waitForTimeout(2000);
-        if (await this.isVisible(this.yesConfirmationButton)) {
-            await this.click(this.yesConfirmationButton);
-            await this.waitForLoaders();
-        }
+        await test.step('Edit package enrollment and update notes', async () => {
+            await this.click(this.editButton);
+            const packageId = await this.getText(this.getLatestPackageID);
+            console.log("package id : " + packageId);
+            await this.click(this.editDetailsTab(packageId));
+            try {
+                await this.waitForVisible(this.skipSelectionButton);
+                await this.click(this.skipSelectionButton);
+            } catch {
+                // Button not present, continue
+            }
+            await this.fill(this.notesTextbox, "updating package notes");
+            await this.click(this.updateButton);
+            await this.page.waitForTimeout(2000);
+            if (await this.isVisible(this.yesConfirmationButton)) {
+                await this.click(this.yesConfirmationButton);
+                await this.waitForLoaders();
+            }
+        });
     }
 
     /**
      * Deletes the latest CR Package enrollment and confirms the action.
     **/
     async editAndDelete() {
-        await this.waitForVisible(this.editButton);
-        await this.click(this.editButton);
-        const packageId = await this.getText(this.getLatestPackageID);
-        await this.waitForVisible(this.deleteLink(packageId));
-        await this.deleteLink(packageId).click({ force: true });
-        // await this.click(this.deleteLink(packageId));
-        await this.click(this.yesConfirmationButton);
+        await test.step('Delete package enrollment', async () => {
+            await this.waitForVisible(this.editButton);
+            await this.click(this.editButton);
+            const packageId = await this.getText(this.getLatestPackageID);
+            await this.waitForVisible(this.deleteLink(packageId));
+            await this.deleteLink(packageId).click({ force: true });
+            await this.click(this.yesConfirmationButton);
+        });
     }
 
     /**
@@ -292,11 +229,13 @@ export default class EnrollmentBillingPage extends BasePage {
      * @param {string} studentName - Student's name to search.
     **/
     async selectStudent(studentName) {
-        await this.click(this.studentNotSelected);
-        await this.verifyVisible(this.studentSearch);
-        await this.pressSequentially(this.studentSearch, studentName);
-        await this.click(this.studentDropdownValue(studentName.replace(" ", ", ")));
-        await this.click(this.goButton);
+        await test.step(`Search and select student: "${studentName}"`, async () => {
+            await this.click(this.studentNotSelected);
+            await this.verifyVisible(this.studentSearch);
+            await this.pressSequentially(this.studentSearch, studentName);
+            await this.click(this.studentDropdownValue(studentName.replace(" ", ", ")));
+            await this.click(this.goButton);
+        });
     }
 
     /**
@@ -305,7 +244,6 @@ export default class EnrollmentBillingPage extends BasePage {
       **/
     async getBillingAmount() {
         const text = await this.getText(this.billingAmountCaption);
-        // console.log("billing amount : " + text);
         const match = text.match(/\$([\d,]+\.?\d*)/);
         return match ? parseFloat(match[1].replace(',', '')) : null;
     }
@@ -314,146 +252,146 @@ export default class EnrollmentBillingPage extends BasePage {
      * Adds a swiped card transaction payment, saves, verifies 'Payment Entered' modal, and asserts billing balance update.
     **/
     async addSwipedTransaction() {
-        const amountBefore = await this.getBillingAmount();
+        await test.step('Add Swiped Card Transaction payment and verify balance update', async () => {
+            const amountBefore = await this.getBillingAmount();
 
-        await this.click(this.addNewBilling);
-        await this.click(this.swipedTransaction);
-        await this.clear(this.swipeAmountTextbox);
-        await this.fill(this.swipeAmountTextbox, paymentData.swipedTransaction.amount);
-        await this.fill(this.last4Digits, paymentData.swipedTransaction.last4Digits);
-        await this.click(this.cardTypeSelectDropdown);
-        await this.click(this.discover);
-        await this.fill(this.transactionNumber, paymentData.swipedTransaction.transactionNumber);
-        await this.fill(this.receiptNumber, paymentData.swipedTransaction.receiptNumber);
-        await this.fill(this.cashNotesTextbox, paymentData.swipedTransaction.notes);
-        await this.click(this.saveButton);
-        await this.click(this.yesConfirmationButton);
-        await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForVisible(this.closeButton);
-        await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
-        await this.click(this.closeButton);
-        // await this.page.waitForLoadState('networkidle');
-        await this.waitForLoaders();
-        // await this.waitForVisible(this.addNewBilling);
-
-        const amountAfter = await this.getBillingAmount();
-        expect(amountAfter).not.toEqual(amountBefore);
+            await this.click(this.addNewBilling);
+            await this.click(this.swipedTransaction);
+            await this.clear(this.swipeAmountTextbox);
+            await this.fill(this.swipeAmountTextbox, paymentData.swipedTransaction.amount);
+            await this.fill(this.last4Digits, paymentData.swipedTransaction.last4Digits);
+            await this.click(this.cardTypeSelectDropdown);
+            await this.click(this.discover);
+            await this.fill(this.transactionNumber, paymentData.swipedTransaction.transactionNumber);
+            await this.fill(this.receiptNumber, paymentData.swipedTransaction.receiptNumber);
+            await this.fill(this.cashNotesTextbox, paymentData.swipedTransaction.notes);
+            await this.click(this.saveButton);
+            await this.click(this.yesConfirmationButton);
+            await this.waitForHidden(this.yesConfirmationButton);
+            await this.waitForVisible(this.closeButton);
+            await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
+            await this.click(this.closeButton);
+            await this.waitForLoaders();
+            const amountAfter = await this.getBillingAmount();
+            expect(amountAfter).not.toEqual(amountBefore);
+        });
     }
 
     /**
      * Adds a check payment, marks check as deposited, saves, verifies confirmation, and asserts balance update.
     **/
     async addCheckPayment() {
-        const amountBefore = await this.getBillingAmount();
+        await test.step('Add Check Payment and verify balance update', async () => {
+            const amountBefore = await this.getBillingAmount();
 
-        await this.click(this.addNewBilling);
-        await this.click(this.checkPayment);
-        await this.clear(this.checkAmount);
-        await this.fill(this.checkAmount, paymentData.checkPayment.amount);
-        await this.fill(this.checkNumber, paymentData.checkPayment.checkNumber);
-        await this.fill(this.receiptNumber, paymentData.checkPayment.receiptNumber);
-        await this.fill(this.chequeNotesTextbox, paymentData.checkPayment.notes);
-        await this.click(this.chequeDeposited);
-        await this.click(this.saveButton);
-        await this.click(this.yesConfirmationButton);
-        await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForVisible(this.closeButton);
-        await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
-        await this.click(this.closeButton);
-        // await this.page.waitForLoadState('networkidleidle');
-        await this.waitForLoaders();
-        await this.waitForVisible(this.addNewBilling);
-        const amountAfter = await this.getBillingAmount();
-        expect(amountAfter).not.toEqual(amountBefore);
+            await this.click(this.addNewBilling);
+            await this.click(this.checkPayment);
+            await this.clear(this.checkAmount);
+            await this.fill(this.checkAmount, paymentData.checkPayment.amount);
+            await this.fill(this.checkNumber, paymentData.checkPayment.checkNumber);
+            await this.fill(this.receiptNumber, paymentData.checkPayment.receiptNumber);
+            await this.fill(this.chequeNotesTextbox, paymentData.checkPayment.notes);
+            await this.click(this.chequeDeposited);
+            await this.click(this.saveButton);
+            await this.click(this.yesConfirmationButton);
+            await this.waitForHidden(this.yesConfirmationButton);
+            await this.waitForVisible(this.closeButton);
+            await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
+            await this.click(this.closeButton);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.addNewBilling);
+
+            const amountAfter = await this.getBillingAmount();
+            expect(amountAfter).not.toEqual(amountBefore);
+        });
     }
 
     /**
      * Adds a cash payment record, saves, verifies 'Payment Entered' modal, and asserts billing balance update.
     **/
     async addCashPayment() {
-        const amountBefore = await this.getBillingAmount();
+        await test.step('Add Cash Payment and verify balance update', async () => {
+            const amountBefore = await this.getBillingAmount();
 
-        await this.click(this.addNewBilling);
-        await this.click(this.cashPayment);
-        await this.clear(this.cashAmountTextbox);
-        await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
-        await this.fill(this.receiptNumber, paymentData.cashPayment.receiptNumber);
-        await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
-        await this.click(this.saveButton);
-        await this.click(this.yesConfirmationButton);
-        await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForVisible(this.closeButton);
-        await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
-        await this.click(this.closeButton);
-        // await this.page.waitForLoadState('networkidle');
-        await this.waitForLoaders();
-        await this.waitForVisible(this.addNewBilling);
+            await this.click(this.addNewBilling);
+            await this.click(this.cashPayment);
+            await this.clear(this.cashAmountTextbox);
+            await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
+            await this.fill(this.receiptNumber, paymentData.cashPayment.receiptNumber);
+            await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
+            await this.click(this.saveButton);
+            await this.click(this.yesConfirmationButton);
+            await this.waitForHidden(this.yesConfirmationButton);
+            await this.waitForVisible(this.closeButton);
+            await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
+            await this.click(this.closeButton);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.addNewBilling);
 
-        const amountAfter = await this.getBillingAmount();
-        expect(amountAfter).not.toEqual(amountBefore);
+            const amountAfter = await this.getBillingAmount();
+            expect(amountAfter).not.toEqual(amountBefore);
+        });
     }
 
     /**
      * Adds a balance adjustment payment (Refund / Add to balance), saves, and asserts billing balance update.
     **/
     async addAdjustment() {
-        const amountBefore = await this.getBillingAmount();
+        await test.step('Add Balance Adjustment and verify balance update', async () => {
+            const amountBefore = await this.getBillingAmount();
 
-        await this.click(this.addNewBilling);
-        await this.click(this.adjustment);
-        await this.clear(this.cashAmountTextbox);
-        await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
-        await this.click(this.selectButton);
-        await this.click(this.refundAddToBalance);
-        await this.fill(this.receiptNumber, paymentData.adjustment.receiptNumber);
-        await this.fill(this.cashNotesTextbox, paymentData.adjustment.notes);
-        await this.click(this.saveButton);
-        await this.click(this.yesConfirmationButton);
-        await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForVisible(this.closeButton);
-        await this.verifyVisible(this.page.getByText('Adjustment Entered', { exact: true }));
-        await this.click(this.closeButton);
-        // await this.page.waitForLoadState('networkidle');
-        await this.waitForLoaders();
-        await this.waitForVisible(this.addNewBilling);
+            await this.click(this.addNewBilling);
+            await this.click(this.adjustment);
+            await this.clear(this.cashAmountTextbox);
+            await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
+            await this.click(this.selectButton);
+            await this.click(this.refundAddToBalance);
+            await this.fill(this.receiptNumber, paymentData.adjustment.receiptNumber);
+            await this.fill(this.cashNotesTextbox, paymentData.adjustment.notes);
+            await this.click(this.saveButton);
+            await this.click(this.yesConfirmationButton);
+            await this.waitForHidden(this.yesConfirmationButton);
+            await this.waitForVisible(this.closeButton);
+            await this.verifyVisible(this.page.getByText('Adjustment Entered', { exact: true }));
+            await this.click(this.closeButton);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.addNewBilling);
 
-        const amountAfter = await this.getBillingAmount();
-        expect(amountAfter).not.toEqual(amountBefore);
+            const amountAfter = await this.getBillingAmount();
+            expect(amountAfter).not.toEqual(amountBefore);
+        });
     }
 
     /**
      * Processes an online credit card transaction with card info and billing address, confirms payment, and asserts balance update.
     **/
     async processCreditCardPayment() {
-        const amountBefore = await this.getBillingAmount();
+        await test.step('Process Credit Card payment and verify balance update', async () => {
+            const amountBefore = await this.getBillingAmount();
 
-        await this.click(this.addNewBilling);
-        await this.click(this.processCreditCard);
-
-        // await this.click(this.amount);
-        // await this.click(this.sameAddress);
-
-        await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
-        await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
-        await this.fill(this.cvv, paymentData.processCreditCard.cvv);
-        await this.fill(this.nameOnCard, paymentData.processCreditCard.nameOnCard);
-        await this.fill(this.receiptNumber, paymentData.processCreditCard.receiptNumber);
-        await this.fill(this.billingAddress, paymentData.processCreditCard.billingAddress);
-        await this.fill(this.billingCity, paymentData.processCreditCard.billingCity);
-        await this.click(this.billStateDropdown);
-        await this.click(this.billStateDropdownValue);
-        await this.fill(this.billingZipCode, paymentData.processCreditCard.billingZipCode);
-        await this.fill(this.cashNotesTextbox, paymentData.processCreditCard.notes);
-        await this.click(this.saveButton);
-        await this.click(this.yesConfirmationButton);
-        await this.waitForHidden(this.yesConfirmationButton);
-        await this.waitForVisible(this.closeButton);
-        await this.verifyVisible(this.page.getByText('Payment Approved', { exact: true }));
-        await this.click(this.closeButton);
-        // await this.page.waitForLoadState('networkidle');
-        await this.waitForLoaders();
-        await this.waitForVisible(this.addNewBilling);
-        const amountAfter = await this.getBillingAmount();
-        expect(amountAfter).not.toEqual(amountBefore);
+            await this.click(this.addNewBilling);
+            await this.click(this.processCreditCard);
+            await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
+            await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
+            await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+            await this.fill(this.nameOnCard, paymentData.processCreditCard.nameOnCard);
+            await this.fill(this.receiptNumber, paymentData.processCreditCard.receiptNumber);
+            await this.fill(this.billingAddress, paymentData.processCreditCard.billingAddress);
+            await this.fill(this.billingCity, paymentData.processCreditCard.billingCity);
+            await this.click(this.billStateDropdown);
+            await this.click(this.billStateDropdownValue);
+            await this.fill(this.billingZipCode, paymentData.processCreditCard.billingZipCode);
+            await this.fill(this.cashNotesTextbox, paymentData.processCreditCard.notes);
+            await this.click(this.saveButton);
+            await this.click(this.yesConfirmationButton);
+            await this.waitForHidden(this.yesConfirmationButton);
+            await this.waitForVisible(this.closeButton);
+            await this.verifyVisible(this.page.getByText('Payment Approved', { exact: true }));
+            await this.click(this.closeButton);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.addNewBilling);
+            const amountAfter = await this.getBillingAmount();
+            expect(amountAfter).not.toEqual(amountBefore);
+        });
     }
 }

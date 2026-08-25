@@ -1,4 +1,5 @@
 import BasePage from '../../utils/BasePage';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Student Profile Page in the Student Portal (CSP).
@@ -9,7 +10,7 @@ export default class StudentProfilePage extends BasePage {
     /**
      * Initializes locators for the Student Profile Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
-     **/
+      **/
     constructor(page) {
         super(page);
 
@@ -35,41 +36,44 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [details.parentPhone] - Parent phone number.
      **/
     async updateProfileDetails(details = {}) {
-        await this.verifyVisible(this.parent1GuardianNameTxt);
-        await this.clear(this.parent1GuardianNameTxt);
-        await this.fill(this.parent1GuardianNameTxt, details.parent1GuardianName);
+        await test.step('Fill updated student profile details', async () => {
+            await this.verifyVisible(this.parent1GuardianNameTxt);
+            await this.clear(this.parent1GuardianNameTxt);
+            await this.fill(this.parent1GuardianNameTxt, details.parent1GuardianName);
 
+            await this.verifyVisible(this.homePhoneTxt);
+            await this.clear(this.homePhoneTxt);
+            await this.fill(this.homePhoneTxt, details.homePhone);
 
-        await this.verifyVisible(this.homePhoneTxt);
-        await this.clear(this.homePhoneTxt);
-        await this.fill(this.homePhoneTxt, details.homePhone);
-
-
-        await this.verifyVisible(this.parentPhoneTxt);
-        await this.clear(this.parentPhoneTxt);
-        await this.fill(this.parentPhoneTxt, details.parentPhone);
-
+            await this.verifyVisible(this.parentPhoneTxt);
+            await this.clear(this.parentPhoneTxt);
+            await this.fill(this.parentPhoneTxt, details.parentPhone);
+        });
     }
 
     /**
      * Clicks on the Update button and confirms the confirmation dialog if presented.
      **/
     async clickUpdate() {
-        await this.verifyVisible(this.updateBtn);
-        await this.click(this.updateBtn);
+        await test.step('Click Update and confirm changes', async () => {
+            await this.verifyVisible(this.updateBtn);
+            await this.click(this.updateBtn);
 
-        if (await this.isVisible(this.yesConfirmationBtn)) {
-            await this.click(this.yesConfirmationBtn);
-        }
-        await this.waitForLoaders();
+            if (await this.isVisible(this.yesConfirmationBtn)) {
+                await this.click(this.yesConfirmationBtn);
+            }
+            await this.waitForLoaders();
+        });
     }
 
     /**
      * Verifies that the profile details were updated successfully.
      **/
     async verifyProfileUpdateSuccess() {
-        await this.verifyVisible(this.successAlert);
-        await this.verifyContainsText(this.successAlert, 'Details updated successfully.');
+        await test.step('Verify "Details updated successfully." message', async () => {
+            await this.verifyVisible(this.successAlert);
+            await this.verifyContainsText(this.successAlert, 'Details updated successfully.');
+        });
     }
 
     /**
@@ -80,20 +84,22 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [expectedDetails.parentPhone] - Expected parent phone.
      **/
     async verifyProfileDetails(expectedDetails = {}) {
-        if (expectedDetails.parent1GuardianName !== undefined) {
-            await this.verifyVisible(this.parent1GuardianNameTxt);
-            await this.verifyAttribute(this.parent1GuardianNameTxt, 'value', expectedDetails.parent1GuardianName);
-        }
+        await test.step('Verify profile field values match expected', async () => {
+            if (expectedDetails.parent1GuardianName !== undefined) {
+                await this.verifyVisible(this.parent1GuardianNameTxt);
+                await this.verifyAttribute(this.parent1GuardianNameTxt, 'value', expectedDetails.parent1GuardianName);
+            }
 
-        if (expectedDetails.homePhone !== undefined) {
-            await this.verifyVisible(this.homePhoneTxt);
-            await this.verifyAttribute(this.homePhoneTxt, 'value', expectedDetails.homePhone);
-        }
+            if (expectedDetails.homePhone !== undefined) {
+                await this.verifyVisible(this.homePhoneTxt);
+                await this.verifyAttribute(this.homePhoneTxt, 'value', expectedDetails.homePhone);
+            }
 
-        if (expectedDetails.parentPhone !== undefined) {
-            await this.verifyVisible(this.parentPhoneTxt);
-            await this.verifyAttribute(this.parentPhoneTxt, 'value', expectedDetails.parentPhone);
-        }
+            if (expectedDetails.parentPhone !== undefined) {
+                await this.verifyVisible(this.parentPhoneTxt);
+                await this.verifyAttribute(this.parentPhoneTxt, 'value', expectedDetails.parentPhone);
+            }
+        });
     }
-
 }
+

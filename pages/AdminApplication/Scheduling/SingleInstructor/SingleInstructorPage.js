@@ -1,5 +1,5 @@
 import BasePage from "../../../../utils/BasePage";
-import { expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import CombinedAppointmentPage from "./CombinedAppointmentPage";
 
 /**
@@ -18,40 +18,28 @@ export default class SingleInstructorPage extends BasePage {
 
         this.combinedAppointmentPage = new CombinedAppointmentPage(page);
 
-
-        this.submitButtonPopup = page.getByRole("button", {
-            name: "Yes, Submit",
-        });
+        this.submitButtonPopup = page.getByRole("button", { name: "Yes, Submit", });
 
         this.editAppointmentLink = page.getByRole('link', { name: 'Edit Appointment' });
         this.copyAppointmentLink = page.getByRole('link', { name: 'Copy Appointment' });
 
         // Buttons
-        this.getScheduleBtn = page.getByRole("button", {
-            name: "Get Schedule"
-        });
+        this.getScheduleBtn = page.getByRole("button", { name: "Get Schedule" });
 
         this.appointmentConfirmed = page.locator("xpath=//div[@data-statuss1='Confirmed' and @data-types='Appointment']");
 
         this.timeSlot = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[10]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[1]");
-
         this.timeSlot2 = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[10]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[2]");
 
         this.allSlotsInRow = (rowIndex) => page.locator(
             `xpath=(//div[@id='scheduler']//tr[@role='row'])[${rowIndex}]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))]`
         );
 
-
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
-        // this.deletionSuccessToast = page.getByText('Appointment deleted successfully.', { exact: true });
-
         this.calendarPrevBtn = page.getByRole('group').filter({ hasText: 'Single Instructor View:' }).getByLabel('Previous').first();
         this.listMenuOfANoShowAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='No Show']//span[@data-types='Appointment']//img)[1]");
         this.listMenuOfCancelledAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//span[@data-types='Appointment']//img)[1]");
-
         this.deleteCancelledAppointmentButton = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//a[@href='cancelAppt'])[1]");
-
-
     }
 
     /**
@@ -153,56 +141,57 @@ export default class SingleInstructorPage extends BasePage {
         );
     }
 
-
     /**
      * Verifies page title and selects the last instructor from the Single Instructor dropdown.
      **/
     async selectInstructor() {
-        await this.verifyTitle("Single Instructor Scheduler");
-        await this.click(this.getDropdownButton("SingleInst"));
-        await this.click(this.getLastDropdownOption("SingleInst"));
-
+        await test.step('Select Single Instructor from dropdown', async () => {
+            await this.verifyTitle("Single Instructor Scheduler");
+            await this.click(this.getDropdownButton("SingleInst"));
+            await this.click(this.getLastDropdownOption("SingleInst"));
+        });
     }
 
     /**
      * Clicks the 'Get Schedule' button to load the selected instructor's timetable grid.
      **/
     async getSchedule() {
-        await this.click(this.getScheduleBtn);
-        await this.waitForLoaders();
-        // await this.page.waitForLoadState("networkidle")
-
+        await test.step('Click Get Schedule to load timetable', async () => {
+            await this.click(this.getScheduleBtn);
+            await this.waitForLoaders();
+        });
     }
 
     /**
      * Calculates target calendar date (7 days prior, non-Sunday), navigates previous months if needed, and clicks the date.
      **/
     async selectDateInCalendar() {
-        const today = new Date();
-        const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() - 7);
+        await test.step('Select target date in scheduler calendar', async () => {
+            const today = new Date();
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() - 7);
 
-        // If Sunday (0), go one more day back to Saturday
-        if (targetDate.getDay() === 0) {
-            targetDate.setDate(targetDate.getDate() - 1);
-        }
+            // If Sunday (0), go one more day back to Saturday
+            if (targetDate.getDay() === 0) {
+                targetDate.setDate(targetDate.getDate() - 1);
+            }
 
-        const year = targetDate.getFullYear();
-        const month = targetDate.getMonth(); // Kendo uses 0-indexed months in data-value (e.g. July = 6)
-        const day = targetDate.getDate();
-        const dataValue = `${year}/${month}/${day}`;
+            const year = targetDate.getFullYear();
+            const month = targetDate.getMonth();
+            const day = targetDate.getDate();
+            const dataValue = `${year}/${month}/${day}`;
 
-        // Navigate to previous month in calendar if target date is in a prior month
-        const todayYear = today.getFullYear();
-        const todayMonth = today.getMonth();
-        const monthDiff = (todayYear - year) * 12 + (todayMonth - month);
+            const todayYear = today.getFullYear();
+            const todayMonth = today.getMonth();
+            const monthDiff = (todayYear - year) * 12 + (todayMonth - month);
 
-        for (let i = 0; i < monthDiff; i++) {
-            await this.click(this.calendarPrevBtn);
-            await this.page.waitForTimeout(300);
-        }
+            for (let i = 0; i < monthDiff; i++) {
+                await this.click(this.calendarPrevBtn);
+                await this.page.waitForTimeout(300);
+            }
 
-        await this.click(this.page.locator(`xpath=//a[@data-value="${dataValue}"]`).first());
+            await this.click(this.page.locator(`xpath=//a[@data-value="${dataValue}"]`).first());
+        });
     }
 
     /**
@@ -260,20 +249,17 @@ export default class SingleInstructorPage extends BasePage {
                 const cell = cells[i];
                 const cellBox = cell.getBoundingClientRect();
 
-                // Skip cells not fully visible in the current viewport or without dimensions
                 if (cellBox.width === 0 || cellBox.height === 0 ||
                     cellBox.top < 0 || cellBox.bottom > innerHeight ||
                     cellBox.left < 0 || cellBox.right > innerWidth) {
                     continue;
                 }
 
-                // Check if the center point of the cell is intercepted by an appointment/overlay element
                 const centerX = cellBox.left + cellBox.width / 2;
                 const centerY = cellBox.top + cellBox.height / 2;
                 const elAtCenter = document.elementFromPoint(centerX, centerY);
                 const isPointBlocked = elAtCenter && !cell.contains(elAtCenter) && elAtCenter !== cell;
 
-                // Check bounding box overlap with all existing appointments
                 const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
                     if (apptBox.width === 0 || apptBox.height === 0) return false;
@@ -303,21 +289,23 @@ export default class SingleInstructorPage extends BasePage {
      * @param {string} appointmentType - Context menu label for appointment type.
      **/
     async selectCreateAppointment(appointmentType) {
-        await this.selectDateInCalendar();
-        await this.waitForLoaders().catch(() => { });
-        await this.page.waitForTimeout(1000);
+        await test.step(`Right-click free slot and select: "${appointmentType}"`, async () => {
+            await this.selectDateInCalendar();
+            await this.waitForLoaders().catch(() => { });
+            await this.page.waitForTimeout(1000);
 
-        const slot = await this.findAvailableSlot(0);
-        await slot.click({ button: "right" });
-        await this.page.waitForTimeout(2500);
-        try {
-            await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
-        } catch {
-            console.log("right click menu options not visible, right clicking again");
+            const slot = await this.findAvailableSlot(0);
             await slot.click({ button: "right" });
-            await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
-        }
-        await this.click(this.createAppointmentOnRightClick(appointmentType));
+            await this.page.waitForTimeout(2500);
+            try {
+                await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
+            } catch {
+                console.log("right click menu options not visible, right clicking again");
+                await slot.click({ button: "right" });
+                await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
+            }
+            await this.click(this.createAppointmentOnRightClick(appointmentType));
+        });
     }
 
     /**
@@ -325,18 +313,19 @@ export default class SingleInstructorPage extends BasePage {
      * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
     async editAppointment(studentOrNotes) {
-        await this.isVisible(this.listMenuOfCreatedAppointment(studentOrNotes));
-        await this.listMenuOfCreatedAppointment(studentOrNotes).click({ force: true });
+        await test.step(`Open action menu and click Edit Appointment for: "${this.getStudentSearchText(studentOrNotes)}"`, async () => {
+            await this.isVisible(this.listMenuOfCreatedAppointment(studentOrNotes));
+            await this.listMenuOfCreatedAppointment(studentOrNotes).click({ force: true });
 
-        try {
-            await this.waitForVisible(this.editAppointmentLink);
-        } catch {
-            console.log("edit appointment link was not visible. Re-clicking the list menu...");
-
-            await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
-            await this.waitForVisible(this.editAppointmentLink);
-        }
-        await this.click(this.editAppointmentLink);
+            try {
+                await this.waitForVisible(this.editAppointmentLink);
+            } catch {
+                console.log("edit appointment link was not visible. Re-clicking the list menu...");
+                await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
+                await this.waitForVisible(this.editAppointmentLink);
+            }
+            await this.click(this.editAppointmentLink);
+        });
     }
 
     /**
@@ -345,31 +334,33 @@ export default class SingleInstructorPage extends BasePage {
      * @param {Object} [student2] - Student 2 data object.
      **/
     async editAndVerifyDetailsForAllAppointments(student1, student2) {
-        const menus = this.allListMenusOfCreatedAppointments(student1);
-        await this.waitForVisible(menus.first());
-        const count = await menus.count();
-        console.log(`Found ${count} appointment(s) matching: "${this.getStudentSearchText(student1)}"`);
+        await test.step(`Edit and verify details for all appointments matching: "${this.getStudentSearchText(student1)}"`, async () => {
+            const menus = this.allListMenusOfCreatedAppointments(student1);
+            await this.waitForVisible(menus.first());
+            const count = await menus.count();
+            console.log(`Found ${count} appointment(s) matching: "${this.getStudentSearchText(student1)}"`);
 
-        for (let i = 0; i < count; i++) {
-            console.log(`Opening and verifying appointment ${i + 1} of ${count}...`);
-            const menu = menus.nth(i);
-            await this.waitForVisible(menu);
-            await menu.scrollIntoViewIfNeeded();
-            await menu.click({ button: "middle" });
-            await this.page.waitForTimeout(1000);
-
-            try {
-                await this.waitForVisible(this.editAppointmentLink);
-            } catch {
-                console.log(`Edit appointment link was not visible for appointment ${i + 1}. Re-clicking the list menu...`);
+            for (let i = 0; i < count; i++) {
+                console.log(`Opening and verifying appointment ${i + 1} of ${count}...`);
+                const menu = menus.nth(i);
+                await this.waitForVisible(menu);
+                await menu.scrollIntoViewIfNeeded();
                 await menu.click({ button: "middle" });
-                await this.waitForVisible(this.editAppointmentLink);
-            }
+                await this.page.waitForTimeout(1000);
 
-            await this.click(this.editAppointmentLink);
-            await this.combinedAppointmentPage.verifyCombinedAppointmentCreatedValues(student1, student2);
-            await this.page.waitForTimeout(1000);
-        }
+                try {
+                    await this.waitForVisible(this.editAppointmentLink);
+                } catch {
+                    console.log(`Edit appointment link was not visible for appointment ${i + 1}. Re-clicking the list menu...`);
+                    await menu.click({ button: "middle" });
+                    await this.waitForVisible(this.editAppointmentLink);
+                }
+
+                await this.click(this.editAppointmentLink);
+                await this.combinedAppointmentPage.verifyCombinedAppointmentCreatedValues(student1, student2);
+                await this.page.waitForTimeout(1000);
+            }
+        });
     }
 
     /**
@@ -377,15 +368,17 @@ export default class SingleInstructorPage extends BasePage {
      * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
     async deleteAppointment(studentOrNotes) {
-        await this.hover(this.listMenuOfCreatedAppointment(studentOrNotes));
-        await this.isVisible(this.deleteAppointmentButton(studentOrNotes));
-        await this.click(this.deleteAppointmentButton(studentOrNotes));
-        await this.click(this.deleteButtonInPopup);
-        await this.waitForHidden(this.deleteButtonInPopup);
-        await this.waitForLoaders();
-        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await this.verifyVisible(toast);
-        await this.verifyText(toast, 'Appointment deleted successfully.');
+        await test.step(`Delete appointment for: "${this.getStudentSearchText(studentOrNotes)}"`, async () => {
+            await this.hover(this.listMenuOfCreatedAppointment(studentOrNotes));
+            await this.isVisible(this.deleteAppointmentButton(studentOrNotes));
+            await this.click(this.deleteAppointmentButton(studentOrNotes));
+            await this.click(this.deleteButtonInPopup);
+            await this.waitForHidden(this.deleteButtonInPopup);
+            await this.waitForLoaders();
+            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
+            await this.verifyVisible(toast);
+            await this.verifyText(toast, 'Appointment deleted successfully.');
+        });
     }
 
     /**
@@ -393,72 +386,67 @@ export default class SingleInstructorPage extends BasePage {
      * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
     async copyAppointment(studentOrNotes) {
-        // await this.waitForVisible(this.appointmentConfirmed);
-        await this.waitForVisible(this.listMenuOfCreatedAppointment(studentOrNotes));
-        await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
-        await this.page.waitForTimeout(2500);
-
-        try {
-            await this.waitForVisible(this.copyAppointmentLink);
-        } catch {
-            console.log("Copy appointment link was not visible. Re-clicking the list menu...");
+        await test.step(`Copy and paste appointment for: "${this.getStudentSearchText(studentOrNotes)}"`, async () => {
+            await this.waitForVisible(this.listMenuOfCreatedAppointment(studentOrNotes));
             await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
-            await this.waitForVisible(this.copyAppointmentLink);
-        }
-        await this.click(this.copyAppointmentLink);
-
-        const maxRetries = 20;
-
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            // Wait for any lingering toasts from previous steps to clear
-            await this.page.waitForFunction(() => {
-                const container = document.querySelector('#toast-container');
-                return !container || Array.from(container.children).every(
-                    c => !c.offsetParent || getComputedStyle(c).display === 'none'
-                );
-            }, { timeout: 8000 }).catch(() => {
-            });
-
-            const slot = await this.findAvailableSlot(attempt);
-            await slot.click({ button: "right" });
-            await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
+            await this.page.waitForTimeout(2500);
 
             try {
-                await this.waitForVisible(this.submitButtonPopup);
-                await this.click(this.submitButtonPopup);
-
+                await this.waitForVisible(this.copyAppointmentLink);
             } catch {
-                console.log("Submit confirmation popup did not appear.");
+                console.log("Copy appointment link was not visible. Re-clicking the list menu...");
+                await this.click(this.listMenuOfCreatedAppointment(studentOrNotes));
+                await this.waitForVisible(this.copyAppointmentLink);
+            }
+            await this.click(this.copyAppointmentLink);
+
+            const maxRetries = 20;
+
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                await this.page.waitForFunction(() => {
+                    const container = document.querySelector('#toast-container');
+                    return !container || Array.from(container.children).every(
+                        c => !c.offsetParent || getComputedStyle(c).display === 'none'
+                    );
+                }, { timeout: 8000 }).catch(() => { });
+
+                const slot = await this.findAvailableSlot(attempt);
+                await slot.click({ button: "right" });
+                await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
+
+                try {
+                    await this.waitForVisible(this.submitButtonPopup);
+                    await this.click(this.submitButtonPopup);
+                } catch {
+                    console.log("Submit confirmation popup did not appear.");
+                }
+
+                const toastLocator = this.page.locator('#toast-container .toast-message');
+
+                let message = '';
+                try {
+                    await this.waitForVisible(toastLocator);
+                    message = (await this.getText(toastLocator))?.trim() || '';
+                } catch {
+                    console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
+                }
+
+                console.log(`Slot attempt ${attempt}: Toast message = "${message}"`);
+
+                if (message.includes("Appointment created successfully.")) {
+                    console.log(`Success on attempt ${attempt}: ${message}`);
+                    return;
+                } else {
+                    console.log(`Non-success toast received: "${message}"`);
+                    await this.page.locator('#toast-container .toast').waitFor({
+                        state: 'hidden',
+                        timeout: 5000
+                    }).catch(() => { });
+                }
             }
 
-            // Locate and wait for toast message to appear
-            const toastLocator = this.page.locator('#toast-container .toast-message');
-
-            let message = '';
-            try {
-                await this.waitForVisible(toastLocator);
-                message = (await this.getText(toastLocator))?.trim() || '';
-            } catch {
-                console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
-            }
-
-            console.log(`Slot attempt ${attempt}: Toast message = "${message}"`);
-
-            // Check if toast matches success message
-            if (message.includes("Appointment created successfully.")) {
-                console.log(`Success on attempt ${attempt}: ${message}`);
-                return; // Skip/exit to next step
-            } else {
-                console.log(`Non-success toast received: "${message}"`);
-                await this.page.locator('#toast-container .toast').waitFor({
-                    state: 'hidden',
-                    timeout: 5000
-                }).catch(() => {
-                });
-            }
-        }
-
-        throw new Error("Could not paste appointment: student not available in any of the tried slots");
+            throw new Error("Could not paste appointment: student not available in any of the tried slots");
+        });
     }
 
     /**
@@ -466,52 +454,57 @@ export default class SingleInstructorPage extends BasePage {
      * @param {Object|string} studentOrNotes - Student object, student name string, or unique notes value.
      **/
     async verifyAppointmentIsCopied(studentOrNotes) {
-        let studentName = '';
-        if (studentOrNotes && typeof studentOrNotes === 'object') {
-            studentName = (studentOrNotes.firstName && studentOrNotes.lastName)
-                ? `${studentOrNotes.lastName}, ${studentOrNotes.firstName}`
-                : (studentOrNotes.name || String(studentOrNotes));
-        } else {
-            studentName = String(studentOrNotes);
-        }
+        await test.step(`Verify appointment is duplicated in scheduler for: "${this.getStudentSearchText(studentOrNotes)}"`, async () => {
+            let studentName = '';
+            if (studentOrNotes && typeof studentOrNotes === 'object') {
+                studentName = (studentOrNotes.firstName && studentOrNotes.lastName)
+                    ? `${studentOrNotes.lastName}, ${studentOrNotes.firstName}`
+                    : (studentOrNotes.name || String(studentOrNotes));
+            } else {
+                studentName = String(studentOrNotes);
+            }
 
-        const locator = this.page.locator(`xpath=//p[contains(text(),'${studentName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
-        await expect(locator).toHaveCount(2);
-        await this.waitForLoaders();
+            const locator = this.page.locator(`xpath=//p[contains(text(),'${studentName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
+            await expect(locator).toHaveCount(2);
+            await this.waitForLoaders();
+        });
     }
 
     /**
      * Deletes an open/cancelled appointment slot and verifies success toast.
      **/
     async deleteCancelledAppointment() {
-        await this.isVisible(this.listMenuOfCancelledAppointment);
-        await this.hover(this.listMenuOfCancelledAppointment);
-        await this.isVisible(this.deleteCancelledAppointmentButton);
-        await this.click(this.deleteCancelledAppointmentButton);
-        await this.click(this.deleteButtonInPopup);
-        await this.waitForHidden(this.deleteButtonInPopup);
-        await this.waitForLoaders();
-        const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-        await this.verifyVisible(toast);
-        await this.verifyText(toast, 'Appointment deleted successfully.');
+        await test.step('Delete cancelled appointment slot', async () => {
+            await this.isVisible(this.listMenuOfCancelledAppointment);
+            await this.hover(this.listMenuOfCancelledAppointment);
+            await this.isVisible(this.deleteCancelledAppointmentButton);
+            await this.click(this.deleteCancelledAppointmentButton);
+            await this.click(this.deleteButtonInPopup);
+            await this.waitForHidden(this.deleteButtonInPopup);
+            await this.waitForLoaders();
+            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
+            await this.verifyVisible(toast);
+            await this.verifyText(toast, 'Appointment deleted successfully.');
+        });
     }
 
     /**
      * Opens the edit modal for a cancelled appointment from its action menu.
      **/
     async editCancelledAppointment() {
-        await this.isVisible(this.listMenuOfCancelledAppointment);
-        await this.click(this.listMenuOfCancelledAppointment);
-
-        try {
-            await this.waitForVisible(this.editAppointmentLink);
-        } catch {
-            console.log("edit appointment link was not visible. Re-clicking the list menu...");
-
+        await test.step('Open Edit modal for cancelled appointment', async () => {
+            await this.isVisible(this.listMenuOfCancelledAppointment);
             await this.click(this.listMenuOfCancelledAppointment);
-            await this.waitForVisible(this.editAppointmentLink);
-        }
-        await this.click(this.editAppointmentLink);
+
+            try {
+                await this.waitForVisible(this.editAppointmentLink);
+            } catch {
+                console.log("edit appointment link was not visible. Re-clicking the list menu...");
+                await this.click(this.listMenuOfCancelledAppointment);
+                await this.waitForVisible(this.editAppointmentLink);
+            }
+            await this.click(this.editAppointmentLink);
+        });
     }
 
     /**
@@ -522,20 +515,20 @@ export default class SingleInstructorPage extends BasePage {
         const studentName = typeof studentOrName === 'object'
             ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
             : studentOrName;
-        const listMenu = this.listMenuOfNoShowAppointment(studentName);
-        await this.isVisible(listMenu);
-        await this.click(listMenu);
 
-        try {
-            await this.waitForVisible(this.editAppointmentLink);
-        } catch {
-            console.log("edit appointment link was not visible. Re-clicking the list menu...");
-
+        await test.step(`Open Edit modal for No Show appointment: "${studentName}"`, async () => {
+            const listMenu = this.listMenuOfNoShowAppointment(studentName);
+            await this.isVisible(listMenu);
             await this.click(listMenu);
-            await this.waitForVisible(this.editAppointmentLink);
-        }
-        await this.click(this.editAppointmentLink);
+
+            try {
+                await this.waitForVisible(this.editAppointmentLink);
+            } catch {
+                console.log("edit appointment link was not visible. Re-clicking the list menu...");
+                await this.click(listMenu);
+                await this.waitForVisible(this.editAppointmentLink);
+            }
+            await this.click(this.editAppointmentLink);
+        });
     }
-
-
 }

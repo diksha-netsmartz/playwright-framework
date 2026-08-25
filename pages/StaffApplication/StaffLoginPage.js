@@ -1,5 +1,6 @@
 import BasePage from '../../utils/BasePage';
 import config from '../../config/config';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Staff Portal Login Page.
@@ -23,7 +24,9 @@ export default class StaffLoginPage extends BasePage {
      * Navigates to the Staff Login page using the configured CSM URL.
     **/
     async navigateToLoginPage() {
-        await this.navigate(config.csmURL);
+        await test.step('Navigate to Staff Login Page', async () => {
+            await this.navigate(config.csmURL);
+        });
     }
 
     /**
@@ -32,13 +35,15 @@ export default class StaffLoginPage extends BasePage {
      * @param {string} password - Staff password.
     **/
     async login(username, password) {
-        await this.verifyVisible(this.usernameTxt);
-        await this.fill(this.usernameTxt, username);
-        await this.fill(this.passwordTxt, password);
-        await this.click(this.loginBtn);
-        await this.verifyTitle("Staff Home");
-        await this.waitForLoaders();
-        await this.page.waitForLoadState('load', { timeout: 75000 })
+        await test.step(`Login to Staff Portal with user: ${username}`, async () => {
+            await this.verifyVisible(this.usernameTxt);
+            await this.fill(this.usernameTxt, username);
+            await this.fill(this.passwordTxt, password);
+            await this.click(this.loginBtn);
+            await this.verifyTitle("Staff Home");
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 75000 });
+        });
     }
-
 }
+

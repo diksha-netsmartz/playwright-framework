@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Student Reset Password Page.
@@ -10,7 +10,7 @@ export default class StudentResetPasswordPage extends BasePage {
     /**
      * Initializes locators for the Student Reset Password Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
-     **/
+      **/
     constructor(page) {
         super(page);
 
@@ -26,7 +26,9 @@ export default class StudentResetPasswordPage extends BasePage {
      * @param {string} resetPasswordUrl - The reset password URL from the email.
      **/
     async navigateToResetPasswordUrl(resetPasswordUrl) {
-        await this.navigate(resetPasswordUrl);
+        await test.step(`Navigate to Reset Password URL: ${resetPasswordUrl}`, async () => {
+            await this.navigate(resetPasswordUrl);
+        });
     }
 
     /**
@@ -34,17 +36,22 @@ export default class StudentResetPasswordPage extends BasePage {
      * @param {string} newPassword - The new password to set.
      **/
     async resetPassword(newPassword) {
-        await this.verifyVisible(this.newPasswordTxt);
-        await this.fill(this.newPasswordTxt, newPassword);
-        await this.fill(this.confirmPasswordTxt, newPassword);
-        await this.click(this.resetBtn);
+        await test.step('Fill new password and submit reset form', async () => {
+            await this.verifyVisible(this.newPasswordTxt);
+            await this.fill(this.newPasswordTxt, newPassword);
+            await this.fill(this.confirmPasswordTxt, newPassword);
+            await this.click(this.resetBtn);
+        });
     }
 
     /**
      * Verifies that the password was reset successfully.
      **/
     async verifyResetPasswordSuccess() {
-        await this.verifyVisible(this.page.getByText('Your password has been updated.', { exact: true }));
-        await this.verifyVisible(this.resetPasswordSuccessIcon);
+        await test.step('Verify "Your password has been updated." message', async () => {
+            await this.verifyVisible(this.page.getByText('Your password has been updated.', { exact: true }));
+            await this.verifyVisible(this.resetPasswordSuccessIcon);
+        });
     }
 }
+

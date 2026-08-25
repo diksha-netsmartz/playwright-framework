@@ -71,11 +71,13 @@ export default class BulkAppointmentPage extends BasePage {
      * Selects a date range spanning from the 1st of current month to the 25th of next month and applies the filter.
     **/
     async applyFilter() {
-        await this.click(this.selectDate);
-        await this.click(this.currentMonthFirstDay);
-        await this.click(this.nextMonthDay);
-        await this.click(this.filterButton);
-        await this.waitForLoaders();
+        await test.step('Apply date range filter in Bulk Appointments', async () => {
+            await this.click(this.selectDate);
+            await this.click(this.currentMonthFirstDay);
+            await this.click(this.nextMonthDay);
+            await this.click(this.filterButton);
+            await this.waitForLoaders();
+        });
     }
 
     /**
@@ -83,83 +85,88 @@ export default class BulkAppointmentPage extends BasePage {
      * @param {string} statusName - Name of the status to filter by.
     **/
     async filterByStatus(statusName) {
-        await this.click(this.selectStatusDropdown);
-        await this.click(this.statusMenuOption(statusName));
-        await this.click(this.filterButton);
-        await this.waitForLoaders();
+        await test.step(`Filter Bulk Appointments by status: "${statusName}"`, async () => {
+            await this.click(this.selectStatusDropdown);
+            await this.click(this.statusMenuOption(statusName));
+            await this.click(this.filterButton);
+            await this.waitForLoaders();
+        });
     }
 
     /**
      * Selects the first appointment row checkbox in the bulk appointments grid.
     **/
     async selectAppointment() {
-        await this.page.waitForTimeout(5000);
-        await this.click(this.selectAppointmentCheckbox);
+        await test.step('Select appointment from grid', async () => {
+            await this.page.waitForTimeout(5000);
+            await this.click(this.selectAppointmentCheckbox);
+        });
     }
 
     /**
      * Selects an appointment, opens the edit modal, updates notes, saves, and verifies success toast.
     **/
     async editAppointment() {
-        await this.selectAppointment();
-        await this.click(this.editAppointmentsLink);
-        await this.fill(this.notesTextbox, "updating appointment");
-        await this.click(this.updateButton);
-        await this.click(this.yesConfirmationButton);
-        await this.waitForLoaders();
-        await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
-
+        await test.step('Edit Bulk Appointment notes and save', async () => {
+            await this.selectAppointment();
+            await this.click(this.editAppointmentsLink);
+            await this.fill(this.notesTextbox, "updating appointment");
+            await this.click(this.updateButton);
+            await this.click(this.yesConfirmationButton);
+            await this.waitForLoaders();
+            await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
+        });
     }
 
     /**
      * Selects an appointment, clicks the Delete link, confirms deletion, and verifies success toast.
     **/
     async deleteAppointment() {
-        await this.selectAppointment();
-        await this.click(this.deleteAppointmentsLink);
-        await this.click(this.deleteYesButton);
-        await this.waitForLoaders();
-        await this.verifyVisible(this.page.getByText('Appointments deleted successfully.', { exact: true }));
-
-
+        await test.step('Delete Bulk Appointment and confirm', async () => {
+            await this.selectAppointment();
+            await this.click(this.deleteAppointmentsLink);
+            await this.click(this.deleteYesButton);
+            await this.waitForLoaders();
+            await this.verifyVisible(this.page.getByText('Appointments deleted successfully.', { exact: true }));
+        });
     }
 
     /**
      * Selects a Confirmed appointment, clicks Cancel Appointments, confirms cancellation, and verifies success toast.
     **/
     async cancelAppointment() {
-        await this.selectAppointment();
-        await this.click(this.cancelAppointmentsLink);
-        await this.click(this.cancelYesButton);
-        await this.waitForLoaders();
-        await this.verifyVisible(this.page.getByText('Appointments cancelled successfully.', { exact: true }));
-
-
+        await test.step('Cancel Bulk Appointment and confirm', async () => {
+            await this.selectAppointment();
+            await this.click(this.cancelAppointmentsLink);
+            await this.click(this.cancelYesButton);
+            await this.waitForLoaders();
+            await this.verifyVisible(this.page.getByText('Appointments cancelled successfully.', { exact: true }));
+        });
     }
 
     /**
      * Shifts selected appointment by date: chooses date in calendar, toggles staff/vehicle availability, updates and verifies success.
     **/
     async shiftAppointment() {
-        await this.selectAppointment();
-        await this.click(this.shiftAppointmentsLink);
-        await this.check(this.byDateRadio);
-        await this.click(this.shiftDateInput);
-        await this.click(this.selectDateInCalendar);
-        await this.click(this.staffAvailabilityToggle);
-        await this.click(this.vehicleAvailabilityToggle);
-        await this.click(this.shiftBulkUpdateButton);
-        await this.click(this.yesConfirmationButton);
-
-        if (await this.isVisible(this.continueRegardlessButton)) {
-            await this.click(this.continueRegardlessButton);
+        await test.step('Shift Bulk Appointment to new date', async () => {
+            await this.selectAppointment();
+            await this.click(this.shiftAppointmentsLink);
+            await this.check(this.byDateRadio);
+            await this.click(this.shiftDateInput);
+            await this.click(this.selectDateInCalendar);
+            await this.click(this.staffAvailabilityToggle);
+            await this.click(this.vehicleAvailabilityToggle);
+            await this.click(this.shiftBulkUpdateButton);
             await this.click(this.yesConfirmationButton);
-        }
 
-        await this.waitForLoaders();
-        await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
+            if (await this.isVisible(this.continueRegardlessButton)) {
+                await this.click(this.continueRegardlessButton);
+                await this.click(this.yesConfirmationButton);
+            }
 
-
+            await this.waitForLoaders();
+            await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
+        });
     }
-
 }
+

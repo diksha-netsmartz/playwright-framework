@@ -1,5 +1,6 @@
 import BasePage from '../../utils/BasePage';
 import config from '../../config/config';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Student Portal Login Page.
@@ -24,7 +25,9 @@ export default class StudentLoginPage extends BasePage {
      * Navigates to the Student Login Page using the configured CSP URL.
     **/
     async navigateToLoginPage() {
-        await this.navigate(config.cspURL);
+        await test.step('Navigate to Student Login Page (CSP)', async () => {
+            await this.navigate(config.cspURL);
+        });
     }
 
     /**
@@ -33,14 +36,16 @@ export default class StudentLoginPage extends BasePage {
      * @param {string} password - Student account password.
     **/
     async login(username, password) {
-        await this.verifyVisible(this.usernameTxt);
-        await this.fill(this.usernameTxt, username);
-        await this.fill(this.passwordTxt, password);
-        await this.click(this.loginBtn);
-        await this.verifyTitle("Student Home");
-        await this.waitForLoaders();
-        await this.verifyVisible(this.profileDropdownOnHomepage);
-        await this.page.waitForLoadState('load', { timeout: 75000 })
+        await test.step(`Login to Student Portal with user: ${username}`, async () => {
+            await this.verifyVisible(this.usernameTxt);
+            await this.fill(this.usernameTxt, username);
+            await this.fill(this.passwordTxt, password);
+            await this.click(this.loginBtn);
+            await this.verifyTitle("Student Home");
+            await this.waitForLoaders();
+            await this.verifyVisible(this.profileDropdownOnHomepage);
+            await this.page.waitForLoadState('load', { timeout: 75000 });
+        });
     }
-
 }
+
