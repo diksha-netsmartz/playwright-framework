@@ -18,16 +18,20 @@ test('TC_011: CSP - Verify that the file is getting uploaded', async ({page}) =>
     const loginPage = new LoginPage(page);
     const adminHomePage = new AdminHomePage(page);
 
-    // Step 1: Navigate to the CSP URL and login using the test credentials
-    await studentLoginPage.navigateToLoginPage();
-    await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
+    await test.step('Step 1: Login to CSP student portal with valid credentials', async () => {
+        await studentLoginPage.navigateToLoginPage();
+        await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
+    });
 
-    // Step 2-4: Scroll down to "Upload Files" widget, choose file and upload
-    await studentHomePage.uploadFile('test-data/UploadFile.jpg');
-    await studentHomePage.verifyUploadSuccess();
+    await test.step('Step 2-4: Upload file in "Upload Files" widget and verify success', async () => {
+        await studentHomePage.uploadFile('test-data/UploadFile.jpg');
+        await studentHomePage.verifyUploadSuccess();
+    });
 
-    // Verify uploaded file in C-Admin > Uploaded Files widget
-    await loginPage.navigateToLoginPage();
-    await loginPage.login(login.validUser.username, login.validUser.password);
-    await adminHomePage.clickShowFilesToConfirm();
+    await test.step('Verify uploaded file under C-Admin -> Uploaded Files widget', async () => {
+        await loginPage.navigateToLoginPage();
+        await loginPage.login(login.validUser.username, login.validUser.password);
+        await adminHomePage.clickShowFilesToConfirm();
+    });
 });
+

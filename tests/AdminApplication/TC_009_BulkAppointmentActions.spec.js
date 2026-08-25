@@ -17,26 +17,34 @@ test('TC_009: C-admin > Scheduling > Manage Appointment Slot > Appointment Bulk 
     const homePage = new HomePage(page);
     const bulkAppointmentPage = new BulkAppointmentPage(page);
 
-    // Step 1: Login to C-admin
-    await loginPage.navigateToLoginPage();
-    await loginPage.login(login.validUser.username, login.validUser.password);
+    await test.step('Step 1: Login to C-admin with valid credentials', async () => {
+        await loginPage.navigateToLoginPage();
+        await loginPage.login(login.validUser.username, login.validUser.password);
+    });
 
-    // Step 2: Click on Scheduling on left Navigation -> Manage Time Slots -> Bulk Appointment
-    await homePage.navigateToBulkAppointment();
+    await test.step('Step 2: Navigate to Scheduling -> Manage Time Slots -> Bulk Appointment', async () => {
+        await homePage.navigateToBulkAppointment();
+    });
 
-    // Step 3: Click on Filter button
-    await bulkAppointmentPage.applyFilter();
+    await test.step('Step 3: Apply filter to view appointments', async () => {
+        await bulkAppointmentPage.applyFilter();
+    });
 
-    // Step 4: Select Appointment and Shift Appointment (by date, check availability and update)
-    await bulkAppointmentPage.shiftAppointment();
+    await test.step('Step 4: Select Appointment and Shift Appointment', async () => {
+        await bulkAppointmentPage.shiftAppointment();
+    });
 
-    // Step 5: Select Appointment, click Edit Appointment, add notes and update
-    await bulkAppointmentPage.editAppointment();
+    await test.step('Step 5: Select Appointment, edit notes, and update', async () => {
+        await bulkAppointmentPage.editAppointment();
+    });
 
-    // Step 6: Select Appointment, click Delete Appointments and confirm Yes
-    await bulkAppointmentPage.deleteAppointment();
+    await test.step('Step 6: Select Appointment, delete and confirm', async () => {
+        await bulkAppointmentPage.deleteAppointment();
+    });
 
-    // Step 7: Select Appointment with Confirm Status, click Cancel Appointments and confirm Yes
-    await bulkAppointmentPage.filterByStatus("Confirmed");
-    await bulkAppointmentPage.cancelAppointment();
+    await test.step('Step 7: Filter by Confirmed status and cancel appointment', async () => {
+        await bulkAppointmentPage.filterByStatus("Confirmed");
+        await bulkAppointmentPage.cancelAppointment();
+    });
 });
+

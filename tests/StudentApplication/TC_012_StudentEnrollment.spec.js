@@ -15,25 +15,29 @@ test('TC_012: CSP - Verify student is able to Enroll Package', async ({ page }) 
     const studentEnrollPage = new StudentEnrollPage(page);
     const studentHomePage = new StudentHomePage(page);
 
-    // Step 1: Login to student portal (CSP)
-    await studentLoginPage.navigateToLoginPage();
-    await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
+    let receiptPage;
 
-    // Step 2: Click on Enroll on left Navigation
-    await studentHomePage.navigateToEnroll();
+    await test.step('Step 1: Login to student portal (CSP)', async () => {
+        await studentLoginPage.navigateToLoginPage();
+        await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
+    });
 
-    // Step 3: Select Package
-    await studentEnrollPage.selectPackage();
+    await test.step('Step 2: Navigate to Enroll on left navigation', async () => {
+        await studentHomePage.navigateToEnroll();
+    });
 
-    // Step 4: Click on Pay Later
-    await studentEnrollPage.clickPayLater();
+    await test.step('Step 3 & 4: Select Package and click Pay Later', async () => {
+        await studentEnrollPage.selectPackage();
+        await studentEnrollPage.clickPayLater();
+    });
 
-    // Verify student is enrolled successfully
-    await studentEnrollPage.verifyEnrollmentSuccess();
+    await test.step('Verify student enrollment success', async () => {
+        await studentEnrollPage.verifyEnrollmentSuccess();
+    });
 
-    // Step 5: Click on Print Receipt
-    const receiptPage = await studentEnrollPage.clickPrintReceipt();
-
-    // Verify receipt shows Enrollment COMPLETED
-    await studentEnrollPage.verifyReceiptPage(receiptPage);
+    await test.step('Step 5: Click Print Receipt and verify receipt page', async () => {
+        receiptPage = await studentEnrollPage.clickPrintReceipt();
+        await studentEnrollPage.verifyReceiptPage(receiptPage);
+    });
 });
+

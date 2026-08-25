@@ -15,35 +15,33 @@ test('TC_019: CSM - Verify attendance can be marked', async ({page}) => {
     const staffLoginPage = new StaffLoginPage(page);
     const classroomAttendancePage = new ClassroomAttendancePage(page);
 
-    // Step 1: Login to the CSM portal as classroom instructor
-    await staffLoginPage.navigateToLoginPage();
-    await staffLoginPage.login(login.classroomInstructor.username, login.classroomInstructor.password);
+    await test.step('Step 1: Login to CSM portal as classroom instructor', async () => {
+        await staffLoginPage.navigateToLoginPage();
+        await staffLoginPage.login(login.classroomInstructor.username, login.classroomInstructor.password);
+    });
 
-    // Step 2: In the "Upcoming Schedule" widget, click View
-    await classroomAttendancePage.clickViewInUpcomingSchedule();
+    await test.step('Step 2 & 3: Navigate to Upcoming Schedule and view all', async () => {
+        await classroomAttendancePage.clickViewInUpcomingSchedule();
+        await classroomAttendancePage.clickViewAll();
+    });
 
-    // Step 3: Click the View All button
-    await classroomAttendancePage.clickViewAll();
+    await test.step('Step 4 & 5: Filter by Class and Last 26 Weeks', async () => {
+        await classroomAttendancePage.selectClassFilter();
+        await classroomAttendancePage.selectLast26WeeksAndFilter();
+    });
 
-    // Step 4: From first filter, uncheck all and select Class
-    await classroomAttendancePage.selectClassFilter();
+    await test.step('Step 6: Click Take Attendance', async () => {
+        await classroomAttendancePage.clickTakeAttendance();
+    });
 
-    // Step 5: From last filter select "Last 26 Weeks" and click Filter
-    await classroomAttendancePage.selectLast26WeeksAndFilter();
+    await test.step('Step 7 & 8: Mark student present and sign signature', async () => {
+        await classroomAttendancePage.markStudentPresent();
+        await classroomAttendancePage.signInstructorSignature();
+    });
 
-    // Step 6: Click on "Take Attendance" button
-    await classroomAttendancePage.clickTakeAttendance();
-
-    // Step 7: Check the checkbox in front of student name to mark them as present
-    await classroomAttendancePage.markStudentPresent();
-
-    // Step 8: Sign on the signature pad
-    await classroomAttendancePage.signInstructorSignature();
-
-    // Step 9: Click on Save button
-    await classroomAttendancePage.saveAttendance();
-
-    // Verify attendance marked successfully
-    await classroomAttendancePage.verifyAttendanceMarkedSuccessfully();
-
+    await test.step('Step 9: Save attendance and verify success message', async () => {
+        await classroomAttendancePage.saveAttendance();
+        await classroomAttendancePage.verifyAttendanceMarkedSuccessfully();
+    });
 });
+

@@ -40,26 +40,32 @@ for (const { packageName, selectDOBInDetails, fillInfoMethod } of packageScenari
         const enrollmentPage = new NewStudentEnrollmentPage(page);
         const homePage = new HomePage(page);
 
-        // Step 1: Login to C-admin
-        await loginPage.navigateToLoginPage();
-        await loginPage.login(
-            login.validUser.username,
-            login.validUser.password
-        );
+        await test.step('Step 1: Login to C-admin with valid credentials', async () => {
+            await loginPage.navigateToLoginPage();
+            await loginPage.login(
+                login.validUser.username,
+                login.validUser.password
+            );
+        });
 
-        // Step 2: Click on New student enrollment in Left Navigation
-        await homePage.navigateToNewStudentEnrollment();
+        await test.step('Step 2: Click on New student enrollment in Left Navigation', async () => {
+            await homePage.navigateToNewStudentEnrollment();
+        });
 
-        // Step 3: Select Package in package selection dropdown and add it
-        await enrollmentPage.addPackage(packageName);
+        await test.step(`Step 3: Select Package: "${packageName}" and add it`, async () => {
+            await enrollmentPage.addPackage(packageName);
+        });
 
-        // Step 4: Select student information Type and fill student details
-        await enrollmentPage[fillInfoMethod](studentData.student1);
-        if (selectDOBInDetails) {
-            await enrollmentPage.selectDOBInStudentDetails();
-        }
+        await test.step('Step 4: Select student information Type and fill student details', async () => {
+            await enrollmentPage[fillInfoMethod](studentData.student1);
+            if (selectDOBInDetails) {
+                await enrollmentPage.selectDOBInStudentDetails();
+            }
+        });
 
-        // Step 5: Click on Save button and verify student enrollment
-        await enrollmentPage.save();
+        await test.step('Step 5: Click on Save button and verify student enrollment', async () => {
+            await enrollmentPage.save();
+        });
     });
 }
+

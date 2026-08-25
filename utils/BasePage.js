@@ -20,7 +20,7 @@ export default class BasePage {
      */
     async navigate(url) {
         await this.page.goto(url);
-        await this.page.waitForLoadState("networkidle");
+        await this.page.waitForLoadState("load", { timeout: 10000 });
     }
 
     /**

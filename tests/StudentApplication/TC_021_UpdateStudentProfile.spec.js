@@ -16,36 +16,43 @@ test('TC_021: CSP - Verify student is able to update the profile', async ({ page
     const studentHomePage = new StudentHomePage(page);
     const studentProfilePage = new StudentProfilePage(page);
 
-    // Generate dynamic runtime values for each test execution
-    const dynamicParentName = TestDataGenerator.generateRandomFullName('Guardian');
-    const dynamicHomePhone = TestDataGenerator.generateRandomPhoneNumber();
-    const dynamicParentPhone = TestDataGenerator.generateRandomPhoneNumber();
+    let dynamicParentName;
+    let dynamicHomePhone;
+    let dynamicParentPhone;
 
-    // Step 1: Login to student Portal
-    await studentLoginPage.navigateToLoginPage();
-    await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
-
-    // Step 2: In the left navigation tab, click on My Account > Profile
-    await studentHomePage.navigateToProfile();
-
-    // Step 3: Update 2 to 3 fields with dynamic runtime values
-    await studentProfilePage.updateProfileDetails({
-        parent1GuardianName: dynamicParentName,
-        parentPhone: dynamicParentPhone,
-        homePhone: dynamicHomePhone
+    await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
+        await studentLoginPage.navigateToLoginPage();
+        await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
     });
 
-    // Step 4: Click on Update
-    await studentProfilePage.clickUpdate();
+    await test.step('Step 2: Navigate to My Account > Profile', async () => {
+        await studentHomePage.navigateToProfile();
+    });
 
-    // Step 5: Verify success message
-    await studentProfilePage.verifyProfileUpdateSuccess();
+    await test.step('Step 3: Update profile fields with dynamic runtime values', async () => {
+        dynamicParentName = TestDataGenerator.generateRandomFullName('Guardian');
+        dynamicHomePhone = TestDataGenerator.generateRandomPhoneNumber();
+        dynamicParentPhone = TestDataGenerator.generateRandomPhoneNumber();
 
-    // Step 6: Navigate to My Account > Profile again and verify updated values
-    await studentHomePage.navigateToProfile();
-    await studentProfilePage.verifyProfileDetails({
-        parent1GuardianName: dynamicParentName,
-        parentPhone: dynamicParentPhone,
-        homePhone: dynamicHomePhone
+        await studentProfilePage.updateProfileDetails({
+            parent1GuardianName: dynamicParentName,
+            parentPhone: dynamicParentPhone,
+            homePhone: dynamicHomePhone
+        });
+    });
+
+    await test.step('Step 4 & 5: Click Update and verify success message', async () => {
+        await studentProfilePage.clickUpdate();
+        await studentProfilePage.verifyProfileUpdateSuccess();
+    });
+
+    await test.step('Step 6: Navigate back to Profile and verify updated values', async () => {
+        await studentHomePage.navigateToProfile();
+        await studentProfilePage.verifyProfileDetails({
+            parent1GuardianName: dynamicParentName,
+            parentPhone: dynamicParentPhone,
+            homePhone: dynamicHomePhone
+        });
     });
 });
+

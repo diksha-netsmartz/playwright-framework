@@ -21,64 +21,72 @@ test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled",
     const instructorPage = new SingleInstructorPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
-    // Step 1: Login to C-admin
-    await loginPage.navigateToLoginPage();
-    await loginPage.login(login.validUser.username, login.validUser.password);
+    let student1;
+    let student2;
 
-    // Step 2: Generate dynamic student 1 & student 2 details at runtime
-    const student1 = TestDataGenerator.generateStudentData(createAppointmentData.student1);
-    const student2 = TestDataGenerator.generateStudentData(createAppointmentData.student2);
-    console.log("Enrolling runtime Student 1:", student1.name);
-    console.log("Enrolling runtime Student 2:", student2.name);
-
-    // Step 3: Create / Enroll Student 1 (using TC_006 enrollment flow)
-    await homePage.navigateToNewStudentEnrollment();
-    await enrollmentPage.enrollNewStudent({
-        packageName: createAppointmentData.packageConfig.packageName,
-        fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
-        studentData: student1,
-        selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+    await test.step('Step 1: Login to C-admin with valid credentials', async () => {
+        await loginPage.navigateToLoginPage();
+        await loginPage.login(login.validUser.username, login.validUser.password);
     });
-    await enrollmentPage.closeEnrollmentConfirmationPopup();
 
-    // Step 4: Create / Enroll Student 2 (using TC_006 enrollment flow)
-    await homePage.navigateToNewStudentEnrollment();
-    await enrollmentPage.enrollNewStudent({
-        packageName: createAppointmentData.packageConfig.packageName,
-        fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
-        studentData: student2,
-        selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+    await test.step('Step 2: Generate dynamic student 1 & student 2 details at runtime', async () => {
+        student1 = TestDataGenerator.generateStudentData(createAppointmentData.student1);
+        student2 = TestDataGenerator.generateStudentData(createAppointmentData.student2);
+        console.log("Enrolling runtime Student 1:", student1.name);
+        console.log("Enrolling runtime Student 2:", student2.name);
     });
-    await enrollmentPage.closeEnrollmentConfirmationPopup();
 
-    // Step 5: Navigate to Scheduling > Single Instructor and select instructor schedule
-    await homePage.navigateToSingleInstructor();
-    await instructorPage.selectInstructor();
-    await instructorPage.getSchedule();
+    await test.step('Step 3: Create / Enroll Student 1', async () => {
+        await homePage.navigateToNewStudentEnrollment();
+        await enrollmentPage.enrollNewStudent({
+            packageName: createAppointmentData.packageConfig.packageName,
+            fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
+            studentData: student1,
+            selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+        });
+        await enrollmentPage.closeEnrollmentConfirmationPopup();
+    });
 
-    // Precondition / Setup: Create initial Combined Appointment (under TC_001)
-    await instructorPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
-    await combinedAppointmentPage.verifyPopup();
-    await combinedAppointmentPage.selectMidTimeDropdown();
-    await combinedAppointmentPage.selectEndTimeDropdown();
-    await combinedAppointmentPage.selectDropdown("Location");
-    await combinedAppointmentPage.selectDropdown("Vehicle");
-    await combinedAppointmentPage.fillStudentDetails(1, student1);
-    await combinedAppointmentPage.fillStudentDetails(2, student2);
-    await combinedAppointmentPage.selectDuration();
-    await combinedAppointmentPage.submitAppointment();
+    await test.step('Step 4: Create / Enroll Student 2', async () => {
+        await homePage.navigateToNewStudentEnrollment();
+        await enrollmentPage.enrollNewStudent({
+            packageName: createAppointmentData.packageConfig.packageName,
+            fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
+            studentData: student2,
+            selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+        });
+        await enrollmentPage.closeEnrollmentConfirmationPopup();
+    });
 
-    // Step 6: Right click the appointment and select Edit Appointment
-    await instructorPage.editAppointment(student1);
+    await test.step('Step 5: Navigate to Scheduling > Single Instructor and select schedule', async () => {
+        await homePage.navigateToSingleInstructor();
+        await instructorPage.selectInstructor();
+        await instructorPage.getSchedule();
+    });
 
-    // Step 7: Scroll down to Student 1's view and click "Cancel Appointment", enter text, confirm
-    await combinedAppointmentPage.cancelAppointment(student1);
+    await test.step('Precondition / Setup: Create initial Combined Appointment', async () => {
+        await instructorPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
+        await combinedAppointmentPage.verifyPopup();
+        await combinedAppointmentPage.selectMidTimeDropdown();
+        await combinedAppointmentPage.selectEndTimeDropdown();
+        await combinedAppointmentPage.selectDropdown("Location");
+        await combinedAppointmentPage.selectDropdown("Vehicle");
+        await combinedAppointmentPage.fillStudentDetails(1, student1);
+        await combinedAppointmentPage.fillStudentDetails(2, student2);
+        await combinedAppointmentPage.selectDuration();
+        await combinedAppointmentPage.submitAppointment();
+    });
 
-    // Step 8: Verify Student 1 appointment is cancelled successfully
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
+    await test.step('Step 6-8: Cancel appointment for Student 1 and verify cancellation', async () => {
+        await instructorPage.editAppointment(student1);
+        await combinedAppointmentPage.cancelAppointment(student1);
+        await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
+    });
 
-    // Step 9: Repeat cancel appointment for Student 2
-    await instructorPage.editAppointment(student2);
-    await combinedAppointmentPage.cancelAppointment(student2);
-    await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
+    await test.step('Step 9: Cancel appointment for Student 2 and verify cancellation', async () => {
+        await instructorPage.editAppointment(student2);
+        await combinedAppointmentPage.cancelAppointment(student2);
+        await combinedAppointmentPage.verifyAppointmentIsCancelledSuccessfully();
+    });
 });
+

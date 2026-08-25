@@ -14,10 +14,13 @@ test('TC_017: CSM - Verify lesson cancellation functionality', async ({ page }) 
     const staffLoginPage = new StaffLoginPage(page);
     const staffHomePage = new StaffHomePage(page);
 
-    // Step 1: Login to the CSM portal as staff instructor
-    await staffLoginPage.navigateToLoginPage();
-    await staffLoginPage.login(login.staffUser.username, login.staffUser.password);
+    await test.step('Step 1: Login to CSM portal with valid staff credentials', async () => {
+        await staffLoginPage.navigateToLoginPage();
+        await staffLoginPage.login(login.staffUser.username, login.staffUser.password);
+    });
 
-    // Step 2: Navigate to "Needs Attention" widget, click Cancel, enter cancellation text and confirm
-    await staffHomePage.markAppointmentAsCancel();
+    await test.step('Step 2: Navigate to "Needs Attention" widget, cancel appointment and confirm', async () => {
+        await staffHomePage.markAppointmentAsCancel();
+    });
 });
+

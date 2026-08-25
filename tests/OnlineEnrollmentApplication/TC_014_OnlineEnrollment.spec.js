@@ -15,27 +15,31 @@ test('TC_014: COE TEEN/ADULT/WT - Verify new student able to register', async ({
     const adultOnlineEnrollmentPage = new AdultOnlineEnrollmentPage(page);
     const wtOnlineEnrollmentPage = new WTOnlineEnrollmentPage(page);
 
-    // Flow 1: Teen Online Enrollment (Select BTW package, fill student info, Pay later, verify receipt)
-    await teenOnlineEnrollmentPage.navigateToTeenOEPage();
-    await teenOnlineEnrollmentPage.selectBTWPackage();
-    await teenOnlineEnrollmentPage.fillStudentInfo();
-    await teenOnlineEnrollmentPage.clickPayLater();
-    await teenOnlineEnrollmentPage.smsPopup();
-    await teenOnlineEnrollmentPage.verifyReceiptPage();
+    await test.step('Flow 1: Teen Online Enrollment (BTW package, Pay later, verify receipt)', async () => {
+        await teenOnlineEnrollmentPage.navigateToTeenOEPage();
+        await teenOnlineEnrollmentPage.selectBTWPackage();
+        await teenOnlineEnrollmentPage.fillStudentInfo();
+        await teenOnlineEnrollmentPage.clickPayLater();
+        await teenOnlineEnrollmentPage.smsPopup();
+        await teenOnlineEnrollmentPage.verifyReceiptPage();
+    });
 
-    // Flow 2: Adult Online Enrollment (Select BTW package, fill student info, Pay later, verify receipt)
-    await adultOnlineEnrollmentPage.navigateToAdultOEPage();
-    await adultOnlineEnrollmentPage.selectBTWPackage();
-    await adultOnlineEnrollmentPage.fillStudentInfo();
-    await adultOnlineEnrollmentPage.clickPayLater();
-    await adultOnlineEnrollmentPage.smsPopup();
-    await adultOnlineEnrollmentPage.verifyReceiptPage();
+    await test.step('Flow 2: Adult Online Enrollment (BTW package, Pay later, verify receipt)', async () => {
+        await adultOnlineEnrollmentPage.navigateToAdultOEPage();
+        await adultOnlineEnrollmentPage.selectBTWPackage();
+        await adultOnlineEnrollmentPage.fillStudentInfo();
+        await adultOnlineEnrollmentPage.clickPayLater();
+        await adultOnlineEnrollmentPage.smsPopup();
+        await adultOnlineEnrollmentPage.verifyReceiptPage();
+    });
 
-    // Flow 3: WT Online Enrollment (Select BTW package, fill student info, Pay later, verify receipt)
-    await wtOnlineEnrollmentPage.navigateToWTOEPage();
-    await wtOnlineEnrollmentPage.selectBTWPackage();
-    await wtOnlineEnrollmentPage.fillStudentInfo();
-    await wtOnlineEnrollmentPage.clickPayLater();
-    await wtOnlineEnrollmentPage.smsPopup();
-    await wtOnlineEnrollmentPage.verifyReceiptPage();
+    await test.step('Flow 3: WT Online Enrollment (BTW package, Pay later, verify receipt)', async () => {
+        await wtOnlineEnrollmentPage.navigateToWTOEPage();
+        await wtOnlineEnrollmentPage.selectBTWPackage();
+        await wtOnlineEnrollmentPage.fillStudentInfo();
+        await wtOnlineEnrollmentPage.clickPayLater();
+        await wtOnlineEnrollmentPage.smsPopup();
+        await wtOnlineEnrollmentPage.verifyReceiptPage();
+    });
 });
+

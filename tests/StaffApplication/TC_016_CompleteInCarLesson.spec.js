@@ -17,42 +17,42 @@ test('TC_016: CSM - Verify process lesson functionality', async ({page}) => {
     const staffHomePage = new StaffHomePage(page);
     const lessonEvaluationPage = new LessonEvaluationPage(page);
 
-    // Step 1: Login to the CSM portal
-    await staffLoginPage.navigateToLoginPage();
-    await staffLoginPage.login(login.staffUser.username, login.staffUser.password);
+    await test.step('Step 1: Login to CSM portal with valid staff credentials', async () => {
+        await staffLoginPage.navigateToLoginPage();
+        await staffLoginPage.login(login.staffUser.username, login.staffUser.password);
+    });
 
-    // Step 2-4: Navigate to the "Needs Attention" widget, click action dropdown and click Process
-    await staffHomePage.clickProcess();
+    await test.step('Step 2-4: Navigate to "Needs Attention" and click Process', async () => {
+        await staffHomePage.clickProcess();
+    });
 
-    // Step 5: Click on the Process button
-    await lessonEvaluationPage.clickProcess();
+    await test.step('Step 5 & 6: Click Process and select evaluation', async () => {
+        await lessonEvaluationPage.clickProcess();
+        await lessonEvaluationPage.selectEvaluation();
+    });
 
-    // Step 6: From the "Select Evaluation" dropdown, select the evaluation
-    await lessonEvaluationPage.selectEvaluation();
+    await test.step('Step 7: Answer all evaluation questions', async () => {
+        await lessonEvaluationPage.answerAllEvaluationQuestions();
+    });
 
-    // Step 7: Mark all the questions for the evaluation
-    await lessonEvaluationPage.answerAllEvaluationQuestions();
+    await test.step('Step 8-10: Select travel time and enter notes', async () => {
+        await lessonEvaluationPage.selectTravelTime();
+        await lessonEvaluationPage.enterPublicNotes();
+        await lessonEvaluationPage.enterPrivateNotes();
+    });
 
-    // Step 8: Select the travel time option
-    await lessonEvaluationPage.selectTravelTime();
+    await test.step('Step 11 & 12: Sign student and instructor signatures', async () => {
+        await lessonEvaluationPage.signStudentSignature();
+        await lessonEvaluationPage.signInstructorSignature();
+    });
 
-    // Step 9: Enter text in the Public Notes text area
-    await lessonEvaluationPage.enterPublicNotes();
+    await test.step('Step 13: Complete lesson and confirm', async () => {
+        await lessonEvaluationPage.completeLesson();
+        await lessonEvaluationPage.confirmLessonCompletion();
+    });
 
-    // Step 10: Enter text in the Private Notes text area
-    await lessonEvaluationPage.enterPrivateNotes();
-
-    // Step 11: Sign the signature pad for the student
-    await lessonEvaluationPage.signStudentSignature();
-
-    // Step 12: Sign the signature pad for the instructor
-    await lessonEvaluationPage.signInstructorSignature();
-
-    // Step 13: Click on "Complete Lesson (Send Email)" button
-    await lessonEvaluationPage.completeLesson();
-    await lessonEvaluationPage.confirmLessonCompletion();
-
-    // Verify lesson completed successfully
-    await lessonEvaluationPage.verifyLessonCompletedSuccessfully();
-
+    await test.step('Verify lesson completed successfully message', async () => {
+        await lessonEvaluationPage.verifyLessonCompletedSuccessfully();
+    });
 });
+

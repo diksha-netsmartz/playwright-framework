@@ -14,10 +14,13 @@ test('TC_018: CSM - Verify no show functionality', async ({ page }) => {
     const staffLoginPage = new StaffLoginPage(page);
     const staffHomePage = new StaffHomePage(page);
 
-    // Step 1: Login to the CSM portal as staff instructor
-    await staffLoginPage.navigateToLoginPage();
-    await staffLoginPage.login(login.staffUser.username, login.staffUser.password);
+    await test.step('Step 1: Login to CSM portal with valid staff credentials', async () => {
+        await staffLoginPage.navigateToLoginPage();
+        await staffLoginPage.login(login.staffUser.username, login.staffUser.password);
+    });
 
-    // Step 2: Navigate to "Needs Attention" widget, click No Show, enter text and confirm
-    await staffHomePage.markAppointmentAsNoShow();
+    await test.step('Step 2: Navigate to "Needs Attention" widget, mark appointment as No Show and confirm', async () => {
+        await staffHomePage.markAppointmentAsNoShow();
+    });
 });
+

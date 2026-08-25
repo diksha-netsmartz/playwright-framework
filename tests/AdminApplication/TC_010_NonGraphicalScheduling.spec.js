@@ -18,35 +18,34 @@ test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to S
     const homePage = new HomePage(page);
     const nonGraphicalPage = new NonGraphicalPage(page);
 
-    // Step 1: Login to site
-    await loginPage.navigateToLoginPage();
-    await loginPage.login(login.validUser.username, login.validUser.password);
+    await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
+        await loginPage.navigateToLoginPage();
+        await loginPage.login(login.validUser.username, login.validUser.password);
+    });
 
-    // Step 2-3: Click on Scheduling -> Non Graphical
-    await homePage.navigateToNonGraphical();
+    await test.step('Step 2 & 3: Navigate to Scheduling -> Non Graphical', async () => {
+        await homePage.navigateToNonGraphical();
+    });
 
-    // Step 4: Search by student name
-    await nonGraphicalPage.searchStudent(studentData.student1.name);
+    await test.step(`Step 4-6: Search and select student: "${studentData.student1.name}"`, async () => {
+        await nonGraphicalPage.searchStudent(studentData.student1.name);
+        await nonGraphicalPage.selectStudentOption(studentData.student1.name.replace(" ", ", "));
+        await nonGraphicalPage.clickSelectStudent();
+    });
 
-    // Step 5: Select student test, student 1
-    await nonGraphicalPage.selectStudentOption(studentData.student1.name.replace(" ", ", "));
+    await test.step('Step 7 & 8: Select first available green date and slot', async () => {
+        await nonGraphicalPage.selectFirstAvailableDate();
+        await nonGraphicalPage.selectSlot();
+    });
 
-    // Step 6: Click on Select Student
-    await nonGraphicalPage.clickSelectStudent();
+    await test.step('Step 9 & 10: Select Appointment Type and Status', async () => {
+        await nonGraphicalPage.selectAppointmentType();
+        await nonGraphicalPage.selectStatusType();
+    });
 
-    // Step 7: Click on Date with Green color
-    await nonGraphicalPage.selectFirstAvailableDate();
-
-    // Step 8: Click Select
-    await nonGraphicalPage.selectSlot();
-
-    // Step 9: Select Type
-    await nonGraphicalPage.selectAppointmentType();
-
-    // Step 10: Select Status
-    await nonGraphicalPage.selectStatusType();
-
-    // Step 11: Click Select student into Slot
-    await nonGraphicalPage.scheduleIntoSlot();
-    await nonGraphicalPage.verifyToastMessageSuccessful();
+    await test.step('Step 11: Schedule student into slot and verify success message', async () => {
+        await nonGraphicalPage.scheduleIntoSlot();
+        await nonGraphicalPage.verifyToastMessageSuccessful();
+    });
 });
+

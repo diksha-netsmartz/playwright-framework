@@ -18,31 +18,39 @@ test('TC_008: C-admin > Student > Billing - Verify user is able to make payment'
     const homePage = new HomePage(page);
     const enrollmentBillingPage = new EnrollmentBillingPage(page);
 
-    // Step 1: Login to C-admin
-    await loginPage.navigateToLoginPage();
-    await loginPage.login(
-        login.validUser.username,
-        login.validUser.password
-    );
+    await test.step('Step 1: Login to C-admin with valid credentials', async () => {
+        await loginPage.navigateToLoginPage();
+        await loginPage.login(
+            login.validUser.username,
+            login.validUser.password
+        );
+    });
 
-    // Step 2: Click on Student Account on left Navigation -> Enrollment/Billing
-    await homePage.openEnrollmentBilling();
+    await test.step('Step 2: Navigate to Student Account -> Enrollment/Billing', async () => {
+        await homePage.openEnrollmentBilling();
+    });
 
-    // Step 3: Click on Student not selected, search student with lastname, select and click Go
-    await enrollmentBillingPage.selectStudent(studentData.student1.name);
+    await test.step(`Step 3: Search and select student: "${studentData.student1.name}"`, async () => {
+        await enrollmentBillingPage.selectStudent(studentData.student1.name);
+    });
 
-    // Step 4: Click on Add New on Right Side and add Swipe transaction
-    await enrollmentBillingPage.addSwipedTransaction();
+    await test.step('Step 4: Add Swipe transaction payment method', async () => {
+        await enrollmentBillingPage.addSwipedTransaction();
+    });
 
-    // Step 5: Click on Add New and add Check payment
-    await enrollmentBillingPage.addCheckPayment();
+    await test.step('Step 5: Add Check payment method', async () => {
+        await enrollmentBillingPage.addCheckPayment();
+    });
 
-    // Step 6: Click on Add New and add Cash payment
-    await enrollmentBillingPage.addCashPayment();
+    await test.step('Step 6: Add Cash payment method', async () => {
+        await enrollmentBillingPage.addCashPayment();
+    });
 
-    // Step 7: Click on Add New and add Adjustment
-    await enrollmentBillingPage.addAdjustment();
+    await test.step('Step 7: Add Adjustment billing method', async () => {
+        await enrollmentBillingPage.addAdjustment();
+    });
 
-    // Step 8: Click on Add New and Process Credit Card payment
-    await enrollmentBillingPage.processCreditCardPayment();
+    await test.step('Step 8: Process Credit Card payment', async () => {
+        await enrollmentBillingPage.processCreditCardPayment();
+    });
 });

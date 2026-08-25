@@ -18,29 +18,36 @@ test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Del
     const homePage = new HomePage(page);
     const enrollmentBillingPage = new EnrollmentBillingPage(page);
 
-    // Step 1: Login to C-admin
-    await loginPage.navigateToLoginPage();
-    await loginPage.login(
-        login.validUser.username,
-        login.validUser.password
-    );
+    await test.step('Step 1: Login to C-admin with valid credentials', async () => {
+        await loginPage.navigateToLoginPage();
+        await loginPage.login(
+            login.validUser.username,
+            login.validUser.password
+        );
+    });
 
-    // Step 2: Click on Student Account on left Navigation -> Enrollment/Billing
-    await homePage.openEnrollmentBilling();
+    await test.step('Step 2: Navigate to Student Account -> Enrollment/Billing', async () => {
+        await homePage.openEnrollmentBilling();
+    });
 
-    // Step 3: Click on Student not selected, search student with name, select and click Go
-    await enrollmentBillingPage.selectStudent(studentData.student1.name);
+    await test.step(`Step 3: Search and select student: "${studentData.student1.name}"`, async () => {
+        await enrollmentBillingPage.selectStudent(studentData.student1.name);
+    });
 
-    // Step 4: Click on Add New button on Left Side and add CR Package
-    await enrollmentBillingPage.clickAddNew();
-    await enrollmentBillingPage.addCRPackage();
+    await test.step('Step 4: Click Add New and add CR Package', async () => {
+        await enrollmentBillingPage.clickAddNew();
+        await enrollmentBillingPage.addCRPackage();
+    });
 
-    // Step 5: Click on Enroll Button
-    await enrollmentBillingPage.enroll();
+    await test.step('Step 5: Click Enroll Button to enroll student in package', async () => {
+        await enrollmentBillingPage.enroll();
+    });
 
-    // Step 6: Click on Edit button, select Edit, update notes, and click Update button
-    await enrollmentBillingPage.editAndUpdateNotes();
+    await test.step('Step 6: Edit package notes and update', async () => {
+        await enrollmentBillingPage.editAndUpdateNotes();
+    });
 
-    // Step 7: Click on Edit and click Delete
-    await enrollmentBillingPage.editAndDelete();
+    await test.step('Step 7: Delete the enrolled package', async () => {
+        await enrollmentBillingPage.editAndDelete();
+    });
 });

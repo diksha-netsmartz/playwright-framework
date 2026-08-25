@@ -22,46 +22,57 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
     const resetPasswordPage = new StudentResetPasswordPage(page);
     const studentLoginPage = new StudentLoginPage(page);
 
-    // Step 1: Login to Admin Portal using existing login methods
-    await loginPage.navigateToLoginPage();
-    await loginPage.login(login.validUser.username, login.validUser.password);
+    let resetPasswordUrl;
+    let dynamicNewPassword;
 
-    // Step 2: Navigate to Student Account -> Profile
-    await homePage.openStudentProfile();
-
-    // Step 3: Search and select student
-    await studentProfilePage.selectStudent(login.resetStudent.username);
-
-    // Step 4: Update email if not matching the required email
-    await studentProfilePage.updateEmailIfDifferent(login.resetStudent.email);
-
-    // Step 5: Send Reset Password / Username email to student
-    await studentProfilePage.sendUsernamePasswordEmail();
-
-    // Step 6: Fetch the Reset Password URL directly from email via IMAP in background
-    console.log('Fetching Reset Password link from email...');
-    const resetPasswordUrl = await EmailHelper.getResetPasswordLink({
-        recipientEmail: login.resetStudent.email,
-        subject: 'Student UserName/Password',
-        timeoutMs: 20000
+    await test.step('Step 1: Login to Admin Portal using existing login methods', async () => {
+        await loginPage.navigateToLoginPage();
+        await loginPage.login(login.validUser.username, login.validUser.password);
     });
-    console.log('Navigating to Reset Password URL:', resetPasswordUrl);
 
-    // Step 7: Navigate to the Reset Password link
-    await resetPasswordPage.navigateToResetPasswordUrl(resetPasswordUrl);
+    await test.step('Step 2: Navigate to Student Account -> Profile', async () => {
+        await homePage.openStudentProfile();
+    });
 
-    // Step 8: Generate a fresh random password for this execution
-    const dynamicNewPassword = TestDataGenerator.generateRandomPassword();
-    console.log('Setting new password:', dynamicNewPassword);
+    await test.step(`Step 3: Search and select student: ${login.resetStudent.username}`, async () => {
+        await studentProfilePage.selectStudent(login.resetStudent.username);
+    });
 
-    // Step 9: Fill new password, confirm password, and submit
-    await resetPasswordPage.resetPassword(dynamicNewPassword);
+    await test.step('Step 4: Update email if not matching the required email', async () => {
+        await studentProfilePage.updateEmailIfDifferent(login.resetStudent.email);
+    });
 
-    // Step 10: Verify success message and checkmark icon
-    await resetPasswordPage.verifyResetPasswordSuccess();
+    await test.step('Step 5: Send Reset Password / Username email to student', async () => {
+        await studentProfilePage.sendUsernamePasswordEmail();
+    });
 
-    // Step 11: Navigate to CSP and login with username and the updated password
-    console.log(`Logging into Student Portal (CSP) with updated credentials for ${login.resetStudent.username}...`);
-    await studentLoginPage.navigateToLoginPage();
-    await studentLoginPage.login(login.resetStudent.username, dynamicNewPassword);
+    await test.step('Step 6: Fetch the Reset Password URL directly from email via IMAP', async () => {
+        console.log('Fetching Reset Password link from email...');
+        resetPasswordUrl = await EmailHelper.getResetPasswordLink({
+            recipientEmail: login.resetStudent.email,
+            subject: 'Student UserName/Password',
+            timeoutMs: 20000
+        });
+        console.log('Navigating to Reset Password URL:', resetPasswordUrl);
+    });
+
+    await test.step('Step 7: Navigate to the Reset Password link', async () => {
+        await resetPasswordPage.navigateToResetPasswordUrl(resetPasswordUrl);
+    });
+
+    await test.step('Step 8 & 9: Generate dynamic password and submit new password', async () => {
+        dynamicNewPassword = TestDataGenerator.generateRandomPassword();
+        console.log('Setting new password:', dynamicNewPassword);
+        await resetPasswordPage.resetPassword(dynamicNewPassword);
+    });
+
+    await test.step('Step 10: Verify success message and checkmark icon', async () => {
+        await resetPasswordPage.verifyResetPasswordSuccess();
+    });
+
+    await test.step(`Step 11: Navigate to CSP and login with username and the updated password`, async () => {
+        console.log(`Logging into Student Portal (CSP) with updated credentials for ${login.resetStudent.username}...`);
+        await studentLoginPage.navigateToLoginPage();
+        await studentLoginPage.login(login.resetStudent.username, dynamicNewPassword);
+    });
 });
