@@ -1,5 +1,6 @@
 import BasePage from '../../utils/BasePage';
 import { expect, test } from '@playwright/test';
+import PdfHelper from '../../utils/PdfHelper';
 
 /**
  * Page Object representing the Student Enrollment and Receipt Page.
@@ -52,27 +53,80 @@ export default class StudentEnrollPage extends BasePage {
     }
 
     /**
-     * Clicks the Print Receipt link, waits for the new popup browser tab to open, and returns the popup page object.
-     * @returns {Promise<import('@playwright/test').Page>} The popup Page instance representing the receipt page.
+     * Clicks the Print Receipt link, waits for the new popup browser tab to open, captures the PDF buffer, and returns the popup page object.
+     * @returns {Promise<import('@playwright/test').Page>} The popup Page instance with attached pdfBuffer and pdfText properties.
       **/
     async clickPrintReceipt() {
         return await test.step('Click Print Receipt and wait for popup', async () => {
+            // Listen for PDF network response
+            const responsePromise = this.page.context().waitForEvent('response', {
+                predicate: (res) => {
+                    const ct = res.headers()['content-type'] || '';
+                    return res.status() === 200 && (ct.includes('application/pdf') || ct.includes('application/x-pdf'));
+                },
+                timeout: 10000
+            }).then(async (res) => {
+                const body = await res.body().catch(() => null);
+                return (body && body.length > 0) ? body : null;
+            }).catch(() => null);
+
             const popupPromise = this.page.waitForEvent('popup');
             await this.click(this.printReceiptLink);
             const receiptPage = await popupPromise;
-            await receiptPage.waitForLoadState();
+            await receiptPage.waitForLoadState('domcontentloaded');
+
+            let pdfBuffer = await responsePromise;
+
+            // If not captured from network response, fetch from blob URL or embed in the popup page
+            if (!pdfBuffer) {
+                try {
+                    const targetUrl = receiptPage.url().startsWith('blob:') || receiptPage.url().endsWith('.pdf') || receiptPage.url().includes('pdf')
+                        ? receiptPage.url()
+                        : await receiptPage.locator('embed').getAttribute('src').catch(() => null);
+
+                    if (targetUrl) {
+                        const dataArray = await receiptPage.evaluate(async (url) => {
+                            const res = await fetch(url);
+                            const buffer = await res.arrayBuffer();
+                            return Array.from(new Uint8Array(buffer));
+                        }, targetUrl);
+
+                        if (dataArray && dataArray.length > 0) {
+                            pdfBuffer = Buffer.from(dataArray);
+                        }
+                    }
+                } catch (e) {
+                    console.log('Blob / embed PDF buffer extraction:', e.message);
+                }
+            }
+
+            let pdfText = '';
+            if (pdfBuffer && pdfBuffer.length > 0) {
+                pdfText = await PdfHelper.extractText(pdfBuffer);
+                if (pdfText) {
+                    console.log('Extracted text from PDF receipt:', pdfText.trim().substring(0, 200));
+                }
+            }
+
+            receiptPage.pdfText = pdfText;
+            receiptPage.pdfBuffer = pdfBuffer;
+
             return receiptPage;
         });
     }
 
     /**
-     * Verifies that the receipt popup page contains the 'Enrollment COMPLETED' heading text.
+     * Verifies that the receipt popup page contains the expected heading text and attaches the PDF document to the report.
      * @param {import('@playwright/test').Page} receiptPage - The receipt popup Page instance.
+     * @param {string} [expectedText='Enrollment COMPLETED'] - Text to verify on the receipt page.
+     * @param {string} [attachmentName='Enrollment_Receipt.pdf'] - Filename for the attached PDF in reports.
     **/
-    async verifyReceiptPage(receiptPage) {
-        await test.step('Verify "Enrollment COMPLETED" on receipt page', async () => {
-            await expect(receiptPage.getByRole('heading')).toContainText('Enrollment COMPLETED');
-        });
+    async verifyReceiptPage(receiptPage, expectedText = 'Enrollment COMPLETED', attachmentName = 'Enrollment_Receipt.pdf') {
+        await PdfHelper.verifyAndAttachReceipt(receiptPage, expectedText, attachmentName);
     }
 }
+
+
+
+
 

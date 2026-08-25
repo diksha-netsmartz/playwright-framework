@@ -2,6 +2,7 @@ import BasePage from '../../utils/BasePage';
 import { expect, test } from '@playwright/test';
 import config from '../../config/config';
 import oeData from '../../test-data/onlineEnrollmentData.json';
+import PdfHelper from '../../utils/PdfHelper';
 
 /**
  * Page Object representing the Written Test (WT / Knowledge Test) Online Enrollment Page.
@@ -14,7 +15,7 @@ export default class WTOnlineEnrollmentPage extends BasePage {
     **/
     constructor(page) {
         super(page);
-        this.uniqueId = Date.now();
+        this.uniqueId = `${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`;
         // Package selection
         this.btwPackageBtn = page.locator("xpath=//p[text()='BTW Package']//ancestor::tr//a[@data-target='#btnSelect']");
 
@@ -134,7 +135,7 @@ export default class WTOnlineEnrollmentPage extends BasePage {
     **/
     async fillStudentInfo() {
         await test.step('Fill Written Test Student Registration Form', async () => {
-            this.uniqueId = `${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+            this.uniqueId = `${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`;
             const data = oeData.student;
             const random7 = String(Math.floor(1000000 + Math.random() * 9000000));
             const phone = `(555)${random7.slice(0, 3)}-${random7.slice(3)}`;
@@ -201,6 +202,7 @@ export default class WTOnlineEnrollmentPage extends BasePage {
     async clickPayLater() {
         await test.step('Click Pay Later button', async () => {
             await this.click(this.payLaterBtn);
+            await this.waitForLoaders().catch(() => {});
         });
     }
 
@@ -214,17 +216,19 @@ export default class WTOnlineEnrollmentPage extends BasePage {
             await this.fill(this.smsNumber, data.smsNumber);
             await this.click(this.addButton);
             await this.click(this.optInButton);
+            await this.waitForLoaders().catch(() => {});
         });
     }
+
 
     /**
-     * Verifies that the registration receipt page is displayed with confirmation heading.
+     * Verifies that the registration receipt page is displayed and attaches the PDF document to the report.
+     * @param {string} [expectedText='REGISTRATION COMPLETED'] - Text to verify on the receipt page.
+     * @param {string} [attachmentName='WT_Registration_Receipt.pdf'] - Filename for the attached PDF in reports.
     **/
-    async verifyReceiptPage() {
-        await test.step('Verify REGISTRATION COMPLETED receipt page', async () => {
-            await this.waitForVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
-            await this.verifyVisible(this.page.getByText('REGISTRATION COMPLETED', { exact: true }));
-        });
+    async verifyReceiptPage(expectedText = 'REGISTRATION COMPLETED', attachmentName = 'WT_Registration_Receipt.pdf') {
+        await PdfHelper.verifyAndAttachReceipt(this.page, expectedText, attachmentName);
     }
-
 }
+
+
