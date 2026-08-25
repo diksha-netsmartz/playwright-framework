@@ -1,0 +1,21 @@
+{
+  "sessionType": "Single Session Class",
+  "status": "Open",
+  "enrollment": "1000",
+  "makeup": "70",
+  "totalSessions": "50",
+  "weekdays": [
+    "MON",
+    "TUE",
+    "WED",
+    "THU",
+    "FRI",
+    "SAT",
+    "SUN"
+  ],
+  "startTime": "0800",
+  "duration": "3",
+  "webSignupNotes": "web signup notes",
+  "crNotes": "cr notes",
+  "internalCrNotes": "internal cr notes"
+}
