@@ -20,30 +20,47 @@ Follow these steps if you are setting up this project on a brand-new computer:
   ```
 
 ### Step 2: Install Node.js
-- Download and install **Node.js (LTS v18 or higher)** from [nodejs.org](https://nodejs.org/).
-- Verify installation by opening a terminal and checking versions:
+- Download and install **Node.js (LTS v18 or v20+)** from [nodejs.org](https://nodejs.org/).
+- **Important (Windows):** Close and reopen your terminal / VS Code after installing Node.js and Git to reload the system `PATH`.
+- Verify installation:
   ```bash
   node -v
   npm -v
   ```
 
-### Step 3: Clone the Repository
+### Step 3 (Optional for Allure Reports): Install Java (JDK 8+)
+- *Allure HTML reporting requires Java runtime (JDK/JRE).*
+- **Windows:** Download and install OpenJDK (e.g. from [adoptium.net](https://adoptium.net/) or [oracle.com](https://www.oracle.com/java/technologies/downloads/)).
+- Verify Java installation:
+  ```bash
+  java -version
+  ```
+- *(If Java is not installed, standard Playwright HTML reports `npx playwright show-report` will still work perfectly).*
+
+### Step 4: Clone the Repository
 ```bash
 git clone https://github.com/diksha-netsmartz/playwright-framework.git
 cd playwright-framework
 ```
 
-### Step 4: Install Project Dependencies
+### Step 5: Install Project Dependencies
 ```bash
 npm install
 ```
 
-### Step 5: Install Playwright Browsers & OS Dependencies
-```bash
-npx playwright install --with-deps
-```
+> **Note for Windows PowerShell users:** If you encounter `running scripts is disabled on this system`, run this once in PowerShell:
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+> ```
+> Or simply use **Git Bash** or **Command Prompt (CMD)**.
 
-### Step 6: Verify Installation
+### Step 6: Install Playwright Browsers
+```bash
+npx playwright install
+```
+*(On Windows / Linux, you can also run `npx playwright install --with-deps`)*
+
+### Step 7: Verify Installation
 Run a quick test to verify your setup:
 ```bash
 npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/TC_022_VerifyClassroomList.spec.js
