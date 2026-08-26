@@ -13,17 +13,17 @@ module.exports = defineConfig({
 
     /**
      * globalSetup: Path to a module that runs once before all tests run.
-     * Value: './utils/global-setup.js'
+     * Value: './scripts/global-setup.js'
      * Why: Automatically cleans 'allure-results' so only the current execution appears in the report.
      */
-    globalSetup: require.resolve('./utils/global-setup.js'),
+    globalSetup: require.resolve('./scripts/global-setup.js'),
 
     /**
      * globalTeardown: Path to a module that runs once after all tests finish.
-     * Value: './utils/global-teardown.js'
+     * Value: './scripts/global-teardown.js'
      * Why: Automatically generates the Allure HTML report and opens both Playwright & Allure reports in the browser.
      */
-    globalTeardown: require.resolve('./utils/global-teardown.js'),
+    globalTeardown: require.resolve('./scripts/global-teardown.js'),
 
     /**
      * testDir: Specifies the root directory where Playwright searches for test files (*.spec.js).
@@ -71,7 +71,7 @@ module.exports = defineConfig({
      *   - 1, 2, 3 (number of retry attempts).
      * Why: Helps eliminate false negatives caused by intermittent network glitches or slow server responses.
      */
-    retries: 2,
+    // retries: 2,
 
     /**
      * reporter: Defines test execution reporting format and behavior.

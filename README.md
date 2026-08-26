@@ -298,7 +298,10 @@ ClientPlaywrightFramework/
 │   ├── OnlineEnrollmentApplication/ # Public enrollment flows (Adult, Teen, RT, WT)
 │   ├── StaffApplication/           # Staff portal pages (Attendance, Evaluations, Home)
 │   └── StudentApplication/         # Student portal pages (Login, Profile, Password Reset)
-├── scripts/                     # Helper automation scripts
+├── scripts/                     # Framework automation & lifecycle scripts
+│   ├── global-setup.js             # Pre-test run setup & report cleanup
+│   ├── global-teardown.js          # Post-test report generation & auto-open
+│   └── open-latest-allure.js       # Finds and launches the most recent Allure report
 ├── test-data/                   # Test data directory
 │   ├── json/                       # JSON fixtures (logins, student data, services, fees, etc.)
 │   └── uploads/                    # Upload assets (sample images, documents, PDFs)
@@ -307,14 +310,12 @@ ClientPlaywrightFramework/
 │   ├── OnlineEnrollmentApplication/ # Online enrollment test specs
 │   ├── StaffApplication/           # Staff portal test specs
 │   └── StudentApplication/         # Student portal test specs
-├── utils/                       # Framework helpers & global hooks
+├── utils/                       # Framework helper utilities
 │   ├── BasePage.js                 # Reusable Playwright interaction methods
 │   ├── EmailHelper.js              # IMAP email extraction & OTP verification
 │   ├── ExcelHelper.js              # Excel parsing utility
 │   ├── PdfHelper.js                # PDF verification & conversion utility
-│   ├── TestDataGenerator.js        # Dynamic test data generator
-│   ├── global-setup.js             # Pre-test run setup & report cleanup
-│   └── global-teardown.js          # Post-test report generation & auto-open
+│   └── TestDataGenerator.js        # Dynamic test data generator
 ├── allure-reports/              # Timestamped Allure HTML reports (report_YYYY-MM-DD_HH-mm-ss)
 ├── allure-results/              # Raw Allure execution result files
 ├── screenshots/                 # Captured test screenshots
