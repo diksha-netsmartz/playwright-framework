@@ -9,33 +9,40 @@ End-to-end test automation framework built using [Playwright](https://playwright
 Follow these steps if you are setting up this project on a brand-new computer:
 
 ### Step 1: Install Git
-- **macOS:** Open Terminal and run:
+- **Check if already installed:**
   ```bash
-  xcode-select --install
+  git --version
   ```
-- **Windows:** Download and install Git from [git-scm.com](https://git-scm.com/download/win).
-- **Linux (Ubuntu/Debian):**
-  ```bash
-  sudo apt update && sudo apt install git -y
-  ```
+- **If not installed, install via:**
+  - **macOS:** Open Terminal and run:
+    ```bash
+    xcode-select --install
+    ```
+  - **Windows:** Download and install Git from [git-scm.com](https://git-scm.com/download/win).
+  - **Linux (Ubuntu/Debian):**
+    ```bash
+    sudo apt update && sudo apt install git -y
+    ```
 
-### Step 2: Install Node.js
-- Download and install **Node.js (LTS v18 or v20+)** from [nodejs.org](https://nodejs.org/).
-- **Important (Windows):** Close and reopen your terminal / VS Code after installing Node.js and Git to reload the system `PATH`.
-- Verify installation:
+### Step 2: Install Node.js & NPM
+- **Check if already installed:**
   ```bash
   node -v
   npm -v
   ```
+- **If not installed, install via:**
+  - Download and install **Node.js (LTS v18 or v20+)** from [nodejs.org](https://nodejs.org/).
+  - **Important (Windows):** Close and reopen your terminal / VS Code after installing Node.js and Git to reload the system `PATH`.
 
 ### Step 3 (Optional for Allure Reports): Install Java (JDK 8+)
 - *Allure HTML reporting requires Java runtime (JDK/JRE).*
-- **Windows:** Download and install OpenJDK from [oracle.com](https://www.oracle.com/java/technologies/downloads/).
-- Verify Java installation:
+- **Check if already installed:**
   ```bash
   java -version
   ```
-- *(If Java is not installed, standard Playwright HTML reports `npx playwright show-report` will still work perfectly).*
+- **If not installed, install via:**
+  - **Windows:** Download and install OpenJDK from [oracle.com](https://www.oracle.com/java/technologies/downloads/).
+  - *(If Java is not installed, standard Playwright HTML reports `npx playwright show-report` will still work perfectly).*
 
 ### Step 4: Clone the Repository
 ```bash
@@ -119,7 +126,9 @@ These commands use `npx cross-env` to work universally across **macOS, Linux, Wi
 
 ---
 
-### 1. Whole Batch (Run All Tests)
+### 1. Whole Batch (Parallel Execution)
+
+Runs all test cases in parallel using available CPU workers:
 
 | Mode | Universal Command (Default: Server 2) | With Specific Environment (e.g. Staging) | NPM Shortcut |
 |---|---|---|---|
@@ -128,7 +137,18 @@ These commands use `npx cross-env` to work universally across **macOS, Linux, Wi
 
 ---
 
-### 2. Last Failed (Re-run Only Failed Tests)
+### 2. Whole Batch (One-by-One / Sequential Execution)
+
+Runs all test cases **sequentially one by one** using a single worker (`--workers=1`):
+
+| Mode | Universal Command (Default: Server 2) | With Specific Environment (e.g. Staging) | NPM Shortcut |
+|---|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test --workers=1` | `npx cross-env ENV=staging HEADLESS=true npx playwright test --workers=1` | `npm run test:batch:headless` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test --workers=1` | `npx cross-env ENV=staging HEADLESS=false npx playwright test --workers=1` | `npm run test:batch:headed` |
+
+---
+
+### 3. Last Failed (Re-run Only Failed Tests)
 
 | Mode | Universal Command (Default: Server 2) | With Specific Environment | NPM Shortcut |
 |---|---|---|---|
@@ -137,7 +157,7 @@ These commands use `npx cross-env` to work universally across **macOS, Linux, Wi
 
 ---
 
-### 3. Specific Test Case (Single File)
+### 4. Specific Test Case (Single File)
 
 | Mode | Universal Command (Default: Server 2) | With Specific Environment (e.g. Core Server 1) |
 |---|---|---|
@@ -146,16 +166,17 @@ These commands use `npx cross-env` to work universally across **macOS, Linux, Wi
 
 ---
 
-### 4. By Folder / Module (e.g., `AdminApplication`, `StaffApplication`, `StudentApplication`)
+### 5. By Folder / Module (e.g., `AdminApplication`, `StaffApplication`, `StudentApplication`)
 
 | Mode | Universal Command (Default: Server 2) | With Specific Environment |
 |---|---|---|
 | **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test tests/AdminApplication/` | `npx cross-env ENV=staging HEADLESS=true npx playwright test tests/AdminApplication/` |
 | **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/` | `npx cross-env ENV=staging HEADLESS=false npx playwright test tests/AdminApplication/` |
+| **One-by-One (Headed)** | `npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/ --workers=1` | `npx cross-env ENV=staging HEADLESS=false npx playwright test tests/AdminApplication/ --workers=1` |
 
 ---
 
-### 5. Smoke Test Suite (`@smoke`)
+### 6. Smoke Test Suite (`@smoke`)
 
 Run only smoke-tagged tests across modules without needing separate folders:
 
@@ -163,10 +184,11 @@ Run only smoke-tagged tests across modules without needing separate folders:
 |---|---|---|---|
 | **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test --grep @smoke` | `npx cross-env ENV=staging HEADLESS=true npx playwright test --grep @smoke` | `npm run test:smoke:headless` |
 | **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test --grep @smoke` | `npx cross-env ENV=staging HEADLESS=false npx playwright test --grep @smoke` | `npm run test:smoke` |
+| **One-by-One (Headed)** | `npx cross-env HEADLESS=false npx playwright test --grep @smoke --workers=1` | `npx cross-env ENV=staging HEADLESS=false npx playwright test --grep @smoke --workers=1` | — |
 
 ---
 
-### 6. Interactive UI Dashboard & Debugger
+### 7. Interactive UI Dashboard & Debugger
 
 - **Interactive UI Runner:**
   Playwright's interactive runner with live DOM inspection, time travel, and watch mode:
@@ -236,8 +258,10 @@ npx playwright show-trace test-results/<path-to-trace.zip>
 
 | NPM Script | Command | Purpose |
 |---|---|---|
-| `npm run test:headless` | `cross-env HEADLESS=true npx playwright test` | Run all tests in headless mode (1920x1080) |
-| `npm run test:headed` | `cross-env HEADLESS=false npx playwright test` | Run all tests in maximized UI/headed mode |
+| `npm run test:headless` | `cross-env HEADLESS=true npx playwright test` | Run all tests in parallel (headless 1920x1080) |
+| `npm run test:headed` | `cross-env HEADLESS=false npx playwright test` | Run all tests in parallel (maximized UI/headed) |
+| `npm run test:batch:headless` | `cross-env HEADLESS=true npx playwright test --workers=1` | Run all tests **one-by-one sequentially** (headless) |
+| `npm run test:batch:headed` | `cross-env HEADLESS=false npx playwright test --workers=1` | Run all tests **one-by-one sequentially** (maximized UI) |
 | `npm run test:failed:headless` | `cross-env HEADLESS=true npx playwright test --last-failed` | Re-run failed tests headlessly |
 | `npm run test:failed:headed` | `cross-env HEADLESS=false npx playwright test --last-failed` | Re-run failed tests in headed mode |
 | `npm run test:smoke` | `cross-env HEADLESS=false npx playwright test --grep @smoke` | Run all `@smoke` test cases in maximized UI/headed mode |

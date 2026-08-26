@@ -6,6 +6,8 @@
   "scripts": {
     "test:headless": "cross-env HEADLESS=true npx playwright test",
     "test:headed": "cross-env HEADLESS=false npx playwright test",
+    "test:batch:headless": "cross-env HEADLESS=true npx playwright test --workers=1",
+    "test:batch:headed": "cross-env HEADLESS=false npx playwright test --workers=1",
     "test:failed:headless": "cross-env HEADLESS=true npx playwright test --last-failed",
     "test:failed:headed": "cross-env HEADLESS=false npx playwright test --last-failed",
     "test:smoke": "cross-env HEADLESS=false npx playwright test --grep @smoke",
