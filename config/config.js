@@ -1,3 +1,5 @@
+import loginData from '../test-data/json/login.json';
+
 const environments = {
     staging: {
         baseURL: 'https://www.staging.ms/CentralizedAdminDemo/Login/Login?encID=6l_PLUS_AtnWPStg_EQUAL_',
@@ -43,10 +45,13 @@ const environments = {
 
 const currentEnv = process.env.ENV || 'coreServer2';
 const activeEnv = environments[currentEnv] || environments.coreServer2;
+const credentials = loginData[currentEnv] || loginData.coreServer2 || {};
 
 const config = {
+    envName: currentEnv,
     environments,
-    ...activeEnv
+    ...activeEnv,
+    credentials
 };
 
 export default config;

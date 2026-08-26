@@ -299,8 +299,9 @@ ClientPlaywrightFramework/
 │   ├── StaffApplication/           # Staff portal pages (Attendance, Evaluations, Home)
 │   └── StudentApplication/         # Student portal pages (Login, Profile, Password Reset)
 ├── scripts/                     # Helper automation scripts
-│   └── open-latest-allure.js       # Finds and launches the most recent Allure report
-├── test-data/                   # JSON fixtures and test assets (logins, student data, images)
+├── test-data/                   # Test data directory
+│   ├── json/                       # JSON fixtures (logins, student data, services, fees, etc.)
+│   └── uploads/                    # Upload assets (sample images, documents, PDFs)
 ├── tests/                       # Test specifications grouped by application module
 │   ├── AdminApplication/           # Admin portal test specs
 │   ├── OnlineEnrollmentApplication/ # Online enrollment test specs

@@ -1,0 +1,90 @@
+{
+  "coreServer2": {
+    "cadmin": {
+      "username": "owner1",
+      "password": "123456Aa#"
+    },
+    "studentUser": {
+      "username": "tes1",
+      "password": "Student@123123"
+    },
+    "resetStudent": {
+      "username": "rachel",
+      "email": "testingdata3011@gmail.com"
+    },
+    "staffUser": {
+      "username": "instructor6",
+      "password": "123456Aa#"
+    },
+    "classroomInstructor": {
+      "username": "instructor3",
+      "password": "123456Aa#"
+    }
+  },
+  "staging": {
+    "cadmin": {
+      "username": "testautomation",
+      "password": "Staffing@*123321"
+    },
+    "studentUser": {
+      "username": "tes1",
+      "password": "Student@123123"
+    },
+    "resetStudent": {
+      "username": "rachel",
+      "email": "testingdata3011@gmail.com"
+    },
+    "staffUser": {
+      "username": "instructor6",
+      "password": "123456Aa#"
+    },
+    "classroomInstructor": {
+      "username": "instructor3",
+      "password": "123456Aa#"
+    }
+  },
+  "uat": {
+    "cadmin": {
+      "username": "testautomation",
+      "password": "Staffing@*123321"
+    },
+    "studentUser": {
+      "username": "tes1",
+      "password": "Student@123123"
+    },
+    "resetStudent": {
+      "username": "rachel",
+      "email": "testingdata3011@gmail.com"
+    },
+    "staffUser": {
+      "username": "instructor6",
+      "password": "123456Aa#"
+    },
+    "classroomInstructor": {
+      "username": "instructor3",
+      "password": "123456Aa#"
+    }
+  },
+  "coreServer1": {
+    "cadmin": {
+      "username": "testautomation",
+      "password": "Staffing@*123321"
+    },
+    "studentUser": {
+      "username": "tes1",
+      "password": "Student@123123"
+    },
+    "resetStudent": {
+      "username": "rachel",
+      "email": "testingdata3011@gmail.com"
+    },
+    "staffUser": {
+      "username": "instructor6",
+      "password": "123456Aa#"
+    },
+    "classroomInstructor": {
+      "username": "instructor3",
+      "password": "123456Aa#"
+    }
+  }
+}

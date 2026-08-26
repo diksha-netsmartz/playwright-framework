@@ -3,7 +3,7 @@ import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
 import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage';
 import StudentProfilePage from '../../pages/StudentApplication/StudentProfilePage';
 import TestDataGenerator from '../../utils/TestDataGenerator';
-import login from '../../test-data/login.json';
+import login from '../../test-data/json/login.json';
 
 /**
  * TC_021: CSP
@@ -16,13 +16,14 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
     const studentHomePage = new StudentHomePage(page);
     const studentProfilePage = new StudentProfilePage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
     let dynamicParentName;
     let dynamicHomePhone;
     let dynamicParentPhone;
 
     await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
         await studentLoginPage.navigateToLoginPage();
-        await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
+        await studentLoginPage.login(credentials.studentUser.username, credentials.studentUser.password);
     });
 
     await test.step('Step 2: Navigate to My Account > Profile', async () => {

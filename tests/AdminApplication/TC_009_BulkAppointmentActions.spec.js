@@ -3,7 +3,7 @@ import {test} from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
 import BulkAppointmentPage from '../../pages/AdminApplication/Scheduling/BulkAppointmentPage';
-import login from '../../test-data/login.json';
+import login from '../../test-data/json/login.json';
 
 /**
  * TC_009: C-Admin > Scheduling > Manage Appointment Slot > Appointment Bulk Edit
@@ -17,9 +17,11 @@ test('TC_009: C-admin > Scheduling > Manage Appointment Slot > Appointment Bulk 
     const homePage = new HomePage(page);
     const bulkAppointmentPage = new BulkAppointmentPage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
+
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
-        await loginPage.login(login.validUser.username, login.validUser.password);
+        await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
     });
 
     await test.step('Step 2: Navigate to Scheduling -> Manage Time Slots -> Bulk Appointment', async () => {

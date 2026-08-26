@@ -3,8 +3,8 @@ import {test} from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import EnrollmentBillingPage from '../../pages/AdminApplication/EnrollmentBillingPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage'
-import login from "../../test-data/login.json";
-import studentData from "../../test-data/studentData.json"
+import login from "../../test-data/json/login.json";
+import studentData from "../../test-data/json/studentData.json"
 
 /**
  * TC_008: C-admin > Student > Billing
@@ -18,11 +18,13 @@ test('TC_008: C-admin > Student > Billing - Verify user is able to make payment'
     const homePage = new HomePage(page);
     const enrollmentBillingPage = new EnrollmentBillingPage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
+
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(
-            login.validUser.username,
-            login.validUser.password
+            credentials.cadmin.username,
+            credentials.cadmin.password
         );
     });
 

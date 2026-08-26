@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
 import StudentEnrollPage from '../../pages/StudentApplication/StudentEnrollPage';
-import login from '../../test-data/login.json';
+import login from '../../test-data/json/login.json';
 import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage'
 
 /**
@@ -15,11 +15,12 @@ test('TC_012: CSP - Verify student is able to Enroll Package', { tag: '@smoke' }
     const studentEnrollPage = new StudentEnrollPage(page);
     const studentHomePage = new StudentHomePage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
     let receiptPage;
 
     await test.step('Step 1: Login to student portal (CSP)', async () => {
         await studentLoginPage.navigateToLoginPage();
-        await studentLoginPage.login(login.studentUser.username, login.studentUser.password);
+        await studentLoginPage.login(credentials.studentUser.username, credentials.studentUser.password);
     });
 
     await test.step('Step 2: Navigate to Enroll on left navigation', async () => {

@@ -2,8 +2,8 @@ import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
 import NewClassroomPage from '../../pages/AdminApplication/NewClassroomPage';
-import login from '../../test-data/login.json';
-import classroomData from '../../test-data/classroomData.json';
+import login from '../../test-data/json/login.json';
+import classroomData from '../../test-data/json/classroomData.json';
 
 /**
  * TC_023: C-Admin > Classroom > New Class
@@ -16,9 +16,11 @@ test('TC_023: C-admin > Classroom > New Class - Add Multi Session Classroom', as
   const homePage = new HomePage(page);
   const newClassroomPage = new NewClassroomPage(page);
 
+  const credentials = login[process.env.ENV || 'coreServer2'];
+
   await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
     await loginPage.navigateToLoginPage();
-    await loginPage.login(login.validUser.username, login.validUser.password);
+    await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
   });
 
   await test.step('Step 2: Navigate to Classroom >> New Class', async () => {

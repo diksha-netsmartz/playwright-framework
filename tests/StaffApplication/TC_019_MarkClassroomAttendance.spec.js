@@ -3,7 +3,7 @@ import {test} from '@playwright/test';
 import StaffLoginPage from '../../pages/StaffApplication/StaffLoginPage';
 import ClassroomAttendancePage from '../../pages/StaffApplication/ClassroomAttendancePage';
 
-import login from '../../test-data/login.json';
+import login from '../../test-data/json/login.json';
 
 /**
  * TC_019: Centralize Staff Mobile (CSM)
@@ -15,9 +15,11 @@ test('TC_019: CSM - Verify attendance can be marked', { tag: '@smoke' }, async (
     const staffLoginPage = new StaffLoginPage(page);
     const classroomAttendancePage = new ClassroomAttendancePage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
+
     await test.step('Step 1: Login to CSM portal as classroom instructor', async () => {
         await staffLoginPage.navigateToLoginPage();
-        await staffLoginPage.login(login.classroomInstructor.username, login.classroomInstructor.password);
+        await staffLoginPage.login(credentials.classroomInstructor.username, credentials.classroomInstructor.password);
     });
 
     await test.step('Step 2 & 3: Navigate to Upcoming Schedule and view all', async () => {

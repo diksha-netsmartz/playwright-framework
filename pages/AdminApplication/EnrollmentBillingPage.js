@@ -1,6 +1,6 @@
 import BasePage from "../../utils/BasePage";
 import { expect, test } from "@playwright/test";
-import paymentData from "../../test-data/paymentData.json";
+import paymentData from "../../test-data/json/paymentData.json";
 
 /**
  * Page Object representing the Student Enrollment and Billing Page in Admin Portal.

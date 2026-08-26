@@ -5,8 +5,8 @@ import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnr
 import SingleInstructorPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/SingleInstructorPage";
 import CombinedAppointmentPage from "../../pages/AdminApplication/Scheduling/SingleInstructor/CombinedAppointmentPage";
 import TestDataGenerator from "../../utils/TestDataGenerator";
-import createAppointmentData from "../../test-data/createAppointmentData.json";
-import login from "../../test-data/login.json";
+import createAppointmentData from "../../test-data/json/createAppointmentData.json";
+import login from "../../test-data/json/login.json";
 
 /**
  * TC_001: C-admin > Scheduling
@@ -20,12 +20,13 @@ test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", {
     const instructorPage = new SingleInstructorPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
     let student1;
     let student2;
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
-        await loginPage.login(login.validUser.username, login.validUser.password);
+        await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
     });
 
     await test.step('Step 2: Generate dynamic student 1 & student 2 details at runtime', async () => {

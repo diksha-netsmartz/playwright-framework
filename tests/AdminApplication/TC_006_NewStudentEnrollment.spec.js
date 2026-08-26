@@ -2,8 +2,9 @@ import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import NewStudentEnrollmentPage from '../../pages/AdminApplication/NewStudentEnrollmentPage';
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
-import login from "../../test-data/login.json";
-import studentData from "../../test-data/studentData.json";
+import login from "../../test-data/json/login.json";
+import studentData from "../../test-data/json/studentData.json";
+
 
 // Define the packages, their student information type, and specific requirements
 const packageScenarios = [
@@ -40,12 +41,11 @@ for (const { packageName, selectDOBInDetails, fillInfoMethod } of packageScenari
         const enrollmentPage = new NewStudentEnrollmentPage(page);
         const homePage = new HomePage(page);
 
+        const credentials = login[process.env.ENV || 'coreServer2'];
+
         await test.step('Step 1: Login to C-admin with valid credentials', async () => {
             await loginPage.navigateToLoginPage();
-            await loginPage.login(
-                login.validUser.username,
-                login.validUser.password
-            );
+            await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
         });
 
         await test.step('Step 2: Click on New student enrollment in Left Navigation', async () => {

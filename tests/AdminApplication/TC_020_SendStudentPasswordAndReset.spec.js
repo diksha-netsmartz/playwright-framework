@@ -6,7 +6,7 @@ import StudentResetPasswordPage from '../../pages/StudentApplication/StudentRese
 import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
 import EmailHelper from '../../utils/EmailHelper';
 import TestDataGenerator from '../../utils/TestDataGenerator';
-import login from '../../test-data/login.json';
+import login from '../../test-data/json/login.json';
 
 /**
  * TC_020: C-Admin > Student Profile
@@ -22,24 +22,25 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
     const resetPasswordPage = new StudentResetPasswordPage(page);
     const studentLoginPage = new StudentLoginPage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
     let resetPasswordUrl;
     let dynamicNewPassword;
 
     await test.step('Step 1: Login to Admin Portal using existing login methods', async () => {
         await loginPage.navigateToLoginPage();
-        await loginPage.login(login.validUser.username, login.validUser.password);
+        await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
     });
 
     await test.step('Step 2: Navigate to Student Account -> Profile', async () => {
         await homePage.openStudentProfile();
     });
 
-    await test.step(`Step 3: Search and select student: ${login.resetStudent.username}`, async () => {
-        await studentProfilePage.selectStudent(login.resetStudent.username);
+    await test.step(`Step 3: Search and select student: ${credentials.resetStudent.username}`, async () => {
+        await studentProfilePage.selectStudent(credentials.resetStudent.username);
     });
 
     await test.step('Step 4: Update email if not matching the required email', async () => {
-        await studentProfilePage.updateEmailIfDifferent(login.resetStudent.email);
+        await studentProfilePage.updateEmailIfDifferent(credentials.resetStudent.email);
     });
 
     await test.step('Step 5: Send Reset Password / Username email to student', async () => {
@@ -49,7 +50,7 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
     await test.step('Step 6: Fetch the Reset Password URL directly from email via IMAP', async () => {
         console.log('Fetching Reset Password link from email...');
         resetPasswordUrl = await EmailHelper.getResetPasswordLink({
-            recipientEmail: login.resetStudent.email,
+            recipientEmail: credentials.resetStudent.email,
             subject: 'Student UserName/Password',
             timeoutMs: 20000
         });
@@ -71,8 +72,8 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
     });
 
     await test.step(`Step 11: Navigate to CSP and login with username and the updated password`, async () => {
-        console.log(`Logging into Student Portal (CSP) with updated credentials for ${login.resetStudent.username}...`);
+        console.log(`Logging into Student Portal (CSP) with updated credentials for ${credentials.resetStudent.username}...`);
         await studentLoginPage.navigateToLoginPage();
-        await studentLoginPage.login(login.resetStudent.username, dynamicNewPassword);
+        await studentLoginPage.login(credentials.resetStudent.username, dynamicNewPassword);
     });
 });

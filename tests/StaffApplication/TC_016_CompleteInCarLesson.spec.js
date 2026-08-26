@@ -4,7 +4,7 @@ import StaffLoginPage from '../../pages/StaffApplication/StaffLoginPage';
 import StaffHomePage from '../../pages/StaffApplication/StaffHomePage';
 import LessonEvaluationPage from '../../pages/StaffApplication/LessonEvaluationPage';
 
-import login from '../../test-data/login.json';
+import login from '../../test-data/json/login.json';
 
 /**
  * TC_016: Centralize Staff Mobile (CSM)
@@ -17,9 +17,11 @@ test('TC_016: CSM - Verify process lesson functionality', { tag: '@smoke' }, asy
     const staffHomePage = new StaffHomePage(page);
     const lessonEvaluationPage = new LessonEvaluationPage(page);
 
+    const credentials = login[process.env.ENV || 'coreServer2'];
+
     await test.step('Step 1: Login to CSM portal with valid staff credentials', async () => {
         await staffLoginPage.navigateToLoginPage();
-        await staffLoginPage.login(login.staffUser.username, login.staffUser.password);
+        await staffLoginPage.login(credentials.staffUser.username, credentials.staffUser.password);
     });
 
     await test.step('Step 2-4: Navigate to "Needs Attention" and click Process', async () => {
