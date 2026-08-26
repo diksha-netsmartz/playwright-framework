@@ -13,7 +13,7 @@ import login from "../../test-data/login.json";
  * Test Case Title: Verify that the appt is getting created
  * Expected Result: Appointment should be created successfully and all the fields should have the value selected during creation
  **/
-test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", async ({ page }) => {
+test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);

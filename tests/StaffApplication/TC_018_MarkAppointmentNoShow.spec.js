@@ -9,7 +9,7 @@ import login from '../../test-data/login.json';
  * Precondition: There should be a Past Appointment or should be created using TC-001 with staff - test, instructor6
  * Expected Result: Appointment Marked No show successfully message should display
  **/
-test('TC_018: CSM - Verify no show functionality', async ({ page }) => {
+test('TC_018: CSM - Verify no show functionality', { tag: '@smoke' }, async ({ page }) => {
 
     const staffLoginPage = new StaffLoginPage(page);
     const staffHomePage = new StaffHomePage(page);

@@ -12,7 +12,7 @@ import studentData from "../../test-data/studentData.json"
  * Precondition: Student should be created first
  * Expected Result: Enrollment is Added, Edit and Deleted.
  **/
-test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Delete Package', async ({ page }) => {
+test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Delete Package', { tag: '@smoke' }, async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

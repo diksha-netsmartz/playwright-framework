@@ -12,7 +12,7 @@ import studentData from "../../test-data/studentData.json"
  * Precondition: Student should be created first
  * Expected Result: Payments should be made by user
  **/
-test('TC_008: C-admin > Student > Billing - Verify user is able to make payment', async ({page}) => {
+test('TC_008: C-admin > Student > Billing - Verify user is able to make payment', { tag: '@smoke' }, async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

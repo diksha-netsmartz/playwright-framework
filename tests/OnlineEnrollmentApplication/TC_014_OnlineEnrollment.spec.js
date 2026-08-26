@@ -9,7 +9,7 @@ import WTOnlineEnrollmentPage from '../../pages/OnlineEnrollmentApplication/WTOn
  * Test Case Title: Verify new student able to register
  * Expected Result: Receipt Page should appear and student should be Registered and Enrollment should be done
  **/
-test('TC_014: COE TEEN/ADULT/WT - Verify new student able to register', async ({page}) => {
+test('TC_014: COE TEEN/ADULT/WT - Verify new student able to register', { tag: '@smoke' }, async ({page}) => {
 
     const teenOnlineEnrollmentPage = new TeenOnlineEnrollmentPage(page);
     const adultOnlineEnrollmentPage = new AdultOnlineEnrollmentPage(page);

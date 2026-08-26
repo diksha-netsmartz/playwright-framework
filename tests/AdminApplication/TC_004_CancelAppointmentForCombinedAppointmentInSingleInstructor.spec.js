@@ -14,7 +14,7 @@ import login from "../../test-data/login.json";
  * Precondition: Create new appt using TC_001 (Appointment should be created for past date to verify this test case)
  * Expected Result: Appointment slot should become empty
  **/
-test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled", async ({ page }) => {
+test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled", { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);

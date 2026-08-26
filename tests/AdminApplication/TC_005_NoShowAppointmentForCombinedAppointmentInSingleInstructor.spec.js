@@ -14,7 +14,7 @@ import login from "../../test-data/login.json";
  * Precondition: TC_004 should be executed
  * Expected Result: Appointment slot should become empty
  **/
-test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as no show", async ({ page }) => {
+test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as no show", { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);

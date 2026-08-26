@@ -138,7 +138,18 @@ These commands use `npx cross-env` to work universally across **macOS, Linux, Wi
 
 ---
 
-### 5. Interactive UI Dashboard & Debugger
+### 5. Smoke Test Suite (`@smoke`)
+
+Run only smoke-tagged tests across modules without needing separate folders:
+
+| Mode | Universal Command (Default: Server 2) | With Specific Environment | NPM Shortcut |
+|---|---|---|---|
+| **Headless (1920x1080)** | `npx cross-env HEADLESS=true npx playwright test --grep @smoke` | `npx cross-env ENV=staging HEADLESS=true npx playwright test --grep @smoke` | `npm run test:smoke:headless` |
+| **UI / Headed (Full Screen)** | `npx cross-env HEADLESS=false npx playwright test --grep @smoke` | `npx cross-env ENV=staging HEADLESS=false npx playwright test --grep @smoke` | `npm run test:smoke` |
+
+---
+
+### 6. Interactive UI Dashboard & Debugger
 
 - **Interactive UI Runner:**
   Playwright's interactive runner with live DOM inspection, time travel, and watch mode:
@@ -212,6 +223,8 @@ npx playwright show-trace test-results/<path-to-trace.zip>
 | `npm run test:headed` | `cross-env HEADLESS=false npx playwright test` | Run all tests in maximized UI/headed mode |
 | `npm run test:failed:headless` | `cross-env HEADLESS=true npx playwright test --last-failed` | Re-run failed tests headlessly |
 | `npm run test:failed:headed` | `cross-env HEADLESS=false npx playwright test --last-failed` | Re-run failed tests in headed mode |
+| `npm run test:smoke` | `cross-env HEADLESS=false npx playwright test --grep @smoke` | Run all `@smoke` test cases in maximized UI/headed mode |
+| `npm run test:smoke:headless` | `cross-env HEADLESS=true npx playwright test --grep @smoke` | Run all `@smoke` test cases in headless mode |
 | `npm run test:ui` | `npx playwright test --ui` | Launch Playwright Interactive UI dashboard |
 | `npm run test:debug` | `npx playwright test --debug` | Run tests with Playwright Inspector |
 | `npm run allure:open` | `node scripts/open-latest-allure.js` | Open the latest generated Allure report in browser |

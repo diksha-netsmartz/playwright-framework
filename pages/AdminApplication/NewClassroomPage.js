@@ -272,7 +272,6 @@ export default class NewClassroomPage extends BasePage {
                 await this.verifyVisible(this.instructorUpdatedMessage);
                 await this.click(this.closeChangeInstructorModal);
                 await this.waitForLoaders();
-
                 await this.verifyVisible(this.teacherAvailableMessage);
                 await this.click(this.closeTeacherAvailableModal);
                 await this.waitForLoaders();
@@ -282,7 +281,7 @@ export default class NewClassroomPage extends BasePage {
                 await this.waitForVisible(this.confirmYesBtn);
                 await this.click(this.confirmYesBtn);
                 await this.waitForLoaders();
-                await this.verifyVisible(this.teacherRemovedMessage);
+                await this.waitForVisible(this.teacherRemovedMessage);
                 await this.verifyVisible(this.teacherAvailableMessage);
                 await this.click(this.closeTeacherAvailableModal);
                 await this.waitForLoaders();

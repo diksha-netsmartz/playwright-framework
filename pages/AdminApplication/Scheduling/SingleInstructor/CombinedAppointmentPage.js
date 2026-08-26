@@ -353,7 +353,7 @@ export default class CombinedAppointmentPage extends BasePage {
     async fillStudentDetails(studentNo, student) {
         const studentLabel = `Student ${studentNo} (${student.name})`;
         await test.step(`Fill ${studentLabel} details: service "${student.service || 'Default'}", pickup "${student.pickup}", notes "${student.notes}"`, async () => {
-            await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 200 });
+            await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 50 });
             await this.page.waitForTimeout(2000);
             await this.click(this.page.getByRole("option", { name: student.option }).first());
             await this.click(this.clickServiceDropdown(studentNo));

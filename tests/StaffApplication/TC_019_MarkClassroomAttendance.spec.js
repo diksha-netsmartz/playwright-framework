@@ -10,7 +10,7 @@ import login from '../../test-data/login.json';
  * Test Case Title: Verify attendance can be marked
  * Expected Result: Classroom attendance marked successfully message should display
  **/
-test('TC_019: CSM - Verify attendance can be marked', async ({page}) => {
+test('TC_019: CSM - Verify attendance can be marked', { tag: '@smoke' }, async ({page}) => {
 
     const staffLoginPage = new StaffLoginPage(page);
     const classroomAttendancePage = new ClassroomAttendancePage(page);

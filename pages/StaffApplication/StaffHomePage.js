@@ -21,6 +21,7 @@ export default class StaffHomePage extends BasePage {
         this.noShowTextbox = page.locator("#txtnoShowNotes");
         this.noShowButton = page.locator("#btnNoShowLesson").last();
         this.yesConfirmationButton = page.locator("#btnDeleteConfirmation");
+        this.fullAppointmentYesButton = page.locator('#btnDeleteMakeFullAppointment:visible')
         this.cancelLink = page.locator("xpath=(//a//strong[text()='Cancel'])[last()]");
         this.cancelTextbox = page.locator("#txtArea_CancelLesson");
         this.cancelButton = page.locator("#btnCancelLesson").first();
@@ -52,6 +53,10 @@ export default class StaffHomePage extends BasePage {
 
             const noShowMsg = this.page.getByText('Appointment marked No Show successfully.', { exact: true });
             await this.click(this.yesConfirmationButton);
+            await this.page.waitForTimeout(1500);
+            if (await this.isVisible(this.fullAppointmentYesButton)) {
+                await this.click(this.fullAppointmentYesButton);
+            }
             await expect(noShowMsg).toBeAttached({ timeout: 5000 });
             await this.waitForLoaders();
         });

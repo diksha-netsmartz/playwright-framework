@@ -12,7 +12,7 @@ import studentData from '../../test-data/studentData.json';
  * Precondition: Appointment should be Available to be Scheduled
  * Expected Result: Appointment should be scheduled to the student.
  **/
-test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to Schedule in an Appointment', async ({page}) => {
+test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to Schedule in an Appointment', { tag: '@smoke' }, async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

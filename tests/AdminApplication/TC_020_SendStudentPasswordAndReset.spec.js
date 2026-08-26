@@ -14,7 +14,7 @@ import login from '../../test-data/login.json';
  * Precondition: Should be logged into C-admin
  * Expected Result: Student gets logged in successfully with the new reset password
  **/
-test('TC_020: C-admin > Student Profile - Verify send username/password functionality', async ({ page }) => {
+test('TC_020: C-admin > Student Profile - Verify send username/password functionality', { tag: '@smoke' }, async ({ page }) => {
 
     const loginPage = new AdminLoginPage(page);
     const homePage = new AdminPortalHomePage(page);

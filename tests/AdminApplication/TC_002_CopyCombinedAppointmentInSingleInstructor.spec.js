@@ -14,7 +14,7 @@ import login from "../../test-data/login.json";
  * Precondition: TC_001 should be successfully executed
  * Expected Result: Appointment should get copied successfully and all the data should match the copied appointment
  **/
-test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", async ({ page }) => {
+test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);

@@ -8,6 +8,8 @@
     "test:headed": "cross-env HEADLESS=false npx playwright test",
     "test:failed:headless": "cross-env HEADLESS=true npx playwright test --last-failed",
     "test:failed:headed": "cross-env HEADLESS=false npx playwright test --last-failed",
+    "test:smoke": "cross-env HEADLESS=false npx playwright test --grep @smoke",
+    "test:smoke:headless": "cross-env HEADLESS=true npx playwright test --grep @smoke",
     "test:ui": "npx playwright test --ui",
     "test:debug": "npx playwright test --debug",
     "check": "tsc -p jsconfig.json --noEmit",

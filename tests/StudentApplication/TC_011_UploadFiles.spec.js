@@ -11,7 +11,7 @@ import AdminHomePage from '../../pages/AdminApplication/AdminPortalHomePage'
  * Test Case Title: Verify that the file is getting uploaded
  * Expected Result: File should be uploaded successfully and should be visible under C-Admin > Home Page > Uploaded Files widget
  **/
-test('TC_011: CSP - Verify that the file is getting uploaded', async ({page}) => {
+test('TC_011: CSP - Verify that the file is getting uploaded', { tag: '@smoke' }, async ({page}) => {
 
     const studentLoginPage = new StudentLoginPage(page);
     const studentHomePage = new StudentHomePage(page);

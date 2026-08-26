@@ -35,7 +35,7 @@ for (const { packageName, selectDOBInDetails, fillInfoMethod } of packageScenari
      * Test Case Title: Verify new student getting created and Packages are Enrolled.
      * Expected Result: New student should get created Enrollements should be done
      **/
-    test(`TC_006: C-admin > New student enrollment - Verify new student getting created and Packages are Enrolled (${packageName})`, async ({ page }) => {
+    test(`TC_006: C-admin > New student enrollment - Verify new student getting created and Packages are Enrolled (${packageName})`, { tag: '@smoke' }, async ({ page }) => {
         const loginPage = new LoginPage(page);
         const enrollmentPage = new NewStudentEnrollmentPage(page);
         const homePage = new HomePage(page);

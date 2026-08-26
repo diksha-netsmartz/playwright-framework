@@ -11,7 +11,7 @@ import login from '../../test-data/login.json';
  * Precondition: Appointments should be created first with confirm status
  * Expected Result: User should be able to Edit, Delete, Cancel and shift Appointment
  **/
-test('TC_009: C-admin > Scheduling > Manage Appointment Slot > Appointment Bulk Edit - Verify user is able to Edit, Delete, Cancel and Shift Appointment', async ({page}) => {
+test('TC_009: C-admin > Scheduling > Manage Appointment Slot > Appointment Bulk Edit - Verify user is able to Edit, Delete, Cancel and Shift Appointment', { tag: '@smoke' }, async ({page}) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

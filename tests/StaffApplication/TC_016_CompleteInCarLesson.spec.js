@@ -11,7 +11,7 @@ import login from '../../test-data/login.json';
  * Test Case Title: Verify process lesson functionality
  * Expected Result: Success message "Success! Lesson completed and evaluation saved." should be displayed and email sent to student
  **/
-test('TC_016: CSM - Verify process lesson functionality', async ({page}) => {
+test('TC_016: CSM - Verify process lesson functionality', { tag: '@smoke' }, async ({page}) => {
 
     const staffLoginPage = new StaffLoginPage(page);
     const staffHomePage = new StaffHomePage(page);

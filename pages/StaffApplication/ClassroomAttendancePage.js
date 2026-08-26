@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Classroom Attendance Page in Staff Portal.
@@ -21,7 +21,6 @@ export default class ClassroomAttendancePage extends BasePage {
         // Type filter (first filter dropdown)
         this.typeFilterBtn = page.locator("#ddlTypeSelectVal");
         this.selectAllOption = page.locator("xpath=//input[contains(@class,'selAllTypeDDL')]//following-sibling::ins");
-
         this.classFilterCheckbox = page.locator("xpath=(//input[contains(@class,'checkType')]//following-sibling::ins)[1]");
 
         // Date range filter
@@ -34,55 +33,66 @@ export default class ClassroomAttendancePage extends BasePage {
         this.studentChehckbox = page.locator("xpath=(//div[@class='icheckbox_square-grey']//input[not(contains(@class,'chkAll')) and contains(@class,'studentAttendanceClass')]//following-sibling::ins)[1]");
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
         this.clearInstructorSignatureBtn = page.locator("xpath=//button[@data-toggle='confirmationClearInstructorSignature']");
-        this.saveBtn = page.locator("xpath=(//button[@data-toggle='confirmationSaveAttendance'])[1]")
+        this.saveBtn = page.locator("xpath=(//button[@data-toggle='confirmationSaveAttendance'])[1]");
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
-
     }
 
     /**
      * Clicks the 'View' link under the upcoming schedule section.
     **/
     async clickViewInUpcomingSchedule() {
-        await this.click(this.viewLink);
+        await test.step('Click View in upcoming schedule', async () => {
+            await this.click(this.viewLink);
+        });
     }
 
     /**
      * Clicks the 'View All' link to view all scheduled classes.
     **/
     async clickViewAll() {
-        await this.click(this.viewAllLink);
+        await test.step('Click View All in upcoming schedule', async () => {
+            await this.click(this.viewAllLink);
+        });
     }
 
     /**
      * Filters the schedule list by selecting the Class filter checkbox in the type dropdown.
     **/
     async selectClassFilter() {
-        await this.click(this.typeFilterBtn);
-        await this.click(this.selectAllOption);
-        await this.click(this.classFilterCheckbox);
+        await test.step('Filter schedule by Class type', async () => {
+            await this.click(this.typeFilterBtn);
+            await this.click(this.selectAllOption);
+            await this.click(this.classFilterCheckbox);
+        });
     }
 
     /**
      * Applies the 'Last 26 Weeks' date range filter and clicks the Filter button.
     **/
     async selectLast26WeeksAndFilter() {
-        await this.click(this.todayFilterBtn);
-        await this.click(this.last26WeeksLink);
-        await this.click(this.filterBtn);
+        await test.step('Filter schedule by "Last 26 Weeks" date range', async () => {
+            await this.click(this.todayFilterBtn);
+            await this.click(this.last26WeeksLink);
+            await this.click(this.filterBtn);
+        });
     }
 
     /**
      * Clicks the 'Take Attendance' link for the first available classroom session.
     **/
     async clickTakeAttendance() {
-        await this.click(this.takeAttendanceLink);
+        await test.step('Click "Take Attendance" link', async () => {
+            await this.click(this.takeAttendanceLink);
+        });
     }
 
     /**
      * Toggles the attendance checkbox to mark the student present.
     **/
     async markStudentPresent() {
-        await this.click(this.studentChehckbox);
+        await test.step('Mark student present', async () => {
+            await this.click(this.studentChehckbox);
+        });
     }
 
     /**
@@ -107,26 +117,32 @@ export default class ClassroomAttendancePage extends BasePage {
      * Draws the instructor's signature on the signature canvas if it hasn't been signed already.
     **/
     async signInstructorSignature() {
-        const isSigned = await this.isVisible(this.clearInstructorSignatureBtn);
-        if (!isSigned) {
-            await this.#drawSignature(this.instructorSignatureCanvas);
-        }
+        await test.step('Sign instructor signature on canvas if not already signed', async () => {
+            const isSigned = await this.isVisible(this.clearInstructorSignatureBtn);
+            if (!isSigned) {
+                await this.#drawSignature(this.instructorSignatureCanvas);
+            }
+        });
     }
 
     /**
      * Clicks the Save attendance button and confirms the confirmation dialog.
     **/
     async saveAttendance() {
-        await this.click(this.saveBtn);
-        await this.click(this.confirmYesBtn);
-        await this.waitForLoaders();
+        await test.step('Save attendance and confirm', async () => {
+            await this.click(this.saveBtn);
+            await this.click(this.confirmYesBtn);
+            await this.waitForLoaders();
+        });
     }
 
     /**
      * Verifies that the success message 'Classroom attendance marked successfully.' is displayed.
     **/
     async verifyAttendanceMarkedSuccessfully() {
-        await this.verifyVisible(this.page.getByText('Classroom attendance marked successfully.', { exact: true }));
+        await test.step('Verify "Classroom attendance marked successfully." message', async () => {
+            await this.verifyVisible(this.page.getByText('Classroom attendance marked successfully.', { exact: true }));
+        });
     }
-
 }
+
