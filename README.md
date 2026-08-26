@@ -138,45 +138,62 @@ These commands use `npx cross-env` to work universally across **macOS, Linux, Wi
 
 ---
 
-### 5. Interactive UI Dashboard
+### 5. Interactive UI Dashboard & Debugger
 
-Playwright's interactive runner with live DOM inspection, time travel, and watch mode:
-```bash
-npx playwright test --ui
-```
+- **Interactive UI Runner:**
+  Playwright's interactive runner with live DOM inspection, time travel, and watch mode:
+  ```bash
+  npm run test:ui
+  # or
+  npx playwright test --ui
+  ```
+
+- **Playwright Debug Mode (Step-by-Step Inspector):**
+  Pauses execution at breakpoints and opens the Playwright Inspector:
+  ```bash
+  npm run test:debug
+  # or
+  npx playwright test --debug
+  ```
 
 ---
 
 ## 📊 Viewing Test Reports & Traces
 
 ### 1. View Playwright HTML Report
-The HTML report opens automatically after execution, but can also be opened manually:
+The Playwright HTML report can be opened manually:
 ```bash
 npx playwright show-report
 ```
 
 ### 2. View Allure Reports
-Allure results are automatically generated in `allure-results/` during every test execution.
+Allure results are automatically generated in `allure-results/` and timestamped HTML reports are saved in `allure-reports/` upon test execution completion.
 
-- **Generate and open Allure HTML Report in one step (Live Server):**
+- **Open the Latest Allure Report (Recommended):**
+  Opens the most recent timestamped report in `allure-reports/` (or `allure-report/`):
+  ```bash
+  npm run allure:open
+  ```
+
+- **Generate and Serve Live Report directly from `allure-results`:**
   ```bash
   npm run allure:serve
   # or
   npx allure serve allure-results
   ```
 
-- **Generate static Allure Report folder:**
+- **Generate Static Allure Report:**
   ```bash
   npm run allure:generate
   # or
   npx allure generate allure-results --clean -o allure-report
   ```
 
-- **Open previously generated static Allure Report:**
+- **Open a Specific Static Report Manually:**
   ```bash
-  npm run allure:open
-  # or
   npx allure open allure-report
+  # or for a specific timestamped report:
+  npx allure open allure-reports/<report_folder_name>
   ```
 
 ### 3. Inspect Failure Traces
@@ -187,21 +204,67 @@ npx playwright show-trace test-results/<path-to-trace.zip>
 
 ---
 
+## ⚡ Quick NPM Scripts Reference
+
+| NPM Script | Command | Purpose |
+|---|---|---|
+| `npm run test:headless` | `cross-env HEADLESS=true npx playwright test` | Run all tests in headless mode (1920x1080) |
+| `npm run test:headed` | `cross-env HEADLESS=false npx playwright test` | Run all tests in maximized UI/headed mode |
+| `npm run test:failed:headless` | `cross-env HEADLESS=true npx playwright test --last-failed` | Re-run failed tests headlessly |
+| `npm run test:failed:headed` | `cross-env HEADLESS=false npx playwright test --last-failed` | Re-run failed tests in headed mode |
+| `npm run test:ui` | `npx playwright test --ui` | Launch Playwright Interactive UI dashboard |
+| `npm run test:debug` | `npx playwright test --debug` | Run tests with Playwright Inspector |
+| `npm run allure:open` | `node scripts/open-latest-allure.js` | Open the latest generated Allure report in browser |
+| `npm run allure:serve` | `allure serve allure-results` | Serve live Allure report from raw results |
+| `npm run allure:generate` | `allure generate allure-results --clean -o allure-report` | Compile results to static Allure HTML report |
+
+---
+
+## 🛠️ Framework Utilities & Helpers (`utils/`)
+
+The framework includes built-in helper modules located in `utils/` for handling complex automation tasks:
+
+- **`BasePage.js`**: Core page object wrapper providing robust click, fill, dropdown selection, wait utilities, and table interaction methods.
+- **`EmailHelper.js`**: Built on `imapflow` and `mailparser` to programmatically connect to IMAP mailboxes, search emails, and extract OTPs / password reset links.
+- **`PdfHelper.js`**: Utilizes `pdf-to-img` to convert and verify PDF reports and roster downloads.
+- **`ExcelHelper.js`**: Reads and parses data from downloaded or fixture Excel sheets.
+- **`TestDataGenerator.js`**: Generates unique dynamic test data (names, emails, phone numbers, timestamps, addresses) for isolated test runs.
+- **`global-setup.js`**: Runs before tests begin to cleanly clear previous Allure raw results.
+- **`global-teardown.js`**: Runs after all tests finish to compile a timestamped Allure HTML report in `allure-reports/` and launch it in the default browser.
+
+---
+
 ## 📁 Project Structure
 
 ```text
 ClientPlaywrightFramework/
-├── config/                  # Global environment variables and base URLs
-├── pages/                   # Page Object Models
-│   ├── AdminApplication/       # Admin portal pages (Scheduling, Billing, Classroom, etc.)
-│   ├── OnlineEnrollmentApplication/ # Public enrollment flows (Adult, Teen, etc.)
-│   ├── StaffApplication/       # Staff portal pages (Attendance, Evaluations, Home)
-│   └── StudentApplication/     # Student portal pages (Login, Profile, Password Reset)
-├── test-data/               # JSON fixtures and test assets
-├── tests/                   # Test specifications grouped by module
-├── screenshots/             # Captured screenshots
-├── playwright-report/       # Generated HTML test reports
-├── test-results/            # Execution artifacts (traces, error logs)
-├── playwright.config.js     # Global Playwright configuration
-└── package.json             # NPM package scripts and dependencies
+├── config/                      # Global environment configurations & base URLs (config.js)
+├── pages/                       # Page Object Models (POM)
+│   ├── AdminApplication/           # Admin portal pages (Scheduling, Billing, Classroom, etc.)
+│   ├── OnlineEnrollmentApplication/ # Public enrollment flows (Adult, Teen, RT, WT)
+│   ├── StaffApplication/           # Staff portal pages (Attendance, Evaluations, Home)
+│   └── StudentApplication/         # Student portal pages (Login, Profile, Password Reset)
+├── scripts/                     # Helper automation scripts
+│   └── open-latest-allure.js       # Finds and launches the most recent Allure report
+├── test-data/                   # JSON fixtures and test assets (logins, student data, images)
+├── tests/                       # Test specifications grouped by application module
+│   ├── AdminApplication/           # Admin portal test specs
+│   ├── OnlineEnrollmentApplication/ # Online enrollment test specs
+│   ├── StaffApplication/           # Staff portal test specs
+│   └── StudentApplication/         # Student portal test specs
+├── utils/                       # Framework helpers & global hooks
+│   ├── BasePage.js                 # Reusable Playwright interaction methods
+│   ├── EmailHelper.js              # IMAP email extraction & OTP verification
+│   ├── ExcelHelper.js              # Excel parsing utility
+│   ├── PdfHelper.js                # PDF verification & conversion utility
+│   ├── TestDataGenerator.js        # Dynamic test data generator
+│   ├── global-setup.js             # Pre-test run setup & report cleanup
+│   └── global-teardown.js          # Post-test report generation & auto-open
+├── allure-reports/              # Timestamped Allure HTML reports (report_YYYY-MM-DD_HH-mm-ss)
+├── allure-results/              # Raw Allure execution result files
+├── screenshots/                 # Captured test screenshots
+├── playwright-report/           # Generated Playwright HTML test reports
+├── test-results/                # Execution artifacts (traces, error logs)
+├── playwright.config.js         # Global Playwright configuration
+└── package.json                 # NPM package scripts and dependencies
 ```
