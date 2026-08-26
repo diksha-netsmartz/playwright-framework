@@ -1,5 +1,5 @@
-import {test} from '@playwright/test';
-import OnlineEnrollmentPage from '../../pages/OnlineEnrollmentApplication/RTStudentOnlineEnrollmentPage';
+import { test } from '@playwright/test';
+import OnlineEnrollmentPage from '../../pages/OnlineEnrollmentApplication/OnlineEnrollmentPage';
 
 
 /**
