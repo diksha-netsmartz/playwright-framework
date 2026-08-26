@@ -143,6 +143,9 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.click(this.showAppointmentButton);
             await this.waitForVisible(this.selectButton);
             await this.click(this.selectButton);
+            if (await this.isVisible(this.continueButton), { timeout: 2000 }) {
+                await this.click(this.continueButton);
+            }
             await this.waitForLoaders().catch(() => { });
         });
     }

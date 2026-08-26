@@ -71,7 +71,7 @@ module.exports = defineConfig({
      *   - 1, 2, 3 (number of retry attempts).
      * Why: Helps eliminate false negatives caused by intermittent network glitches or slow server responses.
      */
-    // retries: 2,
+    retries: 2,
 
     /**
      * reporter: Defines test execution reporting format and behavior.
