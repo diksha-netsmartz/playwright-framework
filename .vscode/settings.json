@@ -1,0 +1,8 @@
+{
+  "javascript.validate.enable": true,
+  "js/ts.implicitProjectConfig.checkJs": true,
+  "javascript.suggest.autoImports": true,
+  "typescript.suggest.autoImports": true,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true
+}

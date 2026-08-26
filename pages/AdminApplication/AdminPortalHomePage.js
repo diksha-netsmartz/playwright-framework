@@ -58,20 +58,10 @@ export default class AdminPortalHomePage extends BasePage {
         this.accountManagementMenu = page.getByRole('link', { name: /Account Management/i });
         this.servicesSubMenu = page.locator("xpath=//li[@id='li_SetupSettings']//strong[text()='Services']");
         this.componentsProductsLink = page.locator('a').filter({ hasText: 'Components (Products)' });
+        this.feesLink = page.locator("#studentaccount_Fees_li");
     }
 
 
-    /**
-     * Navigates directly to the Admin Home/Dashboard URL (using captured session URL).
-     **/
-    async navigateToHomePage() {
-        await test.step('Navigate to Admin Home/Dashboard', async () => {
-            const homeUrl = SessionHelper.getHomeUrl('admin') || config.baseURL;
-            await this.navigate(homeUrl);
-            await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 75000 });
-        });
-    }
 
     /**
      * Returns a dynamic locator for a specific report category link in the Report Center.
@@ -253,6 +243,30 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForVisible(this.componentsProductsLink);
             await this.click(this.componentsProductsLink);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 });
+
+            await this.verifyTitle("Service Management");
+        });
+    }
+
+    /**
+     * Navigates to Account Management > Services > Fees page.
+     **/
+    async navigateToFees() {
+        await test.step('Navigate to Account Management -> Services -> Fees', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.accountManagementMenu);
+            await this.click(this.accountManagementMenu);
+
+            await this.waitForVisible(this.servicesSubMenu);
+            await this.click(this.servicesSubMenu);
+
+            await this.waitForVisible(this.feesLink);
+            await this.click(this.feesLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 });
+
+            await this.verifyTitle("Service Management");
         });
     }
 }
