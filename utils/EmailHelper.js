@@ -1,6 +1,6 @@
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
-import gmailAccount from '../test-data/gmailAccount.json';
+import gmailAccount from '../test-data/json/gmailAccount.json';
 
 export default class EmailHelper {
     /**
@@ -64,6 +64,9 @@ export default class EmailHelper {
                         for (let i = messages.length - 1; i >= 0; i--) {
                             const messageId = messages[i];
                             const fetched = await client.fetchOne(messageId, { source: true });
+                            if (!fetched || !fetched.source) {
+                                continue;
+                            }
                             const parsed = await simpleParser(fetched.source);
 
                             const subject = parsed.subject || '';

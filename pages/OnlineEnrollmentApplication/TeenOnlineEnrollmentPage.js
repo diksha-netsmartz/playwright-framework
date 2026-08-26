@@ -1,7 +1,7 @@
 import BasePage from '../../utils/BasePage';
 import { expect, test } from '@playwright/test';
 import config from '../../config/config';
-import oeData from '../../test-data/onlineEnrollmentData.json';
+import oeData from '../../test-data/json/onlineEnrollmentData.json';
 import PdfHelper from '../../utils/PdfHelper';
 
 /**
@@ -116,13 +116,13 @@ export default class TeenOnlineEnrollmentPage extends BasePage {
         await test.step('Select Date of Birth', async () => {
             await this.click(this.dobYearDdl);
             await this.waitForVisible(this.yearSelectionInDropdown);
-            await this.page.evaluate(el => el.click(), await this.yearSelectionInDropdown.elementHandle());
+            await this.jsClick(this.yearSelectionInDropdown);
             await this.click(this.dobDayDdl);
             await this.waitForVisible(this.daySelectionInDropdown);
-            await this.page.evaluate(el => el.click(), await this.daySelectionInDropdown.elementHandle());
+            await this.jsClick(this.daySelectionInDropdown);
             await this.click(this.dobMonthDdl);
             await this.waitForVisible(this.monthSelectionInDropdown);
-            await this.page.evaluate(el => el.click(), await this.monthSelectionInDropdown.elementHandle());
+            await this.jsClick(this.monthSelectionInDropdown);
         });
     }
 
@@ -153,37 +153,37 @@ export default class TeenOnlineEnrollmentPage extends BasePage {
             await this.fill(this.emergencyPhoneTxt, data.emergencyPhone);
             await this.selectDOB();
             await this.click(this.highSchoolDropdown);
-            await this.page.evaluate(el => el.click(), await this.highSchoolDropdownSelection.elementHandle());
+            await this.jsClick(this.highSchoolDropdownSelection);
             await this.click(this.wearGlassesDropdown);
-            await this.page.evaluate(el => el.click(), await this.wearGlassesDropdownSelection.elementHandle());
-            await this.page.evaluate(el => el.click(), await this.femaleRadioButton.elementHandle());
+            await this.jsClick(this.wearGlassesDropdownSelection);
+            await this.jsClick(this.femaleRadioButton);
             await this.fill(this.medicalConditionsTxt, data.medicalConditions);
             await this.click(this.howDidYouHearAbtUsDropdown);
-            await this.page.evaluate(el => el.click(), await this.howDidYouHearAbtUsDropdownSelection.elementHandle());
+            await this.jsClick(this.howDidYouHearAbtUsDropdownSelection);
             await this.fill(this.permitNumberTxt, data.permitNumber);
             await this.fill(this.collegeIdTxt, data.collegeId);
-            await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
+            await this.jsClick(this.permitIssuedDateCalendarIcon);
             await this.page.waitForTimeout(1000);
             try {
                 await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
             } catch {
                 console.log("calendar not opened, opening again");
-                await this.page.evaluate(el => el.click(), await this.permitIssuedDateCalendarIcon.elementHandle());
+                await this.jsClick(this.permitIssuedDateCalendarIcon);
                 await this.permitIssueDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
             }
             await this.click(this.permitIssueDateSelectInCalendar);
 
-            await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
+            await this.jsClick(this.permitExpirationDateCalendarIcon);
             await this.page.waitForTimeout(1000);
             try {
                 await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
             } catch {
                 console.log("calendar not opened, opening again");
-                await this.page.evaluate(el => el.click(), await this.permitExpirationDateCalendarIcon.elementHandle());
+                await this.jsClick(this.permitExpirationDateCalendarIcon);
                 await this.permitExpireDateSelectInCalendar.waitFor({ state: "visible", timeout: 2000 });
             }
             await this.click(this.permitExpireDateSelectInCalendar);
-            await this.page.evaluate(el => el.click(), await this.termsConditionsCheckbox.elementHandle());
+            await this.jsClick(this.termsConditionsCheckbox);
             await this.fill(this.addressTxt, "ny");
             await this.fill(this.zipCodeTxt, data.zipCode);
         });

@@ -41,6 +41,14 @@ export default class BasePage {
     }
 
     /**
+     * Performs a JavaScript DOM click directly on an element in browser context.
+     * @param {import('@playwright/test').Locator} locator - Target element locator.
+     */
+    async jsClick(locator) {
+        await locator.evaluate((/** @type {HTMLElement} */ el) => el.click());
+    }
+
+    /**
      * Fills an input or textarea element with a text value.
      * @param {import('@playwright/test').Locator} locator - Target element locator.
      * @param {string} value - Text value to input.
@@ -178,21 +186,23 @@ export default class BasePage {
 
     /**
      * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
+     * @param {number} [timeout=30000] - Optional timeout in milliseconds.
      */
-    async waitForLoaders() {
+    async waitForLoaders(timeout = 30000) {
         await this.page.waitForFunction(() => {
-            const loaders = document.querySelectorAll('.load-area');
+            const loaders = Array.from(document.querySelectorAll('.load-area'));
             if (loaders.length === 0) return true;
-            return Array.from(loaders).every(el => {
+            return loaders.every(node => {
+                const el = /** @type {HTMLElement} */ (node);
                 const style = window.getComputedStyle(el);
                 return (
                     style.display === 'none' ||
                     style.visibility === 'hidden' ||
                     el.offsetParent === null ||
-                    el.style.display === 'none'
+                    (el.style && el.style.display === 'none')
                 );
             });
-        });
+        }, { timeout }).catch(() => { });
     }
 
     /**
