@@ -53,6 +53,8 @@ export default class AdminLoginPage extends BasePage {
             await this.verifyTitle("Home Page");
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 75000 });
+
+            await this.closeMobilePopup();
         });
     }
 
@@ -61,9 +63,12 @@ export default class AdminLoginPage extends BasePage {
     **/
     async closeMobilePopup() {
         await test.step('Close mobile number popup if present', async () => {
-            await this.verifyVisible(this.mobilePopUp);
-            await this.verifyVisible(this.mobilePopupCloseButton);
-            await this.click(this.mobilePopupCloseButton);
+            if (await this.mobilePopUp.isVisible().catch(() => false)) {
+                await this.verifyVisible(this.mobilePopUp);
+                await this.verifyVisible(this.mobilePopupCloseButton);
+                await this.click(this.mobilePopupCloseButton);
+                await this.waitForHidden(this.mobilePopupCloseButton);
+            }
         });
     }
 

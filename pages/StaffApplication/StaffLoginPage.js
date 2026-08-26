@@ -18,6 +18,8 @@ export default class StaffLoginPage extends BasePage {
         this.usernameTxt = page.getByRole('textbox', { name: 'Username' });
         this.passwordTxt = page.getByRole('textbox', { name: 'Password' });
         this.loginBtn = page.getByRole('button', { name: 'Login' });
+        this.mobilePopUp = page.getByText('No mobile number on file.');
+        this.mobilePopupCloseButton = page.locator('.close.closemodalphone');
     }
 
     /**
@@ -43,6 +45,22 @@ export default class StaffLoginPage extends BasePage {
             await this.verifyTitle("Staff Home");
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 75000 });
+
+            await this.closeMobilePopup();
+        });
+    }
+
+    /**
+     * Closes the 'No mobile number on file' modal popup if it appears after login.
+    **/
+    async closeMobilePopup() {
+        await test.step('Close mobile number popup if present', async () => {
+            if (await this.mobilePopUp.isVisible().catch(() => false)) {
+                await this.verifyVisible(this.mobilePopUp);
+                await this.verifyVisible(this.mobilePopupCloseButton);
+                await this.click(this.mobilePopupCloseButton);
+                await this.waitForHidden(this.mobilePopupCloseButton);
+            }
         });
     }
 }
