@@ -30,7 +30,7 @@ Follow these steps if you are setting up this project on a brand-new computer:
 
 ### Step 3 (Optional for Allure Reports): Install Java (JDK 8+)
 - *Allure HTML reporting requires Java runtime (JDK/JRE).*
-- **Windows:** Download and install OpenJDK (e.g. from [adoptium.net](https://adoptium.net/) or [oracle.com](https://www.oracle.com/java/technologies/downloads/)).
+- **Windows:** Download and install OpenJDK from [oracle.com](https://www.oracle.com/java/technologies/downloads/).
 - Verify Java installation:
   ```bash
   java -version
