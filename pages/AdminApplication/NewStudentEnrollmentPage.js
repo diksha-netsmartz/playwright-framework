@@ -26,7 +26,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.addButton = page.locator("xpath=//button[text()='Add' and contains(@onclick,'showSelect(this);')]").first();
         this.addButtonForAdditionalDetails = page.locator("xpath=(//td[text()='Fee']//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')])[1]");
         this.addToCartButton = page.getByRole('button', { name: 'Add To Cart' });
-        this.closeButton = page.locator("xpath=//h4[text()='Class Selection']//ancestor::div[contains(@class,'modal-content')]//button[text()='Close']");
+        this.skipSelectionButton = page.locator("xpath=//h4[text()='Class Selection']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
         this.dobDisabledTextbox = page.locator("xpath=//input[@id='txtDate' and @disabled='disabled']");
 
         // Student Information
@@ -134,17 +134,20 @@ export default class NewStudentEnrollmentPage extends BasePage {
 
     /**
      * Enters default DOB (12/12/2000), filters available slots, selects, and adds to cart.
+     * If the DOB textbox is disabled, skips class selection.
     **/
     async selectDOB() {
         await test.step('Select DOB in package selector and add to cart', async () => {
+            const dobTextbox = this.page.getByRole('textbox', { name: 'MM/DD/YYYY' });
+            const isTextboxDisabled = await dobTextbox.isDisabled().catch(() => false) ||
+                await this.isVisible(this.dobDisabledTextbox).catch(() => false);
 
-            if (this.isVisible(this.dobDisabledTextbox)) {
-                await this.waitForVisible(this.closeButton);
-                await this.click(this.closeButton);
-                await this.waitForHidden(this.closeButton);
-            }
-            else {
-                await this.fill(this.page.getByRole('textbox', { name: 'MM/DD/YYYY' }), "12/12/2000");
+            if (isTextboxDisabled) {
+                await this.waitForVisible(this.skipSelectionButton);
+                await this.click(this.skipSelectionButton);
+                await this.waitForHidden(this.skipSelectionButton);
+            } else {
+                await this.fill(dobTextbox, "12/12/2000");
                 await this.click(this.filterButton);
                 await this.click(this.selectButton);
                 await this.click(this.addButton);
@@ -154,16 +157,19 @@ export default class NewStudentEnrollmentPage extends BasePage {
     }
 
     async selectDOBForPackage() {
-        if (await this.isVisible(this.packageProceedButton)) {
+        await test.step('Select Date of Birth details', async () => {
 
-            await this.click(this.packageDobMonthDropdown);
-            await this.click(this.packageDobMonth);
-            await this.click(this.packageDobDayDropdown);
-            await this.click(this.packageDobDay);
-            await this.click(this.packageDobYearDropdown);
-            await this.click(this.packageDobYear);
-            await this.click(this.packageProceedButton);
-        }
+            if (await this.isVisible(this.packageProceedButton)) {
+
+                await this.click(this.packageDobMonthDropdown);
+                await this.click(this.packageDobMonth);
+                await this.click(this.packageDobDayDropdown);
+                await this.click(this.packageDobDay);
+                await this.click(this.packageDobYearDropdown);
+                await this.click(this.packageDobYear);
+                await this.click(this.packageProceedButton);
+            }
+        });
 
     }
 
@@ -200,7 +206,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 case 'RT Package':
                     await this.click(this.selectButton);
                     await this.click(this.addButton);
-                    await this.click(this.addToCartButton);
+                    // await this.click(this.addToCartButton);
                     await this.addAdditionalDetails();
                     break;
                 case 'BTW Package':
