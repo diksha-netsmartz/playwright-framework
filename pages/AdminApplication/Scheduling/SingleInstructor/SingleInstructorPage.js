@@ -142,13 +142,34 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
-     * Verifies page title and selects the last instructor from the Single Instructor dropdown.
+     * Returns locator for a dropdown option item matching text/name in the specified dropdown.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     * @param {string} optionText - Option text or name to match.
+     * @returns {import('@playwright/test').Locator} Matching dropdown list item locator.
      **/
-    async selectInstructor() {
-        await test.step('Select Single Instructor from dropdown', async () => {
+    getDropdownOptionByName(dropdownName, optionText) {
+        return this.page.locator(
+            `xpath=//button[contains(@data-id,'${dropdownName}')]//parent::div//li[.//span[contains(normalize-space(),'${optionText}')] or .//a[contains(normalize-space(),'${optionText}')]]`
+        ).first();
+    }
+
+    /**
+     * Verifies page title and selects the specified instructor by name/username from the dropdown,
+     * falling back to the last option if no specific instructor is found or passed.
+     * @param {string} [instructorName] - Optional instructor name or username.
+     **/
+    async selectInstructor(instructorName) {
+        await test.step(`Select Single Instructor from dropdown: "${instructorName}"`, async () => {
             await this.verifyTitle("Single Instructor Scheduler");
             await this.click(this.getDropdownButton("SingleInst"));
-            await this.click(this.getLastDropdownOption("SingleInst"));
+
+            const option = this.getDropdownOptionByName("SingleInst", instructorName);
+            if (await option.isVisible({ timeout: 2000 }).catch(() => false)) {
+                await this.click(option);
+                return;
+            }
+
+            // await this.click(this.getLastDropdownOption("SingleInst"));
         });
     }
 

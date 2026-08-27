@@ -42,8 +42,7 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
         await enrollmentPage.enrollNewStudent({
             packageName: createAppointmentData.packageConfig.packageName,
             fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
-            studentData: student1,
-            selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+            studentData: student1
         });
         await enrollmentPage.closeEnrollmentConfirmationPopup();
     });
@@ -53,15 +52,14 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
         await enrollmentPage.enrollNewStudent({
             packageName: createAppointmentData.packageConfig.packageName,
             fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
-            studentData: student2,
-            selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+            studentData: student2
         });
         await enrollmentPage.closeEnrollmentConfirmationPopup();
     });
 
     await test.step('Step 5: Navigate to Scheduling > Single Instructor and select schedule', async () => {
         await homePage.navigateToSingleInstructor();
-        await instructorPage.selectInstructor();
+        await instructorPage.selectInstructor(credentials.staffUser.username);
         await instructorPage.getSchedule();
     });
 

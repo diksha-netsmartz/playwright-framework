@@ -42,8 +42,7 @@ test("TC_003: C-admin > Scheduling - Verify that the appt is getting deleted", {
         await enrollmentPage.enrollNewStudent({
             packageName: createAppointmentData.packageConfig.packageName,
             fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
-            studentData: student1,
-            selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+            studentData: student1
         });
         await enrollmentPage.closeEnrollmentConfirmationPopup();
     });
@@ -53,8 +52,7 @@ test("TC_003: C-admin > Scheduling - Verify that the appt is getting deleted", {
         await enrollmentPage.enrollNewStudent({
             packageName: createAppointmentData.packageConfig.packageName,
             fillInfoMethod: createAppointmentData.packageConfig.fillInfoMethod,
-            studentData: student2,
-            selectDOBInDetails: createAppointmentData.packageConfig.selectDOBInDetails
+            studentData: student2
         });
         await enrollmentPage.closeEnrollmentConfirmationPopup();
     });
@@ -64,7 +62,7 @@ test("TC_003: C-admin > Scheduling - Verify that the appt is getting deleted", {
     });
 
     await test.step('Step 6 & 7: Select instructor and click Get Schedule', async () => {
-        await instructorPage.selectInstructor();
+        await instructorPage.selectInstructor(credentials.staffUser.username);
         await instructorPage.getSchedule();
     });
 
