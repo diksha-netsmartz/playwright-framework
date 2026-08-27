@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import AdminLoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import AdminPortalHomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import StudentProfilePage from '../../pages/AdminApplication/StudentProfilePage';
+import StudentProfilePage from '../../pages/AdminApplication/StudentAccount/StudentProfilePage';
 import StudentResetPasswordPage from '../../pages/StudentApplication/StudentResetPasswordPage';
 import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
 import EmailHelper from '../../utils/EmailHelper';

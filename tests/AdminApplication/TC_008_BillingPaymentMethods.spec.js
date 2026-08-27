@@ -1,7 +1,7 @@
 import {test} from '@playwright/test';
 
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import EnrollmentBillingPage from '../../pages/AdminApplication/EnrollmentBillingPage';
+import EnrollmentBillingPage from '../../pages/AdminApplication/StudentAccount/EnrollmentBillingPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage'
 import login from "../../test-data/json/login.json";
 import studentData from "../../test-data/json/studentData.json"

@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import NewClassroomPage from '../../pages/AdminApplication/NewClassroomPage';
+import NewClassPage from '../../pages/AdminApplication/Classroom/NewClassPage';
 import login from '../../test-data/json/login.json';
 import classroomData from '../../test-data/json/classroomData.json';
 
@@ -14,7 +14,7 @@ import classroomData from '../../test-data/json/classroomData.json';
 test('TC_024: C-admin > Classroom > New Class - Add Single Session Class', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
-  const newClassroomPage = new NewClassroomPage(page);
+  const newClassPage = new NewClassPage(page);
 
   const credentials = login[process.env.ENV || 'coreServer2'];
 
@@ -28,7 +28,7 @@ test('TC_024: C-admin > Classroom > New Class - Add Single Session Class', async
   });
 
   await test.step('Step 3: Fill all Single-Session Classroom fields and submit', async () => {
-    await newClassroomPage.createSingleSessionClassroom(classroomData);
+    await newClassPage.createSingleSessionClassroom(classroomData);
   });
 });
 

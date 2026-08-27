@@ -1,17 +1,17 @@
-import BasePage from '../../utils/BasePage';
+import BasePage from '../../../utils/BasePage';
 import { expect, test } from '@playwright/test';
-import PdfHelper from '../../utils/PdfHelper';
-import ExcelHelper from '../../utils/ExcelHelper';
+import PdfHelper from '../../../utils/PdfHelper';
+import ExcelHelper from '../../../utils/ExcelHelper';
 
 /**
  * Page Object representing the Classroom Attendance Page in Admin Portal.
  * Handles selecting sessions, adding students, marking attendance (Present/Absent),
  * handling file upload prompts, and verifying attendance submission.
  **/
-export default class AdminClassroomAttendancePage extends BasePage {
+export default class ClassroomAttendancePage extends BasePage {
 
     /**
-     * Initializes locators for the Admin Classroom Attendance Page.
+     * Initializes locators for the Classroom Attendance Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
      **/
     constructor(page) {

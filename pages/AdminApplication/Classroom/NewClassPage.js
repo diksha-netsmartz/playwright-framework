@@ -1,4 +1,4 @@
-import BasePage from '../../utils/BasePage';
+import BasePage from '../../../utils/BasePage';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -6,10 +6,10 @@ import { expect, test } from '@playwright/test';
  * Handles selecting session type, services, status, location, dates, session times,
  * instructors, availability checks, notes, and saving new multi-session classrooms.
  **/
-export default class NewClassroomPage extends BasePage {
+export default class NewClassPage extends BasePage {
 
     /**
-     * Initializes locators for the New Classroom Page.
+     * Initializes locators for the New Class Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
      **/
     constructor(page) {

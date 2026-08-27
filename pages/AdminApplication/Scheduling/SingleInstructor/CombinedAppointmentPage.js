@@ -428,7 +428,8 @@ export default class CombinedAppointmentPage extends BasePage {
         await test.step('Submit Combined Appointment and verify confirmation', async () => {
             await this.click(this.submitButton);
             await this.click(this.confirmYesButton);
-            await this.page.waitForTimeout(2500);
+            await this.waitForLoaders();
+            await this.page.waitForTimeout(1500);
 
             if (await this.isVisible(this.submitButtonPopup)) {
                 await this.click(this.submitButtonPopup);

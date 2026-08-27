@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import NewClassroomPage from '../../pages/AdminApplication/NewClassroomPage';
+import NewClassPage from '../../pages/AdminApplication/Classroom/NewClassPage';
 import login from '../../test-data/json/login.json';
 import classroomData from '../../test-data/json/classroomData.json';
 
@@ -14,7 +14,7 @@ import classroomData from '../../test-data/json/classroomData.json';
 test('TC_023: C-admin > Classroom > New Class - Add Multi Session Classroom', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
-  const newClassroomPage = new NewClassroomPage(page);
+  const newClassPage = new NewClassPage(page);
 
   const credentials = login[process.env.ENV || 'coreServer2'];
 
@@ -28,6 +28,6 @@ test('TC_023: C-admin > Classroom > New Class - Add Multi Session Classroom', as
   });
 
   await test.step('Step 3: Fill all Multi-Session Classroom fields and submit', async () => {
-    await newClassroomPage.createMultiSessionClassroom(classroomData);
+    await newClassPage.createMultiSessionClassroom(classroomData);
   });
 });

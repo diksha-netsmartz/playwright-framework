@@ -2,7 +2,7 @@ import {test} from '@playwright/test';
 
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import BulkAppointmentPage from '../../pages/AdminApplication/Scheduling/BulkAppointmentPage';
+import BulkAppointmentPage from '../../pages/AdminApplication/Scheduling/ManageTimeSlots/BulkAppointmentPage';
 import login from '../../test-data/json/login.json';
 
 /**

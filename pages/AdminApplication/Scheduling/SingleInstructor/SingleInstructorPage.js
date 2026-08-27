@@ -25,6 +25,7 @@ export default class SingleInstructorPage extends BasePage {
 
         // Buttons
         this.getScheduleBtn = page.getByRole("button", { name: "Get Schedule" });
+        this.singleInstructorTextbox = page.locator("xpath=//button[contains(@data-id,'SingleInst')]//parent::div//input[@type='text']");
 
         this.appointmentConfirmed = page.locator("xpath=//div[@data-statuss1='Confirmed' and @data-types='Appointment']");
 
@@ -162,14 +163,16 @@ export default class SingleInstructorPage extends BasePage {
         await test.step(`Select Single Instructor from dropdown: "${instructorName}"`, async () => {
             await this.verifyTitle("Single Instructor Scheduler");
             await this.click(this.getDropdownButton("SingleInst"));
-
+            await this.waitForVisible(this.singleInstructorTextbox);
             const option = this.getDropdownOptionByName("SingleInst", instructorName);
+            await this.fill(this.singleInstructorTextbox, instructorName);
+
             if (await option.isVisible({ timeout: 2000 }).catch(() => false)) {
                 await this.click(option);
                 return;
             }
 
-            // await this.click(this.getLastDropdownOption("SingleInst"));
+            await this.waitForLoaders();
         });
     }
 
