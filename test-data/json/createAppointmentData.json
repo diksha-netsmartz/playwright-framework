@@ -1,8 +1,7 @@
 {
   "packageConfig": {
     "packageName": "BTW and CR Package",
-    "fillInfoMethod": "fillTeenStudentInformation",
-    "selectDOBInDetails": false
+    "fillInfoMethod": "fillTeenStudentInformation"
   },
   "student1": {
     "pickup": "test PU1231",

@@ -24,8 +24,10 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.filterButton = page.getByRole('button', { name: 'Filter' });
         this.selectButton = page.locator("xpath=//a[text()='Select' and @onclick='showAddButton(this);']").first();
         this.addButton = page.locator("xpath=//button[text()='Add' and contains(@onclick,'showSelect(this);')]").first();
-        this.addButtonForAdditionalDetails = page.locator("xpath=//td[text()='Fee']//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')]").first();
+        this.addButtonForAdditionalDetails = page.locator("xpath=(//td[text()='Fee']//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')])[1]");
         this.addToCartButton = page.getByRole('button', { name: 'Add To Cart' });
+        this.closeButton = page.locator("xpath=//h4[text()='Class Selection']//ancestor::div[contains(@class,'modal-content')]//button[text()='Close']");
+        this.dobDisabledTextbox = page.locator("xpath=//input[@id='txtDate' and @disabled='disabled']");
 
         // Student Information
         this.studentInformationType = page.getByRole('button', { name: 'Student Information Type' });
@@ -92,6 +94,16 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.assignToLocationDropdownSelection = page.locator("xpath=(//button[contains(@data-id,'AssignToLocation')]//parent::div//span[contains(text(),'Location')])[1]");
         this.assignToStaffDropdown = page.locator("xpath=//button[contains(@data-id,'AssignToStaff')]//span[text()='Please Select']");
         this.assignToStaffDropdownSelection = page.locator("xpath=(//button[contains(@data-id,'AssignToStaff')]//parent::div//li)[last()]");
+
+        //package selection date of birth popup
+        this.packageDobMonthDropdown = page.locator("button[data-id='ddlDOMMonths']")
+        this.packageDobMonth = page.locator("xpath=//button[@data-id='ddlDOMMonths']//following-sibling::div//a//span[text()='Jun']");
+        this.packageDobDayDropdown = page.locator("button[data-id='ddlDOBDays']")
+        this.packageDobDay = page.locator("xpath=//button[@data-id='ddlDOBDays']//following-sibling::div//a//span[text()='01']");
+        this.packageDobYearDropdown = page.locator("button[data-id='ddlDOMYears']")
+        this.packageDobYear = page.locator("xpath=//button[@data-id='ddlDOMYears']//following-sibling::div//a//span[text()='2006']");
+        this.packageProceedButton = page.locator("#btnServiceForCertificationProceedForPack")
+
     }
 
     /**
@@ -100,6 +112,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
     **/
     async selectPackage(packageName) {
         await test.step(`Select package: "${packageName}"`, async () => {
+            await this.waitForVisible(this.packageSelectionButton);
             await this.click(this.packageSelectionButton);
             if (packageName === 'RT Package') {
                 await this.click(this.rtPackageOption);
@@ -124,12 +137,34 @@ export default class NewStudentEnrollmentPage extends BasePage {
     **/
     async selectDOB() {
         await test.step('Select DOB in package selector and add to cart', async () => {
-            await this.fill(this.page.getByRole('textbox', { name: 'MM/DD/YYYY' }), "12/12/2000");
-            await this.click(this.filterButton);
-            await this.click(this.selectButton);
-            await this.click(this.addButton);
-            await this.click(this.addToCartButton);
+
+            if (this.isVisible(this.dobDisabledTextbox)) {
+                await this.waitForVisible(this.closeButton);
+                await this.click(this.closeButton);
+                await this.waitForHidden(this.closeButton);
+            }
+            else {
+                await this.fill(this.page.getByRole('textbox', { name: 'MM/DD/YYYY' }), "12/12/2000");
+                await this.click(this.filterButton);
+                await this.click(this.selectButton);
+                await this.click(this.addButton);
+                await this.click(this.addToCartButton);
+            }
         });
+    }
+
+    async selectDOBForPackage() {
+        if (await this.isVisible(this.packageProceedButton)) {
+
+            await this.click(this.packageDobMonthDropdown);
+            await this.click(this.packageDobMonth);
+            await this.click(this.packageDobDayDropdown);
+            await this.click(this.packageDobDay);
+            await this.click(this.packageDobYearDropdown);
+            await this.click(this.packageDobYear);
+            await this.click(this.packageProceedButton);
+        }
+
     }
 
     /**
@@ -137,8 +172,11 @@ export default class NewStudentEnrollmentPage extends BasePage {
     **/
     async addAdditionalDetails() {
         await test.step('Add additional details fee to cart', async () => {
-            await this.click(this.addButtonForAdditionalDetails);
-            await this.click(this.addToCartButton);
+            await this.page.waitForTimeout(5000);
+            if (await this.isVisible(this.addButtonForAdditionalDetails, { timeout: 5000 })) {
+                await this.click(this.addButtonForAdditionalDetails);
+                await this.click(this.addToCartButton);
+            }
         });
     }
 
@@ -148,8 +186,10 @@ export default class NewStudentEnrollmentPage extends BasePage {
     **/
     async addPackage(packageName) {
         await test.step(`Configure and add package: "${packageName}"`, async () => {
+            await this.selectDOBForPackage();
             await this.selectPackage(packageName);
             await this.click(this.addPackageButton);
+            await this.waitForLoaders();
 
             switch (packageName) {
                 case 'BTW and CR Package':
@@ -398,12 +438,19 @@ export default class NewStudentEnrollmentPage extends BasePage {
     **/
     async selectDOBInStudentDetails() {
         await test.step('Select DOB in Student Details', async () => {
-            await this.click(this.dobMonthDropdown);
-            await this.click(this.dobMonth);
-            await this.click(this.dobDayDropdown);
-            await this.click(this.dobDay);
-            await this.click(this.dobYearDropdown);
-            await this.click(this.dobYear);
+            if (await this.isVisible(this.dobMonthDropdown)) {
+                const classAttr = await this.dobMonthDropdown.getAttribute('class') || '';
+                const isDisabled = classAttr.includes('disabled') || await this.dobMonthDropdown.isDisabled();
+
+                if (!isDisabled) {
+                    await this.click(this.dobMonthDropdown);
+                    await this.click(this.dobMonth);
+                    await this.click(this.dobDayDropdown);
+                    await this.click(this.dobDay);
+                    await this.click(this.dobYearDropdown);
+                    await this.click(this.dobYear);
+                }
+            }
         });
     }
 
@@ -438,14 +485,11 @@ export default class NewStudentEnrollmentPage extends BasePage {
      * @param {string} config.packageName - Name of package.
      * @param {string} [config.fillInfoMethod='fillTeenStudentInformation'] - Method to fill student details.
      * @param {Object} config.studentData - Student details.
-     * @param {boolean} [config.selectDOBInDetails=false] - Whether to select DOB in student details.
      */
-    async enrollNewStudent({ packageName = 'BTW and CR Package', fillInfoMethod = 'fillTeenStudentInformation', studentData, selectDOBInDetails = false }) {
+    async enrollNewStudent({ packageName = 'BTW and CR Package', fillInfoMethod = 'fillTeenStudentInformation', studentData }) {
         await this.addPackage(packageName);
         await this[fillInfoMethod](studentData);
-        if (selectDOBInDetails) {
-            await this.selectDOBInStudentDetails();
-        }
+        await this.selectDOBInStudentDetails();
         await this.save();
     }
 }

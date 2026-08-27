@@ -6,31 +6,27 @@ import login from "../../test-data/json/login.json";
 import studentData from "../../test-data/json/studentData.json";
 
 
-// Define the packages, their student information type, and specific requirements
+// Define the packages and their student information type
 const packageScenarios = [
     {
         packageName: 'BTW and CR Package',
-        selectDOBInDetails: false,
         fillInfoMethod: 'fillTeenStudentInformation',
     },
     {
         packageName: 'CR Package',
-        selectDOBInDetails: false,
         fillInfoMethod: 'fillRoadTestStudentInformation',
     },
     {
         packageName: 'RT Package',
-        selectDOBInDetails: true,
         fillInfoMethod: 'fillAdultStudentInformation',
     },
     {
         packageName: 'BTW Package',
-        selectDOBInDetails: true,
         fillInfoMethod: 'fillKnowledgeTestStudentInformation',
     },
 ];
 
-for (const { packageName, selectDOBInDetails, fillInfoMethod } of packageScenarios) {
+for (const { packageName, fillInfoMethod } of packageScenarios) {
     /**
      * TC_006: C-admin > New student enrollment
      * Test Case Title: Verify new student getting created and Packages are Enrolled.
@@ -58,9 +54,8 @@ for (const { packageName, selectDOBInDetails, fillInfoMethod } of packageScenari
 
         await test.step('Step 4: Select student information Type and fill student details', async () => {
             await enrollmentPage[fillInfoMethod](studentData.student1);
-            if (selectDOBInDetails) {
-                await enrollmentPage.selectDOBInStudentDetails();
-            }
+            await enrollmentPage.selectDOBInStudentDetails();
+
         });
 
         await test.step('Step 5: Click on Save button and verify student enrollment', async () => {
