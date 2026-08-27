@@ -18,6 +18,7 @@ test('TC_014: COE TEEN/ADULT/WT - Verify new student able to register', { tag: '
     for (const flow of enrollmentFlows) {
         await test.step(`Complete ${flow.name} Online Enrollment (BTW package, Pay later, verify receipt)`, async () => {
             await flow.navigate();
+            await oe.selectDOBForPackage();
             await oe.selectBTWPackage();
             await oe.fillStudentInfo(flow.prefix.toLowerCase());
             await oe.clickPayLater();

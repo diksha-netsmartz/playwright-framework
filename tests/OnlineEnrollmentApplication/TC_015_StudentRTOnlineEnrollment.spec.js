@@ -15,7 +15,8 @@ test('TC_015: COE RT - Verify new student able to register', { tag: '@smoke' }, 
         await onlineEnrollmentPage.navigateToRTOEPage();
     });
 
-    await test.step('Step 2: Select RT Package', async () => {
+    await test.step('Step 2: Select DOB and RT Package', async () => {
+        await onlineEnrollmentPage.selectDOBForPackage();
         await onlineEnrollmentPage.selectRTPackage();
     });
 

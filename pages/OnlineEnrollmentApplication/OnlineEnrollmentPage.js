@@ -61,6 +61,16 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.dobYearDdl = page.locator("xpath=//span[@aria-owns='int_DOB_Year_listbox']");
         this.yearSelectionInDropdown = page.locator("xpath=(//ul[@id='int_DOB_Year_listbox'])[last()]//li[text()='2009']");
 
+
+        this.dobMonthPackage = page.locator("xpath=//span[text()='Month']");
+        this.monthSelectionInDropdownPackage = page.locator("xpath=(//ul[contains(@id,'DOBMonths')])[last()]//li[text()='Feb']");
+        this.dobDayPackage = page.locator("xpath=//span[text()='Day']");
+        this.daySelectionInDropdownPackage = page.locator("xpath=(//ul[contains(@id,'DOBDays')])[last()]//li[text()='02']");
+        this.dobYearPackage = page.locator("xpath=//span[text()='Year']");
+        this.yearSelectionInDropdownPackage = page.locator("xpath=(//ul[contains(@id,'DOBYears')])[last()]//li[text()='2009']");
+        this.proceedButton = page.locator("#btnServiceForCertificationProceed");
+
+
         // Other fields
         this.highSchoolDropdown = page.locator("xpath=//span[contains(@aria-owns,'HighSchool')]//span[text()='Please Select']");
         this.highSchoolDropdownSelection = page.locator("xpath=((//ul[@id='HighSchool_listbox'])[last()]//li[contains(text(),'High')])[1]");
@@ -166,17 +176,38 @@ export default class OnlineEnrollmentPage extends BasePage {
      * Selects the Date of Birth (Year, Day, Month) from custom dropdown controls.
      **/
     async selectDOB() {
-        await test.step('Select Date of Birth', async () => {
-            await this.click(this.dobYearDdl);
-            await this.waitForVisible(this.yearSelectionInDropdown);
-            await this.jsClick(this.yearSelectionInDropdown);
-            await this.click(this.dobDayDdl);
-            await this.waitForVisible(this.daySelectionInDropdown);
-            await this.jsClick(this.daySelectionInDropdown);
-            await this.click(this.dobMonthDdl);
-            await this.waitForVisible(this.monthSelectionInDropdown);
-            await this.jsClick(this.monthSelectionInDropdown);
-        });
+
+        if (!await this.dobYearDdl.isDisabled) {
+            await test.step('Select Date of Birth', async () => {
+                await this.click(this.dobYearDdl);
+                await this.waitForVisible(this.yearSelectionInDropdown);
+                await this.jsClick(this.yearSelectionInDropdown);
+                await this.click(this.dobDayDdl);
+                await this.waitForVisible(this.daySelectionInDropdown);
+                await this.jsClick(this.daySelectionInDropdown);
+                await this.click(this.dobMonthDdl);
+                await this.waitForVisible(this.monthSelectionInDropdown);
+                await this.jsClick(this.monthSelectionInDropdown);
+            });
+        }
+
+    }
+
+    async selectDOBForPackage() {
+        await this.page.waitForTimeout(5000);
+        if (await this.isVisible(this.dobMonthPackage)) {
+            await this.click(this.dobMonthPackage);
+            await this.click(this.monthSelectionInDropdownPackage);
+            await this.click(this.dobYearPackage);
+            await this.click(this.yearSelectionInDropdownPackage);
+            await this.click(this.dobDayPackage);
+            await this.click(this.daySelectionInDropdownPackage);
+            await this.click(this.proceedButton);
+            await this.waitForHidden(this.proceedButton);
+
+        }
+
+
     }
 
     /**
