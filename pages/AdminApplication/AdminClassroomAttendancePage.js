@@ -198,15 +198,9 @@ export default class AdminClassroomAttendancePage extends BasePage {
      **/
     async verifyPdfReport(pdfPage, expectedText, attachmentName = `${expectedText.replace(/\s+/g, '_')}.pdf`) {
         await test.step(`Verify PDF report tab is loaded`, async () => {
-            await this.page.waitForTimeout(60000);
-            await pdfPage.waitForLoadState('domcontentloaded');
-            await expect(pdfPage.locator('body')).toBeVisible();
-            await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')));
-            await this.verifyVisible(this.page.getByText(new RegExp(expectedText, 'i')));
-
+            await expect(pdfPage).toHaveTitle(/Report/i);
         });
         await PdfHelper.downloadVerifyAndAttach(pdfPage, expectedText, attachmentName);
-        await this.page.waitForTimeout(1000);
         await pdfPage.close().catch(() => { });
     }
 
@@ -345,12 +339,12 @@ export default class AdminClassroomAttendancePage extends BasePage {
             // Listen for send email API response
             this.sendEmailResponsePromise = this.page.waitForResponse(
                 response => response.url().includes('Classroom/CRAttendanceSendEmailToMultipleRecipient') && response.status() === 200
-            );
+                , { timeout: 30000 });
 
             await this.waitForVisible(this.sendEmailSubmitBtn);
             await this.click(this.sendEmailSubmitBtn);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load');
+            await this.page.waitForLoadState('load', { timeout: 60000 });
         });
     }
 

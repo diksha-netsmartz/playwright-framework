@@ -27,20 +27,23 @@
       "password": "Staffing@*123321"
     },
     "studentUser": {
-      "username": "tes1",
-      "password": "Student@123123"
+      "name": "testautomation_donotuse",
+      "username": "tes105400",
+      "password": "Student@*/123321"
     },
     "resetStudent": {
       "username": "rachel",
       "email": "testingdata3011@gmail.com"
     },
     "staffUser": {
-      "username": "instructor6",
-      "password": "123456Aa#"
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
     },
     "classroomInstructor": {
-      "username": "instructor3",
-      "password": "123456Aa#"
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
     }
   },
   "uat": {
@@ -49,20 +52,23 @@
       "password": "Staffing@*123321"
     },
     "studentUser": {
-      "username": "tes1",
-      "password": "Student@123123"
+      "name": "testautomation_donotuse",
+      "username": "tes19482",
+      "password": "Student@*/123321"
     },
     "resetStudent": {
       "username": "rachel",
       "email": "testingdata3011@gmail.com"
     },
     "staffUser": {
-      "username": "instructor6",
-      "password": "123456Aa#"
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
     },
     "classroomInstructor": {
-      "username": "instructor3",
-      "password": "123456Aa#"
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
     }
   },
   "coreServer1": {
@@ -71,20 +77,48 @@
       "password": "Staffing@*123321"
     },
     "studentUser": {
-      "username": "tes1",
-      "password": "Student@123123"
+      "name": "testautomation_donotuse",
+      "username": "tes105400",
+      "password": "Student@*/123321"
     },
     "resetStudent": {
       "username": "rachel",
       "email": "testingdata3011@gmail.com"
     },
     "staffUser": {
-      "username": "instructor6",
-      "password": "123456Aa#"
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
     },
     "classroomInstructor": {
-      "username": "instructor3",
-      "password": "123456Aa#"
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
+    }
+  },
+  "coredev": {
+    "cadmin": {
+      "username": "testautomation",
+      "password": "Staffing@*123321"
+    },
+    "studentUser": {
+      "name": "testautomation_donotuse",
+      "username": "tes25266",
+      "password": "Student@*/123321"
+    },
+    "resetStudent": {
+      "username": "rachel",
+      "email": "testingdata3011@gmail.com"
+    },
+    "staffUser": {
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
+    },
+    "classroomInstructor": {
+      "name": "automation_instructor_donotuse",
+      "username": "automation_instructor_donotuse",
+      "password": "Session@123"
     }
   }
 }
