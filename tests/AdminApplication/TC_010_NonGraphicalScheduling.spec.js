@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
@@ -12,13 +12,14 @@ import studentData from '../../test-data/json/studentData.json';
  * Precondition: Appointment should be Available to be Scheduled
  * Expected Result: Appointment should be scheduled to the student.
  **/
-test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to Schedule in an Appointment', { tag: '@smoke' }, async ({page}) => {
+test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to Schedule in an Appointment', { tag: '@smoke' }, async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const nonGraphicalPage = new NonGraphicalPage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];
+    const targetStudent = credentials.studentUser.name;
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -29,9 +30,9 @@ test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to S
         await homePage.navigateToNonGraphical();
     });
 
-    await test.step(`Step 4-6: Search and select student: "${studentData.student1.name}"`, async () => {
-        await nonGraphicalPage.searchStudent(studentData.student1.name);
-        await nonGraphicalPage.selectStudentOption(studentData.student1.name.replace(" ", ", "));
+    await test.step(`Step 4-6: Search and select student: "${targetStudent}"`, async () => {
+        await nonGraphicalPage.searchStudent(targetStudent);
+        await nonGraphicalPage.selectStudentOption(targetStudent.replace(" ", ", "));
         await nonGraphicalPage.clickSelectStudent();
     });
 

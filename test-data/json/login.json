@@ -5,11 +5,13 @@
       "password": "123456Aa#"
     },
     "studentUser": {
+      "name": "testautomation_donotuse",
       "username": "tes1",
       "password": "Student@123123"
     },
     "resetStudent": {
-      "username": "rachel",
+      "name": "testautomation_resetpwd_donotuse",
+      "username": "testautomation_resetpwd",
       "email": "testingdata3011@gmail.com"
     },
     "staffUser": {

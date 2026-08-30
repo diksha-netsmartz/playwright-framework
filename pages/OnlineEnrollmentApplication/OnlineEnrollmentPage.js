@@ -58,7 +58,7 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.monthSelectionInDropdown = page.locator("xpath=(//ul[@id='int_DOB_Day_listbox'])[last()]//li[text()='Feb']");
         this.dobDayDdl = page.locator("xpath=//span[@aria-owns='int_DOB_Month_listbox']");
         this.daySelectionInDropdown = page.locator("xpath=(//ul[@id='int_DOB_Month_listbox'])[last()]//li[text()='02']");
-        this.dobYearDdl = page.locator("xpath=//span[@aria-owns='int_DOB_Year_listbox']");
+        this.dobYearDdl = page.locator("xpath=//span[@aria-owns='int_DOB_Year_listbox' and @aria-disabled='false']");
         this.yearSelectionInDropdown = page.locator("xpath=(//ul[@id='int_DOB_Year_listbox'])[last()]//li[text()='2009']");
 
 
@@ -177,7 +177,7 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async selectDOB() {
 
-        if (!await this.dobYearDdl.isDisabled) {
+        if (await this.isVisible(this.dobYearDdl)) {
             await test.step('Select Date of Birth', async () => {
                 await this.click(this.dobYearDdl);
                 await this.waitForVisible(this.yearSelectionInDropdown);
@@ -273,9 +273,8 @@ export default class OnlineEnrollmentPage extends BasePage {
             if (await this.isVisible(this.emergencyPhoneTxt)) {
                 await this.fill(this.emergencyPhoneTxt, `(333)${random7.slice(0, 3)}-${random7.slice(3)}`);
             }
-            if (await this.isVisible(this.dobYearDdl)) {
-                await this.selectDOB();
-            }
+            await this.selectDOB();
+
             if (await this.isVisible(this.highSchoolDropdown)) {
                 await this.click(this.highSchoolDropdown);
                 await this.jsClick(this.highSchoolDropdownSelection);

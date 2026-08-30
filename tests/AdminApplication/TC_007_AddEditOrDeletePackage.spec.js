@@ -19,6 +19,7 @@ test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Del
     const enrollmentBillingPage = new EnrollmentBillingPage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];
+    const targetStudent = credentials.studentUser.name;
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -29,8 +30,8 @@ test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Del
         await homePage.openEnrollmentBilling();
     });
 
-    await test.step(`Step 3: Search and select student: "${studentData.student1.name}"`, async () => {
-        await enrollmentBillingPage.selectStudent(studentData.student1.name);
+    await test.step(`Step 3: Search and select student: "${targetStudent}"`, async () => {
+        await enrollmentBillingPage.selectStudent(targetStudent);
     });
 
     await test.step('Step 4: Click Add New and add CR Package', async () => {

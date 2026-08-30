@@ -62,14 +62,16 @@ export default class AdminLoginPage extends BasePage {
      * Closes the 'No mobile number on file' modal popup if it appears after login.
     **/
     async closeMobilePopup() {
-        await test.step('Close mobile number popup if present', async () => {
-            if (await this.mobilePopUp.isVisible().catch(() => false)) {
+        if (await this.mobilePopUp.isVisible().catch(() => false)) {
+            await test.step('Close mobile number popup', async () => {
+
                 await this.verifyVisible(this.mobilePopUp);
                 await this.verifyVisible(this.mobilePopupCloseButton);
                 await this.click(this.mobilePopupCloseButton);
                 await this.waitForHidden(this.mobilePopupCloseButton);
-            }
-        });
+            });
+        }
+
     }
 
     /**

@@ -272,6 +272,8 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
             await this.click(this.closeButton);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 });
+            await this.page.waitForTimeout(3000);
             const amountAfter = await this.getBillingAmount();
             expect(amountAfter).not.toEqual(amountBefore);
         });
@@ -299,6 +301,8 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
             await this.click(this.closeButton);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 });
+            await this.page.waitForTimeout(3000);
             await this.waitForVisible(this.addNewBilling);
 
             const amountAfter = await this.getBillingAmount();
@@ -326,6 +330,8 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.verifyVisible(this.page.getByText('Payment Entered', { exact: true }));
             await this.click(this.closeButton);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 });
+            await this.page.waitForTimeout(3000);
             await this.waitForVisible(this.addNewBilling);
 
             const amountAfter = await this.getBillingAmount();
@@ -355,6 +361,8 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.verifyVisible(this.page.getByText('Adjustment Entered', { exact: true }));
             await this.click(this.closeButton);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 });
+            await this.page.waitForTimeout(3000);
             await this.waitForVisible(this.addNewBilling);
 
             const amountAfter = await this.getBillingAmount();
@@ -389,6 +397,8 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.verifyVisible(this.page.getByText('Payment Approved', { exact: true }));
             await this.click(this.closeButton);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 });
+            await this.page.waitForTimeout(3000);
             await this.waitForVisible(this.addNewBilling);
             const amountAfter = await this.getBillingAmount();
             expect(amountAfter).not.toEqual(amountBefore);

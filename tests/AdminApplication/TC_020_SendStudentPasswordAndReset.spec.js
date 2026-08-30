@@ -26,6 +26,8 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
     let resetPasswordUrl;
     let dynamicNewPassword;
 
+    const targetStudent = credentials.resetStudent.name;
+
     await test.step('Step 1: Login to Admin Portal using existing login methods', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
@@ -35,15 +37,17 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
         await homePage.openStudentProfile();
     });
 
-    await test.step(`Step 3: Search and select student: ${credentials.resetStudent.username}`, async () => {
-        await studentProfilePage.selectStudent(credentials.resetStudent.username);
+    await test.step(`Step 3: Search and select student: "${targetStudent}"`, async () => {
+        await studentProfilePage.selectStudent(targetStudent);
     });
 
     await test.step('Step 4: Update email if not matching the required email', async () => {
         await studentProfilePage.updateEmailIfDifferent(credentials.resetStudent.email);
     });
 
+    let emailSentTime;
     await test.step('Step 5: Send Reset Password / Username email to student', async () => {
+        emailSentTime = new Date(Date.now() - 15000);
         await studentProfilePage.sendUsernamePasswordEmail();
     });
 
@@ -52,7 +56,8 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
         resetPasswordUrl = await EmailHelper.getResetPasswordLink({
             recipientEmail: credentials.resetStudent.email,
             subject: 'Student UserName/Password',
-            timeoutMs: 20000
+            sentAfter: emailSentTime,
+            timeoutMs: 45000
         });
         console.log('Navigating to Reset Password URL:', resetPasswordUrl);
     });

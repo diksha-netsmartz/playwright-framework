@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import EnrollmentBillingPage from '../../pages/AdminApplication/StudentAccount/EnrollmentBillingPage';
@@ -12,13 +12,14 @@ import studentData from "../../test-data/json/studentData.json"
  * Precondition: Student should be created first
  * Expected Result: Payments should be made by user
  **/
-test('TC_008: C-admin > Student > Billing - Verify user is able to make payment', { tag: '@smoke' }, async ({page}) => {
+test('TC_008: C-admin > Student > Billing - Verify user is able to make payment', { tag: '@smoke' }, async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentBillingPage = new EnrollmentBillingPage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];
+    const targetStudent = credentials.studentUser.name;
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -32,8 +33,8 @@ test('TC_008: C-admin > Student > Billing - Verify user is able to make payment'
         await homePage.openEnrollmentBilling();
     });
 
-    await test.step(`Step 3: Search and select student: "${studentData.student1.name}"`, async () => {
-        await enrollmentBillingPage.selectStudent(studentData.student1.name);
+    await test.step(`Step 3: Search and select student: "${targetStudent}"`, async () => {
+        await enrollmentBillingPage.selectStudent(targetStudent);
     });
 
     await test.step('Step 4: Add Swipe transaction payment method', async () => {
