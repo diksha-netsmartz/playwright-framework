@@ -36,15 +36,12 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
         dynamicParentPhone = TestDataGenerator.generateRandomPhoneNumber();
         dynamicParentEmail = `parent_${Date.now()}@test.com`;
         dynamicAddress = `${Math.floor(100 + Math.random() * 900)} Main Street`;
-        dynamicCity = 'Miami';
         dynamicZipcode = `${Math.floor(10000 + Math.random() * 90000)}`;
 
         await studentProfilePage.updateProfileDetails({
             parentPhone: dynamicParentPhone,
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
-            city: dynamicCity,
-            zipcode: dynamicZipcode
         });
     });
 
@@ -59,8 +56,6 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
             parentPhone: dynamicParentPhone,
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
-            city: dynamicCity,
-            zipcode: dynamicZipcode
         });
     });
 });

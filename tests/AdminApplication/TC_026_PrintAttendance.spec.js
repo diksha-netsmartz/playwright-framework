@@ -36,7 +36,7 @@ test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', as
 
     await test.step('Step 4 & 5: Export Attendance report to PDF and verify content in new tab', async () => {
         pdfPage = await attendancePage.exportToPdf();
-        await attendancePage.verifyPdfReport(pdfPage, 'Attendance Report');
+        await attendancePage.verifyRosterPdfReport(pdfPage, 'Attendance Report');
     });
 
     await test.step('Step 6: Export Attendance report to Excel and verify downloaded file', async () => {
