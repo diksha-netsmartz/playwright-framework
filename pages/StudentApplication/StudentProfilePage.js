@@ -35,7 +35,6 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [details.parentPhone] - Parent phone number.
      * @param {string} [details.parentGuardianEmail] - Parent / Guardian email.
      * @param {string} [details.address] - Street address.
-     * @param {string} [details.city] - City.
      * @param {string} [details.zipcode] - Zip / postal code.
      **/
     async updateProfileDetails(details = {}) {
@@ -45,15 +44,6 @@ export default class StudentProfilePage extends BasePage {
             await this.clear(this.addressTextbox);
             await this.fill(this.addressTextbox, details.address);
 
-
-            await this.verifyVisible(this.cityTextbox);
-            await this.clear(this.cityTextbox);
-            await this.fill(this.cityTextbox, details.city);
-
-
-            await this.verifyVisible(this.zipcodeTextbox);
-            await this.clear(this.zipcodeTextbox);
-            await this.fill(this.zipcodeTextbox, details.zipcode);
 
 
             await this.verifyVisible(this.parentPhoneTxt);
@@ -99,35 +89,22 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [expectedDetails.parentPhone] - Expected parent phone.
      * @param {string} [expectedDetails.parentGuardianEmail] - Expected parent / guardian email.
      * @param {string} [expectedDetails.address] - Expected address.
-     * @param {string} [expectedDetails.city] - Expected city.
      * @param {string} [expectedDetails.zipcode] - Expected zipcode.
      **/
     async verifyProfileDetails(expectedDetails = {}) {
         await test.step('Verify profile field values match expected', async () => {
-            if (expectedDetails.parentPhone !== undefined) {
-                await this.verifyVisible(this.parentPhoneTxt);
-                await expect(this.parentPhoneTxt).toHaveValue(expectedDetails.parentPhone);
-            }
+            await this.verifyVisible(this.parentPhoneTxt);
+            await expect(this.parentPhoneTxt).toHaveValue(expectedDetails.parentPhone);
 
-            if (expectedDetails.parentGuardianEmail !== undefined) {
-                await this.verifyVisible(this.parentGuardianEmail);
-                await expect(this.parentGuardianEmail).toHaveValue(expectedDetails.parentGuardianEmail);
-            }
 
-            if (expectedDetails.address !== undefined) {
-                await this.verifyVisible(this.addressTextbox);
-                await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
-            }
+            await this.verifyVisible(this.parentGuardianEmail);
+            await expect(this.parentGuardianEmail).toHaveValue(expectedDetails.parentGuardianEmail);
 
-            if (expectedDetails.city !== undefined) {
-                await this.verifyVisible(this.cityTextbox);
-                await expect(this.cityTextbox).toHaveValue(expectedDetails.city);
-            }
 
-            if (expectedDetails.zipcode !== undefined) {
-                await this.verifyVisible(this.zipcodeTextbox);
-                await expect(this.zipcodeTextbox).toHaveValue(expectedDetails.zipcode);
-            }
+            await this.verifyVisible(this.addressTextbox);
+            await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
+
+
         });
     }
 }

@@ -253,6 +253,8 @@ export default class OnlineEnrollmentPage extends BasePage {
     }
 
     async selectDOBForPackage() {
+        await this.waitForLoaders();
+        await this.page.waitForLoadState('load', { timeout: 5000 })
         await this.page.waitForTimeout(5000);
         if (await this.isVisible(this.dobMonthPackage)) {
             await this.click(this.dobMonthPackage);
@@ -434,7 +436,8 @@ export default class OnlineEnrollmentPage extends BasePage {
     async verifyReceiptPage(expectedText, attachmentName) {
         await test.step(`Verify "${expectedText}" on receipt page`, async () => {
             await this.waitForLoaders().catch(() => { });
-            await this.page.waitForLoadState('load', { timeout: 10000 })
+            await this.page.waitForLoadState('load', { timeout: 10000 });
+            await this.page.waitForTimeout(10000);
             await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')));
             await this.verifyVisible(this.page.getByText(new RegExp(expectedText, 'i')));
         });

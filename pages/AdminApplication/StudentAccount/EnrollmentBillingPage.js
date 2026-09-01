@@ -76,7 +76,7 @@ export default class EnrollmentBillingPage extends BasePage {
         this.cashDrawerLocationDropdownOption = page.locator("(//div[@id='cashlocations']//ul//li[not(@class='selected')])[1]");
         this.terminalIDTextbox = page.getByRole('textbox', { name: 'Terminal #' });
         this.accountNicknameTextbox = page.getByRole('textbox', { name: 'Account Nickname' });
-        this.doNotSendEmailCheckbox = page.locator("//input[@id='chb_DoNotSendEmail']/following-sibling::ins");
+        this.doNotSendEmailCheckbox = page.locator("(//input[@id='chb_DoNotSendEmail']/following-sibling::ins)[1]");
 
         // Check Payment
         this.checkPayment = page.locator('a').filter({ hasText: 'Check Payment' }).last();
