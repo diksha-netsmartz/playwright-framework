@@ -456,7 +456,94 @@ export default class DateHelper {
         const y = parseInt(parts[1], 10);
         return new Date(y, mIdx !== -1 ? mIdx : 0, 1);
     }
+
+    /**
+     * Returns only the formatted range string for the current month (e.g. "09/01/2026 - 09/30/2026").
+     * Convenience shorthand for `getCurrentMonthDateRange().formattedRange`.
+     * @param {Date} [baseDate=new Date()] - Reference date.
+     * @returns {string}
+     */
+    static getCurrentMonthFormattedRange(baseDate = new Date()) {
+        return this.getCurrentMonthDateRange(baseDate).formattedRange;
+    }
+
+    /**
+     * Returns only the formatted range string spanning Previous Month → Next Month
+     * (e.g. "07/01/2026 - 09/30/2026").
+     * Convenience shorthand for `getThreeMonthDateRange().formattedRange`.
+     * @param {Date} [baseDate=new Date()] - Reference date.
+     * @returns {string}
+     */
+    static getThreeMonthFormattedRange(baseDate = new Date()) {
+        return this.getThreeMonthDateRange(baseDate).formattedRange;
+    }
+
+    /**
+     * Picks an available start day and consecutive next day from a month using standard
+     * scheduling constraints: minDay=1, maxDay=25.
+     * Shorthand for `getAvailableDateAndNextDay(occupiedDays, { minDay: 1, maxDay: 25, baseDate })`.
+     *
+     * @param {number[]|Set<number>} [occupiedDays=[]] - Days already occupied in the month.
+     * @param {Date} [baseDate=new Date()] - Reference date for the target month.
+     * @returns {{
+     *   startDate: Date, endDate: Date,
+     *   startDay: number, endDay: number,
+     *   formattedStartDate: string, formattedEndDate: string, formattedRange: string
+     * } | null}
+     */
+    static getStandardAvailableDateRange(occupiedDays = [], baseDate = new Date()) {
+        return this.getAvailableDateAndNextDay(occupiedDays, { minDay: 1, maxDay: 25, baseDate });
+    }
+
+    /**
+     * Generates a random start day and consecutive next day within the current month
+     * using standard scheduling constraints: minDay=1, maxDay=25.
+     * Shorthand for `getRandomDateAndNextDay({ minDay: 1, maxDay: 25, baseDate })`.
+     *
+     * @param {Date} [baseDate=new Date()] - Reference date for the target month.
+     * @returns {{
+     *   startDate: Date, endDate: Date,
+     *   startDay: number, endDay: number,
+     *   formattedStartDate: string, formattedEndDate: string, formattedRange: string
+     * }}
+     */
+    static getStandardRandomDateRange(baseDate = new Date()) {
+        return this.getRandomDateAndNextDay({ minDay: 1, maxDay: 25, baseDate });
+    }
+
+    /**
+     * Returns all date information needed to navigate a datepicker calendar spanning
+     * from the 1st of the previous month to the last day of the current month.
+     *
+     * Combines `getPrevMonthToCurrentMonthRange()` and `getMonthLongNameYear()` into a
+     * single call, eliminating repeated boilerplate in pages that drive calendar pickers.
+     *
+     * @param {Date} [baseDate=new Date()] - Reference date.
+     * @returns {{
+     *   prevMonthDate: Date,
+     *   currentMonthDate: Date,
+     *   lastDayCurrentMonth: number,
+     *   startDate: string,
+     *   endDate: string,
+     *   formattedRange: string,
+     *   prevMonthNameYear: string,
+     *   currMonthNameYear: string,
+     *   prevDay: string,
+     *   currLastDay: string
+     * }}
+     */
+    static getPrevToCurrentMonthCalendarInfo(baseDate = new Date()) {
+        const range = this.getPrevMonthToCurrentMonthRange(baseDate);
+        return {
+            ...range,
+            prevMonthNameYear: this.getMonthLongNameYear(range.prevMonthDate),
+            currMonthNameYear: this.getMonthLongNameYear(range.currentMonthDate),
+            prevDay: '1',
+            currLastDay: String(range.lastDayCurrentMonth)
+        };
+    }
 }
+
 
 
 
