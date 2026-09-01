@@ -1,0 +1,26 @@
+{
+  "coreServer2": {
+    "btwAndCrPackage": "BTW and CR Package",
+    "crPackage": "CR Package",
+    "rtPackage": "RT PAckage 1",
+    "btwPackage": "BTW Package"
+  },
+  "coreServer1": {
+    "btwAndCrPackage": "BTW AND CR Package",
+    "crPackage": "CR + Additional CR package",
+    "rtPackage": "WA RT Package",
+    "btwPackage": "BTW package"
+  },
+  "staging": {
+    "btwAndCrPackage": "BTW and CR Package",
+    "crPackage": "CR Package",
+    "rtPackage": "RT Package",
+    "btwPackage": "BTW Package"
+  },
+  "uat": {
+    "btwAndCrPackage": "BTW and CR Package",
+    "crPackage": "CR Package",
+    "rtPackage": "RT Package",
+    "btwPackage": "BTW Package"
+  }
+}

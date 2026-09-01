@@ -17,7 +17,7 @@ export default class StaffLoginPage extends BasePage {
 
         this.usernameTxt = page.getByRole('textbox', { name: 'Username' });
         this.passwordTxt = page.getByRole('textbox', { name: 'Password' });
-        this.loginBtn = page.getByRole('button', { name: 'Login' });
+        this.loginBtn = page.getByRole('button', { name: 'Login' }).first();
         this.mobilePopUp = page.getByText('No mobile number on file.');
         this.mobilePopupCloseButton = page.locator('.close.closemodalphone');
     }
@@ -54,6 +54,7 @@ export default class StaffLoginPage extends BasePage {
      * Closes the 'No mobile number on file' modal popup if it appears after login.
     **/
     async closeMobilePopup() {
+        await this.page.waitForTimeout(5000);
         if (await this.mobilePopUp.isVisible().catch(() => false)) {
             await test.step('Close mobile number popup', async () => {
                 await this.verifyVisible(this.mobilePopUp);

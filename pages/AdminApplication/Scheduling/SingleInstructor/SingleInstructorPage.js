@@ -1,6 +1,7 @@
 import BasePage from "../../../../utils/BasePage";
 import { expect, test } from "@playwright/test";
 import CombinedAppointmentPage from "./CombinedAppointmentPage";
+import DateHelper from "../../../../utils/DateHelper";
 
 /**
  * Page Object representing the Single Instructor Scheduler View in Admin Portal.
@@ -191,23 +192,11 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async selectDateInCalendar() {
         await test.step('Select target date in scheduler calendar', async () => {
+            const targetDate = DateHelper.getWeekdayDaysAgo(7);
+            const dataValue = DateHelper.toSchedulerDataValue(targetDate);
+
             const today = new Date();
-            const targetDate = new Date(today);
-            targetDate.setDate(today.getDate() - 7);
-
-            // If Sunday (0), go one more day back to Saturday
-            if (targetDate.getDay() === 0) {
-                targetDate.setDate(targetDate.getDate() - 1);
-            }
-
-            const year = targetDate.getFullYear();
-            const month = targetDate.getMonth();
-            const day = targetDate.getDate();
-            const dataValue = `${year}/${month}/${day}`;
-
-            const todayYear = today.getFullYear();
-            const todayMonth = today.getMonth();
-            const monthDiff = (todayYear - year) * 12 + (todayMonth - month);
+            const monthDiff = (today.getFullYear() - targetDate.getFullYear()) * 12 + (today.getMonth() - targetDate.getMonth());
 
             for (let i = 0; i < monthDiff; i++) {
                 await this.click(this.calendarPrevBtn);

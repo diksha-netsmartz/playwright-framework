@@ -17,9 +17,11 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
     const studentProfilePage = new StudentProfilePage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];
-    let dynamicParentName;
-    let dynamicHomePhone;
     let dynamicParentPhone;
+    let dynamicParentEmail;
+    let dynamicAddress;
+    let dynamicCity;
+    let dynamicZipcode;
 
     await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
         await studentLoginPage.navigateToLoginPage();
@@ -31,14 +33,18 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
     });
 
     await test.step('Step 3: Update profile fields with dynamic runtime values', async () => {
-        dynamicParentName = TestDataGenerator.generateRandomFullName('Guardian');
-        dynamicHomePhone = TestDataGenerator.generateRandomPhoneNumber();
         dynamicParentPhone = TestDataGenerator.generateRandomPhoneNumber();
+        dynamicParentEmail = `parent_${Date.now()}@test.com`;
+        dynamicAddress = `${Math.floor(100 + Math.random() * 900)} Main Street`;
+        dynamicCity = 'Miami';
+        dynamicZipcode = `${Math.floor(10000 + Math.random() * 90000)}`;
 
         await studentProfilePage.updateProfileDetails({
-            parent1GuardianName: dynamicParentName,
             parentPhone: dynamicParentPhone,
-            homePhone: dynamicHomePhone
+            parentGuardianEmail: dynamicParentEmail,
+            address: dynamicAddress,
+            city: dynamicCity,
+            zipcode: dynamicZipcode
         });
     });
 
@@ -50,9 +56,11 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
     await test.step('Step 6: Navigate back to Profile and verify updated values', async () => {
         await studentHomePage.navigateToProfile();
         await studentProfilePage.verifyProfileDetails({
-            parent1GuardianName: dynamicParentName,
             parentPhone: dynamicParentPhone,
-            homePhone: dynamicHomePhone
+            parentGuardianEmail: dynamicParentEmail,
+            address: dynamicAddress,
+            city: dynamicCity,
+            zipcode: dynamicZipcode
         });
     });
 });

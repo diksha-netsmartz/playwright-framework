@@ -1,0 +1,16 @@
+{
+  "componentPrefix": "Component",
+  "notes": "Automated component notes",
+  "price": "100",
+  "additionalTax": "15",
+  "publicNamePrefix": "Public_Comp",
+  "publicDescription": "Automated component public description",
+  "emailContent": "Automated notification email content for component",
+  "drivingHours": "2",
+  "observationHours": "1",
+  "editNotes": "Updated automated component notes",
+  "editPrice": "250",
+  "editDrivingHours": "5",
+  "editObservationHours": "3",
+  "editPublicDescription": "Updated component public description"
+}

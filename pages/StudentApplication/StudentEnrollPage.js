@@ -18,6 +18,7 @@ export default class StudentEnrollPage extends BasePage {
         this.payLaterBtn = page.getByRole('button', { name: 'Pay Later' });
         this.printReceiptLink = page.getByRole('link', { name: 'Print Receipt' }).last();
         this.getPackageSelectBtn = page.locator("xpath=(//button[contains(@class,'PriceTax')])[1]");
+        this.skipSelectionButton = page.getByRole('button', { name: 'Skip Selection' })
     }
 
     /**
@@ -26,6 +27,11 @@ export default class StudentEnrollPage extends BasePage {
     async selectPackage() {
         await test.step('Select package from price table', async () => {
             await this.click(this.getPackageSelectBtn);
+            await this.page.waitForTimeout(5000);
+            if (await this.isVisible(this.skipSelectionButton)) {
+                await this.click(this.skipSelectionButton);
+                await this.page.waitForTimeout(5000);
+            }
         });
     }
 
