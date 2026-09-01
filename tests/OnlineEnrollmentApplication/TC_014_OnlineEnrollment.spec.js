@@ -10,9 +10,9 @@ test('TC_014: COE TEEN/ADULT/WT - Verify new student able to register', { tag: '
     const oe = new OnlineEnrollmentPage(page);
 
     const enrollmentFlows = [
-        { name: 'Teen', navigate: () => oe.navigateToTeenOEPage(), prefix: 'Teen' },
-        { name: 'Adult', navigate: () => oe.navigateToAdultOEPage(), prefix: 'Adult' },
-        { name: 'WT', navigate: () => oe.navigateToWTOEPage(), prefix: 'WT' }
+        { name: 'Teen', navigate: () => oe.navigateToTeenOEPage() },
+        { name: 'Adult', navigate: () => oe.navigateToAdultOEPage() },
+        { name: 'WT', navigate: () => oe.navigateToWTOEPage() }
     ];
 
     for (const flow of enrollmentFlows) {
@@ -20,10 +20,10 @@ test('TC_014: COE TEEN/ADULT/WT - Verify new student able to register', { tag: '
             await flow.navigate();
             await oe.selectDOBForPackage();
             await oe.selectBTWPackage();
-            await oe.fillStudentInfo(flow.prefix.toLowerCase());
+            await oe.fillStudentInfo();
             await oe.clickPayLater();
             await oe.smsPopup();
-            await oe.verifyReceiptPage('REGISTRATION COMPLETED', `${flow.prefix}_Registration_Receipt.pdf`);
+            await oe.verifyReceiptPage('REGISTRATION COMPLETED', `${flow.name}_Registration_Receipt.pdf`);
         });
     }
 });

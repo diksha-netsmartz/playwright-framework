@@ -1,4 +1,10 @@
 {
+  "urlParameters": {
+    "packageParam": "&param=BTW1",
+    "crParam": "&CR=CR1",
+    "packageAndCrParam": "&param=BTWCR1&CR=CR1",
+    "packageCrAndLocParam": "&param=BTWCR1&CR=CR1&loc=LA"
+  },
   "student": {
     "firstName": "monica",
     "middleName": "emma",

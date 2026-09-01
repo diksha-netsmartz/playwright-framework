@@ -15,8 +15,8 @@ export default class TestDataGenerator {
      * @param {string} prefix
      * @returns {string} e.g. "test_1692200000"
      */
-    static generateUniqueId(prefix = 'user') {
-        return `${prefix}_${Date.now()}`;
+    static generateUniqueId(prefix) {
+        return `${prefix} ${Date.now()}`;
     }
     /**
      * Generates a random full name.
