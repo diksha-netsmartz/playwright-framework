@@ -5,7 +5,9 @@
     "cardType": "Discover",
     "transactionNumber": "11111222223",
     "receiptNumber": "33333333",
-    "notes": "swiped transaction payment"
+    "notes": "swiped transaction payment",
+    "terminalID": "1234567890",
+    "accountNickname": "card"
   },
   "checkPayment": {
     "amount": "100",

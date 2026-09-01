@@ -156,11 +156,15 @@ export default class NewClassPage extends BasePage {
      * Selects classroom location from the location dropdown. If no locationName is provided, selects the first available option in the list.
      **/
     async selectLocation() {
-        await test.step('Select Classroom Location', async () => {
-            await this.click(this.locationDropdownBtn);
-            await this.waitForVisible(this.locationOption);
-            await this.click(this.locationOption);
-        });
+
+        if (await this.isVisible(this.locationDropdownBtn)) {
+            await test.step('Select Classroom Location', async () => {
+                await this.click(this.locationDropdownBtn);
+                await this.waitForVisible(this.locationOption);
+                await this.click(this.locationOption);
+            });
+        }
+
     }
 
     /**

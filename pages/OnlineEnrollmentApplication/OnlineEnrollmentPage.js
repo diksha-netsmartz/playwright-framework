@@ -85,7 +85,7 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.medicalConditionsTxt = page.locator('#MedicalConditions');
         this.permitNumberTxt = page.getByRole('textbox', { name: 'Permit #' });
         this.collegeIdTxt = page.getByRole('textbox', { name: 'CollegeID' });
-        this.termsConditionsCheckbox = page.locator("xpath=//input[@id='TermsConditions']//following-sibling::span");
+        this.termsConditionsCheckbox = page.locator("(//input[@id='TermsConditions']//following-sibling::span)[1]");
         this.permitIssuedDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Issued Date']//following-sibling::span//span");
         this.permitIssueDateSelectInCalendar = page.locator("xpath=(//div[contains(@id,'PermitIssue')]//td//a)[1]");
         this.permitExpirationDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Expiration Date']//following-sibling::span//span");

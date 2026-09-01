@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import BasePage from "../../../utils/BasePage";
+import packageData from "../../../test-data/json/packageData.json";
 
 /**
  * Page Object representing the New Student Enrollment Page in Admin Portal.
@@ -16,6 +17,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
         super(page);
 
         // Package
+        this.searchPackageInDropdown = page.locator('#lstPackagesForSelectionSearch');
         this.packageSelectionButton = page.getByRole('button', { name: 'Package Selection' });
         this.rtPackageOption = page.locator("xpath=//a[@data-packtype='RT']");
         this.addPackageButton = page.getByRole('button', { name: 'Add Package' });
@@ -114,11 +116,15 @@ export default class NewStudentEnrollmentPage extends BasePage {
         await test.step(`Select package: "${packageName}"`, async () => {
             await this.waitForVisible(this.packageSelectionButton);
             await this.click(this.packageSelectionButton);
-            if (packageName === 'RT Package') {
-                await this.click(this.rtPackageOption);
-            } else {
-                await this.click(this.page.getByRole('link', { name: packageName, exact: true }));
-            }
+            await this.waitForVisible(this.packageSelectionButton);
+            await this.fill(this.searchPackageInDropdown, packageName);
+            await this.page.waitForTimeout(2000);
+            // if (packageName === 'RT Package') {
+            //     await this.click(this.rtPackageOption);
+            // } else {
+            await this.click(this.page.getByRole('link', { name: packageName, exact: true }));
+            // await this.click(this.page.getByRole('link', { name: new RegExp(packageName, 'i') })).first();
+            // }
         });
     }
 
@@ -187,13 +193,36 @@ export default class NewStudentEnrollmentPage extends BasePage {
     }
 
     /**
-     * Selects and configures a package based on package type ('BTW and CR Package', 'CR Package', 'RT PAckage 1', 'BTW Package').
-     * @param {string} packageName - The package name to configure and add.
+     * Resolves the environment-specific package name from packageData.json.
+     * @param {string} packageName - Standard package name ('BTW and CR Package', 'CR Package', 'RT Package', 'BTW Package').
+     * @returns {string} The resolved package name for the active environment.
+     **/
+    getResolvedPackageName(packageName) {
+        const env = process.env.ENV || 'coreServer2';
+        const envPackages = packageData[env] || packageData['coreServer2'];
+        if (!envPackages) return packageName;
+
+        const packageMap = {
+            'BTW and CR Package': envPackages.btwAndCrPackage,
+            'CR Package': envPackages.crPackage,
+            'RT Package': envPackages.rtPackage,
+            'BTW Package': envPackages.btwPackage,
+        };
+
+        return packageMap[packageName] || packageName;
+    }
+
+    /**
+     * Selects and configures a package. Automatically resolves environment-specific
+     * package names from packageData.json so spec files don't need any changes.
+     * @param {string} packageName - Standard package name ('BTW and CR Package', 'CR Package', 'RT Package', 'BTW Package').
     **/
     async addPackage(packageName) {
-        await test.step(`Configure and add package: "${packageName}"`, async () => {
+        const resolvedName = this.getResolvedPackageName(packageName);
+
+        await test.step(`Configure and add package: "${resolvedName}"`, async () => {
             await this.selectDOBForPackage();
-            await this.selectPackage(packageName);
+            await this.selectPackage(resolvedName);
             await this.click(this.addPackageButton);
             await this.waitForLoaders();
 
@@ -206,15 +235,14 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 case 'RT Package':
                     await this.click(this.selectButton);
                     await this.click(this.addButton);
-                    // await this.click(this.addToCartButton);
-                    await this.addAdditionalDetails();
-                    break;
-                case 'BTW Package':
                     await this.addAdditionalDetails();
                     break;
                 case 'CR Package':
                     await this.selectLocation();
                     await this.selectDOB();
+                    await this.addAdditionalDetails();
+                    break;
+                case 'BTW Package':
                     await this.addAdditionalDetails();
                     break;
                 default:

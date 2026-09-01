@@ -16,6 +16,7 @@ export default class StudentPortalHomePage extends BasePage {
 
         this.fileInput = page.locator('input[type="file"]').first();
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
+        this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files')]");
         this.chooseFileBtn = page.locator("#uploadimageChoose").first();
         this.enrollNavLink = page.locator('#Marketplace_li');
         this.myAccountNavLink = page.getByRole('link', { name: ' My Account ' });
@@ -41,6 +42,9 @@ export default class StudentPortalHomePage extends BasePage {
     **/
     async uploadFile(filePath) {
         await test.step(`Upload student file: ${filePath}`, async () => {
+            await this.waitForVisible(this.uploadFilesWidget);
+            await this.verifyVisible(this.uploadFilesWidget, 5000);
+            await this.uploadFilesWidget.scrollIntoViewIfNeeded();
             await this.setInputFiles(this.fileInput, filePath);
             await this.click(this.uploadBtn);
             await this.waitForLoaders();

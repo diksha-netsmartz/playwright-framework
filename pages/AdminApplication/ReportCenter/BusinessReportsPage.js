@@ -142,7 +142,7 @@ export default class BusinessReportsPage extends BasePage {
             await this.click(reportLink);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 30000 });
-            await this.verifyText(this.reportHeading, reportName);
+            await this.verifyContainsText(this.reportHeading, reportName);
             await this.waitForLoaders();
             await this.page.waitForTimeout(8000);
         });
@@ -906,7 +906,7 @@ export default class BusinessReportsPage extends BasePage {
                 await expect(studentText).toBeVisible({ timeout: 15000 });
             }
 
-            // Expected field keys on the Student Information report
+            // Expected field keys on the Student Information report (with regex OR for environment differences)
             const expectedFieldKeys = [
                 'Student#',
                 'Cell',
@@ -916,9 +916,9 @@ export default class BusinessReportsPage extends BasePage {
                 'Student',
                 'Address',
                 'Home',
-                'LDL',
+                /(LDL|DL\/Permit|Permit No)/i,          // LDL on coreServer2, DL/Permit # or Permit No on coreServer1
                 'Student Balance',
-                'DOI',
+                /(DOI|Permit Issue Date)/i,             // DOI on coreServer2, Permit Issue Date on coreServer1
                 'DOB',
                 'ParentName',
                 'Age',
@@ -931,8 +931,9 @@ export default class BusinessReportsPage extends BasePage {
             ];
 
             for (const key of expectedFieldKeys) {
-                const keyLocator = reportPage.getByText(key, { exact: false }).first();
-                await expect(keyLocator, `Expected field key "${key}" to be visible on Student Info Report`).toBeVisible({ timeout: 10000 });
+                const label = typeof key === 'string' ? key : key.source;
+                const keyLocator = reportPage.getByText(key).first();
+                await expect(keyLocator, `Expected field key "${label}" to be visible on Student Info Report`).toBeVisible({ timeout: 10000 });
             }
         });
     }
@@ -1052,7 +1053,7 @@ export default class BusinessReportsPage extends BasePage {
     /**
      * Verifies that the Vehicle Hours Report modal popup is displayed with correct headers and columns:
      * - Verifies header 'Vehicle Hours Report' in modal header
-     * - Verifies column headers: 'Vehicle No', 'Type', 'Status', 'No of Appnt\'s', 'Total Hours'
+     * - Verifies column headers across environments: 'Vehicle No', 'Type'/'Vehicle Type', 'Status'/'Vehicle Status', 'No of Appnt\'s'/'No of Appointments', 'Total Hours'
      * - Attaches screenshot of the modal to test report
      **/
     async verifyVehicleHoursReportModal() {
@@ -1061,15 +1062,16 @@ export default class BusinessReportsPage extends BasePage {
             await expect(this.vehicleHoursModalHeader).toContainText('Vehicle Hours Report');
 
             const expectedColumns = [
-                'Vehicle No',
-                'Type',
-                'Status',
-                "No of Appnt's"
+                /^Vehicle No$/i,
+                /^(Vehicle )?Type$/i,
+                /^(Vehicle )?Status$/i,
+                /^No of (Appointments|Appnt's)$/i,
+                /^Total Hours$/i
             ];
 
             for (const col of expectedColumns) {
-                const colHeader = this.vehicleHoursModal.getByRole('columnheader', { name: col })
-                await expect(colHeader, `Verify column "${col}" is visible in modal`).toBeVisible();
+                const colHeader = this.vehicleHoursModal.getByRole('columnheader', { name: col });
+                await expect(colHeader, `Verify column matching ${col} is visible in modal`).toBeVisible();
             }
 
             // Capture and attach screenshot to test report

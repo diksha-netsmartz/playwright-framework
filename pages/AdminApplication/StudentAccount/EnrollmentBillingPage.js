@@ -72,6 +72,11 @@ export default class EnrollmentBillingPage extends BasePage {
         this.transactionNumber = page.getByRole('textbox', { name: 'Transaction#' });
         this.receiptNumber = page.getByRole('textbox', { name: 'Receipt#' });
         this.cashNotesTextbox = page.locator("#txtCashNotes").first();
+        this.cashDrawerLocationDropdown = page.locator("//button[@data-id='billingLocation']");
+        this.cashDrawerLocationDropdownOption = page.locator("(//div[@id='cashlocations']//ul//li[not(@class='selected')])[1]");
+        this.terminalIDTextbox = page.getByRole('textbox', { name: 'Terminal #' });
+        this.accountNicknameTextbox = page.getByRole('textbox', { name: 'Account Nickname' });
+        this.doNotSendEmailCheckbox = page.locator("//input[@id='chb_DoNotSendEmail']/following-sibling::ins");
 
         // Check Payment
         this.checkPayment = page.locator('a').filter({ hasText: 'Check Payment' }).last();
@@ -262,9 +267,22 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.fill(this.last4Digits, paymentData.swipedTransaction.last4Digits);
             await this.click(this.cardTypeSelectDropdown);
             await this.click(this.discover);
+            await this.click(this.doNotSendEmailCheckbox);
             await this.fill(this.transactionNumber, paymentData.swipedTransaction.transactionNumber);
             await this.fill(this.receiptNumber, paymentData.swipedTransaction.receiptNumber);
+            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+                await this.click(this.cashDrawerLocationDropdown);
+                await this.waitForVisible(this.cashDrawerLocationDropdownOption);
+                await this.click(this.cashDrawerLocationDropdownOption);
+            }
             await this.fill(this.cashNotesTextbox, paymentData.swipedTransaction.notes);
+            if (await this.isVisible(this.terminalIDTextbox)) {
+                await this.fill(this.terminalIDTextbox, paymentData.swipedTransaction.terminalID)
+            }
+
+            if (await this.isVisible(this.accountNicknameTextbox)) {
+                await this.fill(this.accountNicknameTextbox, paymentData.swipedTransaction.accountNickname)
+            }
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
@@ -294,6 +312,12 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.fill(this.receiptNumber, paymentData.checkPayment.receiptNumber);
             await this.fill(this.chequeNotesTextbox, paymentData.checkPayment.notes);
             await this.click(this.chequeDeposited);
+            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+                await this.click(this.cashDrawerLocationDropdown);
+                await this.waitForVisible(this.cashDrawerLocationDropdownOption);
+                await this.click(this.cashDrawerLocationDropdownOption);
+            }
+            await this.click(this.doNotSendEmailCheckbox);
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
@@ -323,6 +347,12 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
             await this.fill(this.receiptNumber, paymentData.cashPayment.receiptNumber);
             await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
+            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+                await this.click(this.cashDrawerLocationDropdown);
+                await this.waitForVisible(this.cashDrawerLocationDropdownOption);
+                await this.click(this.cashDrawerLocationDropdownOption);
+            }
+            await this.click(this.doNotSendEmailCheckbox);
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
@@ -354,6 +384,12 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.refundAddToBalance);
             await this.fill(this.receiptNumber, paymentData.adjustment.receiptNumber);
             await this.fill(this.cashNotesTextbox, paymentData.adjustment.notes);
+            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+                await this.click(this.cashDrawerLocationDropdown);
+                await this.waitForVisible(this.cashDrawerLocationDropdownOption);
+                await this.click(this.cashDrawerLocationDropdownOption);
+            }
+            await this.click(this.doNotSendEmailCheckbox);
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
@@ -390,6 +426,12 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.billStateDropdownValue);
             await this.fill(this.billingZipCode, paymentData.processCreditCard.billingZipCode);
             await this.fill(this.cashNotesTextbox, paymentData.processCreditCard.notes);
+            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+                await this.click(this.cashDrawerLocationDropdown);
+                await this.waitForVisible(this.cashDrawerLocationDropdownOption);
+                await this.click(this.cashDrawerLocationDropdownOption);
+            }
+            await this.click(this.doNotSendEmailCheckbox);
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);

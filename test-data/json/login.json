@@ -84,7 +84,8 @@
       "password": "Student@*/123321"
     },
     "resetStudent": {
-      "username": "rachel",
+      "name": "testautomation_resetpwd_donotuse",
+      "username": "tes105414",
       "email": "testingdata3011@gmail.com"
     },
     "staffUser": {

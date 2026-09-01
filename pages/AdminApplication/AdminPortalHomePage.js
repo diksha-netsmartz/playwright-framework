@@ -26,11 +26,11 @@ export default class AdminPortalHomePage extends BasePage {
             name: "Single Instructor"
         });
         this.manageTimeSlotsLink = page.locator('b').filter({ hasText: 'Manage Time Slots' })
-        this.bulkAppointmentLink = page.getByRole('link', { name: 'Bulk Appointment' });
+        this.bulkAppointmentLink = page.locator("#li_scheduling_managetimeslots_bulkappointments");
         this.openTimeSlotsLink = page.getByRole('link', { name: 'Open Time Slots' });
-        this.nonGraphicalLink = page.getByRole('link', { name: 'Non Graphical' });
-        this.corporateTimeOffLink = page.getByRole('link', { name: 'Corporate Time Off' });
-        this.staffAppointmentListLink = page.getByRole('link', { name: 'Staff Appointment List' });
+        this.nonGraphicalLink = page.locator("#scheduling_NonGraphicalScheduler_li");
+        this.corporateTimeOffLink = page.locator("#scheduling_corporatetimeoff_li");
+        this.staffAppointmentListLink = page.locator("#li_Staff_appointment_daily_List");
 
         //student account
         this.studentAccount = page.getByRole('link', { name: /Student Account/i });

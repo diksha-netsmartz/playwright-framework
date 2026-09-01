@@ -57,21 +57,21 @@ export default class StaffHomePage extends BasePage {
 
             await this.click(this.yesConfirmationButton);
 
-            // Catch the transient banner as soon as it appears in the DOM/page
-            const toastSeen = await this.page.waitForFunction(() => {
-                const text = document.body.innerText || '';
-                return text.includes('No Show successfully') || (text.includes('no show') && text.includes('successfully'));
-            }, { timeout: 7000 }).then(() => true).catch(() => false);
-
-            if (toastSeen) {
-                console.log('[StaffHomePage] Verified: "Appointment marked No Show successfully." banner was observed.');
-                await test.step('Verified: "Appointment marked No Show successfully." banner was displayed', async () => { });
-            }
-
             await this.page.waitForTimeout(1000);
             if (await this.isVisible(this.fullAppointmentYesButton)) {
                 await this.click(this.fullAppointmentYesButton);
             }
+
+            // Catch the transient banner as soon as it appears in the DOM/page
+            const toastSeen = await this.page.waitForFunction(() => {
+                const text = document.body.innerText || '';
+                return text.includes('No Show successfully') || (text.includes('no show') && text.includes('successfully'));
+            }, { timeout: 15000 }).then(() => true).catch(() => false);
+
+            expect(toastSeen, 'Expected "Appointment marked No Show successfully." banner to be displayed, but it was not present.').toBe(true);
+            await test.step('Verified: "Appointment marked No Show successfully." banner was displayed', async () => { });
+
+
 
             await this.waitForLoaders().catch(() => { });
         });
@@ -99,10 +99,9 @@ export default class StaffHomePage extends BasePage {
                 return /cance[l]+ed successfully/i.test(text) || (text.includes('Appointment') && /cance[l]+ed/i.test(text));
             }, { timeout: 7000 }).then(() => true).catch(() => false);
 
-            if (toastSeen) {
-                console.log('[StaffHomePage] Verified: "Appointment cancelled successfully." banner was observed.');
-                await test.step('Verified: "Appointment cancelled successfully." banner was displayed', async () => { });
-            }
+            expect(toastSeen, 'Expected "Appointment cancelled successfully." banner to be displayed, but it was not present.').toBe(true);
+            await test.step('Verified: "Appointment cancelled successfully." banner was displayed', async () => { });
+
             await this.waitForLoaders().catch(() => { });
         });
     }

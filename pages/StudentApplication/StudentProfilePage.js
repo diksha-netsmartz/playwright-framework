@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 /**
  * Page Object representing the Student Profile Page in the Student Portal (CSP).
@@ -15,10 +15,11 @@ export default class StudentProfilePage extends BasePage {
         super(page);
 
         // Profile input fields
-        this.parent1GuardianNameTxt = page.getByRole('textbox', { name: 'Parent1/Guardian Name' });
-        this.parentPhoneTxt = page.getByRole('textbox', { name: 'Parent Phone' });
-        this.homePhoneTxt = page.getByRole('textbox', { name: 'Home Phone' });
-        this.parentNameTxt = page.getByRole('textbox', { name: 'Parent Name' });
+        this.parentPhoneTxt = page.locator('#ParentPhone')
+        this.parentGuardianEmail = page.getByPlaceholder('Parent/Guardian Email')
+        this.addressTextbox = page.locator('#Address');
+        this.cityTextbox = page.locator('#City');
+        this.zipcodeTextbox = page.locator('#ZipPostalCode')
 
         // Action buttons
         this.updateBtn = page.getByRole('button', { name: 'Update' });
@@ -31,23 +32,39 @@ export default class StudentProfilePage extends BasePage {
     /**
      * Updates student profile fields with the provided details.
      * @param {Object} details - Profile fields to update.
-     * @param {string} [details.parent1GuardianName] - Parent 1 / Guardian name.
-     * @param {string} [details.homePhone] - Home phone number.
      * @param {string} [details.parentPhone] - Parent phone number.
+     * @param {string} [details.parentGuardianEmail] - Parent / Guardian email.
+     * @param {string} [details.address] - Street address.
+     * @param {string} [details.city] - City.
+     * @param {string} [details.zipcode] - Zip / postal code.
      **/
     async updateProfileDetails(details = {}) {
         await test.step('Fill updated student profile details', async () => {
-            await this.verifyVisible(this.parent1GuardianNameTxt);
-            await this.clear(this.parent1GuardianNameTxt);
-            await this.fill(this.parent1GuardianNameTxt, details.parent1GuardianName);
 
-            await this.verifyVisible(this.homePhoneTxt);
-            await this.clear(this.homePhoneTxt);
-            await this.fill(this.homePhoneTxt, details.homePhone);
+            await this.verifyVisible(this.addressTextbox);
+            await this.clear(this.addressTextbox);
+            await this.fill(this.addressTextbox, details.address);
+
+
+            await this.verifyVisible(this.cityTextbox);
+            await this.clear(this.cityTextbox);
+            await this.fill(this.cityTextbox, details.city);
+
+
+            await this.verifyVisible(this.zipcodeTextbox);
+            await this.clear(this.zipcodeTextbox);
+            await this.fill(this.zipcodeTextbox, details.zipcode);
+
 
             await this.verifyVisible(this.parentPhoneTxt);
             await this.clear(this.parentPhoneTxt);
             await this.fill(this.parentPhoneTxt, details.parentPhone);
+
+
+            await this.verifyVisible(this.parentGuardianEmail);
+            await this.clear(this.parentGuardianEmail);
+            await this.fill(this.parentGuardianEmail, details.parentGuardianEmail);
+
         });
     }
 
@@ -77,27 +94,39 @@ export default class StudentProfilePage extends BasePage {
     }
 
     /**
-     * Verifies that the profile fields display the expected values in their value attributes.
+     * Verifies that the profile fields display the expected values.
      * @param {Object} expectedDetails - Expected profile field values.
-     * @param {string} [expectedDetails.parent1GuardianName] - Expected parent 1 / guardian name.
-     * @param {string} [expectedDetails.homePhone] - Expected home phone.
      * @param {string} [expectedDetails.parentPhone] - Expected parent phone.
+     * @param {string} [expectedDetails.parentGuardianEmail] - Expected parent / guardian email.
+     * @param {string} [expectedDetails.address] - Expected address.
+     * @param {string} [expectedDetails.city] - Expected city.
+     * @param {string} [expectedDetails.zipcode] - Expected zipcode.
      **/
     async verifyProfileDetails(expectedDetails = {}) {
         await test.step('Verify profile field values match expected', async () => {
-            if (expectedDetails.parent1GuardianName !== undefined) {
-                await this.verifyVisible(this.parent1GuardianNameTxt);
-                await this.verifyAttribute(this.parent1GuardianNameTxt, 'value', expectedDetails.parent1GuardianName);
-            }
-
-            if (expectedDetails.homePhone !== undefined) {
-                await this.verifyVisible(this.homePhoneTxt);
-                await this.verifyAttribute(this.homePhoneTxt, 'value', expectedDetails.homePhone);
-            }
-
             if (expectedDetails.parentPhone !== undefined) {
                 await this.verifyVisible(this.parentPhoneTxt);
-                await this.verifyAttribute(this.parentPhoneTxt, 'value', expectedDetails.parentPhone);
+                await expect(this.parentPhoneTxt).toHaveValue(expectedDetails.parentPhone);
+            }
+
+            if (expectedDetails.parentGuardianEmail !== undefined) {
+                await this.verifyVisible(this.parentGuardianEmail);
+                await expect(this.parentGuardianEmail).toHaveValue(expectedDetails.parentGuardianEmail);
+            }
+
+            if (expectedDetails.address !== undefined) {
+                await this.verifyVisible(this.addressTextbox);
+                await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
+            }
+
+            if (expectedDetails.city !== undefined) {
+                await this.verifyVisible(this.cityTextbox);
+                await expect(this.cityTextbox).toHaveValue(expectedDetails.city);
+            }
+
+            if (expectedDetails.zipcode !== undefined) {
+                await this.verifyVisible(this.zipcodeTextbox);
+                await expect(this.zipcodeTextbox).toHaveValue(expectedDetails.zipcode);
             }
         });
     }
