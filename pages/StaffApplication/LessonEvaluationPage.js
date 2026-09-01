@@ -25,7 +25,7 @@ export default class LessonEvaluationPage extends BasePage {
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
         this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
-        this.successMessage = page.getByText('Success! Lesson completed and');
+        this.questionsDropdowns = page.locator("(//div[contains(@id,'divEvalQuestionNumber')])[1]");
         this.successMessageDiv = page.locator('#GlobalErrorSuccessDiv');
     }
 
@@ -34,7 +34,14 @@ export default class LessonEvaluationPage extends BasePage {
     **/
     async clickProcess() {
         await test.step('Click PROCESS button', async () => {
-            await this.click(this.processBtn);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 })
+            if (await this.isVisible(this.processBtn)) {
+                await this.click(this.processBtn);
+                await this.waitForHidden(this.processBtn);
+                await this.waitForLoaders();
+                await this.page.waitForLoadState('load', { timeout: 5000 })
+            }
         });
     }
 
@@ -45,6 +52,7 @@ export default class LessonEvaluationPage extends BasePage {
         await test.step('Select evaluation template from dropdown', async () => {
             await this.click(this.selectEvaluationBtn);
             await this.click(this.selectEvalutionDropdownValue);
+
         });
     }
 
@@ -85,6 +93,7 @@ export default class LessonEvaluationPage extends BasePage {
             await this.selectQuestionByText(18, '2-Beginning');          // Q18
             await this.selectQuestionByText(19, '4-Competent');          // Q19
             await this.selectQuestionByText(20, '1-Improvement Needed'); // Q20
+
         });
     }
 
