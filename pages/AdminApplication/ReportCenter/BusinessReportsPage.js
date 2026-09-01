@@ -690,7 +690,7 @@ export default class BusinessReportsPage extends BasePage {
      * @param {string} [dateRangeString] - Optional custom date range string e.g. '07/01/2026 - 09/30/2026'.
      **/
     async enterBtwAppointmentDateRange(dateRangeString) {
-        const range = dateRangeString || DateHelper.getThreeMonthDateRange().formattedRange;
+        const range = dateRangeString || DateHelper.getThreeMonthFormattedRange();
         await test.step(`Enter BTW appointment date range: "${range}"`, async () => {
             await this.waitForLoaders();
             await this.waitForVisible(this.btwAppointmentDateInput);
@@ -975,13 +975,7 @@ export default class BusinessReportsPage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.vehicleHoursStartDateInput);
 
-            const { prevMonthDate, currentMonthDate, lastDayCurrentMonth } = DateHelper.getPrevMonthToCurrentMonthRange();
-            const prevMonthNameYear = DateHelper.getMonthLongNameYear(prevMonthDate);
-            const prevDay = '1';
-
-            // Current month last day
-            const currMonthNameYear = DateHelper.getMonthLongNameYear(currentMonthDate);
-            const currLastDay = String(lastDayCurrentMonth);
+            const { prevMonthNameYear, currMonthNameYear, prevDay, currLastDay } = DateHelper.getPrevToCurrentMonthCalendarInfo();
 
             // 1. Select Start Date: click input, navigate back to previous month, click day 1
             await this.vehicleHoursStartDateInput.click();
@@ -1096,13 +1090,7 @@ export default class BusinessReportsPage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.inCarEvalStartDateInput);
 
-            const { prevMonthDate, currentMonthDate, lastDayCurrentMonth } = DateHelper.getPrevMonthToCurrentMonthRange();
-            const prevMonthNameYear = DateHelper.getMonthLongNameYear(prevMonthDate);
-            const prevDay = '1';
-
-            // Current month last day
-            const currMonthNameYear = DateHelper.getMonthLongNameYear(currentMonthDate);
-            const currLastDay = String(lastDayCurrentMonth);
+            const { prevMonthNameYear, currMonthNameYear, prevDay, currLastDay } = DateHelper.getPrevToCurrentMonthCalendarInfo();
 
             // 1. Select Start Date: click input, navigate back to previous month, click day 1
             await this.inCarEvalStartDateInput.click();

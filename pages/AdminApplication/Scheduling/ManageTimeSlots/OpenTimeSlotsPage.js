@@ -166,7 +166,7 @@ export default class OpenTimeSlotsPage extends BasePage {
      **/
     async applyFilterWithCurrentMonth(options = {}) {
         return await test.step('Apply filter with Current Month, Instructor, and Appointment Type', async () => {
-            const currentMonthRange = DateHelper.getCurrentMonthDateRange().formattedRange;
+            const currentMonthRange = DateHelper.getCurrentMonthFormattedRange();
 
             await this.waitForLoaders();
             await this.page.waitForLoadState('load');
@@ -318,7 +318,7 @@ export default class OpenTimeSlotsPage extends BasePage {
             const occupied = occupiedDays || this.occupiedDays || await this.getOccupiedDaysFromTable(activeDate);
 
             // Find 2 consecutive available dates in the current month
-            const dates = DateHelper.getAvailableDateAndNextDay(occupied, { minDay: 1, maxDay: 25, baseDate: activeDate });
+            const dates = DateHelper.getStandardAvailableDateRange(occupied, activeDate);
 
             let startDay;
             let endDay;
@@ -512,7 +512,7 @@ export default class OpenTimeSlotsPage extends BasePage {
      **/
     async selectDateRangeCurrentMonth() {
         await test.step('Select date range: Current month in #txtOTSRange', async () => {
-            const { formattedRange } = DateHelper.getCurrentMonthDateRange();
+            const formattedRange = DateHelper.getCurrentMonthFormattedRange();
             await this.waitForLoaders();
             await this.waitForVisible(this.selectDateRangeInput);
             await this.clear(this.selectDateRangeInput);
@@ -530,7 +530,7 @@ export default class OpenTimeSlotsPage extends BasePage {
      **/
     async selectDateRangePrevMonthFirstToThisMonthLast() {
         await test.step('Select date range: Previous month 1st to Current month last date', async () => {
-            const { formattedRange: dateRange } = DateHelper.getPrevMonthToCurrentMonthRange();
+            const dateRange = DateHelper.getPrevMonthToCurrentMonthRange().formattedRange;
             await this.waitForLoaders();
             await this.waitForVisible(this.selectDateRangeInput);
             await this.clear(this.selectDateRangeInput)
