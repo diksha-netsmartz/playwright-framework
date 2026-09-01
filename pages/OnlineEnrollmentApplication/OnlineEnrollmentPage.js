@@ -18,8 +18,11 @@ export default class OnlineEnrollmentPage extends BasePage {
         super(page);
 
         // Package selection
-        this.btwPackageBtn = page.locator("xpath=//p[text()='BTW Package']//ancestor::tr//a[@data-target='#btnSelect']");
-        this.rtPackageBtn = page.locator("xpath=//p[contains(text(),'RT')]//ancestor::tr//a[@data-target='#btnSelect']");
+        this.btwPackageBtn = page.locator("xpath=(//p[contains(text(),'BTW Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
+        this.rtPackageBtn = page.locator("xpath=(//p[contains(text(),'RT Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
+        this.btwCRPackage = page.locator("//p[text()='BTW and CR Package']//ancestor::tr//a");
+        this.additionalPackageCheckbox = page.locator("(//input[@type='checkbox' and contains(@class,'AdditionalProduct')]//following-sibling::span)[1]");
+        this.continueAdditionalProduct = page.locator('#btnContinueAdditionalProduct');
         this.showAppointmentButton = page.locator('#btnAvailableClass');
         this.selectButton = page.locator("xpath=(//input[@value='Select'])[1]");
         this.continueButton = page.locator("xpath=(//input[@value='Continue'])[1]");
@@ -109,6 +112,22 @@ export default class OnlineEnrollmentPage extends BasePage {
     }
 
     /**
+     * Navigates to the Teen Online Enrollment page with custom query parameters (e.g. package, CR, location).
+     * @param {string} [params=''] - Parameter string to append (e.g. '&param=BTW1', '&CR=CR1', '&param=BTWCR1&CR=CR1', etc.)
+     **/
+    async navigateToTeenOEPageWithParams(params = '') {
+        await test.step(`Navigate to Teen Online Enrollment Page with params: "${params}"`, async () => {
+            let url = config.teenOEURL;
+            if (params) {
+                const cleanParams = String(params).trim();
+                const separator = cleanParams.startsWith('&') || cleanParams.startsWith('?') ? '' : '&';
+                url = `${url}${separator}${cleanParams}`;
+            }
+            await this.navigate(url);
+        });
+    }
+
+    /**
      * Navigates to the Adult Online Enrollment page.
      **/
     async navigateToAdultOEPage() {
@@ -156,6 +175,46 @@ export default class OnlineEnrollmentPage extends BasePage {
             if (await this.isVisible(this.continueButton), { timeout: 2000 }) {
                 await this.click(this.continueButton);
             }
+            await this.waitForLoaders().catch(() => { });
+        });
+    }
+
+    /**
+     * Clicks on the Select button for any classroom session/class.
+     **/
+    async selectClass() {
+        await test.step('Click on the Select button for location', async () => {
+            await this.waitForLoaders().catch(() => { });
+            const selectBtn = this.page.locator("(//input[@value='Select'])[1]");
+            await this.waitForVisible(selectBtn);
+            await this.click(selectBtn);
+            await this.waitForLoaders().catch(() => { });
+        });
+    }
+
+    /**
+     * Selects BTW and CR Package from the select package modal popup (#btnSelectPackageByClass).
+     **/
+    async selectBtwAndCrPackage() {
+        await test.step('From the select package pop-up, select BTW and CR Package', async () => {
+            await this.waitForLoaders().catch(() => { });
+            await this.waitForVisible(this.btwCRPackage);
+            await this.click(this.btwCRPackage);
+            await this.waitForVisible(this.additionalPackageCheckbox);
+            await this.click(this.additionalPackageCheckbox);
+            await this.waitForLoaders().catch(() => { });
+        });
+    }
+
+    /**
+     * Clicks on the Continue button after package selection.
+     **/
+    async clickContinue() {
+        await test.step('Click on Continue', async () => {
+            await this.waitForLoaders().catch(() => { });
+            await this.waitForVisible(this.continueAdditionalProduct);
+            await this.click(this.continueAdditionalProduct);
+            await this.waitForHidden(this.continueAdditionalProduct)
             await this.waitForLoaders().catch(() => { });
         });
     }
@@ -212,10 +271,9 @@ export default class OnlineEnrollmentPage extends BasePage {
 
     /**
      * Fills the entire student registration form conditionally checking visibility for every field.
-     * @param {string} [prefix='student'] - Prefix for generated emails and usernames.
      **/
-    async fillStudentInfo(prefix = 'student') {
-        await test.step(`Fill Online Enrollment Form (${prefix})`, async () => {
+    async fillStudentInfo() {
+        await test.step(`Fill Online Enrollment Form`, async () => {
             this.uniqueId = `${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`;
             const data = oeData.student;
             const random7 = String(Math.floor(1000000 + Math.random() * 9000000));
@@ -244,7 +302,7 @@ export default class OnlineEnrollmentPage extends BasePage {
                 await this.fill(this.cellPhoneTxt, phone);
             }
             if (await this.isVisible(this.emailTxt)) {
-                await this.fill(this.emailTxt, `${prefix}_${this.uniqueId}@gmail.com`);
+                await this.fill(this.emailTxt, `${data.firstName}_${this.uniqueId}@gmail.com`);
             }
             if (await this.isVisible(this.parentGuardianNameTxt)) {
                 await this.fill(this.parentGuardianNameTxt, data.parentGuardianName);
@@ -376,6 +434,7 @@ export default class OnlineEnrollmentPage extends BasePage {
     async verifyReceiptPage(expectedText, attachmentName) {
         await test.step(`Verify "${expectedText}" on receipt page`, async () => {
             await this.waitForLoaders().catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 10000 })
             await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')));
             await this.verifyVisible(this.page.getByText(new RegExp(expectedText, 'i')));
         });
