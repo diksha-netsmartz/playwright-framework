@@ -75,7 +75,6 @@ export default class StaffHomePage extends BasePage {
             await this.waitForVisible(this.cancelTextbox);
             await this.fill(this.cancelTextbox, "cancel appointment");
             await this.click(this.cancelButton);
-
             const cancelMsg = this.page.getByText('Appointment cancelled successfully.', { exact: true });
             await this.click(this.yesConfirmationButton);
             await expect(cancelMsg).toBeAttached({ timeout: 5000 });

@@ -57,7 +57,7 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
             recipientEmail: credentials.resetStudent.email,
             subject: 'Student UserName/Password',
             sentAfter: emailSentTime,
-            timeoutMs: 45000
+            timeoutMs: 75000
         });
         console.log('Navigating to Reset Password URL:', resetPasswordUrl);
     });

@@ -75,6 +75,7 @@ export default class StudentProfilePage extends BasePage {
      **/
     async updateEmailIfDifferent(specifiedEmail) {
         await test.step(`Update student email if different from: "${specifiedEmail}"`, async () => {
+            await this.waitForVisible(this.emailInput);
             await this.verifyVisible(this.emailInput);
             const currentEmail = (await this.getInputValue(this.emailInput)).trim();
 
