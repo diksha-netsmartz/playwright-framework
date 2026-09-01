@@ -192,22 +192,11 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async selectDateInCalendar() {
         await test.step('Select target date in scheduler calendar', async () => {
-            let targetDate = DateHelper.getDateDaysAgo(7);
-
-            // If Sunday (0), go one more day back to Saturday
-            if (targetDate.getDay() === 0) {
-                targetDate = DateHelper.getDateDaysAgo(8);
-            }
-
-            const year = targetDate.getFullYear();
-            const month = targetDate.getMonth();
-            const day = targetDate.getDate();
-            const dataValue = `${year}/${month}/${day}`;
+            const targetDate = DateHelper.getWeekdayDaysAgo(7);
+            const dataValue = DateHelper.toSchedulerDataValue(targetDate);
 
             const today = new Date();
-            const todayYear = today.getFullYear();
-            const todayMonth = today.getMonth();
-            const monthDiff = (todayYear - year) * 12 + (todayMonth - month);
+            const monthDiff = (today.getFullYear() - targetDate.getFullYear()) * 12 + (today.getMonth() - targetDate.getMonth());
 
             for (let i = 0; i < monthDiff; i++) {
                 await this.click(this.calendarPrevBtn);
