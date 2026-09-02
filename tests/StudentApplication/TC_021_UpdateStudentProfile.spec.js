@@ -20,8 +20,8 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
     let dynamicParentPhone;
     let dynamicParentEmail;
     let dynamicAddress;
-    let dynamicCity;
     let dynamicZipcode;
+    let dynamicPermitNumber;
 
     await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
         await studentLoginPage.navigateToLoginPage();
@@ -37,11 +37,13 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
         dynamicParentEmail = `parent_${Date.now()}@test.com`;
         dynamicAddress = `${Math.floor(100 + Math.random() * 900)} Main Street`;
         dynamicZipcode = `${Math.floor(10000 + Math.random() * 90000)}`;
+        dynamicPermitNumber = `PM${Math.floor(10000 + Math.random() * 90000)}`;
 
         await studentProfilePage.updateProfileDetails({
             parentPhone: dynamicParentPhone,
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
+            permit: dynamicPermitNumber,
         });
     });
 
@@ -56,6 +58,7 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smok
             parentPhone: dynamicParentPhone,
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
+            permit: dynamicPermitNumber,
         });
     });
 });

@@ -19,8 +19,14 @@ export default class StudentProfilePage extends BasePage {
         this.parentGuardianEmail = page.getByPlaceholder('Parent/Guardian Email')
         this.addressTextbox = page.locator('#Address');
         this.cityTextbox = page.locator('#City');
-        this.zipcodeTextbox = page.locator('#ZipPostalCode')
-
+        this.zipcodeTextbox = page.locator('#ZipPostalCode');
+        this.dlPermit = page.locator('[name="DLPermit#"]');
+        this.wearGlassDropdown = page.locator("button[data-id='WearGlassesContacts']");
+        this.wearGlassDropdownValue = page.locator("(//button[@data-id='WearGlassesContacts']//parent::div//li//span[1][not(contains(text(),'Please Select'))])[1]");
+        this.permitIssuedDate = page.locator('#dt_Date_PermitIssue');
+        this.monthFirstDay = page.locator("//a[text()='1']");
+        this.monthLastDay = page.locator("//a[text()='27']");
+        this.permitExpireDate = page.locator('#dt_Date_ExpirePermit')
         // Action buttons
         this.updateBtn = page.getByRole('button', { name: 'Update' });
         this.yesConfirmationBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
@@ -56,6 +62,27 @@ export default class StudentProfilePage extends BasePage {
             await this.clear(this.parentGuardianEmail);
             await this.fill(this.parentGuardianEmail, details.parentGuardianEmail);
 
+
+            if (await this.isVisible(this.dlPermit)) {
+                await this.fill(this.dlPermit, details.permit);
+            }
+
+            if (await this.isVisible(this.wearGlassDropdown)) {
+                await this.click(this.wearGlassDropdown);
+                await this.click(this.wearGlassDropdownValue);
+            }
+
+            if (await this.isVisible(this.permitIssuedDate)) {
+                await this.clear(this.permitIssuedDate);
+                await this.waitForVisible(this.monthFirstDay);
+                await this.click(this.monthFirstDay);
+            }
+
+            if (await this.isVisible(this.permitExpireDate)) {
+                await this.clear(this.permitExpireDate);
+                await this.waitForVisible(this.monthLastDay);
+                await this.click(this.monthLastDay);
+            }
         });
     }
 
@@ -104,6 +131,10 @@ export default class StudentProfilePage extends BasePage {
 
             await this.verifyVisible(this.addressTextbox);
             await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
+
+            if (await this.isVisible(this.dlPermit)) {
+                await expect(this.dlPermit).toHaveValue(expectedDetails.permit);
+            }
 
 
         });

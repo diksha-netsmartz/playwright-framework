@@ -49,6 +49,7 @@ export default class AdminPortalHomePage extends BasePage {
         // Uploaded Files widget
         this.uploadedFilesWidget = page.getByText('Uploaded Files', { exact: true });
         this.showFilesToConfirmBtn = page.getByRole('button', { name: 'Show Files to Confirm' });
+        this.studentSearchBox = page.locator("(//input[@aria-controls='StudentPortalEmaildataTable'])[1]")
         this.filePreviewIcon = page.getByTitle('File Preview', { exact: true }).first();
         this.selectCategoryButton = page.getByRole('button', { name: 'Select Category' });
         this.selectCategoryDropdownCheckbox = page.locator("xpath=(//div[@class='selectCategorFromImagePreViewModal']//input[@type='checkbox' and contains(@class,'Document')]//following-sibling::ins)[1]");
@@ -279,22 +280,28 @@ export default class AdminPortalHomePage extends BasePage {
     /**
      * Confirms uploaded student documents in the Uploaded Files dashboard widget and sends a confirmation email.
      **/
-    async clickShowFilesToConfirm() {
+    async clickShowFilesToConfirm(studentName) {
         await test.step('Confirm uploaded student documents and send email', async () => {
             await this.waitForLoaders();
             await this.verifyVisible(this.uploadedFilesWidget);
             await this.click(this.showFilesToConfirmBtn);
+            await this.waitForVisible(this.studentSearchBox);
+            await this.pressSequentially(this.studentSearchBox, studentName);
+            await this.page.waitForTimeout(1000);
             await this.click(this.filePreviewIcon);
-            await this.click(this.selectCategoryButton);
-            await this.click(this.selectCategoryDropdownCheckbox);
+            // await this.click(this.selectCategoryButton);
+            // await this.click(this.selectCategoryDropdownCheckbox);
             await this.click(this.confirmButton);
             await this.click(this.yesConfirmationButton);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.sendButton);
             await this.waitForVisible(this.page.getByText(' File has been confirmed', { exact: true }))
             await this.verifyVisible(this.page.getByText(' File has been confirmed', { exact: true }));
-            await this.click(this.sendButton);
+            await this.jsClick(this.sendButton);
             await this.waitForHidden(this.sendButton);
             await this.waitForLoaders();
             await this.waitForVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+            await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
         });
     }
 
