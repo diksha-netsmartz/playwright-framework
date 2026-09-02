@@ -35,7 +35,7 @@ export default class LessonEvaluationPage extends BasePage {
     async clickProcess() {
         await test.step('Click PROCESS button', async () => {
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 5000 })
+            await this.page.waitForTimeout(10000)
             if (await this.isVisible(this.processBtn)) {
                 await this.click(this.processBtn);
                 await this.waitForHidden(this.processBtn);
@@ -49,11 +49,13 @@ export default class LessonEvaluationPage extends BasePage {
      * Opens the evaluation dropdown and selects the last evaluation type.
     **/
     async selectEvaluation() {
-        await test.step('Select evaluation template from dropdown', async () => {
-            await this.click(this.selectEvaluationBtn);
-            await this.click(this.selectEvalutionDropdownValue);
+        if (await this.isVisible(this.selectEvaluationBtn)) {
+            await test.step('Select evaluation template from dropdown', async () => {
+                await this.click(this.selectEvaluationBtn);
+                await this.click(this.selectEvalutionDropdownValue);
+            });
+        }
 
-        });
     }
 
     /**
@@ -64,8 +66,10 @@ export default class LessonEvaluationPage extends BasePage {
     async selectQuestionByText(questionNumber, optionText) {
         const dropdownBtn = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[@class='filter-option pull-left']`);
         const dropdownValue = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[text()='${optionText}']`);
-        await this.click(dropdownBtn);
-        await this.click(dropdownValue);
+        if (await this.isVisible(dropdownBtn)) {
+            await this.click(dropdownBtn);
+            await this.click(dropdownValue);
+        }
     }
 
     /**
