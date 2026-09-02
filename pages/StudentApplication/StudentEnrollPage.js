@@ -19,6 +19,10 @@ export default class StudentEnrollPage extends BasePage {
         this.printReceiptLink = page.getByRole('link', { name: 'Print Receipt' }).last();
         this.getPackageSelectBtn = page.locator("xpath=(//button[contains(@class,'PriceTax')])[1]");
         this.skipSelectionButton = page.getByRole('button', { name: 'Skip Selection' })
+        this.studentSignature = page.locator('#txtStudentSignature');
+        this.contractSignatureSaveButton = page.locator("(//h4[text()='Contract Signature']//ancestor::div[contains(@class,'modal-content')]//button[contains(text(),'Save')])[1]");
+        this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
+
     }
 
     /**
@@ -41,6 +45,14 @@ export default class StudentEnrollPage extends BasePage {
     async clickPayLater() {
         await test.step('Click Pay Later button', async () => {
             await this.click(this.payLaterBtn);
+            await this.page.waitForTimeout(5000);
+            if (await this.isVisible(this.studentSignature)) {
+                await this.fill(this.studentSignature, "Student Signature");
+                await this.click(this.contractSignatureSaveButton);
+                await this.click(this.yesConfirmationButton);
+                await this.waitForLoaders();
+
+            }
         });
     }
 

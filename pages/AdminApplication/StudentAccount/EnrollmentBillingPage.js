@@ -34,7 +34,9 @@ export default class EnrollmentBillingPage extends BasePage {
 
         // Package Selection
         this.packageSelectionButton = page.getByRole('button', { name: 'Package Selection' });
-
+        this.searchPackageInDropdown = page.locator('#lstPackagesForSelectionSearch');
+        this.cashDrawerLocationDropdownInPackageSelection = page.getByRole('button', { name: 'Select Cash Drawer Location' })
+        this.cashDrawerLocationSelectionInPackageSelection = page.locator("(//div[@id='drp_CashdrawerLocation']//li//span[1][not(contains(text(),'Select'))])[1]");
         this.addPackageButton = page.getByRole('button', { name: 'Add Package' });
 
         // Location / Appointment
@@ -51,6 +53,7 @@ export default class EnrollmentBillingPage extends BasePage {
         // Edit
         this.editButton = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//ancestor::tr//a[@data-toggle='dropdown'])[1]");
         this.getLatestPackageID = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[4])[1]");
+        this.getLatestPackageId2 = page.locator("(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[text()='Package']//following-sibling::td)[1]")
 
         // Update
         this.notesTextbox = page.locator('#txtpackageNotes');
@@ -58,6 +61,10 @@ export default class EnrollmentBillingPage extends BasePage {
         this.updateButton = page.getByRole('button', { name: 'Update' }).first();
 
         this.skipSelectionButton = page.getByRole('button', { name: 'Skip Selection' }).first();
+        this.skipSelectionButtonForClassSelection = page.locator("xpath=//h4[text()='Class Selection']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
+        this.skipSelectionButtonAddOnServices = page.locator("//h4[text()='Add On Services/Products']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
+
+
 
         // Billing grid
         this.selectButton = page.getByRole('button', { name: 'Select' });
@@ -90,6 +97,7 @@ export default class EnrollmentBillingPage extends BasePage {
         this.cashAmountTextbox = page.locator("#txtCashAmount").first();
 
         // Adjustment
+        this.adjustmentTypeDropdown = page.locator('#btnAdjustmentType')
         this.adjustment = page.getByText('Adjustment', { exact: true }).last();
         this.refundAddToBalance = page.locator("xpath=//ul[@id='ddlAdjustmentTypeType']//li//span[text()='Refund (Add to balance)']");
 
@@ -106,9 +114,21 @@ export default class EnrollmentBillingPage extends BasePage {
         this.billStateDropdownValue = page.locator("xpath=//div[@role='option' and text()='AK']");
         this.billingZipCode = page.getByRole('textbox', { name: 'Zip Code' });
 
-        // Billing amount caption (e.g. "Billing: $1275.00")
-        this.billingAmountCaption = page.locator("//div[@id='divBillingGrid']//div[contains(@class,'caption')]");
+        // Clover iframe locators (Card Number, Expiration Date, CVV for other env)
+        this.cardNumberIframe = page.locator('#CARD_NUMBER_ID, iframe[title="CARD NUMBER"]');
+        this.cardNumberInIframe = page.frameLocator('#CARD_NUMBER_ID, iframe[title="CARD NUMBER"]').locator('#cardNumber');
 
+        this.cardDateIframe = page.locator('#CARD_DATE_ID, iframe[title="CARD DATE"]');
+        this.expiryDateInIframe = page.frameLocator('#CARD_DATE_ID, iframe[title="CARD DATE"]').locator('#date');
+
+        this.cardCvvIframe = page.locator('#CARD_CVV_ID, iframe[title="CARD CVV"]');
+        this.cvvInIframe = page.frameLocator('#CARD_CVV_ID, iframe[title="CARD CVV"]').locator('#cvv');
+
+        this.cardPostalCodeIframe = page.locator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]');
+        this.postalCodeInIframe = page.frameLocator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]').locator('#postal');
+
+        // Billing amount caption (e.g. "Billing: $1275.00" or "Billing: $-1100.00")
+        this.billingAmountCaption = page.locator("//div[@id='divBillingGrid']//div[contains(@class,'caption')]");
         // Common buttons
         this.saveButton = page.getByRole('button', { name: 'Save' });
         this.closeButton = page.getByRole('button', { name: 'Close' });
@@ -157,6 +177,8 @@ export default class EnrollmentBillingPage extends BasePage {
     async selectPackage(packageName) {
         await test.step(`Select package: "${packageName}"`, async () => {
             await this.click(this.packageSelectionButton);
+            await this.waitForVisible(this.packageSelectionButton);
+            await this.pressSequentially(this.searchPackageInDropdown, packageName);
             await this.click(this.page.getByRole('link', {
                 name: packageName,
                 exact: true
@@ -165,18 +187,52 @@ export default class EnrollmentBillingPage extends BasePage {
     }
 
     /**
+* Opens the cash drawer location modal and selects the cash drawer location.
+**/
+    async selectCashDrawerLocation() {
+        if (await this.isVisible(this.cashDrawerLocationDropdownInPackageSelection)) {
+            await test.step(`Select Cash Drawer Location`, async () => {
+                await this.waitForVisible(this.cashDrawerLocationDropdownInPackageSelection);
+                await this.click(this.cashDrawerLocationDropdownInPackageSelection);
+                await this.waitForVisible(this.cashDrawerLocationSelectionInPackageSelection);
+                await this.click(this.cashDrawerLocationSelectionInPackageSelection);
+                await this.page.waitForTimeout(2000);
+
+            });
+        }
+    }
+
+    /**
      * Completes the entire workflow to add a CR Package to cart (location, filter, select slot, additional details).
     **/
     async addCRPackage() {
         await test.step('Add CR Package to cart', async () => {
             await this.selectPackage('CR Package');
+            await this.selectCashDrawerLocation();
             await this.click(this.addPackageButton);
-            await this.click(this.selectLocationDropdown);
-            await this.click(this.showAllCheckbox);
-            await this.click(this.filterButton);
-            await this.click(this.selectButton);
-            await this.click(this.addButtonForAdditionalDetails);
-            await this.click(this.addToCartButton);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 })
+            // await this.page.waitForTimeout(2500);
+            // if (await this.isVisible(this.selectLocationDropdown)) {
+            //     await this.click(this.selectLocationDropdown);
+            //     await this.click(this.showAllCheckbox);
+            //     await this.click(this.filterButton);
+            //     await this.click(this.selectButton);
+            // }
+            // await this.click(this.addButtonForAdditionalDetails);
+            // await this.click(this.addToCartButton);
+
+            await this.page.waitForTimeout(3000);
+            if (await this.isVisible(this.skipSelectionButtonForClassSelection)) {
+                await this.click(this.skipSelectionButtonForClassSelection);
+                await this.waitForHidden(this.skipSelectionButtonForClassSelection);
+            }
+            await this.page.waitForTimeout(3000);
+            if (await this.isVisible(this.skipSelectionButtonAddOnServices)) {
+                await this.click(this.skipSelectionButtonAddOnServices);
+                await this.waitForHidden(this.skipSelectionButtonAddOnServices);
+            }
+
         });
     }
 
@@ -187,6 +243,9 @@ export default class EnrollmentBillingPage extends BasePage {
         await test.step('Enroll student in package', async () => {
             await this.click(this.enrollButton);
             await this.click(this.yesConfirmationButton);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.page.getByText('Enrolled successfully.', { exact: true }));
+            await this.verifyVisible(this.page.getByText('Enrolled successfully.', { exact: true }));
         });
     }
 
@@ -196,7 +255,15 @@ export default class EnrollmentBillingPage extends BasePage {
     async editAndUpdateNotes() {
         await test.step('Edit package enrollment and update notes', async () => {
             await this.click(this.editButton);
-            const packageId = await this.getText(this.getLatestPackageID);
+            let packageId = "";
+            if (await this.getLatestPackageId2.count() > 0) {
+                packageId = await this.getText(this.getLatestPackageId2);
+
+            }
+            else {
+                packageId = await this.getText(this.getLatestPackageID);
+            }
+
             console.log("package id : " + packageId);
             await this.click(this.editDetailsTab(packageId));
             try {
@@ -222,7 +289,15 @@ export default class EnrollmentBillingPage extends BasePage {
         await test.step('Delete package enrollment', async () => {
             await this.waitForVisible(this.editButton);
             await this.click(this.editButton);
-            const packageId = await this.getText(this.getLatestPackageID);
+            let packageId = "";
+            if (await this.getLatestPackageId2.count() > 0) {
+                packageId = await this.getText(this.getLatestPackageId2);
+
+            }
+            else {
+                packageId = await this.getText(this.getLatestPackageID);
+            }
+            console.log("package id : " + packageId);
             await this.waitForVisible(this.deleteLink(packageId));
             await this.deleteLink(packageId).click({ force: true });
             await this.click(this.yesConfirmationButton);
@@ -248,9 +323,22 @@ export default class EnrollmentBillingPage extends BasePage {
      * @returns {Promise<number|null>} Parsed float amount or null.
       **/
     async getBillingAmount() {
-        const text = await this.getText(this.billingAmountCaption);
-        const match = text.match(/\$([\d,]+\.?\d*)/);
-        return match ? parseFloat(match[1].replace(',', '')) : null;
+        await this.waitForVisible(this.billingAmountCaption);
+        await this.waitForLoaders();
+        const rawText = await this.getText(this.billingAmountCaption);
+        console.log("Raw billing caption text:", JSON.stringify(rawText));
+
+        // Match the text string "Billing: $-1100.00" or "Billing: $1275.00"
+        const textMatch = rawText ? rawText.match(/Billing:\s*[-$0-9,.]+/i) : null;
+        const billingString = textMatch ? textMatch[0].trim() : (rawText ? rawText.trim() : null);
+        console.log("Extracted billing string:", billingString);
+
+        // Parse into numeric amount (supports negative numbers like $-1100.00 or -$1100.00)
+        const numMatch = rawText ? rawText.match(/Billing:\s*([-$0-9,.]+)/i) : null;
+        const amount = numMatch ? parseFloat(numMatch[1].replace(/[$\s]/g, '').replace(/,/g, '')) : null;
+        console.log("Parsed numeric amount:", amount);
+
+        return amount;
     }
 
     /**
@@ -258,6 +346,7 @@ export default class EnrollmentBillingPage extends BasePage {
     **/
     async addSwipedTransaction() {
         await test.step('Add Swiped Card Transaction payment and verify balance update', async () => {
+
             const amountBefore = await this.getBillingAmount();
 
             await this.click(this.addNewBilling);
@@ -293,6 +382,8 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 5000 });
             await this.page.waitForTimeout(3000);
             const amountAfter = await this.getBillingAmount();
+            console.log("amount before : " + amountBefore);
+            console.log("amount after : " + amountAfter);
             expect(amountAfter).not.toEqual(amountBefore);
         });
     }
@@ -380,7 +471,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.adjustment);
             await this.clear(this.cashAmountTextbox);
             await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
-            await this.click(this.selectButton);
+            await this.click(this.adjustmentTypeDropdown);
             await this.click(this.refundAddToBalance);
             await this.fill(this.receiptNumber, paymentData.adjustment.receiptNumber);
             await this.fill(this.cashNotesTextbox, paymentData.adjustment.notes);
@@ -415,16 +506,40 @@ export default class EnrollmentBillingPage extends BasePage {
 
             await this.click(this.addNewBilling);
             await this.click(this.processCreditCard);
-            await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
-            await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
-            await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+            await this.waitForVisible(this.saveButton);
+            await this.verifyVisible(this.saveButton)
+            if (await this.isVisible(this.cardNumberIframe)) {
+                await this.waitForVisible(this.cardNumberInIframe);
+                await this.click(this.cardNumberInIframe);
+                await this.pressSequentially(this.cardNumberInIframe, paymentData.processCreditCard.cardNumber);
+
+                const expRaw = paymentData.processCreditCard.expiryDate;
+                const expFormatted = expRaw.length === 6 ? `${expRaw.slice(0, 2)}${expRaw.slice(4)}` : expRaw;
+                await this.click(this.expiryDateInIframe);
+                await this.pressSequentially(this.expiryDateInIframe, expFormatted);
+
+                await this.click(this.cvvInIframe);
+                await this.pressSequentially(this.cvvInIframe, paymentData.processCreditCard.cvv);
+            } else {
+                await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
+                await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
+                await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+            }
+
             await this.fill(this.nameOnCard, paymentData.processCreditCard.nameOnCard);
             await this.fill(this.receiptNumber, paymentData.processCreditCard.receiptNumber);
             await this.fill(this.billingAddress, paymentData.processCreditCard.billingAddress);
             await this.fill(this.billingCity, paymentData.processCreditCard.billingCity);
             await this.click(this.billStateDropdown);
             await this.click(this.billStateDropdownValue);
-            await this.fill(this.billingZipCode, paymentData.processCreditCard.billingZipCode);
+
+            if (await this.isVisible(this.cardPostalCodeIframe)) {
+                await this.waitForVisible(this.postalCodeInIframe);
+                await this.click(this.postalCodeInIframe);
+                await this.pressSequentially(this.postalCodeInIframe, paymentData.processCreditCard.billingZipCode);
+            } else {
+                await this.fill(this.billingZipCode, paymentData.processCreditCard.billingZipCode);
+            }
             await this.fill(this.cashNotesTextbox, paymentData.processCreditCard.notes);
             if (await this.isVisible(this.cashDrawerLocationDropdown)) {
                 await this.click(this.cashDrawerLocationDropdown);

@@ -40,11 +40,12 @@ export default class StudentProfilePage extends BasePage {
     async updateProfileDetails(details = {}) {
         await test.step('Fill updated student profile details', async () => {
 
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 5000 })
+            await this.waitForVisible(this.addressTextbox);
             await this.verifyVisible(this.addressTextbox);
             await this.clear(this.addressTextbox);
             await this.fill(this.addressTextbox, details.address);
-
-
 
             await this.verifyVisible(this.parentPhoneTxt);
             await this.clear(this.parentPhoneTxt);

@@ -20,7 +20,7 @@ export default class OnlineEnrollmentPage extends BasePage {
         // Package selection
         this.btwPackageBtn = page.locator("xpath=(//p[contains(text(),'BTW Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
         this.rtPackageBtn = page.locator("xpath=(//p[contains(text(),'RT Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
-        this.btwCRPackage = page.locator("//p[text()='BTW and CR Package']//ancestor::tr//a");
+        this.btwCRPackage = page.locator("(//p[text()='BTW and CR Package' or text()='This is BTW and CR Package']//ancestor::tr//a)[1]");
         this.additionalPackageCheckbox = page.locator("(//input[@type='checkbox' and contains(@class,'AdditionalProduct')]//following-sibling::span)[1]");
         this.continueAdditionalProduct = page.locator('#btnContinueAdditionalProduct');
         this.showAppointmentButton = page.locator('#btnAvailableClass');
@@ -40,6 +40,8 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.homePhoneTxt = page.getByRole('textbox', { name: 'Home Phone' });
         this.cellPhoneTxt = page.getByRole('textbox', { name: 'Cell Phone' });
         this.emailTxt = page.locator('#Email');
+        this.textsignature = page.getByText('Text Signature');
+        this.studentSignature = page.locator('#StudentSignature');
 
         // Parent / Guardian 1
         this.parentGuardianNameTxt = page.locator('#ParentName');
@@ -65,12 +67,12 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.yearSelectionInDropdown = page.locator("xpath=(//ul[@id='int_DOB_Year_listbox'])[last()]//li[text()='2009']");
 
 
-        this.dobMonthPackage = page.locator("xpath=//span[text()='Month']");
-        this.monthSelectionInDropdownPackage = page.locator("xpath=(//ul[contains(@id,'DOBMonths')])[last()]//li[text()='Feb']");
-        this.dobDayPackage = page.locator("xpath=//span[text()='Day']");
-        this.daySelectionInDropdownPackage = page.locator("xpath=(//ul[contains(@id,'DOBDays')])[last()]//li[text()='02']");
-        this.dobYearPackage = page.locator("xpath=//span[text()='Year']");
-        this.yearSelectionInDropdownPackage = page.locator("xpath=(//ul[contains(@id,'DOBYears')])[last()]//li[text()='2009']");
+        this.dobMonthPackage = page.locator("xpath=(//span[text()='Month'])[1]");
+        this.monthSelectionInDropdownPackage = page.locator("xpath=(//li[text()='Feb'])[last()]");
+        this.dobDayPackage = page.locator("xpath=(//span[text()='Day'])[1]");
+        this.daySelectionInDropdownPackage = page.locator("xpath=(//li[text()='02'])[last()]");
+        this.dobYearPackage = page.locator("xpath=(//span[text()='Year'])[1]");
+        this.yearSelectionInDropdownPackage = page.locator("xpath=(//li[text()='2009'])[last()]");
         this.proceedButton = page.locator("#btnServiceForCertificationProceed");
 
 
@@ -100,6 +102,7 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.addButton = page.locator('#btnSavePhoneNumber');
         this.optInButton = page.locator('#btnSubmitInDBPhoneNumber');
         this.printReceiptLink = page.getByRole('link', { name: 'Print Receipt' }).last();
+        this.captchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]').first();
     }
 
     /**
@@ -263,9 +266,12 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.click(this.yearSelectionInDropdownPackage);
             await this.click(this.dobDayPackage);
             await this.click(this.daySelectionInDropdownPackage);
-            await this.click(this.proceedButton);
+            if (await this.isVisible(this.showAppointmentButton)) {
+                await this.click(this.showAppointmentButton);
+            }
+            else
+                await this.click(this.proceedButton);
             await this.waitForHidden(this.proceedButton);
-
         }
 
 
@@ -401,6 +407,21 @@ export default class OnlineEnrollmentPage extends BasePage {
             if (await this.isVisible(this.last6DigitsParentsDriverLicense)) {
                 await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
             }
+
+            if (await this.isVisible(this.textsignature)) {
+                await this.click(this.textsignature);
+                await this.waitForLoaders().catch(() => { });
+                await this.waitForVisible(this.studentSignature);
+                await this.fill(this.studentSignature, data.firstName);
+            }
+
+            const captcha = this.captchaFrame.locator('#recaptcha-anchor');
+            if (await this.isVisible(captcha)) {
+                await this.click(captcha);
+                await this.verifyAttribute(captcha, "aria-checked", "true");
+            }
+            await this.page.waitForTimeout(1000);
+
         });
     }
 

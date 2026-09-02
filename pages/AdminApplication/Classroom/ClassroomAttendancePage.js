@@ -1,5 +1,5 @@
 import BasePage from '../../../utils/BasePage';
-import {expect, test} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import PdfHelper from '../../../utils/PdfHelper';
 import ExcelHelper from '../../../utils/ExcelHelper';
 
@@ -16,15 +16,17 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     constructor(page) {
         super(page);
+        this.selectedAttendanceAction = null;
+        this.beforeCheckedCount = 0;
 
         // Session selection
         this.sessionRadioBtn = page.locator('.radioinner').first();
         this.sessionRadioBtns = page.locator('.radioinner');
-        this.noRecordMessage = page.getByText('No record exists.', {exact: true});
+        this.noRecordMessage = page.getByText('No record exists.', { exact: true });
 
         // Student search & addition
         // this.searchStudentInput = page.getByRole('textbox', { name: 'Search Student' });
-        this.addStudentBtn = page.getByRole('button', {name: 'ADD'});
+        this.addStudentBtn = page.getByRole('button', { name: 'ADD' });
         this.confirmYesBtn = page.locator("xpath=//div[contains(@id,'confirmation')]//a[text()='Yes']");
 
         // Attendance radio options
@@ -32,7 +34,7 @@ export default class ClassroomAttendancePage extends BasePage {
         this.absentRadioBtn = page.locator("xpath=(//label[not(contains(@class,'checkedTrueAbsent'))]//span[@class='checkstudenta1'])[last()]");
 
         // Save & Feedback
-        this.saveAttendanceBtn = page.getByRole('link', {name: 'SAVE'});
+        this.saveAttendanceBtn = page.getByRole('link', { name: 'SAVE' });
         this.alertNoButton = page.locator("xpath=//button[text()='No']");
         this.noFileUploadBtn = page.locator("xpath=//a[text()='No' and @data-apply='confirmation'] | //div[contains(@id,'confirmation')]//a[text()='No'] | //button[text()='No']");
 
@@ -53,7 +55,7 @@ export default class ClassroomAttendancePage extends BasePage {
         this.emailSubjectInput = page.getByPlaceholder('Email Subject');
         this.emailBodyContent = page.locator('.note-editable');
         this.sendEmailSubmitBtn = page.locator("xpath=(//button[text()='Send'])[1]");
-        this.emailSentSuccessMessage = page.getByText('Email sent successfully.', {exact: true});
+        this.emailSentSuccessMessage = page.getByText('Email sent successfully.', { exact: true });
 
         // Tracked locators
         this.presentLabelLocator = null;
@@ -77,7 +79,7 @@ export default class ClassroomAttendancePage extends BasePage {
                 await this.waitForLoaders();
                 await this.page.waitForLoadState('load');
                 await this.page.waitForTimeout(5000);
-                const isNoRecord = await this.noRecordMessage.isVisible({timeout: 5000}).catch(() => false);
+                const isNoRecord = await this.noRecordMessage.isVisible({ timeout: 5000 }).catch(() => false);
                 if (!isNoRecord) {
                     console.log(`Selected session #${i + 1} which has student records.`);
                     return;
@@ -93,27 +95,30 @@ export default class ClassroomAttendancePage extends BasePage {
      * @returns {Promise<{action: string, beforeCount: number}>}
      **/
     async markRandomAttendance() {
-        const action = Math.random() < 0.5 ? 'Present' : 'Absent';
-        this.selectedAttendanceAction = action;
 
-        return await test.step(`Randomly mark student attendance as "${action}"`, async () => {
-            await this.waitForLoaders();
+        await this.waitForLoaders();
 
-            if (action === 'Present') {
+        if (await this.isVisible(this.presentRadioBtn)) {
+            await test.step(`Randomly mark student attendance as Present`, async () => {
+                this.selectedAttendanceAction = 'Present';
                 await this.waitForVisible(this.presentRadioBtn);
                 this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTruePresent')]").count();
                 console.log(`[Random Selection] Chose: Present. Checked Present count before: ${this.beforeCheckedCount}`);
                 await this.click(this.presentRadioBtn);
-            } else {
+            });
+        } else {
+            await test.step(`Randomly mark student attendance as Absent`, async () => {
+                this.selectedAttendanceAction = 'Absent';
                 await this.waitForVisible(this.absentRadioBtn);
                 this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTrueAbsent')]").count();
                 console.log(`[Random Selection] Chose: Absent. Checked Absent count before: ${this.beforeCheckedCount}`);
                 await this.click(this.absentRadioBtn);
-            }
+            });
+        }
 
-            await this.waitForLoaders();
-            return {action: this.selectedAttendanceAction, beforeCount: this.beforeCheckedCount};
-        });
+        await this.waitForLoaders();
+        return { action: this.selectedAttendanceAction, beforeCount: this.beforeCheckedCount };
+
     }
 
     /**
@@ -136,8 +141,8 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async verifyAttendanceMarkedSuccessfully() {
         await test.step('Verify "Classroom attendance marked successfully." confirmation message', async () => {
-            await this.waitForVisible(this.page.getByText('Classroom attendance marked successfully.', {exact: true}));
-            await this.verifyVisible(this.page.getByText('Classroom attendance marked successfully.', {exact: true}));
+            await this.waitForVisible(this.page.getByText('Classroom attendance marked successfully.', { exact: true }));
+            await this.verifyVisible(this.page.getByText('Classroom attendance marked successfully.', { exact: true }));
             await this.waitForLoaders();
         });
     }
@@ -246,10 +251,10 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async verifyRosterPdfReport(pdfPage, expectedText, attachmentName = `${expectedText.replace(/\s+/g, '_')}.pdf`) {
         await test.step(`Verify Roster PDF report tab is loaded`, async () => {
-            await pdfPage.waitForFunction(() => document.title.trim().length > 0, {timeout: 30000}).catch(() => {
+            await pdfPage.waitForFunction(() => document.title.trim().length > 0, { timeout: 30000 }).catch(() => {
                 console.log('Title did not become non-empty within 30s; proceeding with assertion.');
             });
-            await expect(pdfPage).toHaveTitle(/Report/i, {timeout: 15000});
+            await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 15000 });
         });
         await PdfHelper.downloadVerifyAndAttach(pdfPage, expectedText, attachmentName);
         await pdfPage.close().catch(() => {
@@ -341,12 +346,12 @@ export default class ClassroomAttendancePage extends BasePage {
             // Listen for send email API response
             this.sendEmailResponsePromise = this.page.waitForResponse(
                 response => response.url().includes('Classroom/CRAttendanceSendEmailToMultipleRecipient') && response.status() === 200
-                , {timeout: 30000});
+                , { timeout: 30000 });
 
             await this.waitForVisible(this.sendEmailSubmitBtn);
             await this.click(this.sendEmailSubmitBtn);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', {timeout: 60000});
+            await this.page.waitForLoadState('load', { timeout: 60000 });
         });
     }
 

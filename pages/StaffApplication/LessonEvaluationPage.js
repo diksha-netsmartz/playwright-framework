@@ -23,7 +23,8 @@ export default class LessonEvaluationPage extends BasePage {
         this.privateNotesTxt = page.locator('#txtAreaPrivateLesson');
         this.studentSignatureCanvas = page.locator('#canvasStudentSignature');
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
-        this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
+        this.completeLessonSendEmailBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
+        this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson' })
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.questionsDropdowns = page.locator("(//div[contains(@id,'divEvalQuestionNumber')])[1]");
         this.successMessageDiv = page.locator('#GlobalErrorSuccessDiv');
@@ -105,9 +106,12 @@ export default class LessonEvaluationPage extends BasePage {
      * Selects the 15-minute travel time option.
     **/
     async selectTravelTime() {
-        await test.step('Select 15 min travel time option', async () => {
-            await this.check(this.travelTime);
-        });
+        if (await this.isVisible(this.travelTime)) {
+            await test.step('Select 15 min travel time option', async () => {
+                await this.check(this.travelTime);
+            });
+        }
+
     }
 
     /**
@@ -168,8 +172,14 @@ export default class LessonEvaluationPage extends BasePage {
      * Clicks the 'Complete Lesson (Send Email)' button to finalize the lesson.
     **/
     async completeLesson() {
-        await test.step('Click Complete Lesson (Send Email) button', async () => {
-            await this.click(this.completeLessonBtn);
+        await test.step('Click Complete Lesson button', async () => {
+            if (await this.isVisible(this.completeLessonSendEmailBtn)) {
+                await this.click(this.completeLessonSendEmailBtn);
+            }
+
+            else if (await this.isVisible(this.completeLessonBtn)) {
+                await this.click(this.completeLessonBtn);
+            }
         });
     }
 

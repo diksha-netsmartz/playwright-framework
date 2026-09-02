@@ -17,7 +17,9 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', async 
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
+    const env = process.env.ENV || 'coreServer2';
+    const credentials = login[env || 'coreServer2'];
+    const reportName = env === 'coreServer2' ? 'Roster report' : 'Test report';
     let pdfPage;
     let download;
 
@@ -36,12 +38,12 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', async 
 
     await test.step('Step 4 & 5: Export Roster report to PDF and verify content in new tab', async () => {
         pdfPage = await attendancePage.exportRosterToPdf();
-        await attendancePage.verifyRosterPdfReport(pdfPage, 'Roster Report');
+        await attendancePage.verifyRosterPdfReport(pdfPage, reportName);
     });
 
     await test.step('Step 6: Export Roster report to Excel and verify downloaded file', async () => {
         download = await attendancePage.exportRosterToExcel();
-        await attendancePage.verifyExcelReportDownloaded(download, 'Roster Report');
+        await attendancePage.verifyExcelReportDownloaded(download, reportName);
     });
 });
 

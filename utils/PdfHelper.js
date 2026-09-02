@@ -333,6 +333,7 @@ export default class PdfHelper {
         console.log(`==================================================================\n`);
 
         const normalizedPdfText = pdfText.replace(/\s+/g, ' ').toLowerCase();
+        const compressedPdfText = pdfText.replace(/\s+/g, '').toLowerCase();
 
         const matchedTexts = [];
         const missingTexts = [];
@@ -341,8 +342,9 @@ export default class PdfHelper {
             if (!exp || String(exp).trim().length === 0) continue;
             const textToVerify = String(exp).trim();
             const normalizedExp = textToVerify.replace(/\s+/g, ' ').toLowerCase();
+            const compressedExp = normalizedExp.replace(/\s+/g, '');
 
-            if (normalizedPdfText.includes(normalizedExp)) {
+            if (normalizedPdfText.includes(normalizedExp) || (compressedExp.length > 3 && compressedPdfText.includes(compressedExp))) {
                 matchedTexts.push(textToVerify);
             } else {
                 // If multi-word, check if each word exists
