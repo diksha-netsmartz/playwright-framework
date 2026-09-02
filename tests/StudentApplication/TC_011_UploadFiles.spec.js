@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import login from '../../test-data/json/login.json';
@@ -11,7 +11,7 @@ import AdminHomePage from '../../pages/AdminApplication/AdminPortalHomePage'
  * Test Case Title: Verify that the file is getting uploaded
  * Expected Result: File should be uploaded successfully and should be visible under C-Admin > Home Page > Uploaded Files widget
  **/
-test('TC_011: CSP - Verify that the file is getting uploaded', { tag: '@smoke' }, async ({page}) => {
+test('TC_011: CSP - Verify that the file is getting uploaded', { tag: '@smoke' }, async ({ page }) => {
 
     const studentLoginPage = new StudentLoginPage(page);
     const studentHomePage = new StudentHomePage(page);
@@ -33,7 +33,7 @@ test('TC_011: CSP - Verify that the file is getting uploaded', { tag: '@smoke' }
     await test.step('Verify uploaded file under C-Admin -> Uploaded Files widget', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
-        await adminHomePage.clickShowFilesToConfirm();
+        await adminHomePage.clickShowFilesToConfirm(credentials.studentUser.name);
     });
 });
 

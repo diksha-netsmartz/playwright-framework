@@ -461,12 +461,11 @@ export default class BusinessReportsPage extends BasePage {
                     'Session#',
                     `${this.selectedSessionText}`,
                     'Teacher',
-                    'StudentName',
+                    'Student Name',
                     'Score',
-                    'AttendanceNotes',
-                    'StudentSignature',
-                    'StudentNotes'
-
+                    'Student Notes',
+                    'Attendance Notes',
+                    'Student Signature'
                 ]
             });
         });
@@ -661,18 +660,34 @@ export default class BusinessReportsPage extends BasePage {
 
     /**
      * Verifies the downloaded Attendance Sheet report file and attaches it to the report.
+     * Validates column names, row headers, and report metadata in the PDF.
      * @param {import('@playwright/test').Download|string} download - The Playwright Download instance.
+     * @param {string} [crName] - Optional CR name to verify in the report.
      **/
-    async verifyAttendanceSheetReportDownloaded(download) {
+    async verifyAttendanceSheetReportDownloaded(download, crName) {
         await test.step('Verify Attendance Sheet report downloaded successfully and attach to report', async () => {
             expect(download).toBeTruthy();
             const fileName = typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'AttendanceSheetReport.pdf';
             console.log(`Downloaded file name: ${fileName}`);
 
             if (fileName.endsWith('.pdf')) {
+                const expectedTexts = [
+                    'Provider Name',
+                    'Provider Certificate',
+                    'CR#',
+                    'Location',
+                    'Student Name',
+                    'Teacher Name',
+                    'Teacher Signature'
+                ];
+
+                if (crName) {
+                    expectedTexts.push(crName);
+                }
+
                 await PdfHelper.verifyPdfDownloaded(download, {
                     attachmentName: fileName,
-                    expectedTexts: ['Attendance']
+                    expectedTexts
                 });
             } else {
                 const filePath = typeof download === 'string' ? download : await download.path();

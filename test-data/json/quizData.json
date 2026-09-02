@@ -1,0 +1,10 @@
+{
+  "quizName": "Quiz",
+  "size": "10",
+  "passingMarks": "75",
+  "associateWithClassSessions": "1",
+  "timeToComplete": "30",
+  "passFeedback": "Congratulations, you passed!",
+  "failFeedback": "Please review and retake the quiz.",
+  "welcomeText": "Welcome to the online quiz."
+}

@@ -28,6 +28,7 @@
     "permitNumber": "3333333333333333333",
     "collegeId": "44444",
     "smsNumber": "(999)999-9999",
-    "parentsDriverLicense": "123456"
+    "parentsDriverLicense": "123456",
+    "apartment": "12345"
   }
 }

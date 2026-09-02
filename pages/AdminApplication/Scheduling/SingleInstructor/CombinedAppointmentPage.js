@@ -429,7 +429,7 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.click(this.submitButton);
             await this.click(this.confirmYesButton);
             await this.waitForLoaders();
-            await this.page.waitForTimeout(1500);
+            await this.page.waitForTimeout(2500);
 
             if (await this.isVisible(this.submitButtonPopup)) {
                 await this.click(this.submitButtonPopup);

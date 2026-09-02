@@ -7,7 +7,7 @@
     "pickup": "test PU1231",
     "notes": "note student1",
     "middleName": "test1",
-    "address": "los angeles",
+    "address": "new york",
     "zipCode": "10020",
     "homePhone": "3333333333",
     "studentCellPhone": "2222222222",
@@ -22,13 +22,17 @@
     "emergencyPhone": "1111111111",
     "medicalConditions": "no medical conditions",
     "studentNotes": "student notes",
-    "drivingNotes": "student driving notes"
+    "drivingNotes": "student driving notes",
+    "socialSecurityNumber": "123456789",
+    "studentSignature": "test student signature",
+    "apartment": "12345",
+    "datePicker": "12/22/2026"
   },
   "student2": {
     "pickup": "test PU123e",
     "notes": "note student2",
     "middleName": "test2",
-    "address": "los angeles",
+    "address": "new york",
     "zipCode": "10020",
     "homePhone": "3333333333",
     "studentCellPhone": "2222222222",
@@ -43,7 +47,11 @@
     "emergencyPhone": "1111111111",
     "medicalConditions": "no medical conditions",
     "studentNotes": "student notes",
-    "drivingNotes": "student driving notes"
+    "drivingNotes": "student driving notes",
+    "socialSecurityNumber": "123456789",
+    "studentSignature": "test student signature",
+    "apartment": "12345",
+    "datePicker": "12/22/2026"
   },
   "appointmentDetails": {
     "appointmentType": " Create Combined Appointment (Driver and Observer)",

@@ -90,14 +90,16 @@ export default class NonGraphicalPage extends BasePage {
             for (let i = 0; i < count; i++) {
                 const dateToClick = availableDates.nth(i);
                 await this.click(dateToClick);
+                await this.waitForLoaders();
+                await this.page.waitForLoadState('load', { timeout: 5000 })
 
                 // Wait for the slots table to refresh after selecting the date
-                await this.page.waitForTimeout(1000);
+                await this.page.waitForTimeout(5000);
 
                 const hasNoRecords = await this.isVisible(this.noRecordsFound);
                 const hasSlot = await this.isVisible(this.firstSlotCheckbox);
 
-                if (!hasNoRecords && hasSlot) {
+                if (hasSlot) {
                     console.log(`Found available slots on highlighted date #${i + 1}`);
                     return;
                 }

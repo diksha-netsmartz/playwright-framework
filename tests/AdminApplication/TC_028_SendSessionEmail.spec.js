@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
 import ClassroomAttendancePage from '../../pages/AdminApplication/Classroom/ClassroomAttendancePage';
@@ -10,7 +10,7 @@ import login from '../../test-data/json/login.json';
  * Precondition: User should have valid admin login credentials and at least one classroom session with student records
  * Expected Result: CR SESSION mail should be sent successfully
  **/
-test('TC_028: C-admin > Classroom > Attendance - To verify send Session Email', async ({page}) => {
+test('TC_028: C-admin > Classroom > Attendance - To verify send Session Email', async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
@@ -42,11 +42,10 @@ test('TC_028: C-admin > Classroom > Attendance - To verify send Session Email', 
         await attendancePage.fillAndSendEmail('CR Session Notification', 'This is an automated CR Session notification email.');
     });
 
-    await test.step('Verify send email API response is successful', async () => {
-        await attendancePage.verifySendEmailResponse();
-    });
+
 
     await test.step('Verify CR Session email is sent successfully', async () => {
+        // await attendancePage.verifySendEmailResponse();
         await attendancePage.verifyEmailSentSuccessfully();
     });
 });

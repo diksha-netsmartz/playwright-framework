@@ -14,13 +14,16 @@ export default class StudentPortalHomePage extends BasePage {
     constructor(page) {
         super(page);
 
-        this.fileInput = page.locator('input[type="file"]').first();
+        this.fileInput = page.locator('input[type="file"][multiple]').first();
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
         this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files')]");
         this.chooseFileBtn = page.locator("#uploadimageChoose").first();
         this.enrollNavLink = page.locator('#Marketplace_li');
         this.myAccountNavLink = page.getByRole('link', { name: ' My Account ' });
         this.profileNavLink = page.locator("xpath=//li[contains(@id,'Profile')]");
+        this.categoryDropdown = page.getByRole('button', { name: '--Select--' });
+        this.categoryDropdownOption = page.locator("(//select[@name='file_Category']//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
+
     }
 
     /**
@@ -46,9 +49,13 @@ export default class StudentPortalHomePage extends BasePage {
             await this.verifyVisible(this.uploadFilesWidget, 5000);
             await this.uploadFilesWidget.scrollIntoViewIfNeeded();
             await this.setInputFiles(this.fileInput, filePath);
+            await this.waitForVisible(this.categoryDropdown);
+            await this.click(this.categoryDropdown);
+            await this.waitForVisible(this.categoryDropdownOption);
+            await this.click(this.categoryDropdownOption)
             await this.click(this.uploadBtn);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('networkidle');
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
         });
     }
 

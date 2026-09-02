@@ -38,7 +38,7 @@ export default class StaffHomePage extends BasePage {
             await this.click(this.processLink);
             await this.waitForLoaders();
             await this.page.waitForTimeout(10000)
-            await this.verifyTitle("Process Lesson")
+            await this.verifyTitle(/Process Lesson|Process Yard Skills/i);
         });
     }
 

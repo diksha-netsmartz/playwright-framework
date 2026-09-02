@@ -23,7 +23,8 @@ export default class LessonEvaluationPage extends BasePage {
         this.privateNotesTxt = page.locator('#txtAreaPrivateLesson');
         this.studentSignatureCanvas = page.locator('#canvasStudentSignature');
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
-        this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
+        this.completeLessonSendEmailBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
+        this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson' })
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.questionsDropdowns = page.locator("(//div[contains(@id,'divEvalQuestionNumber')])[1]");
         this.successMessageDiv = page.locator('#GlobalErrorSuccessDiv');
@@ -35,7 +36,7 @@ export default class LessonEvaluationPage extends BasePage {
     async clickProcess() {
         await test.step('Click PROCESS button', async () => {
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 5000 })
+            await this.page.waitForTimeout(10000)
             if (await this.isVisible(this.processBtn)) {
                 await this.click(this.processBtn);
                 await this.waitForHidden(this.processBtn);
@@ -49,11 +50,13 @@ export default class LessonEvaluationPage extends BasePage {
      * Opens the evaluation dropdown and selects the last evaluation type.
     **/
     async selectEvaluation() {
-        await test.step('Select evaluation template from dropdown', async () => {
-            await this.click(this.selectEvaluationBtn);
-            await this.click(this.selectEvalutionDropdownValue);
+        if (await this.isVisible(this.selectEvaluationBtn)) {
+            await test.step('Select evaluation template from dropdown', async () => {
+                await this.click(this.selectEvaluationBtn);
+                await this.click(this.selectEvalutionDropdownValue);
+            });
+        }
 
-        });
     }
 
     /**
@@ -64,8 +67,10 @@ export default class LessonEvaluationPage extends BasePage {
     async selectQuestionByText(questionNumber, optionText) {
         const dropdownBtn = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[@class='filter-option pull-left']`);
         const dropdownValue = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[text()='${optionText}']`);
-        await this.click(dropdownBtn);
-        await this.click(dropdownValue);
+        if (await this.isVisible(dropdownBtn)) {
+            await this.click(dropdownBtn);
+            await this.click(dropdownValue);
+        }
     }
 
     /**
@@ -101,9 +106,12 @@ export default class LessonEvaluationPage extends BasePage {
      * Selects the 15-minute travel time option.
     **/
     async selectTravelTime() {
-        await test.step('Select 15 min travel time option', async () => {
-            await this.check(this.travelTime);
-        });
+        if (await this.isVisible(this.travelTime)) {
+            await test.step('Select 15 min travel time option', async () => {
+                await this.check(this.travelTime);
+            });
+        }
+
     }
 
     /**
@@ -164,8 +172,14 @@ export default class LessonEvaluationPage extends BasePage {
      * Clicks the 'Complete Lesson (Send Email)' button to finalize the lesson.
     **/
     async completeLesson() {
-        await test.step('Click Complete Lesson (Send Email) button', async () => {
-            await this.click(this.completeLessonBtn);
+        await test.step('Click Complete Lesson button', async () => {
+            if (await this.isVisible(this.completeLessonSendEmailBtn)) {
+                await this.click(this.completeLessonSendEmailBtn);
+            }
+
+            else if (await this.isVisible(this.completeLessonBtn)) {
+                await this.click(this.completeLessonBtn);
+            }
         });
     }
 

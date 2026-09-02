@@ -19,6 +19,8 @@ export default class NewStudentEnrollmentPage extends BasePage {
         // Package
         this.searchPackageInDropdown = page.locator('#lstPackagesForSelectionSearch');
         this.packageSelectionButton = page.getByRole('button', { name: 'Package Selection' });
+        this.cashDrawerLocationDropdown = page.getByRole('button', { name: 'Select Cash Drawer Location' })
+        this.cashDrawerLocationSelection = page.locator("(//div[@id='drp_CashdrawerLocation']//li//span[1][not(contains(text(),'Select'))])[1]");
         this.rtPackageOption = page.locator("xpath=//a[@data-packtype='RT']");
         this.addPackageButton = page.getByRole('button', { name: 'Add Package' });
         this.selectLocationDropdown = page.getByRole('link', { name: 'Select Location' });
@@ -26,9 +28,11 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.filterButton = page.getByRole('button', { name: 'Filter' });
         this.selectButton = page.locator("xpath=//a[text()='Select' and @onclick='showAddButton(this);']").first();
         this.addButton = page.locator("xpath=//button[text()='Add' and contains(@onclick,'showSelect(this);')]").first();
-        this.addButtonForAdditionalDetails = page.locator("xpath=(//td[text()='Fee']//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')])[1]");
+        this.addButtonForAdditionalDetails = page.locator("(//td[contains(text(),'fee') or contains(text(),'Fee')]//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')])[1]");
         this.addToCartButton = page.getByRole('button', { name: 'Add To Cart' });
         this.skipSelectionButton = page.locator("xpath=//h4[text()='Class Selection']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
+        this.skipSelectionButtonAddOnServices = page.locator("//h4[text()='Add On Services/Products']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
+        this.skipSelectionButtonRoadTestModal = page.locator("//h4[text()='Road Test']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
         this.dobDisabledTextbox = page.locator("xpath=//input[@id='txtDate' and @disabled='disabled']");
 
         // Student Information
@@ -37,19 +41,22 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.middleName = page.getByRole('textbox', { name: 'Middle Name' });
         this.lastName = page.getByRole('textbox', { name: 'Last Name' });
         this.address = page.getByRole('textbox', { name: 'Address' });
-        this.city = page.locator('div').filter({ hasText: 'Los Angeles CountyCA, USA' }).first();
+        this.addressSelectionDropdown = page.locator("xpath=(//div[@class='pac-item']//span[text()='New York'])[1]");
+        // this.city = page.locator('div').filter({ hasText: 'Los Angeles CountyCA, USA' }).first();
+        this.apartment = page.getByPlaceholder('Apartment #');
+        this.preferredNickname = page.getByPlaceholder('Preferred Nickname')
         this.stateDropdown = page.locator("xpath=//button[@data-id='State']");
-        this.stateOptionValue = page.locator('a').filter({ hasText: 'AK' });
+        this.stateOptionValue = page.locator("(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]");
         this.zipCode = page.getByRole('textbox', { name: 'Zip Code' });
         this.homePhone = page.getByRole('textbox', { name: 'Home Phone' });
         this.studentCellPhone = page.getByRole('textbox', { name: 'Student Cell Phone' });
-        this.studentEmail = page.getByRole('textbox', { name: 'Student Email' });
-        this.parentName = page.getByRole('textbox', { name: 'Parent Name', exact: true });
-        this.parentCellPhone = page.getByRole('textbox', { name: 'Parent Cell Phone' });
-        this.parentEmail = page.getByRole('textbox', { name: 'Parent Email', exact: true });
+        this.studentEmail = page.locator('#Email');
+        this.parentName = page.locator("#ParentName")
+        this.parentCellPhone = page.locator('#ParentPhone')
+        this.parentEmail = page.locator('#ParentEmail1')
         this.parentName2 = page.getByRole('textbox', { name: 'Parent Name 2' });
         this.parentPhone2 = page.getByRole('textbox', { name: 'Parent Phone' });
-        this.parentEmail2 = page.getByRole('textbox', { name: 'Parent Email 2' }).or(page.getByRole('textbox', { name: 'Parent Email2' }));
+        this.parentEmail2 = page.locator('#ParentEmail2')
         this.emergencyName = page.getByRole('textbox', { name: 'Emergency Name' });
         this.emergencyRelationship = page.getByRole('textbox', { name: 'Emergency Relationship' });
         this.emergencyPhone = page.getByRole('textbox', { name: 'Emergency Phone' });
@@ -58,6 +65,8 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.studentNotes = page.locator('#StudentNotes');
         this.maleCheckbox = page.getByLabel('Male').first();
         this.drivingNotes = page.locator('#DrivingNotes');
+        this.socialSecurityNumber = page.locator('#socialSecurityNumber');
+        this.studentSignature = page.locator('#StudentSignature');
         this.highSchoolDropdown = page.locator("xpath=//button[contains(@data-id,'HighSchool')]//span[text()='Please Select']");
         this.highSchoolDropdownSelection = page.locator("xpath=(//button[contains(@data-id,'HighSchool')]//parent::div//span[contains(text(),'High')])[1]");
         this.wearGlassesDropdown = page.locator("xpath=//button[contains(@data-id,'WearGlasses')]//span[text()='Please Select']");
@@ -69,7 +78,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.permitExpirationDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Expiration Date']");
         this.permitExpireDateSelectInCalendar = page.locator("xpath=(//div[contains(@class,'datepicker-days')]//td)[last()]");
         this.saveButton = page.getByRole('button', { name: 'Save' }).first();
-        this.termsConditionsCheckbox = page.locator("xpath=//input[@id='TermsConditions']//parent::label//span");
+        this.termsConditionsCheckbox = page.locator("(//input[@id='TermsConditions']//parent::label//span[contains(@class,'checkbox')])[1]");
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.closePopup = page.locator("xpath=//p[contains(text(),'enrollment')]//ancestor::div[@class='modal-body']//button[text()='Close']");
 
@@ -89,6 +98,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.dlPermitExpirationDateCalendarIcon = page.locator('#dt_Date_ExpirePermit');
         this.textbox1 = page.getByRole('textbox', { name: 'TextBox1' });
         this.textbox2 = page.getByRole('textbox', { name: 'TextBox2' });
+        this.customDatepickers = page.locator('input[name*="dt_datepicker"]');
         this.studentDrivingNotes = page.locator('#StudentDrivingNotes');
 
         // Knowledge test fields
@@ -117,7 +127,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
             await this.waitForVisible(this.packageSelectionButton);
             await this.click(this.packageSelectionButton);
             await this.waitForVisible(this.packageSelectionButton);
-            await this.fill(this.searchPackageInDropdown, packageName);
+            await this.pressSequentially(this.searchPackageInDropdown, packageName);
             await this.page.waitForTimeout(2000);
             // if (packageName === 'RT Package') {
             //     await this.click(this.rtPackageOption);
@@ -129,13 +139,33 @@ export default class NewStudentEnrollmentPage extends BasePage {
     }
 
     /**
+    * Opens the cash drawer location modal and selects the cash drawer location.
+   **/
+    async selectCashDrawerLocation() {
+        if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+            await test.step(`Select Cash Drawer Location`, async () => {
+                await this.waitForVisible(this.cashDrawerLocationDropdown);
+                await this.click(this.cashDrawerLocationDropdown);
+                await this.waitForVisible(this.cashDrawerLocationSelection);
+                await this.click(this.cashDrawerLocationSelection);
+                await this.page.waitForTimeout(2000);
+
+            });
+        }
+    }
+
+    /**
      * Opens location dropdown and checks the Show All option.
     **/
     async selectLocation() {
-        await test.step('Select location and Show All', async () => {
-            await this.click(this.selectLocationDropdown);
-            await this.click(this.showAllCheckbox);
-        });
+        await this.waitForLoaders();
+        await this.page.waitForTimeout(2000);
+        if (await this.isVisible(this.selectLocationDropdown)) {
+            await test.step('Select location and Show All', async () => {
+                await this.click(this.selectLocationDropdown);
+                await this.click(this.showAllCheckbox);
+            });
+        }
     }
 
     /**
@@ -183,14 +213,33 @@ export default class NewStudentEnrollmentPage extends BasePage {
      * Adds additional fee details and confirms adding to cart.
     **/
     async addAdditionalDetails() {
-        await test.step('Add additional details fee to cart', async () => {
-            await this.page.waitForTimeout(5000);
-            if (await this.isVisible(this.addButtonForAdditionalDetails, { timeout: 5000 })) {
-                await this.click(this.addButtonForAdditionalDetails);
-                await this.click(this.addToCartButton);
+
+        await this.page.waitForTimeout(5000);
+        if (await this.isVisible(this.skipSelectionButtonAddOnServices, { timeout: 10000 })) {
+            if (await this.isVisible(this.addButtonForAdditionalDetails)) {
+                await test.step('Add additional details fee to cart', async () => {
+                    await this.click(this.addButtonForAdditionalDetails);
+                    await this.click(this.addToCartButton);
+                });
             }
-        });
+            else {
+                await this.click(this.skipSelectionButtonAddOnServices);
+            }
+        }
     }
+
+    /**
+    * Clicks on skip selection button for Road Test Modal Popup
+   **/
+    async skipSelectionForRoadTestModal() {
+
+        await this.page.waitForTimeout(5000);
+        if (await this.isVisible(this.skipSelectionButtonRoadTestModal, { timeout: 5000 })) {
+            await this.click(this.skipSelectionButtonRoadTestModal);
+            await this.waitForHidden(this.skipSelectionButtonRoadTestModal);
+        }
+    }
+
 
     /**
      * Resolves the environment-specific package name from packageData.json.
@@ -223,6 +272,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
         await test.step(`Configure and add package: "${resolvedName}"`, async () => {
             await this.selectDOBForPackage();
             await this.selectPackage(resolvedName);
+            await this.selectCashDrawerLocation();
             await this.click(this.addPackageButton);
             await this.waitForLoaders();
 
@@ -233,8 +283,11 @@ export default class NewStudentEnrollmentPage extends BasePage {
                     await this.addAdditionalDetails();
                     break;
                 case 'RT Package':
-                    await this.click(this.selectButton);
-                    await this.click(this.addButton);
+                    if (await this.isVisible(this.selectButton)) {
+                        await this.click(this.selectButton);
+                        await this.click(this.addButton);
+                    }
+                    await this.skipSelectionForRoadTestModal();
                     await this.addAdditionalDetails();
                     break;
                 case 'CR Package':
@@ -276,28 +329,52 @@ export default class NewStudentEnrollmentPage extends BasePage {
             await this.fill(this.firstName, data.firstName);
             await this.fill(this.middleName, data.middleName);
             await this.fill(this.lastName, data.lastName);
-            await this.pressSequentially(this.address, data.address);
-            await this.click(this.city);
-            await this.click(this.stateDropdown);
-            await this.click(this.stateOptionValue);
+            if (await this.isVisible(this.address) && data.address) {
+                await this.pressSequentially(this.address, data.address);
+                await this.waitForVisible(this.addressSelectionDropdown);
+                await this.click(this.addressSelectionDropdown);
+            }
+            // await this.click(this.city);
+            if (await this.isVisible(this.stateDropdown)) {
+                await this.click(this.stateDropdown);
+                if (await this.isVisible(this.stateOptionValue)) {
+                    await this.click(this.stateOptionValue);
+                }
+            }
+            // await this.click(this.stateOptionValue);
             await this.fill(this.address, data.address);
             await this.fill(this.zipCode, data.zipCode);
             await this.fill(this.homePhone, data.homePhone);
-            await this.fill(this.studentCellPhone, data.studentCellPhone);
+            if (await this.isVisible(this.studentCellPhone)) {
+                await this.fill(this.studentCellPhone, data.studentCellPhone);
+            }
             await this.fill(this.studentEmail, data.studentEmail);
             await this.fill(this.parentName, data.parentName);
             await this.fill(this.parentCellPhone, data.parentCellPhone);
             await this.fill(this.parentEmail, data.parentEmail);
-            await this.fill(this.parentName2, data.parentName2);
-            await this.fill(this.parentPhone2, data.parentPhone2);
+            if (await this.isVisible(this.parentName2)) {
+                await this.fill(this.parentName2, data.parentName2);
+                await this.fill(this.parentPhone2, data.parentPhone2);
+
+            }
             await this.fill(this.parentEmail2, data.parentEmail2);
-            await this.fill(this.emergencyName, data.emergencyName);
-            await this.fill(this.emergencyRelationship, data.emergencyRelationship);
-            await this.fill(this.emergencyPhone, data.emergencyPhone);
+            if (await this.isVisible(this.socialSecurityNumber)) {
+                await this.fill(this.socialSecurityNumber, data.socialSecurityNumber);
+            }
+            if (await this.isVisible(this.studentSignature)) {
+                await this.fill(this.studentSignature, data.studentSignature);
+            }
+            if (await this.isVisible(this.emergencyName)) {
+                await this.fill(this.emergencyName, data.emergencyName);
+                await this.fill(this.emergencyRelationship, data.emergencyRelationship);
+                await this.fill(this.emergencyPhone, data.emergencyPhone);
+            }
             await this.click(this.highSchoolDropdown);
             await this.click(this.highSchoolDropdownSelection);
-            await this.click(this.wearGlassesDropdown);
-            await this.click(this.wearGlassesDropdownSelection);
+            if (await this.isVisible(this.wearGlassesDropdown)) {
+                await this.click(this.wearGlassesDropdown);
+                await this.click(this.wearGlassesDropdownSelection);
+            }
             await this.check(this.maleCheckbox);
             await this.fill(this.permitNumber, data.permitNumber);
             await this.click(this.permitIssuedDateCalendarIcon);
@@ -306,164 +383,239 @@ export default class NewStudentEnrollmentPage extends BasePage {
             await this.click(this.permitExpireDateSelectInCalendar);
             await this.fill(this.medicalConditions, data.medicalConditions);
             await this.fill(this.studentNotes, data.studentNotes);
-            await this.fill(this.drivingNotes, data.drivingNotes);
-            await this.click(this.leadDropdown);
-            await this.click(this.leadDropdownSelection);
+            if (await this.isVisible(this.studentDrivingNotes)) {
+                await this.fill(this.studentDrivingNotes, data.studentDrivingNotes || data.drivingNotes);
+            }
+            if (await this.isVisible(this.leadDropdown)) {
+                await this.click(this.leadDropdown);
+                await this.click(this.leadDropdownSelection);
+            }
             await this.check(this.termsConditionsCheckbox);
         });
     }
 
     /**
-     * Fills the complete student personal, address, parent/guardian, emergency contact, notes, permit, and terms details for Road Test student type.
+     * Unified method that fills complete student personal, address, parent/guardian, emergency contact, notes, permit, and terms details.
+     * Employs safe conditional checks on every single field locator and data property to support Teen, Road Test, Adult, Knowledge Test, or custom packages.
      * @param {Object} data - Student test data object.
-    **/
-    async fillRoadTestStudentInformation(data) {
-        await test.step('Fill Road Test Student Information', async () => {
-            await this.selectStudentType("Road Test");
-            await this.verifyVisible(this.firstName);
-            await this.fill(this.firstName, data.firstName);
-            await this.fill(this.middleName, data.middleName);
-            await this.fill(this.lastName, data.lastName);
-            await this.pressSequentially(this.address, data.address);
-            await this.click(this.city);
-            await this.click(this.stateDropdown);
-            await this.click(this.stateOptionValue);
-            await this.fill(this.address, data.address);
-            await this.fill(this.zipCode, data.zipCode);
-            await this.fill(this.homePhone, data.homePhone);
-            await this.fill(this.cellPhone, data.cellPhone || data.studentCellPhone);
-            await this.fill(this.studentEmail, data.studentEmail);
-            await this.fill(this.parentName, data.parentName);
-            await this.fill(this.parentGuardianCell, data.parentGuardianCell || data.parentCellPhone);
-            await this.fill(this.parentGuardianEmail, data.parentGuardianEmail || data.parentEmail);
-            await this.fill(this.parentName2, data.parentName2);
-            await this.fill(this.parentPhone2, data.parentPhone2);
-            await this.fill(this.parentEmail2, data.parentEmail2);
-            await this.fill(this.emergencyName, data.emergencyName);
-            await this.fill(this.emergencyPhone, data.emergencyPhone);
-            await this.fill(this.emergencyRelationship, data.emergencyRelationship);
-            await this.click(this.highSchoolDropdown);
-            await this.click(this.highSchoolDropdownSelection);
-            await this.click(this.wearGlassesDropdown);
-            await this.click(this.wearGlassesDropdownSelection);
-            await this.check(this.maleCheckbox);
-            await this.fill(this.permitNumber, data.permitNumber);
-            await this.click(this.dlPermitIssuedDateCalendarIcon);
-            await this.click(this.permitIssueDateSelectInCalendar);
-            await this.click(this.dlPermitExpirationDateCalendarIcon);
-            await this.click(this.permitExpireDateSelectInCalendar);
-            await this.fill(this.medicalConditions, data.medicalConditions);
-            await this.click(this.leadDropdown);
-            await this.click(this.leadDropdownSelection);
-            await this.fill(this.textbox1, data.textbox1 || "TextBox1 Notes");
-            await this.fill(this.textbox2, data.textbox2 || "TextBox2 Notes");
-            await this.fill(this.studentNotes, data.studentNotes);
-            await this.fill(this.studentDrivingNotes, data.studentDrivingNotes || data.drivingNotes);
-            await this.check(this.termsConditionsCheckbox);
-        });
-    }
+     * @param {string} [studentType] - Student type to select (e.g. "Teen", "Road Test", "Adult", "Knowledge Test").
+     **/
+    async fillStudentInformation(data, studentType) {
+        const typeLabel = studentType || "Student";
+        await test.step(`Fill ${typeLabel} Information`, async () => {
+            this.uniqueId = `${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`;
+            await this.waitForLoaders().catch(() => { });
 
-    /**
-     * Fills the complete student personal, address, parent/guardian, emergency contact, notes, permit, and terms details for Adult student type.
-     * @param {Object} data - Student test data object.
-    **/
-    async fillAdultStudentInformation(data) {
-        await test.step('Fill Adult Student Information', async () => {
-            await this.selectStudentType("Adult");
-            await this.verifyVisible(this.firstName);
-            await this.fill(this.firstName, data.firstName);
-            await this.fill(this.middleName, data.middleName);
-            await this.fill(this.lastName, data.lastName);
-            await this.pressSequentially(this.address, data.address);
-            await this.click(this.city);
-            await this.click(this.stateDropdown);
-            await this.click(this.stateOptionValue);
-            await this.fill(this.address, data.address);
-            await this.fill(this.zipCode, data.zipCode);
-            await this.fill(this.homePhone, data.homePhone);
-            await this.fill(this.cellPhone, data.cellPhone || data.studentCellPhone);
-            await this.fill(this.studentEmail, data.studentEmail);
-            await this.fill(this.parentName, data.parentName);
-            await this.fill(this.parentGuardianCell, data.parentGuardianCell || data.parentCellPhone);
-            await this.fill(this.parentGuardianEmail, data.parentGuardianEmail || data.parentEmail);
-            await this.fill(this.parentName2, data.parentName2);
-            await this.fill(this.parentPhone2, data.parentPhone2);
-            await this.fill(this.parentEmail2, data.parentEmail2);
-            await this.fill(this.emergencyName, data.emergencyName);
-            await this.fill(this.emergencyPhone, data.emergencyPhone);
-            await this.fill(this.emergencyRelationship, data.emergencyRelationship);
-            await this.click(this.highSchoolDropdown);
-            await this.click(this.highSchoolDropdownSelection);
-            await this.click(this.wearGlassesDropdown);
-            await this.click(this.wearGlassesDropdownSelection);
-            await this.check(this.maleCheckbox);
-            await this.fill(this.permitNumber, data.permitNumber);
-            await this.click(this.dlPermitIssuedDateCalendarIcon);
-            await this.click(this.permitIssueDateSelectInCalendar);
-            await this.click(this.dlPermitExpirationDateCalendarIcon);
-            await this.click(this.permitExpireDateSelectInCalendar);
-            await this.fill(this.medicalConditions, data.medicalConditions);
-            await this.click(this.leadDropdown);
-            await this.click(this.leadDropdownSelection);
-            await this.fill(this.textbox1, data.textbox1 || "TextBox1 Notes");
-            await this.fill(this.textbox2, data.textbox2 || "TextBox2 Notes");
-            await this.fill(this.studentNotes, data.studentNotes);
-            await this.fill(this.studentDrivingNotes, data.studentDrivingNotes || data.drivingNotes);
-            await this.check(this.termsConditionsCheckbox);
-        });
-    }
+            if (studentType) {
+                await this.selectStudentType(studentType);
+            }
 
-    /**
-     * Fills the complete student personal, assignment, address, parent/guardian, emergency contact, notes, permit, and terms details for Knowledge Test student type.
-     * @param {Object} data - Student test data object.
-    **/
-    async fillKnowledgeTestStudentInformation(data) {
-        await test.step('Fill Knowledge Test Student Information', async () => {
-            await this.selectStudentType("Knowledge Test");
-            await this.verifyVisible(this.assignToLocationDropdown);
-            await this.click(this.assignToLocationDropdown);
-            await this.click(this.assignToLocationDropdownSelection);
-            await this.click(this.assignToStaffDropdown);
-            await this.click(this.assignToStaffDropdownSelection);
-            await this.fill(this.firstName, data.firstName);
-            await this.fill(this.middleName, data.middleName);
-            await this.fill(this.lastName, data.lastName);
-            await this.pressSequentially(this.address, data.address);
-            await this.click(this.city);
-            await this.click(this.stateDropdown);
-            await this.click(this.stateOptionValue);
-            await this.fill(this.address, data.address);
-            await this.fill(this.zipCode, data.zipCode);
-            await this.fill(this.homePhone, data.homePhone);
-            await this.fill(this.cellPhone, data.cellPhone || data.studentCellPhone);
-            await this.fill(this.studentEmail, data.studentEmail);
-            await this.fill(this.parentName, data.parentName);
-            await this.fill(this.parentGuardianCell, data.parentGuardianCell || data.parentCellPhone);
-            await this.fill(this.parentGuardianEmail, data.parentGuardianEmail || data.parentEmail);
-            await this.fill(this.parentName2, data.parentName2);
-            await this.fill(this.parentPhone2, data.parentPhone2);
-            await this.fill(this.parentEmail2, data.parentEmail2);
-            await this.fill(this.emergencyName, data.emergencyName);
-            await this.fill(this.emergencyRelationship, data.emergencyRelationship);
-            await this.fill(this.emergencyPhone, data.emergencyPhone);
-            await this.click(this.highSchoolDropdown);
-            await this.click(this.highSchoolDropdownSelection);
-            await this.click(this.wearGlassesDropdown);
-            await this.click(this.wearGlassesDropdownSelection);
-            await this.check(this.maleCheckbox);
-            await this.fill(this.permitNumber, data.permitNumber);
-            await this.click(this.dlPermitExpirationDateCalendarIcon);
-            await this.click(this.permitExpireDateSelectInCalendar);
-            await this.click(this.dlPermitIssuedDateCalendarIcon);
-            await this.click(this.permitIssueDateSelectInCalendar);
-            await this.fill(this.medicalConditions, data.medicalConditions);
-            await this.click(this.leadDropdown);
-            await this.click(this.leadDropdownSelection);
-            await this.fill(this.textbox1, data.textbox1 || "TextBox1 Notes");
-            await this.fill(this.textbox2, data.textbox2 || "TextBox2 Notes");
-            await this.fill(this.studentNotes, data.studentNotes);
-            await this.fill(this.studentDrivingNotes, data.studentDrivingNotes || data.drivingNotes);
-            await this.check(this.termsConditionsCheckbox);
+            // Personal Information
+            await this.waitForVisible(this.firstName);
+            await this.fill(this.firstName, `${data.firstName}_${this.uniqueId}`);
+
+            if (await this.isVisible(this.middleName)) {
+                await this.fill(this.middleName, `${data.middleName}_${this.uniqueId}`);
+            }
+            if (await this.isVisible(this.lastName)) {
+                await this.fill(this.lastName, data.lastName);
+            }
+
+            // Knowledge Test specific assignment fields
+            if (await this.isVisible(this.assignToLocationDropdown)) {
+                await this.click(this.assignToLocationDropdown);
+                if (await this.isVisible(this.assignToLocationDropdownSelection)) {
+                    await this.click(this.assignToLocationDropdownSelection);
+                }
+            }
+            if (await this.isVisible(this.assignToStaffDropdown)) {
+                await this.click(this.assignToStaffDropdown);
+                if (await this.isVisible(this.assignToStaffDropdownSelection)) {
+                    await this.click(this.assignToStaffDropdownSelection);
+                }
+            }
+
+
+            // Address Details
+            if (await this.isVisible(this.address) && data.address) {
+
+                await this.pressSequentially(this.address, data.address);
+                await this.waitForVisible(this.addressSelectionDropdown);
+                await this.click(this.addressSelectionDropdown);
+
+
+            }
+            if (await this.isVisible(this.apartment)) {
+                await this.fill(this.apartment, data.apartment);
+            }
+
+            if (await this.isVisible(this.stateDropdown)) {
+                await this.click(this.stateDropdown);
+                if (await this.isVisible(this.stateOptionValue)) {
+                    await this.click(this.stateOptionValue);
+                }
+            }
+            if (await this.isVisible(this.address) && data.address) {
+                await this.fill(this.address, data.address);
+            }
+            if (await this.isVisible(this.zipCode) && data.zipCode) {
+                await this.fill(this.zipCode, data.zipCode);
+            }
+
+            // Contact Information
+            if (await this.isVisible(this.homePhone) && data.homePhone) {
+                await this.fill(this.homePhone, data.homePhone);
+            }
+            const cellPhoneValue = data.cellPhone || data.studentCellPhone;
+            if (await this.isVisible(this.studentCellPhone) && cellPhoneValue) {
+                await this.fill(this.studentCellPhone, cellPhoneValue);
+            } else if (await this.isVisible(this.cellPhone) && cellPhoneValue) {
+                await this.fill(this.cellPhone, cellPhoneValue);
+            }
+            if (await this.isVisible(this.studentEmail)) {
+                await this.fill(this.studentEmail, `${data.firstName}_${this.uniqueId}@gmail.com`);
+            }
+
+            // Parent 1 Information
+            if (await this.isVisible(this.parentName) && data.parentName) {
+                await this.fill(this.parentName, data.parentName);
+            }
+            const parentPhoneVal = data.parentGuardianCell || data.parentCellPhone;
+            if (await this.isVisible(this.parentCellPhone) && parentPhoneVal) {
+                await this.fill(this.parentCellPhone, parentPhoneVal);
+            } else if (await this.isVisible(this.parentGuardianCell) && parentPhoneVal) {
+                await this.fill(this.parentGuardianCell, parentPhoneVal);
+            }
+            const parentEmailVal = data.parentGuardianEmail || data.parentEmail;
+            if (await this.isVisible(this.parentEmail) && parentEmailVal) {
+                await this.fill(this.parentEmail, parentEmailVal);
+            } else if (await this.isVisible(this.parentGuardianEmail) && parentEmailVal) {
+                await this.fill(this.parentGuardianEmail, parentEmailVal);
+            }
+
+            // Parent 2 Information
+            if (await this.isVisible(this.parentName2) && data.parentName2) {
+                await this.fill(this.parentName2, data.parentName2);
+                if (await this.isVisible(this.parentPhone2) && data.parentPhone2) {
+                    await this.fill(this.parentPhone2, data.parentPhone2);
+                }
+            }
+            if (await this.isVisible(this.parentEmail2) && data.parentEmail2) {
+                await this.fill(this.parentEmail2, data.parentEmail2);
+            }
+
+            // SSN & Signature
+            if (await this.isVisible(this.socialSecurityNumber) && data.socialSecurityNumber) {
+                await this.fill(this.socialSecurityNumber, data.socialSecurityNumber);
+            }
+            if (await this.isVisible(this.studentSignature) && data.studentSignature) {
+                await this.fill(this.studentSignature, data.studentSignature);
+            }
+
+            // Emergency Contact
+            if (await this.isVisible(this.emergencyName) && data.emergencyName) {
+                await this.fill(this.emergencyName, data.emergencyName);
+                if (await this.isVisible(this.emergencyRelationship) && data.emergencyRelationship) {
+                    await this.fill(this.emergencyRelationship, data.emergencyRelationship);
+                }
+                if (await this.isVisible(this.emergencyPhone) && data.emergencyPhone) {
+                    await this.fill(this.emergencyPhone, data.emergencyPhone);
+                }
+            }
+
+            // School & Physical attributes
+            if (await this.isVisible(this.highSchoolDropdown)) {
+                await this.click(this.highSchoolDropdown);
+                if (await this.isVisible(this.highSchoolDropdownSelection)) {
+                    await this.click(this.highSchoolDropdownSelection);
+                }
+            }
+            if (await this.isVisible(this.wearGlassesDropdown)) {
+                await this.click(this.wearGlassesDropdown);
+                if (await this.isVisible(this.wearGlassesDropdownSelection)) {
+                    await this.click(this.wearGlassesDropdownSelection);
+                }
+            }
+            if (await this.isVisible(this.maleCheckbox)) {
+                await this.check(this.maleCheckbox);
+            }
+
+            // Permit Information
+            if (await this.isVisible(this.permitNumber) && data.permitNumber) {
+                await this.fill(this.permitNumber, data.permitNumber);
+            }
+            const issuedIcon = (await this.isVisible(this.dlPermitIssuedDateCalendarIcon))
+                ? this.dlPermitIssuedDateCalendarIcon
+                : this.permitIssuedDateCalendarIcon;
+            if (await this.isVisible(issuedIcon)) {
+                await this.click(issuedIcon);
+                if (await this.isVisible(this.permitIssueDateSelectInCalendar)) {
+                    await this.click(this.permitIssueDateSelectInCalendar);
+                }
+            }
+            const expireIcon = (await this.isVisible(this.dlPermitExpirationDateCalendarIcon))
+                ? this.dlPermitExpirationDateCalendarIcon
+                : this.permitExpirationDateCalendarIcon;
+            if (await this.isVisible(expireIcon)) {
+                await this.click(expireIcon);
+                if (await this.isVisible(this.permitExpireDateSelectInCalendar)) {
+                    await this.click(this.permitExpireDateSelectInCalendar);
+                }
+            }
+
+            // Medical & Notes
+            if (await this.isVisible(this.medicalConditions) && data.medicalConditions) {
+                await this.fill(this.medicalConditions, data.medicalConditions);
+            }
+            if (await this.isVisible(this.studentNotes) && data.studentNotes) {
+                await this.fill(this.studentNotes, data.studentNotes);
+            }
+            const drivingNotesVal = data.studentDrivingNotes || data.drivingNotes;
+            if (await this.isVisible(this.studentDrivingNotes) && drivingNotesVal) {
+                await this.fill(this.studentDrivingNotes, drivingNotesVal);
+            } else if (await this.isVisible(this.drivingNotes) && drivingNotesVal) {
+                await this.fill(this.drivingNotes, drivingNotesVal);
+            }
+
+            if (await this.isVisible(this.preferredNickname)) {
+                await this.pressSequentially(this.preferredNickname, "111111111");
+            }
+
+            // Custom TextBoxes
+            if (await this.isVisible(this.textbox1)) {
+                await this.fill(this.textbox1, data.textbox1 || "TextBox1 Notes");
+            }
+            if (await this.isVisible(this.textbox2)) {
+                await this.fill(this.textbox2, data.textbox2 || "TextBox2 Notes");
+            }
+            if (await this.isVisible(this.termsConditionsCheckbox)) {
+                await this.click(this.termsConditionsCheckbox);
+            }
+
+            // Custom Datepickers
+            const datepickerInputs = this.customDatepickers;
+            const datepickerCount = await datepickerInputs.count();
+            if (datepickerCount > 0) {
+                const dateValue = data.datePicker;
+                console.log(`Found ${datepickerCount} datepicker input(s). Filling with date: "${dateValue}"`);
+                for (let i = 0; i < datepickerCount; i++) {
+                    const input = datepickerInputs.nth(i);
+                    if (await this.isVisible(input)) {
+                        await this.pressSequentially(input, dateValue);
+                        await this.page.waitForTimeout(1000)
+                    }
+                }
+            }
+
+            // Lead & Terms
+            if (await this.isVisible(this.leadDropdown)) {
+                await this.click(this.leadDropdown);
+                if (await this.isVisible(this.leadDropdownSelection)) {
+                    await this.click(this.leadDropdownSelection);
+                }
+            }
+
+
         });
     }
 

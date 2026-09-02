@@ -6,7 +6,7 @@
     "firstName": "test",
     "middleName": "test1",
     "lastName": "test2",
-    "address": "los angeles",
+    "address": "new york",
     "zipCode": "10020",
     "studentEmail": "test@test.com",
     "homePhone": "3333333333",
@@ -23,7 +23,12 @@
     "permitNumber": "222222222",
     "medicalConditions": "no medical conditions",
     "studentNotes": "student notes",
-    "drivingNotes": "student driving notes"
+    "drivingNotes": "student driving notes",
+    "studentDrivingNotes": "student driving notes",
+    "socialSecurityNumber": "123456789",
+    "studentSignature": "test student signature",
+    "apartment": "12345",
+    "datePicker": "12/22/2026"
   },
   "student2": {
     "name": "test student2",

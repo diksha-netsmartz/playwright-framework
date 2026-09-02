@@ -28,6 +28,13 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
 
     const targetStudent = credentials.resetStudent.name;
 
+    await test.step('Precondition: Mark all existing reset password emails as read', async () => {
+        await EmailHelper.markAllUnreadAsRead({
+            recipientEmail: credentials.resetStudent.email,
+            subject: ['Student UserName/Password', 'Reset Password', 'reset pwd']
+        });
+    });
+
     await test.step('Step 1: Login to Admin Portal using existing login methods', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
@@ -45,9 +52,7 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
         await studentProfilePage.updateEmailIfDifferent(credentials.resetStudent.email);
     });
 
-    let emailSentTime;
     await test.step('Step 5: Send Reset Password / Username email to student', async () => {
-        emailSentTime = new Date(Date.now() - 15000);
         await studentProfilePage.sendUsernamePasswordEmail();
     });
 
@@ -56,8 +61,7 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
         resetPasswordUrl = await EmailHelper.getResetPasswordLink({
             recipientEmail: credentials.resetStudent.email,
             subject: 'Student UserName/Password',
-            sentAfter: emailSentTime,
-            timeoutMs: 75000
+            timeoutMs: 90000
         });
         console.log('Navigating to Reset Password URL:', resetPasswordUrl);
     });

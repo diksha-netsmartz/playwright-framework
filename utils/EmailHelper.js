@@ -11,24 +11,15 @@ export default class EmailHelper {
      */
     static async getResetPasswordLink(options = {}, timeoutMs) {
         let recipientEmail = null;
-        let searchSubject = null;
-        let maxWaitTime = timeoutMs || 45000;
-        let sentAfter = null;
+        let searchSubject = 'Student UserName/Password';
+        let maxWaitTime = timeoutMs || 60000; // Default 1 minute (60 seconds)
 
         if (typeof options === 'string') {
             recipientEmail = options;
         } else if (typeof options === 'object' && options !== null) {
             recipientEmail = options.recipientEmail || null;
-            searchSubject = options.subject || null;
+            if (options.subject) searchSubject = options.subject;
             if (options.timeoutMs) maxWaitTime = options.timeoutMs;
-            if (options.sentAfter) {
-                sentAfter = options.sentAfter instanceof Date ? options.sentAfter : new Date(options.sentAfter);
-            }
-        }
-
-        // Default to checking emails received within the last 60 seconds if sentAfter was not provided
-        if (!sentAfter) {
-            sentAfter = new Date(Date.now() - 60 * 1000);
         }
 
         const client = new ImapFlow({
@@ -49,7 +40,14 @@ export default class EmailHelper {
             while (Date.now() - startTime < maxWaitTime) {
                 const lock = await client.getMailboxLock('INBOX');
                 try {
-                    // Search unread messages
+                    // Send NOOP to refresh/reload mailbox state and fetch latest emails from server
+                    try {
+                        await client.noop();
+                    } catch {
+                        // Ignore transient NOOP errors
+                    }
+
+                    // Search for unread reset password emails
                     const searchCriteria = { seen: false };
                     if (recipientEmail) {
                         searchCriteria.to = recipientEmail;
@@ -60,15 +58,14 @@ export default class EmailHelper {
 
                     let messages = await client.search(searchCriteria);
 
-                    // Fallback to checking any unread messages if specific query returned empty
-                    if ((!messages || messages.length === 0) && (recipientEmail || searchSubject)) {
-                        messages = await client.search({ seen: false });
+                    // Fallback to searching by subject alone if recipient header format differs
+                    if ((!messages || messages.length === 0) && recipientEmail && searchSubject) {
+                        messages = await client.search({ seen: false, subject: searchSubject });
                     }
 
                     if (messages && messages.length > 0) {
-                        // Sort descending so the most recently received messages (highest sequence number) are checked first
+                        // Sort descending so the most recent message (highest sequence number) is checked first
                         const sortedMessages = [...messages].sort((a, b) => Number(b) - Number(a));
-                        console.log(`[EmailHelper] Found ${sortedMessages.length} unread message(s). Checking from newest to oldest...`);
 
                         for (const messageId of sortedMessages) {
                             const fetched = await client.fetchOne(messageId, { source: true, internalDate: true, uid: true });
@@ -76,16 +73,9 @@ export default class EmailHelper {
                                 continue;
                             }
                             const parsed = await simpleParser(fetched.source);
-                            const emailDate = parsed.date || fetched.internalDate || new Date(0);
                             const subject = parsed.subject || '';
 
-                            // Ignore emails received before the sentAfter timestamp
-                            if (emailDate.getTime() < sentAfter.getTime()) {
-                                console.log(`[EmailHelper] Skipping older email (received: ${emailDate.toISOString()}, expected after: ${sentAfter.toISOString()})`);
-                                continue;
-                            }
-
-                            // Filter by subject if specified
+                            // Ensure subject matches
                             if (searchSubject && !subject.toLowerCase().includes(searchSubject.toLowerCase())) {
                                 continue;
                             }
@@ -94,41 +84,26 @@ export default class EmailHelper {
                             const textContent = parsed.text || '';
                             const allContent = `${htmlContent}\n${textContent}`;
 
-                            // Check for Reset Password URL patterns
+                            // Check for Reset Password URL patterns (handles unquoted SendGrid tracking links and direct URLs)
                             const match =
-                                htmlContent.match(/href=["'](https?:\/\/[^"'>]*ResetPassword[^"'>]*)["']/i) ||
-                                htmlContent.match(/href=["']([^"'>]+)["'][^>]*>\s*Reset Password\s*<\/a>/i) ||
+                                htmlContent.match(/<a\s+[^>]*href=["']?([^"'\s>]+)["']?[^>]*>\s*Reset\s*Password\s*<\/a>/i) ||
+                                htmlContent.match(/href=["']?(https?:\/\/[^"'>\s]*ResetPassword[^"'>\s]*)["']?/i) ||
                                 allContent.match(/(https?:\/\/[^\s<>"']*ResetPassword[^\s<>"']*)/i) ||
                                 allContent.match(/https?:\/\/[^\s<>"']+\/Login\/ResetPassword\/[^\s<>"']+/i);
 
                             if (match && (match[1] || match[0])) {
                                 const resetUrl = (match[1] || match[0]).replace(/&amp;/g, '&').trim();
-                                console.log(`[EmailHelper] Successfully extracted Reset Password link from newest email (Date: ${emailDate.toISOString()}, Subject: "${subject}")`);
+                                console.log(`[EmailHelper] Successfully extracted Reset Password link (Subject: "${subject}")`);
 
-                                // Mark every email found for reset password as seen
+                                // Mark all matching unread messages as seen
                                 for (const msgId of sortedMessages) {
                                     try {
                                         await client.messageFlagsAdd(msgId, ['\\Seen']);
                                     } catch {
-                                        // Ignore individual flag error
+                                        // Ignore
                                     }
                                 }
 
-                                try {
-                                    const unreadCriteria = { seen: false };
-                                    if (recipientEmail) unreadCriteria.to = recipientEmail;
-                                    if (searchSubject) unreadCriteria.subject = searchSubject;
-                                    const remainingUnread = await client.search(unreadCriteria);
-                                    if (remainingUnread && remainingUnread.length > 0) {
-                                        for (const msg of remainingUnread) {
-                                            await client.messageFlagsAdd(msg, ['\\Seen']);
-                                        }
-                                    }
-                                } catch {
-                                    // Ignore
-                                }
-
-                                console.log(`[EmailHelper] Marked all found reset password email(s) as seen.`);
                                 return resetUrl;
                             }
                         }
@@ -137,91 +112,22 @@ export default class EmailHelper {
                     lock.release();
                 }
 
-                console.log(`[EmailHelper] Waiting for email to arrive... (${Math.round((Date.now() - startTime) / 1000)}s elapsed)`);
+                const elapsedSec = Math.round((Date.now() - startTime) / 1000);
+                const totalSec = Math.round(maxWaitTime / 1000);
+                console.log(`[EmailHelper] Reloading inbox, waiting for new email... (${elapsedSec}s / ${totalSec}s elapsed)`);
                 await new Promise(resolve => setTimeout(resolve, 3000));
             }
 
-            // Instead of throwing error, fetch the link from the last email received
-            console.warn(`[EmailHelper] Reset Password email (sent after ${sentAfter.toISOString()}) was not received within ${maxWaitTime / 1000} seconds.`);
-            console.log('[EmailHelper] Fallback: Fetching Reset Password link from the last email received...');
-
-            const fallbackLock = await client.getMailboxLock('INBOX');
-            try {
-                const totalMessages = client.mailbox.exists;
-                if (totalMessages > 0) {
-                    const checkCount = Math.min(totalMessages, 10);
-                    let foundUrl = null;
-                    const matchedMessageIds = [];
-
-                    for (let seq = totalMessages; seq > totalMessages - checkCount; seq--) {
-                        const fetched = await client.fetchOne(seq, { source: true, internalDate: true, uid: true });
-                        if (!fetched || !fetched.source) {
-                            continue;
-                        }
-
-                        const parsed = await simpleParser(fetched.source);
-                        const htmlContent = parsed.html || parsed.textAsHtml || '';
-                        const textContent = parsed.text || '';
-                        const allContent = `${htmlContent}\n${textContent}`;
-
-                        const match =
-                            htmlContent.match(/href=["'](https?:\/\/[^"'>]*ResetPassword[^"'>]*)["']/i) ||
-                            htmlContent.match(/href=["']([^"'>]+)["'][^>]*>\s*Reset Password\s*<\/a>/i) ||
-                            allContent.match(/(https?:\/\/[^\s<>"']*ResetPassword[^\s<>"']*)/i) ||
-                            allContent.match(/https?:\/\/[^\s<>"']+\/Login\/ResetPassword\/[^\s<>"']+/i);
-
-                        if (match && (match[1] || match[0])) {
-                            matchedMessageIds.push(seq);
-                            if (!foundUrl) {
-                                foundUrl = (match[1] || match[0]).replace(/&amp;/g, '&').trim();
-                                const emailDate = parsed.date || fetched.internalDate || new Date(0);
-                                const subject = parsed.subject || '';
-                                console.log(`[EmailHelper] Successfully extracted Reset Password link from last email received (Seq: ${seq}, Date: ${emailDate.toISOString()}, Subject: "${subject}")`);
-                            }
-                        }
-                    }
-
-                    if (foundUrl) {
-                        // Mark every email found for reset password as seen
-                        for (const seqId of matchedMessageIds) {
-                            try {
-                                await client.messageFlagsAdd(seqId, ['\\Seen']);
-                            } catch {
-                                // Ignore
-                            }
-                        }
-
-                        try {
-                            const searchCriteria = { seen: false };
-                            if (recipientEmail) searchCriteria.to = recipientEmail;
-                            if (searchSubject) searchCriteria.subject = searchSubject;
-                            const unreadMessages = await client.search(searchCriteria);
-                            if (unreadMessages && unreadMessages.length > 0) {
-                                for (const msg of unreadMessages) {
-                                    await client.messageFlagsAdd(msg, ['\\Seen']);
-                                }
-                            }
-                        } catch {
-                            // Ignore
-                        }
-
-                        console.log(`[EmailHelper] Marked all found reset password email(s) as seen.`);
-                        return foundUrl;
-                    }
-                }
-            } finally {
-                fallbackLock.release();
-            }
-
-            throw new Error(`[EmailHelper] Could not find Reset Password link even in the last received email(s).`);
+            throw new Error(`[EmailHelper] Reset Password email was not received within ${maxWaitTime / 1000} seconds.`);
         } finally {
             await client.logout();
         }
     }
 
     /**
-     * Marks all unread emails matching optional recipient and subject as seen.
-     * @param {object} [options={}]
+     * Marks all unread emails matching optional recipient and subject(s) as seen.
+     * Supports passing a single subject string or an array of subjects.
+     * @param {object} [options={}] - Options { recipientEmail, subject }
      */
     static async markAllUnreadAsRead(options = {}) {
         const client = new ImapFlow({
@@ -239,16 +145,54 @@ export default class EmailHelper {
             await client.connect();
             const lock = await client.getMailboxLock('INBOX');
             try {
-                const searchCriteria = { seen: false };
-                if (options.recipientEmail) searchCriteria.to = options.recipientEmail;
-                if (options.subject) searchCriteria.subject = options.subject;
-
-                const messages = await client.search(searchCriteria);
-                if (messages && messages.length > 0) {
-                    for (const msg of messages) {
-                        await client.messageFlagsAdd(msg, ['\\Seen']);
+                // Normalize subjects to search
+                let subjectsToSearch = [];
+                if (options.subject) {
+                    if (Array.isArray(options.subject)) {
+                        subjectsToSearch = options.subject;
+                    } else if (typeof options.subject === 'string') {
+                        if (/reset\s*pwd/i.test(options.subject)) {
+                            subjectsToSearch = [options.subject, 'Student UserName/Password', 'Reset Password'];
+                        } else {
+                            subjectsToSearch = [options.subject];
+                        }
                     }
-                    console.log(`[EmailHelper] Marked ${messages.length} previous unread message(s) as seen.`);
+                } else {
+                    subjectsToSearch = [null];
+                }
+
+                const markedSeqNumbers = new Set();
+
+                for (const subj of subjectsToSearch) {
+                    const searchCriteria = { seen: false };
+                    if (options.recipientEmail) searchCriteria.to = options.recipientEmail;
+                    if (subj) searchCriteria.subject = subj;
+
+                    let messages = await client.search(searchCriteria);
+
+                    // Fallback search by subject alone if recipient filter yielded 0
+                    if ((!messages || messages.length === 0) && options.recipientEmail && subj) {
+                        messages = await client.search({ seen: false, subject: subj });
+                    }
+
+                    if (messages && messages.length > 0) {
+                        for (const msg of messages) {
+                            if (!markedSeqNumbers.has(msg)) {
+                                markedSeqNumbers.add(msg);
+                                try {
+                                    await client.messageFlagsAdd(msg, ['\\Seen']);
+                                } catch {
+                                    // Ignore individual flag error
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (markedSeqNumbers.size > 0) {
+                    console.log(`[EmailHelper] Marked ${markedSeqNumbers.size} unread reset password message(s) as seen.`);
+                } else {
+                    console.log(`[EmailHelper] No matching unread reset password messages found to mark as seen.`);
                 }
             } finally {
                 lock.release();
@@ -260,3 +204,4 @@ export default class EmailHelper {
         }
     }
 }
+

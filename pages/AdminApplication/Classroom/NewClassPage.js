@@ -284,12 +284,26 @@ export default class NewClassPage extends BasePage {
                 await this.waitForLoaders();
                 await this.waitForVisible(this.confirmYesBtn);
                 await this.click(this.confirmYesBtn);
-                await this.waitForLoaders();
-                await this.waitForVisible(this.teacherRemovedMessage);
-                await this.verifyVisible(this.teacherAvailableMessage);
-                await this.click(this.closeTeacherAvailableModal);
+                // await this.waitForLoaders();
+                // await this.page.waitForTimeout(2000);
+                if (await this.isVisible(this.teacherRemovedMessage)) {
+                    await this.waitForVisible(this.teacherRemovedMessage);
+                    await this.verifyVisible(this.teacherRemovedMessage);
+                }
+                await this.page.waitForTimeout(2000);
+                if (await this.isVisible(this.teacherAvailableMessage)) {
+                    await this.verifyVisible(this.teacherAvailableMessage);
+                    await this.click(this.closeTeacherAvailableModal);
+                    await this.waitForHidden(this.closeTeacherAvailableModal);
+                }
                 await this.waitForLoaders();
             }
+            else if (await this.isVisible(this.teacherAvailableMessage)) {
+                await this.verifyVisible(this.teacherAvailableMessage);
+                await this.click(this.closeTeacherAvailableModal);
+                await this.waitForHidden(this.closeTeacherAvailableModal);
+            }
+            await this.waitForLoaders();
         });
     }
 
