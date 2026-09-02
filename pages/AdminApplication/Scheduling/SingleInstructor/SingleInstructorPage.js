@@ -67,7 +67,8 @@ export default class SingleInstructorPage extends BasePage {
      **/
     listMenuOfCreatedAppointment(studentOrNotes) {
         const text = this.getStudentSearchText(studentOrNotes);
-        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img)[last()]`);
+        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img)[last()]`);
+        return this.page.locator(`xpath=(//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')])[last()]`);
     }
 
     /**
@@ -77,7 +78,9 @@ export default class SingleInstructorPage extends BasePage {
      **/
     allListMenusOfCreatedAppointments(studentOrNotes) {
         const text = this.getStudentSearchText(studentOrNotes);
-        return this.page.locator(`xpath=//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
+        // return this.page.locator(`xpath=//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
+        return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
+
     }
 
     /**
@@ -87,7 +90,9 @@ export default class SingleInstructorPage extends BasePage {
      **/
     listMenuInAppointment(studentOrNotes) {
         const text = this.getStudentSearchText(studentOrNotes);
-        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
+        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
+        return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
+
     }
 
     /**
@@ -97,7 +102,9 @@ export default class SingleInstructorPage extends BasePage {
      **/
     listMenuOfNoShowAppointment(studentOrName) {
         const text = this.getStudentSearchText(studentOrName);
-        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
+        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
+        return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
+
     }
 
     /**
@@ -107,7 +114,8 @@ export default class SingleInstructorPage extends BasePage {
      **/
     deleteAppointmentButton(studentOrNotes) {
         const text = this.getStudentSearchText(studentOrNotes);
-        return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//a[@href='cancelAppt'])[last()]`);
+        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//a[@href='cancelAppt'])[last()]`);
+        return this.page.locator(`xpath=(//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//a[@href='cancelAppt'])[last()]`);
     }
 
     /**
@@ -255,23 +263,16 @@ export default class SingleInstructorPage extends BasePage {
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
             );
-            const { innerHeight, innerWidth } = window;
             let skipped = 0;
 
             for (let i = 0; i < cells.length; i++) {
                 const cell = cells[i];
                 const cellBox = cell.getBoundingClientRect();
 
-                if (cellBox.width === 0 || cellBox.height === 0 ||
-                    cellBox.top < 0 || cellBox.bottom > innerHeight ||
-                    cellBox.left < 0 || cellBox.right > innerWidth) {
+                // Only skip unrendered/hidden cells
+                if (cellBox.width === 0 || cellBox.height === 0) {
                     continue;
                 }
-
-                const centerX = cellBox.left + cellBox.width / 2;
-                const centerY = cellBox.top + cellBox.height / 2;
-                const elAtCenter = document.elementFromPoint(centerX, centerY);
-                const isPointBlocked = elAtCenter && !cell.contains(elAtCenter) && elAtCenter !== cell;
 
                 const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
@@ -284,7 +285,7 @@ export default class SingleInstructorPage extends BasePage {
                     );
                 });
 
-                if (!hasApptOverlap && !isPointBlocked) {
+                if (!hasApptOverlap) {
                     if (skipped === skip) return i;
                     skipped++;
                 }
@@ -294,8 +295,11 @@ export default class SingleInstructorPage extends BasePage {
 
         if (freeIndex === -1) throw new Error("No available slot found in the scheduler");
         console.log(`Found available slot at index ${freeIndex}`);
-        return this.page.locator("#scheduler td[role='gridcell']:not(.k-nonwork-hour)").nth(freeIndex);
+        const slot = this.page.locator("#scheduler td[role='gridcell']:not(.k-nonwork-hour)").nth(freeIndex);
+        await slot.scrollIntoViewIfNeeded();
+        return slot;
     }
+
 
     /**
      * Selects date in calendar, right clicks an unoccupied slot, and selects the given appointment creation option.
@@ -382,6 +386,7 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async deleteAppointment(studentOrNotes) {
         await test.step(`Delete appointment for: "${this.getStudentSearchText(studentOrNotes)}"`, async () => {
+            await this.page.waitForTimeout(10000);
             await this.hover(this.listMenuOfCreatedAppointment(studentOrNotes));
             await this.isVisible(this.deleteAppointmentButton(studentOrNotes));
             await this.click(this.deleteAppointmentButton(studentOrNotes));
@@ -428,20 +433,25 @@ export default class SingleInstructorPage extends BasePage {
                 await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
 
                 try {
-                    await this.waitForVisible(this.submitButtonPopup);
+                    await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 1500 });
                     await this.click(this.submitButtonPopup);
                 } catch {
                     console.log("Submit confirmation popup did not appear.");
                 }
 
-                const toastLocator = this.page.locator('#toast-container .toast-message');
+                const toastLocator = this.page.locator('#toast-container .toast-message').last();
 
                 let message = '';
                 try {
-                    await this.waitForVisible(toastLocator);
-                    message = (await this.getText(toastLocator))?.trim() || '';
+                    await toastLocator.waitFor({ state: 'visible', timeout: 4000 });
+                    message = (await toastLocator.textContent())?.trim() || '';
                 } catch {
                     console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
+                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentOrNotes).count();
+                    if (appointmentCount >= 2) {
+                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
+                        return;
+                    }
                 }
 
                 console.log(`Slot attempt ${attempt}: Toast message = "${message}"`);
@@ -450,6 +460,12 @@ export default class SingleInstructorPage extends BasePage {
                     console.log(`Success on attempt ${attempt}: ${message}`);
                     return;
                 } else {
+                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentOrNotes).count();
+                    if (appointmentCount >= 2) {
+                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
+                        return;
+                    }
+
                     console.log(`Non-success toast received: "${message}"`);
                     await this.page.locator('#toast-container .toast').waitFor({
                         state: 'hidden',
@@ -477,7 +493,9 @@ export default class SingleInstructorPage extends BasePage {
                 studentName = String(studentOrNotes);
             }
 
-            const locator = this.page.locator(`xpath=//p[contains(text(),'${studentName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
+            // const locator = this.page.locator(`xpath=//p[contains(text(),'${studentName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
+            const locator = this.page.locator(`xpath=//div[@data-formattedstudentname='${studentName}' or @data-formattedstudentname2='${studentName}']//img[contains(@src,'list')]`);
+
             await expect(locator).toHaveCount(2);
             await this.waitForLoaders();
         });
