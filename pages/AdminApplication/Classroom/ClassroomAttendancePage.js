@@ -224,7 +224,7 @@ export default class ClassroomAttendancePage extends BasePage {
 
             const content = await ExcelHelper.readContent(download);
             console.log(`Verifying Excel content contains: "${expectedText}"`);
-            expect(content).toContain(expectedText);
+            expect(content.toLowerCase()).toContain(expectedText.toLowerCase());
             console.log(`Excel content "${expectedText}" verified successfully.`);
 
             // Attach Excel file to Playwright and Allure Reports

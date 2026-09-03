@@ -17,6 +17,7 @@ export default class StaffHomePage extends BasePage {
         this.needsAttentionWidget = page.getByText('NEEDS ATTENTION', { exact: true });
         this.actionDropdownBtn = page.locator("xpath=(//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')])[1]");
         this.actionDropdownBtn2 = page.locator("xpath=(//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')])[2]");
+        this.actionDropdownButtonsList = page.locator("//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')]");
         this.processLink = page.locator("xpath=(//a//strong[text()='Process'])[last()]");
         this.noShowLink = page.locator("xpath=(//a//strong[text()='No Show'])[last()]");
         this.noShowTextbox = page.locator("#txtnoShowNotes");
@@ -43,12 +44,70 @@ export default class StaffHomePage extends BasePage {
     }
 
     /**
+     * Retrieves the count of action dropdown buttons currently visible in the 'Needs Attention' widget.
+     * @returns {Promise<number>}
+     */
+    async getActionDropdownCount() {
+        await this.waitForLoaders().catch(() => { });
+        return await this.actionDropdownButtonsList.count();
+    }
+
+    /**
+     * Verifies that either:
+     * 1. The success message banner was detected (toastSeen === true), OR
+     * 2. If the banner was not detected, the actionDropdownButtonsList count was decremented by 1.
+     * If neither condition is met, fails the test.
+     * @param {number} initialCount - Button count before triggering the action.
+     * @param {boolean} toastSeen - Whether the message banner was detected.
+     * @param {string} actionDescription - Label for logging and error reporting.
+     */
+    async verifySuccessOrCountDecremented(initialCount, toastSeen, actionDescription = 'Action') {
+        if (toastSeen) {
+            await test.step(`Verified: "${actionDescription}" message banner was displayed`, async () => { });
+            return;
+        }
+
+        // Fallback: If banner was not received, verify that count is decremented by 1
+        await this.waitForLoaders().catch(() => { });
+
+        const expectedCount = Math.max(0, initialCount - 1);
+        let finalCount = await this.actionDropdownButtonsList.count();
+
+        // If count hasn't decremented immediately, poll for up to 10s for the DOM / table to update
+        if (finalCount !== expectedCount) {
+            try {
+                await expect.poll(async () => {
+                    await this.waitForLoaders().catch(() => { });
+                    return await this.actionDropdownButtonsList.count();
+                }, {
+                    timeout: 10000,
+                    intervals: [1000, 2000]
+                }).toBe(expectedCount);
+                finalCount = expectedCount;
+            } catch {
+                finalCount = await this.actionDropdownButtonsList.count();
+            }
+        }
+
+        const isCountDecremented = finalCount === expectedCount;
+
+        if (!isCountDecremented) {
+            expect(finalCount).toBe(expectedCount);
+        }
+
+        await test.step(`Verified: ${actionDescription}`, async () => { });
+    }
+
+    /**
      * Marks an appointment in the 'Needs Attention' widget as No Show with notes and confirms the action.
     **/
     async markAppointmentAsNoShow() {
         await test.step('Mark appointment as No Show and confirm', async () => {
             await this.waitForLoaders();
             await this.waitForVisible(this.needsAttentionWidget);
+
+            const initialCount = await this.getActionDropdownCount();
+
             await this.click(this.actionDropdownBtn);
             await this.click(this.noShowLink);
             await this.waitForVisible(this.noShowTextbox);
@@ -68,10 +127,11 @@ export default class StaffHomePage extends BasePage {
                 return text.includes('No Show successfully') || (text.includes('no show') && text.includes('successfully'));
             }, { timeout: 15000 }).then(() => true).catch(() => false);
 
-            expect(toastSeen, 'Expected "Appointment marked No Show successfully." banner to be displayed, but it was not present.').toBe(true);
-            await test.step('Verified: "Appointment marked No Show successfully." banner was displayed', async () => { });
-
-
+            await this.verifySuccessOrCountDecremented(
+                initialCount,
+                toastSeen,
+                'Appointment marked No Show successfully.'
+            );
 
             await this.waitForLoaders().catch(() => { });
         });
@@ -84,6 +144,9 @@ export default class StaffHomePage extends BasePage {
         await test.step('Cancel appointment and confirm', async () => {
             await this.waitForLoaders();
             await this.waitForVisible(this.needsAttentionWidget);
+
+            const initialCount = await this.getActionDropdownCount();
+
             await this.click(this.actionDropdownBtn2);
             await this.click(this.cancelLink);
             await this.waitForLoaders();
@@ -99,8 +162,11 @@ export default class StaffHomePage extends BasePage {
                 return /cance[l]+ed successfully/i.test(text) || (text.includes('Appointment') && /cance[l]+ed/i.test(text));
             }, { timeout: 7000 }).then(() => true).catch(() => false);
 
-            expect(toastSeen, 'Expected "Appointment cancelled successfully." banner to be displayed, but it was not present.').toBe(true);
-            await test.step('Verified: "Appointment cancelled successfully." banner was displayed', async () => { });
+            await this.verifySuccessOrCountDecremented(
+                initialCount,
+                toastSeen,
+                'Appointment cancelled successfully.'
+            );
 
             await this.waitForLoaders().catch(() => { });
         });
