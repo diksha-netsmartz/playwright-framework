@@ -468,15 +468,14 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.click(this.submitButton);
             await this.click(this.confirmYesButton);
             await this.waitForLoaders();
-            await this.page.waitForTimeout(2500);
+            // await this.page.waitForTimeout(2500);
 
-            if (await this.isVisible(this.submitButtonPopup)) {
+            if (await this.isVisible(this.submitButtonPopup, { timeout: 2500 })) {
                 await this.click(this.submitButtonPopup);
                 await this.waitForLoaders();
             }
-            await this.page.waitForTimeout(1000);
             const toastLocator = this.page.locator('#toast-container .toast-message').last();
-            await this.waitForVisible(toastLocator).catch(() => { });
+            await this.waitForVisible(toastLocator, { timeout: 5000 }).catch(() => { });
             console.log("last toast message :", await toastLocator.textContent().catch(() => null));
 
             const errorToast = this.page.locator('#toast-container .toast-error').last();

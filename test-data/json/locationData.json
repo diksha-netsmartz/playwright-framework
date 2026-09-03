@@ -1,0 +1,20 @@
+{
+  "locationNamePrefix": "Location",
+  "locationCodePrefix": "LOC",
+  "address": "123 Central Ave",
+  "city": "Miami",
+  "county": "Miami-Dade",
+  "fax": "1234567890",
+  "locationManager": "Manager",
+  "zip": "222122",
+  "mainPhone": "(555) 123-4567",
+  "pickupLocation": "PickUp Point",
+  "dropoffLocation": "DropOff Point",
+  "notes": "Automated location note",
+  "surveyLink": "https://survey.example.com",
+  "licenseNumber": "LIC998877",
+  "updatedNotes": "Automated location note updated",
+  "zoomEmail": "testzoom@gmail.com",
+  "providerLocationId": "2222",
+  "distanceCoverage": "10"
+}

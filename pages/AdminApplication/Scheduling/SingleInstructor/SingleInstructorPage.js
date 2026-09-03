@@ -258,7 +258,9 @@ export default class SingleInstructorPage extends BasePage {
     async findAvailableSlot(skipCount = 0) {
         const freeIndex = await this.page.evaluate((skip) => {
             const cells = Array.from(
-                document.querySelectorAll("#scheduler td[role='gridcell']:not(.k-nonwork-hour)")
+                // document.querySelectorAll("#scheduler td[role='gridcell']:not(.k-nonwork-hour)")
+                document.querySelectorAll("#scheduler td[role='gridcell']")
+
             );
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
@@ -295,7 +297,8 @@ export default class SingleInstructorPage extends BasePage {
 
         if (freeIndex === -1) throw new Error("No available slot found in the scheduler");
         console.log(`Found available slot at index ${freeIndex}`);
-        const slot = this.page.locator("#scheduler td[role='gridcell']:not(.k-nonwork-hour)").nth(freeIndex);
+        // const slot = this.page.locator("#scheduler td[role='gridcell']:not(.k-nonwork-hour)").nth(freeIndex);
+        const slot = this.page.locator("#scheduler td[role='gridcell']").nth(freeIndex);
         await slot.scrollIntoViewIfNeeded();
         return slot;
     }
@@ -417,6 +420,7 @@ export default class SingleInstructorPage extends BasePage {
                 await this.waitForLoaders();
                 const expectedCount = Math.max(0, countBefore - 1);
                 const countAfter = await allAppointments.count();
+                expect(expectedCount).toBe(countAfter);
                 console.log(`Appointments count after deletion: ${countAfter}`);
                 console.log(`Toast not found. Appointment deletion verified on scheduler: count decremented from ${countBefore} to ${countAfter}`);
                 await test.step(`Appointment deleted successfully.`, async () => { });

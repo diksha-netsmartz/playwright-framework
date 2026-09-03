@@ -331,6 +331,10 @@ export default class NewStudentEnrollmentPage extends BasePage {
             await this.fill(this.lastName, data.lastName);
             if (await this.isVisible(this.address) && data.address) {
                 await this.pressSequentially(this.address, data.address);
+                if (!await this.isVisible(this.addressSelectionDropdown)) {
+                    await this.clear(this.address);
+                    await this.pressSequentially(this.address, data.address);
+                }
                 await this.waitForVisible(this.addressSelectionDropdown);
                 await this.click(this.addressSelectionDropdown);
             }

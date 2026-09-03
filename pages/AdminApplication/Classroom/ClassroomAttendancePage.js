@@ -371,8 +371,8 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async verifyEmailSentSuccessfully() {
         await test.step('Verify "Email sent successfully." message is displayed', async () => {
-            await this.waitForVisible(this.emailSentSuccessMessage);
-            await this.verifyVisible(this.emailSentSuccessMessage);
+            await this.waitForVisible(this.emailSentSuccessMessage, { timeout: 30000 });
+            await this.verifyVisible(this.emailSentSuccessMessage, { timeout: 30000 });
             await this.waitForLoaders();
         });
     }

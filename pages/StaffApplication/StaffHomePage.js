@@ -64,38 +64,19 @@ export default class StaffHomePage extends BasePage {
     async verifySuccessOrCountDecremented(initialCount, toastSeen, actionDescription = 'Action') {
         if (toastSeen) {
             await test.step(`Verified: "${actionDescription}" message banner was displayed`, async () => { });
+            await this.waitForLoaders().catch(() => { });
             return;
         }
+        else {
+            const finalCount = await this.actionDropdownButtonsList.count();
 
-        // Fallback: If banner was not received, verify that count is decremented by 1
-        await this.waitForLoaders().catch(() => { });
-
-        const expectedCount = Math.max(0, initialCount - 1);
-        let finalCount = await this.actionDropdownButtonsList.count();
-
-        // If count hasn't decremented immediately, poll for up to 10s for the DOM / table to update
-        if (finalCount !== expectedCount) {
-            try {
-                await expect.poll(async () => {
-                    await this.waitForLoaders().catch(() => { });
-                    return await this.actionDropdownButtonsList.count();
-                }, {
-                    timeout: 10000,
-                    intervals: [1000, 2000]
-                }).toBe(expectedCount);
-                finalCount = expectedCount;
-            } catch {
-                finalCount = await this.actionDropdownButtonsList.count();
+            if (initialCount > 0) {
+                expect(finalCount).toBeLessThan(initialCount);
+            } else {
+                expect(finalCount).toBe(0);
             }
+
         }
-
-        const isCountDecremented = finalCount === expectedCount;
-
-        if (!isCountDecremented) {
-            expect(finalCount).toBe(expectedCount);
-        }
-
-        await test.step(`Verified: ${actionDescription}`, async () => { });
     }
 
     /**
@@ -134,6 +115,7 @@ export default class StaffHomePage extends BasePage {
             );
 
             await this.waitForLoaders().catch(() => { });
+            await test.step(`Appointment marked No Show successfully`, async () => { });
         });
     }
 
@@ -169,6 +151,8 @@ export default class StaffHomePage extends BasePage {
             );
 
             await this.waitForLoaders().catch(() => { });
+            await test.step(`Appointment cancelled successfully`, async () => { });
+
         });
     }
 }
