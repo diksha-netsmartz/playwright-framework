@@ -1,5 +1,6 @@
 import BasePage from '../../../utils/BasePage';
 import { expect, test } from '@playwright/test';
+import DateHelper from '../../../utils/DateHelper';
 
 /**
  * Page Object representing the New Classroom / Add Class Page in Admin Portal.
@@ -33,6 +34,7 @@ export default class NewClassPage extends BasePage {
 
         // Date & Sessions
         this.startDateInput = page.getByRole('textbox', { name: 'M/D/YYYY' });
+        this.prevButton = page.locator('th.prev:visible')
         this.lastDateInCalendar = page.locator("xpath=(//div[@class='datepicker-days']//tbody//td)[last()]");
         this.totalSessionsInput = page.getByRole('textbox', { name: 'Total Sessions' });
 
@@ -173,7 +175,11 @@ export default class NewClassPage extends BasePage {
     async selectStartDate() {
         await test.step('Select Start Date from calendar', async () => {
             await this.click(this.startDateInput);
-            await this.click(this.lastDateInCalendar);
+            // await this.waitForVisible(this.prevButton);
+            // await this.click(this.prevButton);
+            // await this.page.waitForTimeout(2000);
+            const yesterdayDate = await DateHelper.getTodayDateAsString();
+            await this.click(this.page.locator(`//div[@class='datepicker-days']//tbody//td[@class='day' and text()='${yesterdayDate}']`));
         });
     }
 
@@ -222,11 +228,14 @@ export default class NewClassPage extends BasePage {
     /**
      * Selects instructor from the instructor dropdown. If no instructorName is provided, selects the first available option in the list.
      **/
-    async selectInstructor() {
+    async selectInstructor(instructorName) {
         await test.step('Select Classroom Instructor', async () => {
             await this.click(this.instructorDropdownBtn);
-            await this.waitForVisible(this.instructorOption);
-            await this.click(this.instructorOption);
+            // await this.waitForVisible(this.instructorOption);
+            // await this.click(this.instructorOption);
+            const instructorOption = this.page.locator(`xpath=(//li//span[contains(text(),'${instructorName}')])[1]`);
+            await this.waitForVisible(instructorOption);
+            await this.click(instructorOption);
         });
     }
 
@@ -349,7 +358,7 @@ export default class NewClassPage extends BasePage {
      * Classroom ID is randomly generated automatically if not provided.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createMultiSessionClassroom(classData = {}) {
+    async createMultiSessionClassroom(classData = {}, instructorName) {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Multi Session Class');
         await this.selectClassroomService();
@@ -361,7 +370,7 @@ export default class NewClassPage extends BasePage {
         await this.enterTotalSessions(classData.totalSessions);
         await this.selectWeekdays(classData.weekdays);
         await this.setSessionTimes(classData.startTime, classData.duration);
-        await this.selectInstructor();
+        await this.selectInstructor(instructorName);
         await this.checkScheduleAvailability();
         await this.enterClassroomNotes(classData.webSignupNotes, classData.crNotes, classData.internalCrNotes);
         await this.clickCreateClassroom();
@@ -373,7 +382,7 @@ export default class NewClassPage extends BasePage {
      * Classroom ID is randomly generated automatically if not provided.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createSingleSessionClassroom(classData = {}) {
+    async createSingleSessionClassroom(classData = {}, instructorName) {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Single Session Class');
         await this.selectClassroomService();
@@ -383,7 +392,7 @@ export default class NewClassPage extends BasePage {
         await this.selectLocation();
         await this.selectStartDate();
         await this.setSessionTimes(classData.startTime, classData.duration);
-        await this.selectInstructor();
+        await this.selectInstructor(instructorName);
         await this.checkScheduleAvailability();
         await this.enterClassroomNotes(classData.webSignupNotes, classData.crNotes, classData.internalCrNotes);
         await this.clickCreateClassroom();

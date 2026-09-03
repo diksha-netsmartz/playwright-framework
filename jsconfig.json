@@ -3,14 +3,18 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "checkJs": false,
+    "checkJs": true,
     "resolveJsonModule": true,
     "allowJs": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "types": ["node", "@playwright/test"]
+    "types": [
+      "node",
+      "@playwright/test"
+    ]
   },
   "include": [
+    "fixtures/**/*.js",
     "pages/**/*.js",
     "tests/**/*.js",
     "utils/**/*.js",

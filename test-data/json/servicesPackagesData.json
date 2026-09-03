@@ -1,0 +1,12 @@
+{
+  "serviceName": "ServicePackage",
+  "serviceCode": "PKG",
+  "webName": "Web ServicePackage",
+  "discountPrice": "10",
+  "btwCostHr": "20",
+  "onlineCostPerModule": "30",
+  "servicePrice": "100",
+  "webDescription": "Automated Service Package Description",
+  "notes": "Automated Service Package Notes",
+  "emailContent": "Automated Service Package Email Content"
+}

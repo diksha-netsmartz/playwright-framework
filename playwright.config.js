@@ -71,7 +71,7 @@ module.exports = defineConfig({
      *   - 1, 2, 3 (number of retry attempts).
      * Why: Helps eliminate false negatives caused by intermittent network glitches or slow server responses.
      */
-    retries: 2,
+    retries: 1,
 
     /**
      * reporter: Defines test execution reporting format and behavior.
@@ -123,7 +123,7 @@ module.exports = defineConfig({
          *   - Any integer in ms (e.g. 100, 250, 500, 1000).
          * Why: Slows down execution so actions can be observed visually in headed mode and lets UI animations settle.
          */
-        slowMo: 500,
+        // slowMo: 500,
 
         /**
          * browserName: Browser engine used to execute tests.
@@ -193,7 +193,7 @@ module.exports = defineConfig({
          *   - 'only-on-failure' (capture screenshot only when a test fails).
          * Why: Provides visual proof of test execution and assists debugging.
          */
-        screenshot: 'on',
+        screenshot: 'only-on-failure',
 
         /**
          * trace: Records detailed execution traces (DOM snapshots, network activity, console logs).
@@ -205,7 +205,7 @@ module.exports = defineConfig({
          *   - 'on-first-retry'     (record trace only when retrying a failed test).
          * Why: Enables deep post-run debugging and time-travel inspection with `npx playwright show-trace`.
          */
-        trace: 'on',
+        trace: 'retain-on-failure',
 
         /**
          * video: Records video files of test execution.

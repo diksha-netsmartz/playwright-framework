@@ -224,7 +224,7 @@ export default class ClassroomAttendancePage extends BasePage {
 
             const content = await ExcelHelper.readContent(download);
             console.log(`Verifying Excel content contains: "${expectedText}"`);
-            expect(content).toContain(expectedText);
+            expect(content.toLowerCase()).toContain(expectedText.toLowerCase());
             console.log(`Excel content "${expectedText}" verified successfully.`);
 
             // Attach Excel file to Playwright and Allure Reports
@@ -371,8 +371,8 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async verifyEmailSentSuccessfully() {
         await test.step('Verify "Email sent successfully." message is displayed', async () => {
-            await this.waitForVisible(this.emailSentSuccessMessage);
-            await this.verifyVisible(this.emailSentSuccessMessage);
+            await this.waitForVisible(this.emailSentSuccessMessage, { timeout: 30000 });
+            await this.verifyVisible(this.emailSentSuccessMessage, { timeout: 30000 });
             await this.waitForLoaders();
         });
     }

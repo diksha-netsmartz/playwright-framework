@@ -79,8 +79,8 @@ export default class EnrollmentBillingPage extends BasePage {
         this.transactionNumber = page.getByRole('textbox', { name: 'Transaction#' });
         this.receiptNumber = page.getByRole('textbox', { name: 'Receipt#' });
         this.cashNotesTextbox = page.locator("#txtCashNotes").first();
-        this.cashDrawerLocationDropdown = page.locator("//button[@data-id='billingLocation']");
-        this.cashDrawerLocationDropdownOption = page.locator("(//div[@id='cashlocations']//ul//li[not(@class='selected')])[1]");
+        this.cashDrawerLocationDropdown = page.locator("(//button[@data-id='billingLocation'])[1]");
+        this.cashDrawerLocationDropdownOption = page.locator("(//div[@id='cashlocations'][1]//ul//li[not(@class='selected')])[1]");
         this.terminalIDTextbox = page.getByRole('textbox', { name: 'Terminal #' });
         this.accountNicknameTextbox = page.getByRole('textbox', { name: 'Account Nickname' });
         this.doNotSendEmailCheckbox = page.locator("(//input[@id='chb_DoNotSendEmail']/following-sibling::ins)[1]");
@@ -326,7 +326,7 @@ export default class EnrollmentBillingPage extends BasePage {
         await this.waitForVisible(this.billingAmountCaption);
         await this.waitForLoaders();
         const rawText = await this.getText(this.billingAmountCaption);
-        console.log("Raw billing caption text:", JSON.stringify(rawText));
+        // console.log("Raw billing caption text:", JSON.stringify(rawText));
 
         // Match the text string "Billing: $-1100.00" or "Billing: $1275.00"
         const textMatch = rawText ? rawText.match(/Billing:\s*[-$0-9,.]+/i) : null;
