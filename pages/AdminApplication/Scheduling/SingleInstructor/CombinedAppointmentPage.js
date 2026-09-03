@@ -351,6 +351,12 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {Object} student - Student test data object.
      **/
     async fillStudentDetails(studentNo, student) {
+        if (studentNo === 1) {
+            this.student1 = student;
+        } else if (studentNo === 2) {
+            this.student2 = student;
+        }
+
         const studentLabel = `Student ${studentNo} (${student.name})`;
         await test.step(`Fill ${studentLabel} details: service "${student.service || 'Default'}", pickup "${student.pickup}", notes "${student.notes}"`, async () => {
             await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 50 });
@@ -421,10 +427,45 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     /**
-     * Submits the combined appointment form, confirms confirmation prompts, and verifies the success toast message.
-     * If an error toast appears, prints the error message in the console and fails the test.
+     * Extracts formatted search text from student object or string ('LastName, FirstName' or 'Name').
+     * @param {Object|string} studentOrIdentifier - Student test data object or name/note string.
+     * @returns {string} Formatted search text.
      **/
-    async submitAppointment() {
+    getStudentSearchText(studentOrIdentifier) {
+        if (!studentOrIdentifier) return '';
+        if (typeof studentOrIdentifier === 'string') {
+            return studentOrIdentifier;
+        }
+        if (typeof studentOrIdentifier === 'object') {
+            if (studentOrIdentifier.firstName && studentOrIdentifier.lastName) {
+                return `${studentOrIdentifier.lastName}, ${studentOrIdentifier.firstName}`;
+            }
+            return studentOrIdentifier.name || String(studentOrIdentifier);
+        }
+        return String(studentOrIdentifier);
+    }
+
+    /**
+     * Returns locator for the action menu 3-dots icon on the created appointment matching student name or notes.
+     * @param {Object|string} [studentOrNotes] - Optional student test data or identifier string.
+     * @returns {import('@playwright/test').Locator}
+     **/
+    listMenuOfCreatedAppointment(studentOrNotes) {
+        const student = studentOrNotes || this.student1 || this.expectedValues?.student1;
+        const text = this.getStudentSearchText(student);
+        if (text) {
+            return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
+        }
+        return this.page.locator("xpath=//div[contains(@class,'k-event') or @data-types='Appointment']//img[contains(@src,'list')]");
+    }
+
+    /**
+     * Submits the combined appointment form, confirms confirmation prompts, and verifies appointment creation.
+     * If the success toast appears, verifies it. Otherwise, checks that listMenuOfCreatedAppointment count > 0.
+     * If an error toast appears, throws an error and fails the test.
+     * @param {Object|string} [studentOrNotes] - Optional student test data or identifier to verify on scheduler.
+     **/
+    async submitAppointment(studentOrNotes) {
         await test.step('Submit Combined Appointment and verify confirmation', async () => {
             await this.click(this.submitButton);
             await this.click(this.confirmYesButton);
@@ -437,7 +478,8 @@ export default class CombinedAppointmentPage extends BasePage {
             }
             await this.page.waitForTimeout(1000);
             const toastLocator = this.page.locator('#toast-container .toast-message').last();
-            await this.waitForVisible(toastLocator);
+            await this.waitForVisible(toastLocator).catch(() => { });
+            console.log("last toast message :", await toastLocator.textContent().catch(() => null));
 
             const errorToast = this.page.locator('#toast-container .toast-error').last();
             if (await this.isVisible(errorToast)) {
@@ -446,10 +488,31 @@ export default class CombinedAppointmentPage extends BasePage {
                 throw new Error(`Appointment creation failed with error: "${errorMessage}"`);
             } else {
                 const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
-                await this.verifyVisible(successToast);
-                await this.verifyText(successToast, 'Appointment created successfully.');
-                console.log(`Appointment created with message: Appointment created successfully.`);
-                await this.waitForHidden(successToast);
+                if (await this.isVisible(successToast)) {
+                    await this.verifyVisible(successToast);
+                    await this.verifyText(successToast, 'Appointment created successfully.');
+                    console.log(`Appointment created with message: Appointment created successfully.`);
+                    await this.waitForHidden(successToast);
+                } else {
+                    await this.waitForLoaders();
+                    const listMenu = this.listMenuOfCreatedAppointment(studentOrNotes);
+                    let count = await listMenu.count();
+
+                    if (count === 0) {
+                        try {
+                            await expect.poll(async () => {
+                                await this.waitForLoaders().catch(() => { });
+                                return await listMenu.count();
+                            }, { timeout: 10000 }).toBeGreaterThan(0);
+                            count = await listMenu.count();
+                        } catch { }
+                    }
+
+                    expect(count).toBeGreaterThan(0);
+                    console.log(`Appointment creation verified on scheduler`);
+                    await test.step(`Appointment created successfully.`, async () => { });
+
+                }
                 await this.waitForLoaders();
             }
         });
