@@ -291,6 +291,7 @@ export default class AdminPortalHomePage extends BasePage {
             await this.click(this.filePreviewIcon);
             // await this.click(this.selectCategoryButton);
             // await this.click(this.selectCategoryDropdownCheckbox);
+            await this.waitForVisible(this.confirmButton)
             await this.click(this.confirmButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForLoaders();

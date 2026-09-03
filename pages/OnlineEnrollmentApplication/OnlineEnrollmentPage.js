@@ -188,9 +188,9 @@ export default class OnlineEnrollmentPage extends BasePage {
     async selectClass() {
         await test.step('Click on the Select button for location', async () => {
             await this.waitForLoaders().catch(() => { });
-            const selectBtn = this.page.locator("(//input[@value='Select'])[1]");
-            await this.waitForVisible(selectBtn);
-            await this.click(selectBtn);
+            // const selectBtn = this.page.locator("(//input[@value='Select'])[1]");
+            await this.waitForVisible(this.selectButton);
+            await this.click(this.selectButton);
             await this.waitForLoaders().catch(() => { });
         });
     }

@@ -60,7 +60,9 @@ export default class StudentLoginPage extends BasePage {
         await this.page.addLocatorHandler(
             this.mobilePopUp,
             async () => {
-                await this.mobilePopupCloseButton.click();
+                await this.click(this.mobilePopupCloseButton);
+                await this.waitForLoaders();
+                await this.waitForHidden(this.mobilePopupCloseButton);
             }
         );
     }

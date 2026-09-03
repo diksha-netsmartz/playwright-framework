@@ -449,9 +449,10 @@ export default class SingleInstructorPage extends BasePage {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
                 await this.page.waitForFunction(() => {
                     const container = document.querySelector('#toast-container');
-                    return !container || Array.from(container.children).every(
-                        c => !c.offsetParent || getComputedStyle(c).display === 'none'
-                    );
+                    return !container || Array.from(container.children).every(c => {
+                        const el = /** @type {HTMLElement} */ (c);
+                        return !el.offsetParent || getComputedStyle(el).display === 'none';
+                    });
                 }, { timeout: 8000 }).catch(() => { });
 
                 const slot = await this.findAvailableSlot(attempt);

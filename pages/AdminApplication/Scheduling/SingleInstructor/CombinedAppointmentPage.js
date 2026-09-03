@@ -277,12 +277,10 @@ export default class CombinedAppointmentPage extends BasePage {
      * Helper to verify that an element text contains the expected substring and log the result.
      * @param {import('@playwright/test').Locator} locator - Element locator.
      * @param {string} expected - Expected text substring.
-     * @param {string} label - Log label for reporting.
      **/
-    async verifyText(locator, expected, label) {
+    async verifyText(locator, expected) {
         const actual = await locator.textContent();
 
-        console.log(`${label}`);
         console.log(`Expected : ${expected}`);
         console.log(`Actual   : ${actual}`);
         console.log("------------------------------------------------");
@@ -552,12 +550,7 @@ export default class CombinedAppointmentPage extends BasePage {
             : student.name.replace(" ", ", ");
 
         await this.verifyText(
-            this.page.locator(
-                `#FirstTypeAppointment_Student${studentNo}Name`
-            ),
-            expectedStudentName,
-            `Student ${studentNo} Name`
-        );
+            this.page.locator(`#FirstTypeAppointment_Student${studentNo}Name`), expectedStudentName);
 
         await this.verifyRegexAttribute(
             this.getDropdownTitle(`Product_Id${suffix}`), "title", expected.product, `Student ${studentNo} Product`);

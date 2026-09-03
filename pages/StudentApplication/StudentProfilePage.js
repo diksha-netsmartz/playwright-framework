@@ -42,6 +42,7 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [details.parentGuardianEmail] - Parent / Guardian email.
      * @param {string} [details.address] - Street address.
      * @param {string} [details.zipcode] - Zip / postal code.
+     * @param {string} [details.permit] - Permit / DL number.
      **/
     async updateProfileDetails(details = {}) {
         await test.step('Fill updated student profile details', async () => {
@@ -118,6 +119,7 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [expectedDetails.parentGuardianEmail] - Expected parent / guardian email.
      * @param {string} [expectedDetails.address] - Expected address.
      * @param {string} [expectedDetails.zipcode] - Expected zipcode.
+     * @param {string} [expectedDetails.permit] - Expected permit / DL number.
      **/
     async verifyProfileDetails(expectedDetails = {}) {
         await test.step('Verify profile field values match expected', async () => {
