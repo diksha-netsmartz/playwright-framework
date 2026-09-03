@@ -21,6 +21,7 @@ export default class StudentLoginPage extends BasePage {
         this.profileDropdownOnHomepage = page.locator("#userprofileSettings");
         this.mobilePopUp = page.getByText('No mobile number on file.');
         this.mobilePopupCloseButton = page.locator('.close.closemodalphone');
+        this.signtuaresPopupCloseButton = page.locator('#btnHideStudentSignPopUpForCRSessions');
     }
 
     /**
@@ -39,6 +40,8 @@ export default class StudentLoginPage extends BasePage {
     **/
     async login(username, password) {
         await test.step(`Login to Student Portal with user: ${username}`, async () => {
+            await this.closeMobilePopup();
+            await this.closeSignaturesPopup();
             await this.verifyVisible(this.usernameTxt);
             await this.fill(this.usernameTxt, username);
             await this.fill(this.passwordTxt, password);
@@ -47,24 +50,32 @@ export default class StudentLoginPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 75000 });
             await this.verifyVisible(this.profileDropdownOnHomepage);
             await this.verifyTitle("Student Home");
-            await this.closeMobilePopup();
         });
     }
 
     /**
-     * Closes the 'No mobile number on file' modal popup if it appears after login.
+     * Registers a locator handler to automatically dismiss the 'No mobile number on file' modal popup whenever it appears.
     **/
     async closeMobilePopup() {
-        await this.page.waitForTimeout(5000);
-        if (await this.mobilePopUp.isVisible().catch(() => false)) {
-            await test.step('Close mobile number popup', async () => {
-                await this.verifyVisible(this.mobilePopUp);
-                await this.verifyVisible(this.mobilePopupCloseButton);
-                await this.click(this.mobilePopupCloseButton);
-                await this.waitForHidden(this.mobilePopupCloseButton);
-            });
-        }
+        await this.page.addLocatorHandler(
+            this.mobilePopUp,
+            async () => {
+                await this.mobilePopupCloseButton.click();
+            }
+        );
+    }
 
+    /**
+     * Registers a locator handler to automatically dismiss the 'Signatures' modal popup whenever it appears.
+    **/
+    async closeSignaturesPopup() {
+        await this.page.addLocatorHandler(
+            this.signtuaresPopupCloseButton,
+            async () => {
+                await this.signtuaresPopupCloseButton.click();
+            }
+        );
     }
 }
+
 

@@ -40,6 +40,7 @@ export default class AdminLoginPage extends BasePage {
     **/
     async login(username, password) {
         await test.step(`Login to Admin Portal with user: ${username}`, async () => {
+            await this.closeMobilePopup();
             await this.verifyVisible(this.usernameTxt);
             await this.fill(this.usernameTxt, username);
             await this.fill(this.passwordTxt, password);
@@ -53,7 +54,6 @@ export default class AdminLoginPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 75000 }).catch(() => { });
             await this.waitForLoaders().catch(() => { });
             await this.verifyTitle("Home Page");
-            await this.closeMobilePopup();
         });
     }
 
@@ -61,15 +61,21 @@ export default class AdminLoginPage extends BasePage {
      * Closes the 'No mobile number on file' modal popup if it appears after login.
     **/
     async closeMobilePopup() {
-        await this.page.waitForTimeout(5000);
-        if (await this.mobilePopUp.isVisible().catch(() => false)) {
-            await test.step('Close mobile number popup', async () => {
-                await this.verifyVisible(this.mobilePopUp);
-                await this.verifyVisible(this.mobilePopupCloseButton);
-                await this.click(this.mobilePopupCloseButton);
-                await this.waitForHidden(this.mobilePopupCloseButton);
-            });
-        }
+        await this.page.addLocatorHandler(
+            this.mobilePopUp,
+            async () => {
+                await this.mobilePopupCloseButton.click();
+            }
+        );
+        // await this.page.waitForTimeout(5000);
+        // if (await this.mobilePopUp.isVisible().catch(() => false)) {
+        //     await test.step('Close mobile number popup', async () => {
+        //         await this.verifyVisible(this.mobilePopUp);
+        //         await this.verifyVisible(this.mobilePopupCloseButton);
+        //         await this.click(this.mobilePopupCloseButton);
+        //         await this.waitForHidden(this.mobilePopupCloseButton);
+        //     });
+        // }
 
     }
 

@@ -257,6 +257,177 @@ export default class DateHelper {
     }
 
     /**
+     * Returns a relative date (day of the month) based on an offset from baseDate.
+     * - offset = 0  => Today's day (e.g. 3)
+     * - offset = -1 => Yesterday's day (e.g. 2)
+     * - offset = +1 => Tomorrow's day (e.g. 4)
+     * - offset = -N => N days in the past
+     * - offset = +N => N days in the future
+     *
+     * Automatically handles month and year boundary transitions.
+     *
+     * @param {number|Object} [offset=0] - Day offset (0 for today, -1 for yesterday, 1 for tomorrow, etc.),
+     *                                     or an options object: { offset, asString, padZero, baseDate }.
+     * @param {boolean|Object|Date} [asStringOrOptions=false] - If true, returns string (e.g. "2").
+     *                                                          Can also be an options object: { asString, padZero, baseDate },
+     *                                                          or a custom Date object.
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {number|string} The resulting day of the month.
+     */
+    static getRelativeDate(offset = 0, asStringOrOptions = false, baseDate = new Date()) {
+        let daysOffset = 0;
+        let asString = false;
+        let padZero = false;
+        let date = baseDate;
+
+        if (typeof offset === 'object' && offset !== null && !(offset instanceof Date)) {
+            daysOffset = Number(offset.offset ?? 0);
+            asString = offset.asString ?? false;
+            padZero = offset.padZero ?? false;
+            if (offset.baseDate instanceof Date) {
+                date = offset.baseDate;
+            }
+        } else {
+            daysOffset = Number(offset || 0);
+            if (typeof asStringOrOptions === 'boolean') {
+                asString = asStringOrOptions;
+            } else if (asStringOrOptions instanceof Date) {
+                date = asStringOrOptions;
+            } else if (typeof asStringOrOptions === 'object' && asStringOrOptions !== null) {
+                asString = asStringOrOptions.asString ?? false;
+                padZero = asStringOrOptions.padZero ?? false;
+                if (asStringOrOptions.baseDate instanceof Date) {
+                    date = asStringOrOptions.baseDate;
+                }
+            }
+        }
+
+        const targetDate = new Date(date);
+        targetDate.setDate(targetDate.getDate() + daysOffset);
+
+        const day = targetDate.getDate();
+        if (asString || padZero) {
+            return padZero ? String(day).padStart(2, '0') : String(day);
+        }
+        return day;
+    }
+
+    /**
+     * Alias for getRelativeDate(). Returns day of the month by offset.
+     * 
+     * @param {number|Object} [offset=0] - 0 for today, -1 for yesterday, 1 for tomorrow.
+     * @param {boolean|Object|Date} [asStringOrOptions=false]
+     * @param {Date} [baseDate=new Date()]
+     * @returns {number|string}
+     */
+    static getDateByOffset(offset = 0, asStringOrOptions = false, baseDate = new Date()) {
+        return this.getRelativeDate(offset, asStringOrOptions, baseDate);
+    }
+
+    /**
+     * Alias for getRelativeDate(). Returns relative day of the month by offset.
+     * 
+     * @param {number|Object} [offset=0] - 0 for today, -1 for yesterday, 1 for tomorrow.
+     * @param {boolean|Object|Date} [asStringOrOptions=false]
+     * @param {Date} [baseDate=new Date()]
+     * @returns {number|string}
+     */
+    static getRelativeDay(offset = 0, asStringOrOptions = false, baseDate = new Date()) {
+        return this.getRelativeDate(offset, asStringOrOptions, baseDate);
+    }
+
+    /**
+     * Returns today's date (day of the month, e.g. 3).
+     * For example, if today is September 3, 2026, it returns 3 (or "3" when asString is true).
+     * 
+     * @param {boolean|Object|Date} [asStringOrOptions=false] - If true, returns string (e.g. "3").
+     *                                                          Can also be an options object: { asString, padZero, baseDate },
+     *                                                          or a custom Date object.
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {number|string} Day of the month (e.g. 3, or "3" when asString is true).
+     */
+    static getTodayDate(asStringOrOptions = false, baseDate = new Date()) {
+        return this.getRelativeDate(0, asStringOrOptions, baseDate);
+    }
+
+    /**
+     * Returns today's date (day of the month) as a string (e.g. "3").
+     * Convenience shorthand for getTodayDate(true).
+     * 
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {string} Day of the month as a string (e.g. "3").
+     */
+    static getTodayDateAsString(baseDate = new Date()) {
+        return this.getTodayDate(true, baseDate);
+    }
+
+    /**
+     * Alias for getTodayDate(). Returns today's day of the month (e.g. 3).
+     * 
+     * @param {boolean|Object|Date} [asStringOrOptions=false]
+     * @param {Date} [baseDate=new Date()]
+     * @returns {number|string}
+     */
+    static getTodayDay(asStringOrOptions = false, baseDate = new Date()) {
+        return this.getTodayDate(asStringOrOptions, baseDate);
+    }
+
+    /**
+     * Alias for getTodayDate(). Returns current day of the month (e.g. 3).
+     * 
+     * @param {boolean|Object|Date} [asStringOrOptions=false]
+     * @param {Date} [baseDate=new Date()]
+     * @returns {number|string}
+     */
+    static getCurrentDay(asStringOrOptions = false, baseDate = new Date()) {
+        return this.getTodayDate(asStringOrOptions, baseDate);
+    }
+
+    /**
+     * Returns yesterday's date (day of the month, e.g. 2).
+     * Convenience method for getRelativeDate(-1).
+     * 
+     * @param {boolean|Object|Date} [asStringOrOptions=false] - If true, returns string (e.g. "2").
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {number|string} Yesterday's day of the month (e.g. 2, or "2" when asString is true).
+     */
+    static getYesterdayDate(asStringOrOptions = false, baseDate = new Date()) {
+        return this.getRelativeDate(-1, asStringOrOptions, baseDate);
+    }
+
+    /**
+     * Returns yesterday's date (day of the month) as a string (e.g. "2").
+     * 
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {string}
+     */
+    static getYesterdayDateAsString(baseDate = new Date()) {
+        return this.getRelativeDate(-1, true, baseDate);
+    }
+
+    /**
+     * Returns tomorrow's date (day of the month, e.g. 4).
+     * Convenience method for getRelativeDate(1).
+     * 
+     * @param {boolean|Object|Date} [asStringOrOptions=false] - If true, returns string (e.g. "4").
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {number|string} Tomorrow's day of the month (e.g. 4, or "4" when asString is true).
+     */
+    static getTomorrowDate(asStringOrOptions = false, baseDate = new Date()) {
+        return this.getRelativeDate(1, asStringOrOptions, baseDate);
+    }
+
+    /**
+     * Returns tomorrow's date (day of the month) as a string (e.g. "4").
+     * 
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {string}
+     */
+    static getTomorrowDateAsString(baseDate = new Date()) {
+        return this.getRelativeDate(1, true, baseDate);
+    }
+
+    /**
      * Computes the date range from the 1st day of the previous month to the last day of the current month,
      * formatted as MM/DD/YYYY. Also returns the raw Date objects and the last day number for calendar pickers.
      * 
