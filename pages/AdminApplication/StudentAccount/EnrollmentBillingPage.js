@@ -521,9 +521,11 @@ export default class EnrollmentBillingPage extends BasePage {
                 await this.click(this.cvvInIframe);
                 await this.pressSequentially(this.cvvInIframe, paymentData.processCreditCard.cvv);
             } else {
-                await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
-                await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
-                await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+                if (await this.isVisible(this.cardNumber)) {
+                    await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
+                    await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
+                    await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+                }
             }
 
             await this.fill(this.nameOnCard, paymentData.processCreditCard.nameOnCard);

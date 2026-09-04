@@ -487,8 +487,10 @@ export default class CombinedAppointmentPage extends BasePage {
                 const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
                 if (await this.isVisible(successToast)) {
                     await this.verifyVisible(successToast);
+                    const toastMessage = (await successToast.textContent())?.trim() || '';
+                    console.log(`Toast message: ${toastMessage}`);
+                    console.log(`Appointment created with message: ${toastMessage}`);
                     await this.verifyText(successToast, 'Appointment created successfully.');
-                    console.log(`Appointment created with message: Appointment created successfully.`);
                     await this.waitForHidden(successToast);
                 } else {
                     await this.waitForLoaders();
