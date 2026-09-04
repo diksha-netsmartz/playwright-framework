@@ -460,7 +460,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 }
             }
             if (await this.isVisible(this.address) && data.address) {
-                await this.fill(this.address, data.address);
+                await this.fill(this.address, `${data.address}_${this.uniqueId}`);
             }
             if (await this.isVisible(this.zipCode) && data.zipCode) {
                 await this.fill(this.zipCode, data.zipCode);

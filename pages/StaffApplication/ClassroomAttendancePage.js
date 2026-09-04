@@ -31,6 +31,7 @@ export default class ClassroomAttendancePage extends BasePage {
         // Attendance table
         this.takeAttendanceLink = page.locator("xpath=(//strong[text()='Take Attendance']//parent::a)[1]");
         this.studentChehckbox = page.locator("xpath=(//div[@class='icheckbox_square-grey']//input[not(contains(@class,'chkAll')) and contains(@class,'studentAttendanceClass')]//following-sibling::ins)[1]");
+        this.studentChehckboxChecked = page.locator("xpath=(//div[@class='icheckbox_square-grey checked']//input[not(contains(@class,'chkAll')) and contains(@class,'studentAttendanceClass')]//following-sibling::ins)[1]");
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
         this.clearInstructorSignatureBtn = page.locator("xpath=//button[@data-toggle='confirmationClearInstructorSignature']");
         this.saveBtn = page.locator("xpath=(//button[@data-toggle='confirmationSaveAttendance'])[1]");
@@ -90,9 +91,22 @@ export default class ClassroomAttendancePage extends BasePage {
      * Toggles the attendance checkbox to mark the student present.
     **/
     async markStudentPresent() {
-        await test.step('Mark student present', async () => {
-            await this.click(this.studentChehckbox);
-        });
+        await this.waitForVisible(this.saveBtn);
+        await this.verifyVisible(this.saveBtn);
+        if (await this.isVisible(this.studentChehckbox)) {
+            await test.step('Mark student present', async () => {
+                await this.click(this.studentChehckbox);
+            });
+        }
+        else {
+            if (await this.isVisible(this.studentChehckboxChecked)) {
+                await test.step('Mark student absent', async () => {
+                    await this.click(this.studentChehckboxChecked);
+                });
+
+            }
+        }
+
     }
 
     /**
