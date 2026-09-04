@@ -331,7 +331,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
             await this.fill(this.lastName, data.lastName);
             if (await this.isVisible(this.address) && data.address) {
                 await this.pressSequentially(this.address, data.address);
-                if (!await this.isVisible(this.addressSelectionDropdown)) {
+                if (!await this.isVisible(this.addressSelectionDropdown, { timeout: 5000 })) {
                     await this.clear(this.address);
                     await this.pressSequentially(this.address, data.address);
                 }
@@ -439,16 +439,17 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 }
             }
 
-
-            // Address Details
             if (await this.isVisible(this.address) && data.address) {
-
                 await this.pressSequentially(this.address, data.address);
+                if (!await this.isVisible(this.addressSelectionDropdown, { timeout: 5000 })) {
+                    await this.clear(this.address);
+                    await this.pressSequentially(this.address, data.address);
+                }
                 await this.waitForVisible(this.addressSelectionDropdown);
                 await this.click(this.addressSelectionDropdown);
-
-
             }
+
+
             if (await this.isVisible(this.apartment)) {
                 await this.fill(this.apartment, data.apartment);
             }
