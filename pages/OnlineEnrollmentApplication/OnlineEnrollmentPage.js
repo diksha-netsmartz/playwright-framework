@@ -299,78 +299,78 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.waitForVisible(this.studentInfoCaption);
             await this.verifyVisible(this.studentInfoCaption);
 
-            if (await this.isVisible(this.firstNameTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.firstNameTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.firstNameTxt, `${data.firstName}_${this.uniqueId}`);
             }
-            if (await this.isVisible(this.middlenameTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.middlenameTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.middlenameTxt, data.middleName);
             }
-            if (await this.isVisible(this.lastNameTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.lastNameTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.lastNameTxt, data.lastName);
             }
-            if (await this.isVisible(this.addressTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.addressTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fillAddress(data.address);
             }
-            if (await this.isVisible(this.homePhoneTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.homePhoneTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.homePhoneTxt, `(212)${random7.slice(0, 3)}-${random7.slice(3)}`);
             }
-            if (await this.isVisible(this.cellPhoneTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.cellPhoneTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.cellPhoneTxt, phone);
             }
-            if (await this.isVisible(this.emailTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.emailTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.emailTxt, `${data.firstName}_${this.uniqueId}@gmail.com`);
             }
-            if (await this.isVisible(this.parentGuardianNameTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentGuardianNameTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.parentGuardianNameTxt, data.parentGuardianName);
             }
-            if (await this.isVisible(this.parentGuardianCellTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentGuardianCellTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.parentGuardianCellTxt, phone);
             }
-            if (await this.isVisible(this.parentGuardianEmailTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentGuardianEmailTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.parentGuardianEmailTxt, `parent_${this.uniqueId}@gmail.com`);
             }
-            if (await this.isVisible(this.parentNameTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentNameTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.parentNameTxt, data.parentName);
             }
-            if (await this.isVisible(this.parentPhoneTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentPhoneTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.parentPhoneTxt, `(999)${random7.slice(0, 3)}-${random7.slice(3)}`);
             }
-            if (await this.isVisible(this.parentEmailTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentEmailTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.parentEmailTxt, `parent2_${this.uniqueId}@gmail.com`);
             }
-            if (await this.isVisible(this.emergencyNameTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.emergencyNameTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.emergencyNameTxt, data.emergencyName);
             }
-            if (await this.isVisible(this.emergencyRelationshipTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.emergencyRelationshipTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.emergencyRelationshipTxt, data.emergencyRelationship);
             }
-            if (await this.isVisible(this.emergencyPhoneTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.emergencyPhoneTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.emergencyPhoneTxt, `(333)${random7.slice(0, 3)}-${random7.slice(3)}`);
             }
             await this.selectDOB();
 
-            if (await this.isVisible(this.highSchoolDropdown, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.highSchoolDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.highSchoolDropdown);
                 await this.jsClick(this.highSchoolDropdownSelection);
             }
-            if (await this.isVisible(this.wearGlassesDropdown, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.wearGlassesDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.wearGlassesDropdown);
                 await this.jsClick(this.wearGlassesDropdownSelection);
             }
-            if (await this.isVisible(this.femaleRadioButton, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.femaleRadioButton, { timeout: 1000 }).catch(() => false)) {
                 await this.jsClick(this.femaleRadioButton);
             }
-            if (await this.isVisible(this.medicalConditionsTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.medicalConditionsTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.medicalConditionsTxt, data.medicalConditions);
             }
-            if (await this.isVisible(this.howDidYouHearAbtUsDropdown, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.howDidYouHearAbtUsDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.howDidYouHearAbtUsDropdown);
                 await this.jsClick(this.howDidYouHearAbtUsDropdownSelection);
             }
-            if (await this.isVisible(this.permitNumberTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.permitNumberTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.permitNumberTxt, String(this.uniqueId));
             }
-            if (await this.isVisible(this.permitIssuedDateCalendarIcon, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.permitIssuedDateCalendarIcon, { timeout: 2000 }).catch(() => false)) {
                 await this.jsClick(this.permitIssuedDateCalendarIcon);
                 await this.page.waitForTimeout(1000);
                 try {
@@ -382,10 +382,10 @@ export default class OnlineEnrollmentPage extends BasePage {
                 }
                 await this.click(this.permitIssueDateSelectInCalendar);
             }
-            if (await this.isVisible(this.collegeIdTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.collegeIdTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.collegeIdTxt, data.collegeId);
             }
-            if (await this.isVisible(this.permitExpirationDateCalendarIcon, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.permitExpirationDateCalendarIcon, { timeout: 2000 }).catch(() => false)) {
                 await this.jsClick(this.permitExpirationDateCalendarIcon);
                 await this.page.waitForTimeout(1000);
                 try {
@@ -397,26 +397,26 @@ export default class OnlineEnrollmentPage extends BasePage {
                 }
                 await this.click(this.permitExpireDateSelectInCalendar);
             }
-            if (await this.isVisible(this.termsConditionsCheckbox, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.termsConditionsCheckbox, { timeout: 1000 }).catch(() => false)) {
                 await this.jsClick(this.termsConditionsCheckbox);
             }
-            if (await this.isVisible(this.addressTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.addressTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.addressTxt, "ny");
             }
-            if (await this.isVisible(this.zipCodeTxt, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.zipCodeTxt, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.zipCodeTxt, data.zipCode);
             }
-            if (await this.isVisible(this.studentSignature, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.studentSignature, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.studentSignature, data.firstName);
             }
-            if (await this.isVisible(this.parentSignature, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentSignature, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.parentSignature, data.parentName);
             }
-            if (await this.isVisible(this.last6DigitsParentsDriverLicense, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.last6DigitsParentsDriverLicense, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
             }
 
-            if (await this.isVisible(this.textsignature, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.textsignature, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.textsignature);
                 await this.waitForLoaders().catch(() => { });
                 await this.waitForVisible(this.studentSignature);
@@ -424,7 +424,7 @@ export default class OnlineEnrollmentPage extends BasePage {
             }
 
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
-            if (await this.isVisible(captcha, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(captcha, { timeout: 1000 }).catch(() => false)) {
                 await this.click(captcha);
                 await this.verifyAttribute(captcha, "aria-checked", "true");
             }
