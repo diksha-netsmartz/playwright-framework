@@ -101,6 +101,7 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.smsNumber = page.locator('#txtSmsPhoneNumber');
         this.addButton = page.locator('#btnSavePhoneNumber');
         this.optInButton = page.locator('#btnSubmitInDBPhoneNumber');
+        this.skipAdditionalFieldsButton = page.locator("//p[text()='Please fill out the additional fields below and click CONTINUE.']//ancestor::div[@class='modal-content']//a[text()='Skip']");
         this.printReceiptLink = page.getByRole('link', { name: 'Print Receipt' }).last();
         this.captchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]').first();
     }
@@ -454,6 +455,11 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.click(this.addButton);
             await this.click(this.optInButton);
             await this.waitForLoaders().catch(() => { });
+
+            if (await this.isVisible(this.skipAdditionalFieldsButton, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.skipAdditionalFieldsButton);
+                await this.waitForLoaders().catch(() => { });
+            }
         });
     }
 
