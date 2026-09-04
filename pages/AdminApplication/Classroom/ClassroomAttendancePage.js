@@ -99,7 +99,7 @@ export default class ClassroomAttendancePage extends BasePage {
 
         await this.waitForLoaders();
 
-        if (await this.isVisible(this.presentRadioBtn)) {
+        if (await this.isVisible(this.presentRadioBtn, { timeout: 5000 }).catch(() => false)) {
             await test.step(`Randomly mark student attendance as Present`, async () => {
                 this.selectedAttendanceAction = 'Present';
                 await this.waitForVisible(this.presentRadioBtn);

@@ -175,7 +175,7 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.selectDateRangeInput);
             await this.clear(this.selectDateRangeInput);
             await this.pressSequentially(this.selectDateRangeInput, currentMonthRange);
-            if (await this.isVisible(this.dateRangeInfoIcon)) {
+            if (await this.isVisible(this.dateRangeInfoIcon, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.dateRangeInfoIcon);
             }
             await this.page.waitForTimeout(300);
@@ -263,7 +263,7 @@ export default class OpenTimeSlotsPage extends BasePage {
         const occupiedEntries = [];
         try {
             const table = this.openTimeSlotsTable;
-            if (!await this.isVisible(table)) {
+            if (!await this.isVisible(table, { timeout: 2000 }).catch(() => false)) {
                 return occupiedDays;
             }
 
@@ -275,7 +275,7 @@ export default class OpenTimeSlotsPage extends BasePage {
 
             for (let i = 0; i < rowCount; i++) {
                 const firstCell = rows.nth(i).locator('td').first();
-                if (!await firstCell.isVisible().catch(() => false)) continue;
+                if (!await firstCell.isVisible({ timeout: 2000 }).catch(() => false)) continue;
 
                 const text = (await firstCell.innerText()).trim();
                 // Match dates like "9/1/2026 6:00 AM-6:30 AM" or "09/01/2026"
@@ -343,7 +343,7 @@ export default class OpenTimeSlotsPage extends BasePage {
 
             // Select 1st day in calendar
             const startCell = this.page.locator(`xpath=(//td[contains(@class,'day') and not(contains(@class,'off')) and not(contains(@class,'old')) and normalize-space()='${startDay}'])[1]`);
-            if (await this.isVisible(startCell)) {
+            if (await this.isVisible(startCell, { timeout: 500 }).catch(() => false)) {
                 await this.click(startCell);
             } else {
                 await this.click(this.availableDateCells.first());
@@ -351,10 +351,10 @@ export default class OpenTimeSlotsPage extends BasePage {
 
             // Select 2nd consecutive day in calendar
             const endCell = this.page.locator(`xpath=(//td[contains(@class,'day') and not(contains(@class,'off')) and not(contains(@class,'old')) and normalize-space()='${endDay}'])[1]`);
-            if (!await this.isVisible(endCell)) {
+            if (!await this.isVisible(endCell, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.dateInputbox);
             }
-            if (await this.isVisible(endCell)) {
+            if (await this.isVisible(endCell, { timeout: 2000 }).catch(() => false)) {
                 await this.click(endCell);
             }
 
@@ -395,7 +395,7 @@ export default class OpenTimeSlotsPage extends BasePage {
             const staffOption = this.page.locator("//select[@id='drp_AOTSInstructor']//parent::div//ul//li//span")
                 .filter({ hasText: new RegExp(targetInstructor, 'i') }).first();
 
-            if (await this.isVisible(staffOption)) {
+            if (await this.isVisible(staffOption, { timeout: 2000 }).catch(() => false)) {
                 await this.click(staffOption);
                 console.log(`[OpenTimeSlotsPage] Selected staff in popup: "${targetInstructor}"`);
             } else {
@@ -518,7 +518,7 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.selectDateRangeInput);
             await this.clear(this.selectDateRangeInput);
             await this.pressSequentially(this.selectDateRangeInput, formattedRange);
-            if (await this.isVisible(this.dateRangeInfoIcon)) {
+            if (await this.isVisible(this.dateRangeInfoIcon, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.dateRangeInfoIcon);
             }
             await this.page.waitForTimeout(500);

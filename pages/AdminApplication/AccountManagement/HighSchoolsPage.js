@@ -108,7 +108,7 @@ export default class HighSchoolsPage extends BasePage {
             await this.waitForVisible(this.zipCodeInput);
             await this.fill(this.zipCodeInput, zip);
 
-            if (await this.isVisible(this.emailInput)) {
+            if (await this.isVisible(this.emailInput, { timeout: 5000 }).catch(() => false)) {
                 await this.fill(this.emailInput, email);
             }
 
@@ -196,7 +196,7 @@ export default class HighSchoolsPage extends BasePage {
             await this.fill(this.notesInput, updatedNotes);
 
             // Update Email
-            if (await this.isVisible(this.emailInput)) {
+            if (await this.isVisible(this.emailInput, { timeout: 5000 }).catch(() => false)) {
                 await this.fill(this.emailInput, updatedEmail);
             }
 

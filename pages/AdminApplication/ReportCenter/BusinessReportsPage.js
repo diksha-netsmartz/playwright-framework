@@ -262,7 +262,7 @@ export default class BusinessReportsPage extends BasePage {
             const download = await downloadPromise;
 
             // Wait until 'Please wait we are processing the data' message is hidden
-            if (await this.processingMessage.isVisible().catch(() => false)) {
+            if (await this.processingMessage.isVisible({ timeout: 10000 }).catch(() => false)) {
                 await this.waitForHidden(this.processingMessage, 60000);
             }
             await this.waitForLoaders();
@@ -634,7 +634,7 @@ export default class BusinessReportsPage extends BasePage {
     async checkShowScoreCheckbox() {
         await test.step('Check "Show Score" checkbox', async () => {
             await this.waitForLoaders();
-            if (await this.isVisible(this.showScoreCheckbox)) {
+            if (await this.isVisible(this.showScoreCheckbox, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.showScoreCheckbox);
                 await this.waitForLoaders();
             }
@@ -747,7 +747,7 @@ export default class BusinessReportsPage extends BasePage {
             await this.click(this.exportIntoExcelButton);
             const download = await downloadPromise;
             // Wait until 'Please wait we are processing the data' message is hidden
-            if (await this.processingMessage.isVisible().catch(() => false)) {
+            if (await this.processingMessage.isVisible({ timeout: 10000 }).catch(() => false)) {
                 await this.waitForHidden(this.processingMessage, 60000);
             }
             await this.waitForLoaders();
@@ -1001,7 +1001,7 @@ export default class BusinessReportsPage extends BasePage {
             const startSwitch = this.page.locator('th.datepicker-switch:visible').first();
 
             let maxAttempts = 12;
-            while (maxAttempts > 0 && await startSwitch.isVisible().catch(() => false)) {
+            while (maxAttempts > 0 && await startSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
                 const switchText = (await startSwitch.innerText()).trim();
                 if (switchText.toLowerCase() === prevMonthNameYear.toLowerCase()) {
                     break;
@@ -1026,7 +1026,7 @@ export default class BusinessReportsPage extends BasePage {
             const endSwitch = this.page.locator('th.datepicker-switch:visible').first();
 
             maxAttempts = 12;
-            while (maxAttempts > 0 && await endSwitch.isVisible().catch(() => false)) {
+            while (maxAttempts > 0 && await endSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
                 const switchText = (await endSwitch.innerText()).trim();
                 if (switchText.toLowerCase() === currMonthNameYear.toLowerCase()) {
                     break;
@@ -1117,7 +1117,7 @@ export default class BusinessReportsPage extends BasePage {
             const startSwitch = this.page.locator('.datepicker:visible .datepicker-switch').first();
 
             let maxAttempts = 12;
-            while (maxAttempts > 0 && await startSwitch.isVisible().catch(() => false)) {
+            while (maxAttempts > 0 && await startSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
                 const switchText = (await startSwitch.innerText()).trim();
                 if (switchText.toLowerCase() === prevMonthNameYear.toLowerCase()) {
                     break;
@@ -1142,7 +1142,7 @@ export default class BusinessReportsPage extends BasePage {
             const endSwitch = this.page.locator('.datepicker:visible .datepicker-switch').first();
 
             maxAttempts = 12;
-            while (maxAttempts > 0 && await endSwitch.isVisible().catch(() => false)) {
+            while (maxAttempts > 0 && await endSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
                 const switchText = (await endSwitch.innerText()).trim();
                 if (switchText.toLowerCase() === currMonthNameYear.toLowerCase()) {
                     break;
@@ -1174,7 +1174,7 @@ export default class BusinessReportsPage extends BasePage {
             await this.click(this.inCarEvalExportExcelBtn);
             const download = await downloadPromise;
 
-            if (await this.processingMessage.isVisible().catch(() => false)) {
+            if (await this.processingMessage.isVisible({ timeout: 2000 }).catch(() => false)) {
                 await this.waitForHidden(this.processingMessage, 60000);
             }
             await this.waitForLoaders();
@@ -1258,7 +1258,7 @@ export default class BusinessReportsPage extends BasePage {
             await this.click(this.exportIntoExcelButton);
             const download = await downloadPromise;
 
-            if (await this.processingMessage.isVisible().catch(() => false)) {
+            if (await this.processingMessage.isVisible({ timeout: 10000 }).catch(() => false)) {
                 await this.waitForHidden(this.processingMessage, 60000);
             }
             await this.waitForLoaders();

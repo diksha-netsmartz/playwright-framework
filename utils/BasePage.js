@@ -178,22 +178,20 @@ export default class BasePage {
     /**
      * Checks if an element is visible, optionally waiting up to a specified timeout.
      * @param {import('@playwright/test').Locator} locator - Target element locator.
-     * @param {number|{ timeout?: number }} [options] - Optional timeout in milliseconds or options object.
+     * @param {number|{ timeout?: number }} [options={ timeout: 5000 }] - Optional timeout in milliseconds or options object.
      * @returns {Promise<boolean>} True if visible, false otherwise.
      */
-    async isVisible(locator, options) {
-        if (options !== undefined) {
-            const timeout = typeof options === 'number' ? options : options.timeout;
+    async isVisible(locator, options = { timeout: 5000 }) {
+        try {
+            const timeout = typeof options === 'number' ? options : options?.timeout;
             if (typeof timeout === 'number') {
-                try {
-                    await locator.waitFor({ state: 'visible', timeout });
-                    return true;
-                } catch {
-                    return false;
-                }
+                await locator.waitFor({ state: 'visible', timeout });
+                return true;
             }
+            return await locator.isVisible();
+        } catch {
+            return false;
         }
-        return await locator.isVisible();
     }
 
     /**

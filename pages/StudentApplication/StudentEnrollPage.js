@@ -31,8 +31,8 @@ export default class StudentEnrollPage extends BasePage {
     async selectPackage() {
         await test.step('Select package from price table', async () => {
             await this.click(this.getPackageSelectBtn);
-            await this.page.waitForTimeout(5000);
-            if (await this.isVisible(this.skipSelectionButton)) {
+            // await this.page.waitForTimeout(5000);
+            if (await this.isVisible(this.skipSelectionButton, { timeout: 5000 }).catch(() => false)) {
                 await this.click(this.skipSelectionButton);
                 await this.page.waitForTimeout(5000);
             }
@@ -45,8 +45,8 @@ export default class StudentEnrollPage extends BasePage {
     async clickPayLater() {
         await test.step('Click Pay Later button', async () => {
             await this.click(this.payLaterBtn);
-            await this.page.waitForTimeout(5000);
-            if (await this.isVisible(this.studentSignature)) {
+            // await this.page.waitForTimeout(5000);
+            if (await this.isVisible(this.studentSignature, { timeout: 5000 }).catch(() => false)) {
                 await this.fill(this.studentSignature, "Student Signature");
                 await this.click(this.contractSignatureSaveButton);
                 await this.click(this.yesConfirmationButton);

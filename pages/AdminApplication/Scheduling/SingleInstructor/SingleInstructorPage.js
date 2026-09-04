@@ -334,7 +334,7 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async editAppointment(studentName) {
         await test.step(`Open action menu and click Edit Appointment for: "${this.getStudentSearchText(studentName)}"`, async () => {
-            await this.isVisible(this.listMenuOfCreatedAppointment(studentName));
+            await this.isVisible(this.listMenuOfCreatedAppointment(studentName), { timeout: 5000 }).catch(() => false);
             await this.listMenuOfCreatedAppointment(studentName).click({ force: true });
 
             try {
@@ -398,7 +398,7 @@ export default class SingleInstructorPage extends BasePage {
             console.log(`Appointments count before deletion: ${countBefore}`);
 
             await this.hover(this.listMenuOfCreatedAppointment(studentName));
-            await this.isVisible(this.deleteAppointmentButton(studentName));
+            await this.isVisible(this.deleteAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
             await this.click(this.deleteAppointmentButton(studentName));
             await this.click(this.deleteButtonInPopup);
             await this.waitForHidden(this.deleteButtonInPopup);
@@ -407,7 +407,7 @@ export default class SingleInstructorPage extends BasePage {
             const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
             await this.waitForVisible(toast, { timeout: 4000 }).catch(() => { });
 
-            if (await this.isVisible(toast)) {
+            if (await this.isVisible(toast, { timeout: 500 }).catch(() => false)) {
                 await this.verifyVisible(toast);
                 await this.verifyText(toast, 'Appointment deleted successfully.');
                 console.log(`Appointment deleted with message: Appointment deleted successfully.`);
@@ -536,9 +536,9 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async deleteCancelledAppointment() {
         await test.step('Delete cancelled appointment slot', async () => {
-            await this.isVisible(this.listMenuOfCancelledAppointment);
+            await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 2000 }).catch(() => false);
             await this.hover(this.listMenuOfCancelledAppointment);
-            await this.isVisible(this.deleteCancelledAppointmentButton);
+            await this.isVisible(this.deleteCancelledAppointmentButton, { timeout: 2000 }).catch(() => false);
             await this.click(this.deleteCancelledAppointmentButton);
             await this.click(this.deleteButtonInPopup);
             await this.waitForHidden(this.deleteButtonInPopup);
@@ -554,7 +554,7 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async editCancelledAppointment() {
         await test.step('Open Edit modal for cancelled appointment', async () => {
-            await this.isVisible(this.listMenuOfCancelledAppointment);
+            await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 2000 }).catch(() => false);
             await this.click(this.listMenuOfCancelledAppointment);
 
             try {
@@ -579,7 +579,7 @@ export default class SingleInstructorPage extends BasePage {
 
         await test.step(`Open Edit modal for No Show appointment: "${studentName}"`, async () => {
             const listMenu = this.listMenuOfNoShowAppointment(studentName);
-            await this.isVisible(listMenu);
+            await this.isVisible(listMenu, { timeout: 2000 }).catch(() => false);
             await this.click(listMenu);
 
             try {

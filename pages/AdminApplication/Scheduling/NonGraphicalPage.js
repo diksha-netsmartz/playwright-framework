@@ -94,10 +94,10 @@ export default class NonGraphicalPage extends BasePage {
                 await this.page.waitForLoadState('load', { timeout: 5000 })
 
                 // Wait for the slots table to refresh after selecting the date
-                await this.page.waitForTimeout(5000);
+                // await this.page.waitForTimeout(5000);
 
-                const hasNoRecords = await this.isVisible(this.noRecordsFound);
-                const hasSlot = await this.isVisible(this.firstSlotCheckbox);
+                const hasNoRecords = await this.isVisible(this.noRecordsFound, { timeout: 5000 }).catch(() => false);
+                const hasSlot = await this.isVisible(this.firstSlotCheckbox, { timeout: 5000 }).catch(() => false);
 
                 if (hasSlot) {
                     console.log(`Found available slots on highlighted date #${i + 1}`);
@@ -198,7 +198,7 @@ export default class NonGraphicalPage extends BasePage {
             await this.waitForVisible(toastLocator);
 
             const errorToast = this.page.locator('#toast-container .toast-error').last();
-            if (await this.isVisible(errorToast)) {
+            if (await this.isVisible(errorToast, { timeout: 10000 }).catch(() => false)) {
                 const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
 
                 const warningIcon = this.page.locator("xpath=(//i[@data-toggle='tooltip' and contains(@id,'ErrorOpenSlot')])[1]");

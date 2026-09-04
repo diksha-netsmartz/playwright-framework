@@ -71,7 +71,7 @@ export default class StudentPortalHomePage extends BasePage {
      **/
     async navigateToProfile() {
         await test.step('Navigate to Student Profile (My Account -> Profile)', async () => {
-            if (!await this.isVisible(this.profileNavLink)) {
+            if (!await this.isVisible(this.profileNavLink, { timeout: 5000 }).catch(() => false)) {
                 await this.click(this.myAccountNavLink);
             }
             await this.click(this.profileNavLink);
@@ -145,7 +145,7 @@ export default class StudentPortalHomePage extends BasePage {
             await this.waitForVisible(this.payButton);
             await this.verifyVisible(this.payButton)
 
-            if (await this.isVisible(this.cardNumberIframe)) {
+            if (await this.isVisible(this.cardNumberIframe, { timeout: 5000 }).catch(() => false)) {
                 await this.waitForVisible(this.cardNumberInIframe);
                 await this.click(this.cardNumberInIframe);
                 await this.pressSequentially(this.cardNumberInIframe, data.cardNumber, { delay: 50 });
@@ -159,7 +159,7 @@ export default class StudentPortalHomePage extends BasePage {
                 await this.pressSequentially(this.cvvInIframe, data.cvv, { delay: 50 });
             }
             else {
-                if (await this.isVisible(this.cardNumber)) {
+                if (await this.isVisible(this.cardNumber, { timeout: 2000 }).catch(() => false)) {
                     await this.fill(this.cardNumber, data.cardNumber);
                     await this.fill(this.expiryDate, data.expiryDate);
                     await this.fill(this.cvv, data.cvv);
@@ -172,7 +172,7 @@ export default class StudentPortalHomePage extends BasePage {
             await this.click(this.billStateDropdown);
             await this.click(this.billStateDropdownValue);
 
-            if (await this.isVisible(this.cardPostalCodeIframe)) {
+            if (await this.isVisible(this.cardPostalCodeIframe, { timeout: 2000 }).catch(() => false)) {
                 await this.waitForVisible(this.postalCodeInIframe);
                 await this.click(this.postalCodeInIframe);
                 await this.pressSequentially(this.postalCodeInIframe, data.billingZipCode);
@@ -201,10 +201,10 @@ export default class StudentPortalHomePage extends BasePage {
         await test.step('Verify payment success / approval', async () => {
             await this.waitForLoaders();
             await this.page.waitForTimeout(2000);
-            if (await this.isVisible(this.paymentSuccessAlert)) {
+            if (await this.isVisible(this.paymentSuccessAlert, { timeout: 2000 }).catch(() => false)) {
                 await this.verifyVisible(this.paymentSuccessAlert);
             }
-            if (await this.isVisible(this.paymentCloseButton)) {
+            if (await this.isVisible(this.paymentCloseButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.paymentCloseButton);
             }
         });

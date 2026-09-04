@@ -45,7 +45,7 @@ export default class AdminLoginPage extends BasePage {
             await this.fill(this.usernameTxt, username);
             await this.fill(this.passwordTxt, password);
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
-            if (await this.isVisible(captcha)) {
+            if (await this.isVisible(captcha, { timeout: 5000 }).catch(() => false)) {
                 await this.click(captcha);
                 await this.verifyAttribute(captcha, "aria-checked", "true");
             }

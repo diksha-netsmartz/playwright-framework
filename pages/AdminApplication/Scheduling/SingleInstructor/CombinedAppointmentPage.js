@@ -470,7 +470,7 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.waitForLoaders();
             // await this.page.waitForTimeout(2500);
 
-            if (await this.isVisible(this.submitButtonPopup, { timeout: 2500 })) {
+            if (await this.isVisible(this.submitButtonPopup, { timeout: 2500 }).catch(() => false)) {
                 await this.click(this.submitButtonPopup);
                 await this.waitForLoaders();
             }
@@ -479,13 +479,13 @@ export default class CombinedAppointmentPage extends BasePage {
             console.log("last toast message :", await toastLocator.textContent().catch(() => null));
 
             const errorToast = this.page.locator('#toast-container .toast-error').last();
-            if (await this.isVisible(errorToast)) {
+            if (await this.isVisible(errorToast, { timeout: 2000 }).catch(() => false)) {
                 const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
                 console.log(`Appointment creation failed with error: "${errorMessage}"`);
                 throw new Error(`Appointment creation failed with error: "${errorMessage}"`);
             } else {
                 const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
-                if (await this.isVisible(successToast)) {
+                if (await this.isVisible(successToast, { timeout: 5000 }).catch(() => false)) {
                     await this.verifyVisible(successToast);
                     const toastMessage = (await successToast.textContent())?.trim() || '';
                     console.log(`Toast message: ${toastMessage}`);
@@ -591,7 +591,7 @@ export default class CombinedAppointmentPage extends BasePage {
             : studentOrName;
 
         await test.step(`Cancel appointment for: "${studentName}"`, async () => {
-            await this.isVisible(this.cancelAppointmentButton(studentName));
+            await this.isVisible(this.cancelAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
             await this.click(this.cancelAppointmentButton(studentName));
             this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
             await this.fill(this.cancelAppointmentTextbox, this.cancelledNotes);
@@ -620,7 +620,7 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.click(this.deleteConfirmationButton);
             await this.waitForLoaders();
 
-            if (await this.isVisible(this.noShowYesButton)) {
+            if (await this.isVisible(this.noShowYesButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.noShowYesButton);
                 await this.waitForLoaders();
             }

@@ -97,8 +97,8 @@ export default class StaffHomePage extends BasePage {
 
             await this.click(this.yesConfirmationButton);
 
-            await this.page.waitForTimeout(1000);
-            if (await this.isVisible(this.fullAppointmentYesButton)) {
+            // await this.page.waitForTimeout(1000);
+            if (await this.isVisible(this.fullAppointmentYesButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.fullAppointmentYesButton);
             }
 

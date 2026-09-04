@@ -190,7 +190,7 @@ export default class EnrollmentBillingPage extends BasePage {
 * Opens the cash drawer location modal and selects the cash drawer location.
 **/
     async selectCashDrawerLocation() {
-        if (await this.isVisible(this.cashDrawerLocationDropdownInPackageSelection)) {
+        if (await this.isVisible(this.cashDrawerLocationDropdownInPackageSelection, { timeout: 5000 }).catch(() => false)) {
             await test.step(`Select Cash Drawer Location`, async () => {
                 await this.waitForVisible(this.cashDrawerLocationDropdownInPackageSelection);
                 await this.click(this.cashDrawerLocationDropdownInPackageSelection);
@@ -222,13 +222,13 @@ export default class EnrollmentBillingPage extends BasePage {
             // await this.click(this.addButtonForAdditionalDetails);
             // await this.click(this.addToCartButton);
 
-            await this.page.waitForTimeout(3000);
-            if (await this.isVisible(this.skipSelectionButtonForClassSelection)) {
+            // await this.page.waitForTimeout(3000);
+            if (await this.isVisible(this.skipSelectionButtonForClassSelection, { timeout: 3000 }).catch(() => false)) {
                 await this.click(this.skipSelectionButtonForClassSelection);
                 await this.waitForHidden(this.skipSelectionButtonForClassSelection);
             }
-            await this.page.waitForTimeout(3000);
-            if (await this.isVisible(this.skipSelectionButtonAddOnServices)) {
+            // await this.page.waitForTimeout(3000);
+            if (await this.isVisible(this.skipSelectionButtonAddOnServices, { timeout: 3000 }).catch(() => false)) {
                 await this.click(this.skipSelectionButtonAddOnServices);
                 await this.waitForHidden(this.skipSelectionButtonAddOnServices);
             }
@@ -274,8 +274,8 @@ export default class EnrollmentBillingPage extends BasePage {
             }
             await this.fill(this.notesTextbox, "updating package notes");
             await this.click(this.updateButton);
-            await this.page.waitForTimeout(2000);
-            if (await this.isVisible(this.yesConfirmationButton)) {
+            // await this.page.waitForTimeout(2000);
+            if (await this.isVisible(this.yesConfirmationButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.yesConfirmationButton);
                 await this.waitForLoaders();
             }
@@ -359,17 +359,16 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.doNotSendEmailCheckbox);
             await this.fill(this.transactionNumber, paymentData.swipedTransaction.transactionNumber);
             await this.fill(this.receiptNumber, paymentData.swipedTransaction.receiptNumber);
-            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+            if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.cashDrawerLocationDropdown);
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
             }
             await this.fill(this.cashNotesTextbox, paymentData.swipedTransaction.notes);
-            if (await this.isVisible(this.terminalIDTextbox)) {
+            if (await this.isVisible(this.terminalIDTextbox, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.terminalIDTextbox, paymentData.swipedTransaction.terminalID)
             }
-
-            if (await this.isVisible(this.accountNicknameTextbox)) {
+            if (await this.isVisible(this.accountNicknameTextbox, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.accountNicknameTextbox, paymentData.swipedTransaction.accountNickname)
             }
             await this.click(this.saveButton);
@@ -403,7 +402,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.fill(this.receiptNumber, paymentData.checkPayment.receiptNumber);
             await this.fill(this.chequeNotesTextbox, paymentData.checkPayment.notes);
             await this.click(this.chequeDeposited);
-            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+            if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.cashDrawerLocationDropdown);
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
@@ -438,7 +437,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
             await this.fill(this.receiptNumber, paymentData.cashPayment.receiptNumber);
             await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
-            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+            if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.cashDrawerLocationDropdown);
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
@@ -475,7 +474,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.refundAddToBalance);
             await this.fill(this.receiptNumber, paymentData.adjustment.receiptNumber);
             await this.fill(this.cashNotesTextbox, paymentData.adjustment.notes);
-            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+            if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.cashDrawerLocationDropdown);
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
@@ -508,7 +507,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.processCreditCard);
             await this.waitForVisible(this.saveButton);
             await this.verifyVisible(this.saveButton)
-            if (await this.isVisible(this.cardNumberIframe)) {
+            if (await this.isVisible(this.cardNumberIframe, { timeout: 5000 }).catch(() => false)) {
                 await this.waitForVisible(this.cardNumberInIframe);
                 await this.click(this.cardNumberInIframe);
                 await this.pressSequentially(this.cardNumberInIframe, paymentData.processCreditCard.cardNumber);
@@ -521,7 +520,7 @@ export default class EnrollmentBillingPage extends BasePage {
                 await this.click(this.cvvInIframe);
                 await this.pressSequentially(this.cvvInIframe, paymentData.processCreditCard.cvv);
             } else {
-                if (await this.isVisible(this.cardNumber)) {
+                if (await this.isVisible(this.cardNumber, { timeout: 1000 }).catch(() => false)) {
                     await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
                     await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
                     await this.fill(this.cvv, paymentData.processCreditCard.cvv);
@@ -535,7 +534,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.billStateDropdown);
             await this.click(this.billStateDropdownValue);
 
-            if (await this.isVisible(this.cardPostalCodeIframe)) {
+            if (await this.isVisible(this.cardPostalCodeIframe, { timeout: 5000 }).catch(() => false)) {
                 await this.waitForVisible(this.postalCodeInIframe);
                 await this.click(this.postalCodeInIframe);
                 await this.pressSequentially(this.postalCodeInIframe, paymentData.processCreditCard.billingZipCode);
@@ -543,7 +542,7 @@ export default class EnrollmentBillingPage extends BasePage {
                 await this.fill(this.billingZipCode, paymentData.processCreditCard.billingZipCode);
             }
             await this.fill(this.cashNotesTextbox, paymentData.processCreditCard.notes);
-            if (await this.isVisible(this.cashDrawerLocationDropdown)) {
+            if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.cashDrawerLocationDropdown);
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
