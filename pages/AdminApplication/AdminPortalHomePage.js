@@ -27,6 +27,7 @@ export default class AdminPortalHomePage extends BasePage {
         });
         this.manageTimeSlotsLink = page.locator('b').filter({ hasText: 'Manage Time Slots' })
         this.bulkAppointmentLink = page.locator("#li_scheduling_managetimeslots_bulkappointments");
+        this.bulkProcessLink = page.locator("#li_scheduling_managetimeslots_bulkprocess");
         this.openTimeSlotsLink = page.getByRole('link', { name: 'Open Time Slots' });
         this.nonGraphicalLink = page.locator("#scheduling_NonGraphicalScheduler_li");
         this.corporateTimeOffLink = page.locator("#scheduling_corporatetimeoff_li");
@@ -196,6 +197,25 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 60000 });
             await this.verifyTitle("Manage Time Slots");
+        });
+    }
+
+    /**
+     * Navigates to the Bulk Process scheduling page via Scheduling -> Manage Time Slots -> Bulk Process.
+     **/
+    async navigateToBulkProcess() {
+        await test.step('Navigate to Scheduling -> Manage Time Slots -> Bulk Process', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schedulingMenu);
+            await this.click(this.schedulingMenu);
+            await this.waitForVisible(this.manageTimeSlotsLink);
+            await this.click(this.manageTimeSlotsLink);
+            await this.waitForVisible(this.bulkProcessLink);
+            await this.click(this.bulkProcessLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+            await this.verifyTitle("Manage Time Slots");
+
         });
     }
 

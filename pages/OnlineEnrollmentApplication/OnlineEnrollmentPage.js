@@ -215,9 +215,11 @@ export default class OnlineEnrollmentPage extends BasePage {
     async clickContinue() {
         await test.step('Click on Continue', async () => {
             await this.waitForLoaders().catch(() => { });
-            await this.waitForVisible(this.continueAdditionalProduct);
-            await this.click(this.continueAdditionalProduct);
-            await this.waitForHidden(this.continueAdditionalProduct)
+            if (await this.isVisible(this.continueAdditionalProduct, { timeout: 5000 })) {
+                await this.waitForVisible(this.continueAdditionalProduct);
+                await this.click(this.continueAdditionalProduct);
+                await this.waitForHidden(this.continueAdditionalProduct, { timeout: 2000 })
+            }
             await this.waitForLoaders().catch(() => { });
         });
     }
@@ -229,6 +231,11 @@ export default class OnlineEnrollmentPage extends BasePage {
     async fillAddress(address) {
         await test.step(`Fill address: "${address}"`, async () => {
             await this.pressSequentially(this.addressTxt, address);
+            if (!await this.isVisible(this.addressSelectionDropdown, { timeout: 2000 })) {
+                await this.clear(this.addressTxt);
+                await this.pressSequentially(this.addressTxt, address);
+
+            }
             await this.waitForVisible(this.addressSelectionDropdown);
             await this.click(this.addressSelectionDropdown);
         });
@@ -456,7 +463,7 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async verifyReceiptPage(expectedText, attachmentName) {
         await test.step(`Verify "${expectedText}" on receipt page`, async () => {
-            // await this.waitForLoaders().catch(() => { });
+            await this.waitForLoaders().catch(() => { });
             // await this.page.waitForLoadState('load', { timeout: 10000 });
             // await this.page.waitForTimeout(10000);
             await this.page.waitForFunction(() => document.title.trim().length > 0, { timeout: 30000 }).catch(() => {

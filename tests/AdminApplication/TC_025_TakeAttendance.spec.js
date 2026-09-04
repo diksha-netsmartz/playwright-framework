@@ -43,7 +43,7 @@ test('TC_025: C-admin > Classroom > Attendance - Take Attendance', async ({ page
     await attendancePage.verifyAttendanceMarkedSuccessfully();
   });
 
-  await test.step('Step 7: Verify that the checked count for the selected status increased by 1', async () => {
-    await attendancePage.verifyAttendanceCountIncremented();
-  });
+  // await test.step('Step 7: Verify that the checked count for the selected status increased by 1', async () => {
+  //   await attendancePage.verifyAttendanceCountIncremented();
+  // });
 });

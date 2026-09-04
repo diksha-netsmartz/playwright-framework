@@ -13,7 +13,7 @@ export default class PdfHelper {
      * @returns {Promise<string>} Combined extracted text content across all pages.
      */
     static async extractText(pdfBuffer) {
-        if (!pdfBuffer || pdfBuffer.length === 0) return '';
+        if (!pdfBuffer || pdfBuffer.byteLength === 0) return '';
 
         try {
             const data = new Uint8Array(pdfBuffer);
@@ -27,7 +27,10 @@ export default class PdfHelper {
             for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
                 const page = await pdfDocument.getPage(pageNum);
                 const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
+                const pageText = textContent.items
+                    .filter(item => 'str' in item)
+                    .map(item => item.str)
+                    .join(' ');
                 fullText += pageText + ' ';
             }
             await pdfDocument.destroy();
@@ -41,7 +44,7 @@ export default class PdfHelper {
     /**
      * Downloads/generates a PDF from the page (handles blob URLs, direct PDF URLs, and HTML pages),
      * extracts & verifies the text inside the PDF, prints the PDF text to console, and attaches it to reports.
-     * @param {import('@playwright/test').Page} page - The Playwright Page instance.
+     * @param {import('@playwright/test').Page & { pdfBuffer?: Buffer | null, pdfText?: string }} page - The Playwright Page instance.
      * @param {string} expectedText - Text expected inside the PDF document.
      * @param {string} attachmentName - Filename for the attached PDF in reports.
      */
@@ -170,21 +173,23 @@ export default class PdfHelper {
         * @param {string[]} [options.ignoreTexts=['EXPORT TO PDF', 'Export TO PDF', 'Close']] - Texts/buttons on UI to exclude from comparison.
         */
     static async verifyPdfMatchesPageContent(webPage, downloadOrPath, options = {}) {
-        const attachmentName = options.attachmentName || (typeof downloadOrPath.suggestedFilename === 'function' ? downloadOrPath.suggestedFilename() : 'ClassroomAttendanceHistory.pdf') || 'ClassroomAttendanceHistory.pdf';
+        const attachmentName = options.attachmentName || (typeof downloadOrPath !== 'string' && downloadOrPath && typeof downloadOrPath.suggestedFilename === 'function' ? downloadOrPath.suggestedFilename() : 'ClassroomAttendanceHistory.pdf') || 'ClassroomAttendanceHistory.pdf';
         const ignoreTexts = options.ignoreTexts || ['EXPORT TO PDF', 'Export TO PDF', 'EXPORT TO EXCEL', 'Close'];
 
         // 1. Extract plain text from PDF
         let pdfBuffer = null;
         let filePath = null;
 
-        if (downloadOrPath && typeof downloadOrPath.path === 'function') {
+        if (typeof downloadOrPath === 'string') {
+            if (fs.existsSync(downloadOrPath)) {
+                filePath = downloadOrPath;
+                pdfBuffer = fs.readFileSync(filePath);
+            }
+        } else if (downloadOrPath && typeof downloadOrPath.path === 'function') {
             filePath = await downloadOrPath.path();
             if (filePath && fs.existsSync(filePath)) {
                 pdfBuffer = fs.readFileSync(filePath);
             }
-        } else if (typeof downloadOrPath === 'string' && fs.existsSync(downloadOrPath)) {
-            filePath = downloadOrPath;
-            pdfBuffer = fs.readFileSync(filePath);
         }
 
         expect(pdfBuffer.length, 'Downloaded PDF buffer is not empty').toBeGreaterThan(0);
@@ -306,20 +311,22 @@ export default class PdfHelper {
      * @param {string} [options.attachmentName='Report.pdf'] - Suggested attachment name.
      */
     static async verifyPdfDownloaded(downloadOrPath, options = {}) {
-        const attachmentName = options.attachmentName || (downloadOrPath && typeof downloadOrPath.suggestedFilename === 'function' ? downloadOrPath.suggestedFilename() : 'Report.pdf') || 'Report.pdf';
+        const attachmentName = options.attachmentName || (typeof downloadOrPath !== 'string' && downloadOrPath && typeof downloadOrPath.suggestedFilename === 'function' ? downloadOrPath.suggestedFilename() : 'Report.pdf') || 'Report.pdf';
         const expectedTexts = options.expectedTexts || [];
 
         let pdfBuffer = null;
         let filePath = null;
 
-        if (downloadOrPath && typeof downloadOrPath.path === 'function') {
+        if (typeof downloadOrPath === 'string') {
+            if (fs.existsSync(downloadOrPath)) {
+                filePath = downloadOrPath;
+                pdfBuffer = fs.readFileSync(filePath);
+            }
+        } else if (downloadOrPath && typeof downloadOrPath.path === 'function') {
             filePath = await downloadOrPath.path();
             if (filePath && fs.existsSync(filePath)) {
                 pdfBuffer = fs.readFileSync(filePath);
             }
-        } else if (typeof downloadOrPath === 'string' && fs.existsSync(downloadOrPath)) {
-            filePath = downloadOrPath;
-            pdfBuffer = fs.readFileSync(filePath);
         }
 
         expect(pdfBuffer, 'Downloaded PDF buffer should exist').toBeTruthy();

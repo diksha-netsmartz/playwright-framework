@@ -367,7 +367,7 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.click(this.clickInstruction2Dropdown(studentNo));
             await this.click(this.getInstruction2DropdownValue(studentNo));
             await this.fill(this.getPickup(studentNo), student.pickup);
-            await this.fill(this.getNotes(studentNo), `${student.notes}_${this.uniqueId}`);
+            await this.fill(this.getNotes(studentNo), student.notes);
         });
     }
 
@@ -444,12 +444,12 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     /**
-     * Returns locator for the action menu 3-dots icon on the created appointment matching student name or notes.
-     * @param {Object|string} [studentOrNotes] - Optional student test data or identifier string.
+     * Returns locator for the action menu 3-dots icon on the created appointment matching student name.
+     * @param {Object|string} [studentName] - Optional student test data or identifier string.
      * @returns {import('@playwright/test').Locator}
      **/
-    listMenuOfCreatedAppointment(studentOrNotes) {
-        const student = studentOrNotes || this.student1 || this.expectedValues?.student1;
+    listMenuOfCreatedAppointment(studentName) {
+        const student = studentName || this.student1 || this.expectedValues?.student1;
         const text = this.getStudentSearchText(student);
         if (text) {
             return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
@@ -461,9 +461,9 @@ export default class CombinedAppointmentPage extends BasePage {
      * Submits the combined appointment form, confirms confirmation prompts, and verifies appointment creation.
      * If the success toast appears, verifies it. Otherwise, checks that listMenuOfCreatedAppointment count > 0.
      * If an error toast appears, throws an error and fails the test.
-     * @param {Object|string} [studentOrNotes] - Optional student test data or identifier to verify on scheduler.
+     * @param {Object|string} [studentName] - Optional student test data or identifier to verify on scheduler.
      **/
-    async submitAppointment(studentOrNotes) {
+    async submitAppointment(studentName) {
         await test.step('Submit Combined Appointment and verify confirmation', async () => {
             await this.click(this.submitButton);
             await this.click(this.confirmYesButton);
@@ -492,7 +492,7 @@ export default class CombinedAppointmentPage extends BasePage {
                     await this.waitForHidden(successToast);
                 } else {
                     await this.waitForLoaders();
-                    const listMenu = this.listMenuOfCreatedAppointment(studentOrNotes);
+                    const listMenu = this.listMenuOfCreatedAppointment(studentName);
                     let count = await listMenu.count();
 
                     if (count === 0) {
@@ -537,8 +537,6 @@ export default class CombinedAppointmentPage extends BasePage {
             ? this.expectedValues
             : CombinedAppointmentPage.storedState.expectedValues;
 
-        const currentUniqueId = this.uniqueId || CombinedAppointmentPage.storedState.uniqueId;
-
         const expected =
             studentNo === 1
                 ? expectedState.student1
@@ -557,7 +555,7 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.verifyAttribute(this.getDropdownTitle(instruction1Id), "title", expected.instruction1, `Student ${studentNo} Instruction 1`);
         await this.verifyAttribute(this.getDropdownTitle(instruction2Id), "title", expected.instruction2, `Student ${studentNo} Instruction 2`);
         await this.verifyAttribute(this.getPickup(studentNo), "oldval", student.pickup, `Student ${studentNo} Pickup`);
-        await this.verifyAttribute(this.getNotes(studentNo), "oldval", `${student.notes}_${currentUniqueId}`, `Student ${studentNo} Notes`);
+        await this.verifyAttribute(this.getNotes(studentNo), "oldval", student.notes, `Student ${studentNo} Notes`);
     }
 
     /**
