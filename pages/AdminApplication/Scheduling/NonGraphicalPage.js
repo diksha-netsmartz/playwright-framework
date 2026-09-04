@@ -129,8 +129,8 @@ export default class NonGraphicalPage extends BasePage {
             await this.waitForVisible(this.appointmentTypeDropdown);
 
             await this.page.waitForFunction(() => {
-                const select = document.querySelector('#drp_OpenSlotBookAppointment_product_0');
-                if (!select) return false;
+                const select = /** @type {HTMLSelectElement|null} */ (document.querySelector('#drp_OpenSlotBookAppointment_product_0'));
+                if (!select || !select.options) return false;
                 return Array.from(select.options).some(opt => {
                     const text = (opt.text || '').trim().toLowerCase();
                     const value = (opt.value || '').trim().toLowerCase();
@@ -144,7 +144,7 @@ export default class NonGraphicalPage extends BasePage {
                 });
             }, { timeout: 10000 });
 
-            const validOptionValue = await this.appointmentTypeDropdown.evaluate(select => {
+            const validOptionValue = await this.appointmentTypeDropdown.evaluate((/** @type {HTMLSelectElement} */ select) => {
                 const validOptions = Array.from(select.options).filter(opt => {
                     const text = (opt.text || '').trim().toLowerCase();
                     const value = (opt.value || '').trim().toLowerCase();

@@ -358,7 +358,7 @@ export default class DateHelper {
      * @returns {string} Day of the month as a string (e.g. "3").
      */
     static getTodayDateAsString(baseDate = new Date()) {
-        return this.getTodayDate(true, baseDate);
+        return String(this.getTodayDate(true, baseDate));
     }
 
     /**
@@ -402,7 +402,7 @@ export default class DateHelper {
      * @returns {string}
      */
     static getYesterdayDateAsString(baseDate = new Date()) {
-        return this.getRelativeDate(-1, true, baseDate);
+        return String(this.getRelativeDate(-1, true, baseDate));
     }
 
     /**
@@ -424,7 +424,7 @@ export default class DateHelper {
      * @returns {string}
      */
     static getTomorrowDateAsString(baseDate = new Date()) {
-        return this.getRelativeDate(1, true, baseDate);
+        return String(this.getRelativeDate(1, true, baseDate));
     }
 
     /**
@@ -558,7 +558,7 @@ export default class DateHelper {
             const fullIdx = fullMonthNames.findIndex(m => m.startsWith(cleanMonth));
             if (fullIdx !== -1) {
                 targetMonthIndex = fullIdx;
-            } else if (!isNaN(cleanMonth) && Number(cleanMonth) >= 1 && Number(cleanMonth) <= 12) {
+            } else if (!isNaN(Number(cleanMonth)) && Number(cleanMonth) >= 1 && Number(cleanMonth) <= 12) {
                 targetMonthIndex = Number(cleanMonth) - 1;
             } else {
                 const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);

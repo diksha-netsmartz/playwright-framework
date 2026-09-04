@@ -116,10 +116,10 @@ export default class BusinessReportsPage extends BasePage {
 
 
     /**
- * Returns locator for a dropdown button element by name.
- * @param {string} dropdownName - Dropdown data-id identifier.
- * @returns {import('@playwright/test').Locator} Dropdown button locator.
-  **/
+     * Returns locator for a delete filter icon by filter name.
+     * @param {string} filterName - Name of the filter.
+     * @returns {import('@playwright/test').Locator}
+     **/
     deleteFilterIcon(filterName) {
         return this.page.locator(
             `xpath=//strong[text()='${filterName}']//ancestor::tr[1]//a[contains(@class,'Delete')]`
@@ -409,7 +409,7 @@ export default class BusinessReportsPage extends BasePage {
         await test.step(`Select multi-session`, async () => {
             await this.waitForLoaders();
             await this.selectOption(this.multiSessionDropdown, { value: '1' });
-            this.selectedSessionText = await this.multiSessionDropdown.evaluate((el) => el.options[el.selectedIndex]?.text?.trim());
+            this.selectedSessionText = await this.multiSessionDropdown.evaluate((/** @type {HTMLSelectElement} */ el) => el.options[el.selectedIndex]?.text?.trim());
             console.log(`Selected Session: "${this.selectedSessionText}"`);
             await this.waitForLoaders();
 
@@ -447,7 +447,7 @@ export default class BusinessReportsPage extends BasePage {
     async verifyAttendanceSignaturesScoresPdf(download, crName = 'automationCR') {
         await test.step('Verify Attendance Signatures/Scores PDF content and attach to report', async () => {
             expect(download).toBeTruthy();
-            const fileName = typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'AttendanceSignaturesScoresReport.pdf';
+            const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'AttendanceSignaturesScoresReport.pdf';
             console.log(`Downloaded PDF file name: ${fileName}`);
             expect(fileName).toMatch(/\.pdf$/i);
 
@@ -567,7 +567,7 @@ export default class BusinessReportsPage extends BasePage {
     async verifyClassroomAbsencesExcelDownloaded(download, customColumns) {
         await test.step('Verify Classroom Absences Excel file downloaded successfully and contains expected columns', async () => {
             expect(download).toBeTruthy();
-            const fileName = typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'ClassroomAbsencesReport.xlsx';
+            const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'ClassroomAbsencesReport.xlsx';
             console.log(`Downloaded Excel file name: ${fileName}`);
             expect(fileName).toMatch(/\.xlsx?$/i);
 
@@ -667,7 +667,7 @@ export default class BusinessReportsPage extends BasePage {
     async verifyAttendanceSheetReportDownloaded(download, crName) {
         await test.step('Verify Attendance Sheet report downloaded successfully and attach to report', async () => {
             expect(download).toBeTruthy();
-            const fileName = typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'AttendanceSheetReport.pdf';
+            const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'AttendanceSheetReport.pdf';
             console.log(`Downloaded file name: ${fileName}`);
 
             if (fileName.endsWith('.pdf')) {
@@ -765,7 +765,7 @@ export default class BusinessReportsPage extends BasePage {
     async verifyBtwDataExportExcelDownloaded(download, customColumns) {
         await test.step('Verify BTW Data Export Excel file downloaded successfully and contains expected columns & sheet name', async () => {
             expect(download).toBeTruthy();
-            const fileName = typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'BTWDataExportReport.xlsx';
+            const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'BTWDataExportReport.xlsx';
             console.log(`Downloaded BTW Excel file name: ${fileName}`);
             expect(fileName).toMatch(/\.xlsx?$/i);
 
@@ -1192,7 +1192,7 @@ export default class BusinessReportsPage extends BasePage {
     async verifyInCarEvaluationExcelDownloaded(download, expectedStudentName = 'testautomation_donotuse') {
         await test.step('Verify In-Car Evaluation Excel report downloaded successfully and contains expected columns & sheet name', async () => {
             expect(download).toBeTruthy();
-            const fileName = typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'InCarEvaluationReport.xlsx';
+            const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'InCarEvaluationReport.xlsx';
             console.log(`Downloaded In-Car Evaluation Excel file name: ${fileName}`);
             expect(fileName).toMatch(/\.xlsx?$/i);
 
@@ -1276,7 +1276,7 @@ export default class BusinessReportsPage extends BasePage {
     async verifyStudentEventLogsExcelDownloaded(download, expectedStudentName = 'testautomation_donotuse') {
         await test.step('Verify Student Event Logs Excel report downloaded successfully and contains expected columns & sheet name', async () => {
             expect(download).toBeTruthy();
-            const fileName = typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'StudentEventLogsReport.xlsx';
+            const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'StudentEventLogsReport.xlsx';
             console.log(`Downloaded Student Event Logs Excel file name: ${fileName}`);
             expect(fileName).toMatch(/\.xlsx?$/i);
 

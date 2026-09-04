@@ -216,17 +216,18 @@ export default class OpenTimeSlotsPage extends BasePage {
 
                 // Also trigger jQuery / DataTables API to ensure the table re-renders with 100 rows
                 await this.page.evaluate((len) => {
-                    const sel = document.querySelector("select[name='tblOTSAppointmentList_length']");
+                    const sel = /** @type {HTMLSelectElement|null} */ (document.querySelector("select[name='tblOTSAppointmentList_length']"));
                     if (sel) {
                         sel.value = String(len);
                         sel.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-                    if (window.$) {
+                    const $ = /** @type {any} */ (window)['$'];
+                    if ($) {
                         const $sel = $('select[name="tblOTSAppointmentList_length"]');
-                        if ($sel.length) {
+                        if ($sel && $sel.length) {
                             $sel.val(String(len)).trigger('change');
                         }
-                        if ($.fn.dataTable && $.fn.dataTable.isDataTable('#tblOTSAppointmentList')) {
+                        if ($.fn && $.fn.dataTable && $.fn.dataTable.isDataTable('#tblOTSAppointmentList')) {
                             $('#tblOTSAppointmentList').DataTable().page.len(Number(len)).draw();
                         }
                     }
@@ -616,7 +617,7 @@ export default class OpenTimeSlotsPage extends BasePage {
                 await this.click(this.showInStudentCenterNoRadioButton);
             }
             await this.waitForLoaders();
-            // return this.updatedPuLocation;
+            return this.updatedPuLocation;
         });
     }
 

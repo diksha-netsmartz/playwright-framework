@@ -186,7 +186,7 @@ export default class ComponentsPage extends BasePage {
             await this.fill(this.searchTextbox, this.componentName);
             await this.page.waitForTimeout(2000);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', 10000)
+            await this.page.waitForLoadState('load', { timeout: 10000 });
             await this.waitForVisible(this.editIcon);
             await expect(this.editIcon).toHaveCount(1);
             await this.click(this.editIcon);
