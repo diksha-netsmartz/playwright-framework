@@ -215,6 +215,7 @@ export default class OnlineEnrollmentPage extends BasePage {
     async clickContinue() {
         await test.step('Click on Continue', async () => {
             await this.waitForLoaders().catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 10000 });
             if (await this.isVisible(this.continueAdditionalProduct, { timeout: 5000 })) {
                 await this.waitForVisible(this.continueAdditionalProduct);
                 await this.click(this.continueAdditionalProduct);
