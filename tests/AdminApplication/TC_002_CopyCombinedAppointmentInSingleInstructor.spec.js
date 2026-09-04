@@ -89,10 +89,5 @@ test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", { 
     await test.step('Step 8: Verify copied appointment data matches original', async () => {
         await instructorPage.editAndVerifyDetailsForAllAppointments(student1, student2);
     });
-
-    await test.step('Cleanup: Delete created and copied appointments', async () => {
-        await instructorPage.deleteAppointment(student1);
-        await instructorPage.deleteAppointment(student1);
-    });
 });
 

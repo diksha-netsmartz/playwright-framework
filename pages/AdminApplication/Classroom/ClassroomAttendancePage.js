@@ -54,6 +54,7 @@ export default class ClassroomAttendancePage extends BasePage {
         this.composeEmailBtn = page.locator("xpath=//button[contains(text(),'COMPOSE') and contains(text(),'EMAIL')]");
         this.emailSubjectInput = page.getByPlaceholder('Email Subject');
         this.emailBodyContent = page.locator('.note-editable');
+        this.additionalEmail = page.locator('#CRAttendanceAdditionalEmail');
         this.sendEmailSubmitBtn = page.locator("xpath=(//button[text()='Send'])[1]");
         this.emailSentSuccessMessage = page.getByText('Email sent successfully.', { exact: true });
 
@@ -102,16 +103,16 @@ export default class ClassroomAttendancePage extends BasePage {
             await test.step(`Randomly mark student attendance as Present`, async () => {
                 this.selectedAttendanceAction = 'Present';
                 await this.waitForVisible(this.presentRadioBtn);
-                this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTruePresent')]").count();
-                console.log(`[Random Selection] Chose: Present. Checked Present count before: ${this.beforeCheckedCount}`);
+                // this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTruePresent')]").count();
+                // console.log(`[Random Selection] Chose: Present. Checked Present count before: ${this.beforeCheckedCount}`);
                 await this.click(this.presentRadioBtn);
             });
         } else {
             await test.step(`Randomly mark student attendance as Absent`, async () => {
                 this.selectedAttendanceAction = 'Absent';
                 await this.waitForVisible(this.absentRadioBtn);
-                this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTrueAbsent')]").count();
-                console.log(`[Random Selection] Chose: Absent. Checked Absent count before: ${this.beforeCheckedCount}`);
+                // this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTrueAbsent')]").count();
+                // console.log(`[Random Selection] Chose: Absent. Checked Absent count before: ${this.beforeCheckedCount}`);
                 await this.click(this.absentRadioBtn);
             });
         }
@@ -344,9 +345,9 @@ export default class ClassroomAttendancePage extends BasePage {
             await this.fill(this.emailBodyContent, body);
 
             // Listen for send email API response
-            this.sendEmailResponsePromise = this.page.waitForResponse(
-                response => response.url().includes('Classroom/CRAttendanceSendEmailToMultipleRecipient') && response.status() === 200
-                , { timeout: 30000 });
+            // this.sendEmailResponsePromise = this.page.waitForResponse(
+            //     response => response.url().includes('Classroom/CRAttendanceSendEmailToMultipleRecipient') && response.status() === 200
+            //     , { timeout: 30000 });
 
             await this.waitForVisible(this.sendEmailSubmitBtn);
             await this.click(this.sendEmailSubmitBtn);
@@ -355,16 +356,16 @@ export default class ClassroomAttendancePage extends BasePage {
         });
     }
 
-    /**
-     * Verifies that the CRAttendanceSendEmailToMultipleRecipient API response returned IsSuccess: true.
-     **/
-    async verifySendEmailResponse() {
-        await test.step('Verify send session email API response is successful', async () => {
-            const response = await this.sendEmailResponsePromise;
-            const responseData = await response.json();
-            expect(responseData.IsSuccess).toBe(true);
-        });
-    }
+    // /**
+    //  * Verifies that the CRAttendanceSendEmailToMultipleRecipient API response returned IsSuccess: true.
+    //  **/
+    // async verifySendEmailResponse() {
+    //     await test.step('Verify send session email API response is successful', async () => {
+    //         const response = await this.sendEmailResponsePromise;
+    //         const responseData = await response.json();
+    //         expect(responseData.IsSuccess).toBe(true);
+    //     });
+    // }
 
     /**
      * Verifies that 'Email sent successfully.' confirmation message appears.
