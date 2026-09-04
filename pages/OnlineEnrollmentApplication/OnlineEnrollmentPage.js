@@ -219,7 +219,7 @@ export default class OnlineEnrollmentPage extends BasePage {
             if (await this.isVisible(this.continueAdditionalProduct, { timeout: 5000 }).catch(() => false)) {
                 await this.waitForVisible(this.continueAdditionalProduct);
                 await this.click(this.continueAdditionalProduct);
-                await this.waitForHidden(this.continueAdditionalProduct, { timeout: 2000 })
+                // await this.waitForHidden(this.continueAdditionalProduct, { timeout: 2000 })
             }
             await this.waitForLoaders().catch(() => { });
         });

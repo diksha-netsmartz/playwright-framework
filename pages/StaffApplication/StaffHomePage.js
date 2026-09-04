@@ -43,41 +43,6 @@ export default class StaffHomePage extends BasePage {
         });
     }
 
-    /**
-     * Retrieves the count of action dropdown buttons currently visible in the 'Needs Attention' widget.
-     * @returns {Promise<number>}
-     */
-    async getActionDropdownCount() {
-        await this.waitForLoaders().catch(() => { });
-        return await this.actionDropdownButtonsList.count();
-    }
-
-    /**
-     * Verifies that either:
-     * 1. The success message banner was detected (toastSeen === true), OR
-     * 2. If the banner was not detected, the actionDropdownButtonsList count was decremented by 1.
-     * If neither condition is met, fails the test.
-     * @param {number} initialCount - Button count before triggering the action.
-     * @param {boolean} toastSeen - Whether the message banner was detected.
-     * @param {string} actionDescription - Label for logging and error reporting.
-     */
-    async verifySuccessOrCountDecremented(initialCount, toastSeen, actionDescription = 'Action') {
-        if (toastSeen) {
-            await test.step(`Verified: "${actionDescription}" message banner was displayed`, async () => { });
-            await this.waitForLoaders().catch(() => { });
-            return;
-        }
-        else {
-            const finalCount = await this.actionDropdownButtonsList.count();
-
-            if (initialCount > 0) {
-                expect(finalCount).toBeLessThan(initialCount);
-            } else {
-                expect(finalCount).toBe(0);
-            }
-
-        }
-    }
 
     /**
      * Marks an appointment in the 'Needs Attention' widget as No Show with notes and confirms the action.
@@ -87,7 +52,6 @@ export default class StaffHomePage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.needsAttentionWidget);
 
-            const initialCount = await this.getActionDropdownCount();
 
             await this.click(this.actionDropdownBtn);
             await this.click(this.noShowLink);
@@ -95,27 +59,42 @@ export default class StaffHomePage extends BasePage {
             await this.fill(this.noShowTextbox, "no show appointment");
             await this.click(this.noShowButton);
 
+            const toastAppeared = this.page.evaluate((expectedText) => {
+                return new Promise((resolve) => {
+                    const matches = () => /no show successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
+                    if (matches()) return resolve(true);
+
+                    const observer = new MutationObserver(() => {
+                        if (matches()) {
+                            observer.disconnect();
+                            resolve(true);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve(false);
+                    }, 10000);
+                });
+            }, 'Appointment marked No Show successfully').catch(() => false);
+
             await this.click(this.yesConfirmationButton);
 
-            // await this.page.waitForTimeout(1000);
             if (await this.isVisible(this.fullAppointmentYesButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.fullAppointmentYesButton);
             }
 
-            // Catch the transient banner as soon as it appears in the DOM/page
-            const toastSeen = await this.page.waitForFunction(() => {
-                const text = document.body.innerText || '';
-                return text.includes('No Show successfully') || (text.includes('no show') && text.includes('successfully'));
-            }, { timeout: 15000 }).then(() => true).catch(() => false);
-
-            await this.verifySuccessOrCountDecremented(
-                initialCount,
-                toastSeen,
-                'Appointment marked No Show successfully.'
-            );
-
-            await this.waitForLoaders().catch(() => { });
-            await test.step(`Appointment marked No Show successfully`, async () => { });
+            // Report whether toast appeared or not
+            const isToastAppeared = await toastAppeared;
+            if (isToastAppeared) {
+                await test.step('Toast message "Appointment marked No Show successfully" appeared', async () => { });
+            } else {
+                await test.step('Toast message "Appointment marked No Show successfully" did NOT appear', async () => {
+                    expect(isToastAppeared, 'Toast message "Appointment marked No Show successfully" did not appear on page within 10 seconds').toBe(true);
+                });
+            }
         });
     }
 
@@ -127,8 +106,6 @@ export default class StaffHomePage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.needsAttentionWidget);
 
-            const initialCount = await this.getActionDropdownCount();
-
             await this.click(this.actionDropdownBtn2);
             await this.click(this.cancelLink);
             await this.waitForLoaders();
@@ -136,22 +113,39 @@ export default class StaffHomePage extends BasePage {
             await this.fill(this.cancelTextbox, "cancel appointment");
             await this.click(this.cancelButton);
 
+            const toastAppeared = this.page.evaluate((expectedText) => {
+                return new Promise((resolve) => {
+                    const matches = () => /cance[l]+ed successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
+                    if (matches()) return resolve(true);
+
+                    const observer = new MutationObserver(() => {
+                        if (matches()) {
+                            observer.disconnect();
+                            resolve(true);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve(false);
+                    }, 10000);
+                });
+            }, 'Appointment cancelled successfully').catch(() => false);
+
+            // 2. Confirm the cancellation action
             await this.click(this.yesConfirmationButton);
 
-            // Catch the transient banner as soon as it appears in the DOM/page before page reload removes it
-            const toastSeen = await this.page.waitForFunction(() => {
-                const text = document.body.innerText || '';
-                return /cance[l]+ed successfully/i.test(text) || (text.includes('Appointment') && /cance[l]+ed/i.test(text));
-            }, { timeout: 7000 }).then(() => true).catch(() => false);
-
-            await this.verifySuccessOrCountDecremented(
-                initialCount,
-                toastSeen,
-                'Appointment cancelled successfully.'
-            );
-
-            await this.waitForLoaders().catch(() => { });
-            await test.step(`Appointment cancelled successfully`, async () => { });
+            // 3. Report whether toast appeared or not
+            const isToastAppeared = await toastAppeared;
+            if (isToastAppeared) {
+                await test.step('Toast message "Appointment cancelled successfully" appeared', async () => { });
+            } else {
+                await test.step('Toast message "Appointment cancelled successfully" did NOT appear', async () => {
+                    expect(isToastAppeared, 'Toast message "Appointment cancelled successfully" did not appear on page within 10 seconds').toBe(true);
+                });
+            }
 
         });
     }
