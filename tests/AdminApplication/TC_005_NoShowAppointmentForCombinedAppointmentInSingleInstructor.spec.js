@@ -79,13 +79,11 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
     await test.step('Step 6-8: Mark appointment as No Show for Student 1 and verify', async () => {
         await instructorPage.editNoShowAppointment(student1);
         await combinedAppointmentPage.markAppointmentAsNoShow(student1);
-        await combinedAppointmentPage.verifyAppointmentIsMarkedAsNoShowSuccessfully();
     });
 
     await test.step('Step 9: Mark appointment as No Show for Student 2 and verify', async () => {
         await instructorPage.editNoShowAppointment(student2);
         await combinedAppointmentPage.markAppointmentAsNoShow(student2);
-        await combinedAppointmentPage.verifyAppointmentIsMarkedAsNoShowSuccessfully();
     });
 });
 

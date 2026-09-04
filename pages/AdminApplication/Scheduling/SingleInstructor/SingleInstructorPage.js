@@ -400,22 +400,58 @@ export default class SingleInstructorPage extends BasePage {
             await this.hover(this.listMenuOfCreatedAppointment(studentName));
             await this.isVisible(this.deleteAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
             await this.click(this.deleteAppointmentButton(studentName));
+            // Setup MutationObserver to capture toast message
+            const toastPromise = this.page.evaluate(() => {
+                return new Promise((resolve) => {
+                    const getToast = () => {
+                        const toasts = Array.from(document.querySelectorAll('#toast-container .toast, .toast'));
+                        for (let i = toasts.length - 1; i >= 0; i--) {
+                            const toast = toasts[i];
+                            const style = window.getComputedStyle(toast);
+                            if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+                                const msgEl = toast.querySelector('.toast-message');
+                                const text = ((msgEl ? msgEl.textContent : toast.textContent) || '').trim();
+                                if (text.length > 0) return text;
+                            }
+                        }
+                        const fallback = document.querySelector('#toast-container .toast-message, .toast-message');
+                        if (fallback) {
+                            const text = (fallback.textContent || '').trim();
+                            if (text.length > 0) return text;
+                        }
+                        return null;
+                    };
+
+                    const initial = getToast();
+                    if (initial) return resolve(initial);
+
+                    const observer = new MutationObserver(() => {
+                        const text = getToast();
+                        if (text) {
+                            observer.disconnect();
+                            resolve(text);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve('');
+                    }, 5000);
+                });
+            }).catch(() => '');
+
             await this.click(this.deleteButtonInPopup);
             await this.waitForHidden(this.deleteButtonInPopup);
             await this.waitForLoaders();
 
-            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-            await this.waitForVisible(toast, { timeout: 4000 }).catch(() => { });
+            const toastMessage = (await toastPromise) || '';
+            console.log(`Captured toast message: "${toastMessage}"`);
 
-            if (await this.isVisible(toast, { timeout: 500 }).catch(() => false)) {
-                await this.verifyVisible(toast);
-                await this.verifyText(toast, 'Appointment deleted successfully.');
-                console.log(`Appointment deleted with message: Appointment deleted successfully.`);
-                await this.waitForHidden(toast).catch(() => { });
+            if (toastMessage && /appointment.*deleted successfully/i.test(toastMessage)) {
+                console.log(`Appointment deleted with message: ${toastMessage}`);
                 await test.step(`Appointment deleted successfully.`, async () => { });
-
-                // const countAfter = await allAppointments.count();
-                // console.log(`Appointments count after deletion: ${countAfter}`);
             } else {
                 await this.waitForLoaders();
                 const expectedCount = Math.max(0, countBefore - 1);
@@ -423,7 +459,6 @@ export default class SingleInstructorPage extends BasePage {
                 console.log(`Appointments count after deletion: ${expectedCount}`);
                 console.log(`Toast not found. Appointment deletion verified on scheduler: count decremented from ${countBefore} to ${expectedCount}`);
                 await test.step(`Appointment deleted successfully.`, async () => { });
-
             }
         });
     }
@@ -460,6 +495,48 @@ export default class SingleInstructorPage extends BasePage {
 
                 const slot = await this.findAvailableSlot(attempt);
                 await slot.click({ button: "right" });
+                // Setup MutationObserver to capture toast message
+                const toastPromise = this.page.evaluate(() => {
+                    return new Promise((resolve) => {
+                        const getToast = () => {
+                            const toasts = Array.from(document.querySelectorAll('#toast-container .toast, .toast'));
+                            for (let i = toasts.length - 1; i >= 0; i--) {
+                                const toast = toasts[i];
+                                const style = window.getComputedStyle(toast);
+                                if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+                                    const msgEl = toast.querySelector('.toast-message');
+                                    const text = ((msgEl ? msgEl.textContent : toast.textContent) || '').trim();
+                                    if (text.length > 0) return text;
+                                }
+                            }
+                            const fallback = document.querySelector('#toast-container .toast-message, .toast-message');
+                            if (fallback) {
+                                const text = (fallback.textContent || '').trim();
+                                if (text.length > 0) return text;
+                            }
+                            return null;
+                        };
+
+                        const initial = getToast();
+                        if (initial) return resolve(initial);
+
+                        const observer = new MutationObserver(() => {
+                            const text = getToast();
+                            if (text) {
+                                observer.disconnect();
+                                resolve(text);
+                            }
+                        });
+
+                        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                        setTimeout(() => {
+                            observer.disconnect();
+                            resolve('');
+                        }, 5000);
+                    });
+                }).catch(() => '');
+
                 await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
 
                 try {
@@ -469,13 +546,9 @@ export default class SingleInstructorPage extends BasePage {
                     console.log("Submit confirmation popup did not appear.");
                 }
 
-                const toastLocator = this.page.locator('#toast-container .toast-message').last();
+                const message = (await toastPromise) || '';
 
-                let message = '';
-                try {
-                    await toastLocator.waitFor({ state: 'visible', timeout: 4000 });
-                    message = (await toastLocator.textContent())?.trim() || '';
-                } catch {
+                if (!message) {
                     console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
                     const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
                     if (appointmentCount >= 2) {
@@ -531,42 +604,42 @@ export default class SingleInstructorPage extends BasePage {
         });
     }
 
-    /**
-     * Deletes an open/cancelled appointment slot and verifies success toast.
-     **/
-    async deleteCancelledAppointment() {
-        await test.step('Delete cancelled appointment slot', async () => {
-            await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 2000 }).catch(() => false);
-            await this.hover(this.listMenuOfCancelledAppointment);
-            await this.isVisible(this.deleteCancelledAppointmentButton, { timeout: 2000 }).catch(() => false);
-            await this.click(this.deleteCancelledAppointmentButton);
-            await this.click(this.deleteButtonInPopup);
-            await this.waitForHidden(this.deleteButtonInPopup);
-            await this.waitForLoaders();
-            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-            await this.verifyVisible(toast);
-            await this.verifyText(toast, 'Appointment deleted successfully.');
-        });
-    }
+    // /**
+    //  * Deletes an open/cancelled appointment slot and verifies success toast.
+    //  **/
+    // async deleteCancelledAppointment() {
+    //     await test.step('Delete cancelled appointment slot', async () => {
+    //         await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 2000 }).catch(() => false);
+    //         await this.hover(this.listMenuOfCancelledAppointment);
+    //         await this.isVisible(this.deleteCancelledAppointmentButton, { timeout: 2000 }).catch(() => false);
+    //         await this.click(this.deleteCancelledAppointmentButton);
+    //         await this.click(this.deleteButtonInPopup);
+    //         await this.waitForHidden(this.deleteButtonInPopup);
+    //         await this.waitForLoaders();
+    //         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
+    //         await this.verifyVisible(toast);
+    //         await this.verifyText(toast, 'Appointment deleted successfully.');
+    //     });
+    // }
 
-    /**
-     * Opens the edit modal for a cancelled appointment from its action menu.
-     **/
-    async editCancelledAppointment() {
-        await test.step('Open Edit modal for cancelled appointment', async () => {
-            await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 2000 }).catch(() => false);
-            await this.click(this.listMenuOfCancelledAppointment);
+    // /**
+    //  * Opens the edit modal for a cancelled appointment from its action menu.
+    //  **/
+    // async editCancelledAppointment() {
+    //     await test.step('Open Edit modal for cancelled appointment', async () => {
+    //         await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 5000 }).catch(() => false);
+    //         await this.click(this.listMenuOfCancelledAppointment);
 
-            try {
-                await this.waitForVisible(this.editAppointmentLink);
-            } catch {
-                console.log("edit appointment link was not visible. Re-clicking the list menu...");
-                await this.click(this.listMenuOfCancelledAppointment);
-                await this.waitForVisible(this.editAppointmentLink);
-            }
-            await this.click(this.editAppointmentLink);
-        });
-    }
+    //         try {
+    //             await this.waitForVisible(this.editAppointmentLink);
+    //         } catch {
+    //             console.log("edit appointment link was not visible. Re-clicking the list menu...");
+    //             await this.click(this.listMenuOfCancelledAppointment);
+    //             await this.waitForVisible(this.editAppointmentLink);
+    //         }
+    //         await this.click(this.editAppointmentLink);
+    //     });
+    // }
 
     /**
      * Opens the edit modal for an appointment matching student name from its action menu.
@@ -579,7 +652,7 @@ export default class SingleInstructorPage extends BasePage {
 
         await test.step(`Open Edit modal for No Show appointment: "${studentName}"`, async () => {
             const listMenu = this.listMenuOfNoShowAppointment(studentName);
-            await this.isVisible(listMenu, { timeout: 2000 }).catch(() => false);
+            await this.isVisible(listMenu, { timeout: 5000 }).catch(() => false);
             await this.click(listMenu);
 
             try {
