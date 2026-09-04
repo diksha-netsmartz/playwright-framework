@@ -1,4 +1,5 @@
 import BasePage from "../../../../utils/BasePage";
+import DateHelper from "../../../../utils/DateHelper";
 import { test } from "@playwright/test";
 
 /**
@@ -52,9 +53,11 @@ export default class BulkAppointmentPage extends BasePage {
 
         //calendar
         this.selectDate = page.locator('#txtBulkRange');
+        this.calendarPrevButton = page.locator("xpath=(//th[contains(@class,'prev')])[1]");
+        this.calendarMonthHeader = page.locator("xpath=(//th[contains(@class,'month')])[1]");
         this.currentMonthFirstDay = page.locator("xpath=(//td[contains(@class,'available') and text()='1'])[1]");
         this.nextMonthDay = page.locator("xpath=(//td[contains(@class,'available') and text()='25'])[2]");
-
+        this.closeSuccessMessageButton = page.locator("//div[@id='msgSuccess']//button")
         this.cancelYesButton = page.locator("xpath=//button[contains(@onclick,'cancelBulkAppointments') and text()='YES']");
     }
 
@@ -68,13 +71,54 @@ export default class BulkAppointmentPage extends BasePage {
     }
 
     /**
-     * Selects a date range spanning from the 1st of current month to the 25th of next month and applies the filter.
+     * Selects a date range spanning from the 1st of previous month to the last day of current month
+     * via calendar clicks (start day on left calendar, last day on right calendar) and applies the filter.
     **/
     async applyFilter() {
-        await test.step('Apply date range filter in Bulk Appointments', async () => {
+        await test.step('Apply date range filter in Bulk Appointments (Previous month 1st to Current month last date)', async () => {
+            const now = new Date();
+            const currMonthShort = now.toLocaleString('en-US', { month: 'short' });
+            const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const prevMonthShort = prevMonthDate.toLocaleString('en-US', { month: 'short' });
+            const currLastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+            await this.waitForVisible(this.selectDate);
             await this.click(this.selectDate);
-            await this.click(this.currentMonthFirstDay);
-            await this.click(this.nextMonthDay);
+            await this.page.waitForTimeout(400);
+
+            // If left calendar shows current month (e.g. "Sep"), click prev button once to show previous month (e.g. "Aug")
+            const headerText = await this.calendarMonthHeader.innerText().catch(() => '');
+            if (headerText.toLowerCase().includes(currMonthShort.toLowerCase()) ||
+                (!headerText.toLowerCase().includes(prevMonthShort.toLowerCase()) && await this.isVisible(this.calendarPrevButton))) {
+                await this.click(this.calendarPrevButton);
+                await this.page.waitForTimeout(300);
+            }
+
+            // 1. Click Start Date: 1st of previous month on the left calendar
+            const startDayCell = this.page.locator("xpath=(//td[contains(@class,'available') and not(contains(@class,'off')) and text()='1'])[1]");
+            if (await this.isVisible(startDayCell, { timeout: 2000 }).catch(() => false)) {
+                await this.click(startDayCell);
+            } else {
+                await this.click(this.page.locator("xpath=(//td[contains(@class,'available') and text()='1'])[1]"));
+            }
+            await this.page.waitForTimeout(300);
+
+            // 2. Click End Date: last day of current month on the right calendar
+            const endDayCell = this.page.locator(`xpath=(//td[contains(@class,'available') and not(contains(@class,'off')) and text()='${currLastDay}'])[2]`);
+            if (await this.isVisible(endDayCell, { timeout: 2000 }).catch(() => false)) {
+                await this.click(endDayCell);
+            } else {
+                const fallbackEnd = this.page.locator(`xpath=(//td[contains(@class,'available') and text()='${currLastDay}'])[last()]`);
+                if (await this.isVisible(fallbackEnd, { timeout: 2000 }).catch(() => false)) {
+                    await this.click(fallbackEnd);
+                } else {
+                    const fallbackRightEnd = this.page.locator("xpath=(//div[contains(@class,'right')]//td[contains(@class,'available') and not(contains(@class,'off'))])[last()]");
+                    await this.click(fallbackRightEnd);
+                }
+            }
+            await this.page.waitForTimeout(400);
+
+            // 3. Click Filter button and wait for loaders
             await this.click(this.filterButton);
             await this.waitForLoaders();
         });
@@ -115,6 +159,9 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.yesConfirmationButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+                await this.click(this.closeSuccessMessageButton);
+            }
         });
     }
 
@@ -128,6 +175,9 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.deleteYesButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments deleted successfully.', { exact: true }));
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+                await this.click(this.closeSuccessMessageButton);
+            }
         });
     }
 
@@ -141,6 +191,9 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.cancelYesButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments cancelled successfully.', { exact: true }));
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+                await this.click(this.closeSuccessMessageButton);
+            }
         });
     }
 
@@ -166,6 +219,9 @@ export default class BulkAppointmentPage extends BasePage {
 
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+                await this.click(this.closeSuccessMessageButton);
+            }
         });
     }
 }
