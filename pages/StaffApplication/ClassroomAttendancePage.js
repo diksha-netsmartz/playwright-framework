@@ -93,18 +93,17 @@ export default class ClassroomAttendancePage extends BasePage {
     async markStudentPresent() {
         await this.waitForVisible(this.saveBtn);
         await this.verifyVisible(this.saveBtn);
-        if (await this.isVisible(this.studentChehckbox)) {
+        if (await this.isVisible(this.studentChehckbox, { timeout: 3000 }).catch(() => false)) {
             await test.step('Mark student present', async () => {
                 await this.click(this.studentChehckbox);
             });
         }
         else {
-            if (await this.isVisible(this.studentChehckboxChecked)) {
-                await test.step('Mark student absent', async () => {
-                    await this.click(this.studentChehckboxChecked);
-                });
+            await test.step('Mark student absent', async () => {
+                await this.click(this.studentChehckboxChecked);
+            });
 
-            }
+
         }
 
     }
@@ -132,7 +131,7 @@ export default class ClassroomAttendancePage extends BasePage {
     **/
     async signInstructorSignature() {
         await test.step('Sign instructor signature on canvas if not already signed', async () => {
-            const isSigned = await this.isVisible(this.clearInstructorSignatureBtn);
+            const isSigned = await this.isVisible(this.clearInstructorSignatureBtn, { timeout: 5000 }).catch(() => false);
             if (!isSigned) {
                 await this.#drawSignature(this.instructorSignatureCanvas);
             }

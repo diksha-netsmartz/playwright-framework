@@ -89,7 +89,7 @@ export default class BulkAppointmentPage extends BasePage {
             // If left calendar shows current month (e.g. "Sep"), click prev button once to show previous month (e.g. "Aug")
             const headerText = await this.calendarMonthHeader.innerText().catch(() => '');
             if (headerText.toLowerCase().includes(currMonthShort.toLowerCase()) ||
-                (!headerText.toLowerCase().includes(prevMonthShort.toLowerCase()) && await this.isVisible(this.calendarPrevButton))) {
+                (!headerText.toLowerCase().includes(prevMonthShort.toLowerCase()) && await this.isVisible(this.calendarPrevButton, { timeout: 2000 }).catch(() => false))) {
                 await this.click(this.calendarPrevButton);
                 await this.page.waitForTimeout(300);
             }
@@ -159,7 +159,7 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.yesConfirmationButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
-            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.closeSuccessMessageButton);
             }
         });
@@ -175,7 +175,7 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.deleteYesButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments deleted successfully.', { exact: true }));
-            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.closeSuccessMessageButton);
             }
         });
@@ -191,7 +191,7 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.cancelYesButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments cancelled successfully.', { exact: true }));
-            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.closeSuccessMessageButton);
             }
         });
@@ -212,14 +212,14 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.shiftBulkUpdateButton);
             await this.click(this.yesConfirmationButton);
             await this.page.waitForTimeout(2000);
-            if (await this.isVisible(this.continueRegardlessButton)) {
+            if (await this.isVisible(this.continueRegardlessButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.continueRegardlessButton);
                 await this.click(this.yesConfirmationButton);
             }
 
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments updated successfully.', { exact: true }));
-            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 })) {
+            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.closeSuccessMessageButton);
             }
         });

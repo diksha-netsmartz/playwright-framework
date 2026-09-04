@@ -76,7 +76,7 @@ export default class FeesPage extends BasePage {
             await this.waitForVisible(this.feeAmountInput);
             await this.fill(this.feeAmountInput, feeAmount);
 
-            if (await this.isVisible(this.eligibleServiceSelection)) {
+            if (await this.isVisible(this.eligibleServiceSelection, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.eligibleServiceSelection)
             }
 

@@ -64,22 +64,22 @@ export default class StudentProfilePage extends BasePage {
             await this.fill(this.parentGuardianEmail, details.parentGuardianEmail);
 
 
-            if (await this.isVisible(this.dlPermit)) {
+            if (await this.isVisible(this.dlPermit, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.dlPermit, details.permit);
             }
 
-            if (await this.isVisible(this.wearGlassDropdown)) {
+            if (await this.isVisible(this.wearGlassDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.wearGlassDropdown);
                 await this.click(this.wearGlassDropdownValue);
             }
 
-            if (await this.isVisible(this.permitIssuedDate)) {
+            if (await this.isVisible(this.permitIssuedDate, { timeout: 1000 }).catch(() => false)) {
                 await this.clear(this.permitIssuedDate);
                 await this.waitForVisible(this.monthFirstDay);
                 await this.click(this.monthFirstDay);
             }
 
-            if (await this.isVisible(this.permitExpireDate)) {
+            if (await this.isVisible(this.permitExpireDate, { timeout: 1000 }).catch(() => false)) {
                 await this.clear(this.permitExpireDate);
                 await this.waitForVisible(this.monthLastDay);
                 await this.click(this.monthLastDay);
@@ -95,7 +95,7 @@ export default class StudentProfilePage extends BasePage {
             await this.verifyVisible(this.updateBtn);
             await this.click(this.updateBtn);
 
-            if (await this.isVisible(this.yesConfirmationBtn)) {
+            if (await this.isVisible(this.yesConfirmationBtn, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.yesConfirmationBtn);
             }
             await this.waitForLoaders();
@@ -134,7 +134,7 @@ export default class StudentProfilePage extends BasePage {
             await this.verifyVisible(this.addressTextbox);
             await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
 
-            if (await this.isVisible(this.dlPermit)) {
+            if (await this.isVisible(this.dlPermit, { timeout: 1000 }).catch(() => false)) {
                 await expect(this.dlPermit).toHaveValue(expectedDetails.permit);
             }
 

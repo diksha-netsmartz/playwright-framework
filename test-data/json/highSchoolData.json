@@ -1,0 +1,12 @@
+{
+  "schoolNamePrefix": "HighSchool",
+  "schoolCodePrefix": "HS",
+  "address": "456 Academy Way",
+  "city": "Hartford",
+  "state": "CT",
+  "zip": "06101",
+  "email": "highschool@example.com",
+  "notes": "Automated High School note",
+  "updatedEmail": "updated_highschool@example.com",
+  "updatedNotes": "Updated High School note"
+}

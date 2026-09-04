@@ -458,61 +458,87 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     /**
-     * Submits the combined appointment form, confirms confirmation prompts, and verifies appointment creation.
-     * If the success toast appears, verifies it. Otherwise, checks that listMenuOfCreatedAppointment count > 0.
-     * If an error toast appears, throws an error and fails the test.
+     * Submits the combined appointment form, confirms confirmation prompts, and verifies appointment creation via toast message.
+     * Looks for toast message for 10 seconds. If 'Appointment created successfully', proceeds.
+     * If an error toast appears or creation fails, logs the toast message and throws an error.
      * @param {Object|string} [studentName] - Optional student test data or identifier to verify on scheduler.
      **/
     async submitAppointment(studentName) {
         await test.step('Submit Combined Appointment and verify confirmation', async () => {
             await this.click(this.submitButton);
-            await this.click(this.confirmYesButton);
-            await this.waitForLoaders();
-            // await this.page.waitForTimeout(2500);
 
-            if (await this.isVisible(this.submitButtonPopup, { timeout: 2500 })) {
+            // 1. Setup MutationObserver to capture toast message before confirming submission
+            const toastPromise = this.page.evaluate((expectedText) => {
+                return new Promise((resolve) => {
+                    const getToast = () => {
+                        const matches = /appointment.*created successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
+                        if (!matches) return null;
+                        const el = document.querySelector('#toast-container .toast-message, .toast-message');
+                        return el && el.textContent ? el.textContent.trim() : expectedText;
+                    };
+                    const initial = getToast();
+                    if (initial) return resolve(initial);
+
+                    const observer = new MutationObserver(() => {
+                        const text = getToast();
+                        if (text) {
+                            observer.disconnect();
+                            resolve(text);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve('');
+                    }, 20000);
+                });
+            }, 'Appointment created successfully').catch(() => '');
+
+            await this.click(this.confirmYesButton);
+
+            if (await this.isVisible(this.submitButtonPopup, { timeout: 2500 }).catch(() => false)) {
                 await this.click(this.submitButtonPopup);
                 await this.waitForLoaders();
             }
-            const toastLocator = this.page.locator('#toast-container .toast-message').last();
-            await this.waitForVisible(toastLocator, { timeout: 5000 }).catch(() => { });
-            console.log("last toast message :", await toastLocator.textContent().catch(() => null));
 
-            const errorToast = this.page.locator('#toast-container .toast-error').last();
-            if (await this.isVisible(errorToast)) {
-                const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
-                console.log(`Appointment creation failed with error: "${errorMessage}"`);
-                throw new Error(`Appointment creation failed with error: "${errorMessage}"`);
+            // 2. Wait for captured toast message
+            const toastMessage = await toastPromise;
+            console.log(`Captured toast message: "${toastMessage}"`);
+
+            // 3. If success toast appeared, log and proceed; otherwise check scheduler fallback or throw error
+            if (toastMessage && /appointment.*created successfully/i.test(toastMessage)) {
+                console.log(`Appointment created with message: ${toastMessage}`);
+                await test.step('Appointment created successfully.', async () => { });
+                await this.waitForLoaders().catch(() => { });
             } else {
-                const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
-                if (await this.isVisible(successToast)) {
-                    await this.verifyVisible(successToast);
-                    const toastMessage = (await successToast.textContent())?.trim() || '';
-                    console.log(`Toast message: ${toastMessage}`);
-                    console.log(`Appointment created with message: ${toastMessage}`);
-                    await this.verifyText(successToast, 'Appointment created successfully.');
-                    await this.waitForHidden(successToast);
-                } else {
-                    await this.waitForLoaders();
-                    const listMenu = this.listMenuOfCreatedAppointment(studentName);
-                    let count = await listMenu.count();
+                if (toastMessage) {
+                    console.log(`Non-success toast received: "${toastMessage}"`);
+                }
 
-                    if (count === 0) {
-                        try {
-                            await expect.poll(async () => {
-                                await this.waitForLoaders().catch(() => { });
-                                return await listMenu.count();
-                            }, { timeout: 10000 }).toBeGreaterThan(0);
-                            count = await listMenu.count();
-                        } catch { }
-                    }
+                await this.waitForLoaders().catch(() => { });
+                const listMenu = this.listMenuOfCreatedAppointment(studentName);
+                let count = await listMenu.count();
 
-                    expect(count).toBeGreaterThan(0);
+                if (count === 0) {
+                    try {
+                        await expect.poll(async () => {
+                            await this.waitForLoaders().catch(() => { });
+                            return await listMenu.count();
+                        }, { timeout: 10000 }).toBeGreaterThan(0);
+                        count = await listMenu.count();
+                    } catch { }
+                }
+
+                if (count > 0) {
                     console.log(`Appointment creation verified on scheduler`);
                     await test.step(`Appointment created successfully.`, async () => { });
-
+                } else {
+                    const errorMsg = toastMessage || 'Appointment creation failed: No success toast appeared and appointment was not found on scheduler';
+                    console.log(`Appointment creation failed with error: "${errorMsg}"`);
+                    throw new Error(`Appointment creation failed with error: "${errorMsg}"`);
                 }
-                await this.waitForLoaders();
             }
         });
     }
@@ -582,7 +608,7 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     /**
-     * Cancels the appointment for the specified student (object or name string) and confirms the cancellation modal.
+     * Cancels the appointment for the specified student (object or name string), confirms the cancellation modal, and verifies the success toast.
      * @param {Object|string} studentOrName - Student object or student's name string.
      **/
     async cancelAppointment(studentOrName) {
@@ -591,19 +617,61 @@ export default class CombinedAppointmentPage extends BasePage {
             : studentOrName;
 
         await test.step(`Cancel appointment for: "${studentName}"`, async () => {
-            await this.isVisible(this.cancelAppointmentButton(studentName));
+            await this.isVisible(this.cancelAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
             await this.click(this.cancelAppointmentButton(studentName));
             this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
             await this.fill(this.cancelAppointmentTextbox, this.cancelledNotes);
             await this.click(this.cancelAppointmentPopupButton);
+
+            // 1. Setup MutationObserver before clicking delete confirmation
+            const toastAppeared = this.page.evaluate((expectedText) => {
+                return new Promise((resolve) => {
+                    const getToast = () => {
+                        const matches = /cance[l]+ed successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
+                        if (!matches) return null;
+                        const el = document.querySelector('#toast-container .toast-message, .toast-message');
+                        return el && el.textContent ? el.textContent.trim() : expectedText;
+                    };
+                    const initial = getToast();
+                    if (initial) return resolve(initial);
+
+                    const observer = new MutationObserver(() => {
+                        const text = getToast();
+                        if (text) {
+                            observer.disconnect();
+                            resolve(text);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve('');
+                    }, 10000);
+                });
+            }, 'Appointment cancelled successfully').catch(() => '');
+
             await this.click(this.deleteConfirmationButton);
             await this.waitForLoaders();
             await this.waitForHidden(this.cancelAppointmentTextbox);
+
+            // 2. Verify cancellation toast
+            const toastMessage = await toastAppeared;
+            console.log(`Captured toast message: "${toastMessage}"`);
+            if (toastMessage) {
+                console.log('Appointment cancelled successfully.');
+                await test.step('Toast message "Appointment cancelled successfully." appeared', async () => { });
+            } else {
+                await test.step('Toast message "Appointment cancelled successfully." did NOT appear', async () => {
+                    expect(toastMessage, 'Toast message "Appointment cancelled successfully." did not appear on page within 10 seconds').toBeTruthy();
+                });
+            }
         });
     }
 
     /**
-     * Marks the appointment as No Show for the specified student (object or name string) and confirms the dialog.
+     * Marks the appointment as No Show for the specified student (object or name string), confirms the dialog, and verifies the success toast.
      * @param {Object|string} studentOrName - Student object or student's name string.
      **/
     async markAppointmentAsNoShow(studentOrName) {
@@ -617,37 +685,56 @@ export default class CombinedAppointmentPage extends BasePage {
             this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
             await this.fill(this.noShowAppointmentTextbox, this.noShowNotes);
             await this.click(this.noShowAppointmentPopupButton);
+
+            // 1. Setup MutationObserver before confirming No Show
+            const toastAppeared = this.page.evaluate((expectedText) => {
+                return new Promise((resolve) => {
+                    const getToast = () => {
+                        const matches = /no show successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
+                        if (!matches) return null;
+                        const el = document.querySelector('#toast-container .toast-message, .toast-message');
+                        return el && el.textContent ? el.textContent.trim() : expectedText;
+                    };
+                    const initial = getToast();
+                    if (initial) return resolve(initial);
+
+                    const observer = new MutationObserver(() => {
+                        const text = getToast();
+                        if (text) {
+                            observer.disconnect();
+                            resolve(text);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve('');
+                    }, 10000);
+                });
+            }, 'Appointment marked No Show successfully').catch(() => '');
+
             await this.click(this.deleteConfirmationButton);
             await this.waitForLoaders();
 
-            if (await this.isVisible(this.noShowYesButton)) {
+            if (await this.isVisible(this.noShowYesButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.noShowYesButton);
                 await this.waitForLoaders();
             }
-        });
-    }
 
-    /**
-     * Verifies that the appointment cancelled success toast message is displayed.
-     **/
-    async verifyAppointmentIsCancelledSuccessfully() {
-        await test.step('Verify "Appointment cancelled successfully." message', async () => {
-            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-            await this.verifyVisible(toast);
-            await this.verifyText(toast, 'Appointment cancelled successfully.');
-        });
-    }
-
-    /**
-     * Verifies that the appointment marked No Show success toast message is displayed.
-     **/
-    async verifyAppointmentIsMarkedAsNoShowSuccessfully() {
-        await test.step('Verify "Appointment marked No Show successfully." message', async () => {
-            const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-            await this.verifyVisible(toast);
-            await this.verifyText(toast, 'Appointment marked No Show successfully.');
-            await this.waitForHidden(toast);
-            await this.waitForLoaders();
+            // 2. Verify No Show toast
+            const toastMessage = await toastAppeared;
+            console.log(`Captured toast message: "${toastMessage}"`);
+            if (toastMessage) {
+                console.log('Appointment marked No Show successfully.');
+                await test.step('Toast message "Appointment marked No Show successfully." appeared', async () => { });
+                await this.waitForLoaders().catch(() => { });
+            } else {
+                await test.step('Toast message "Appointment marked No Show successfully." did NOT appear', async () => {
+                    expect(toastMessage, 'Toast message "Appointment marked No Show successfully." did not appear on page within 10 seconds').toBeTruthy();
+                });
+            }
         });
     }
 

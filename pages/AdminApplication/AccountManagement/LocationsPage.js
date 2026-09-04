@@ -142,31 +142,31 @@ export default class LocationsPage extends BasePage {
             await this.fill(this.mainPhoneInput, mainPhone);
 
 
-            if (await this.isVisible(this.countyInput)) {
+            if (await this.isVisible(this.countyInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.countyInput, data.county)
             }
 
-            if (await this.isVisible(this.faxInput)) {
+            if (await this.isVisible(this.faxInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.faxInput, data.fax)
             }
 
-            if (await this.isVisible(this.locationManagerInput)) {
+            if (await this.isVisible(this.locationManagerInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.locationManagerInput, data.locationManager)
             }
 
-            if (await this.isVisible(this.zoomMailInput)) {
+            if (await this.isVisible(this.zoomMailInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.zoomMailInput, data.zoomEmail)
             }
 
-            if (await this.isVisible(this.providerLocationIdInput)) {
+            if (await this.isVisible(this.providerLocationIdInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.providerLocationIdInput, data.providerLocationId)
             }
 
-            if (await this.isVisible(this.distanceCoverageInput)) {
+            if (await this.isVisible(this.distanceCoverageInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.distanceCoverageInput, data.distanceCoverage)
             }
 
-            if (await this.isVisible(this.areaCoverageSelectableItem)) {
+            if (await this.isVisible(this.areaCoverageSelectableItem, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.areaCoverageSelectableItem);
             }
 

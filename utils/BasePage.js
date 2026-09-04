@@ -182,16 +182,14 @@ export default class BasePage {
      * @returns {Promise<boolean>} True if visible, false otherwise.
      */
     async isVisible(locator, options) {
-        if (options !== undefined) {
-            const timeout = typeof options === 'number' ? options : options.timeout;
-            if (typeof timeout === 'number') {
-                try {
-                    await locator.waitFor({ state: 'visible', timeout });
-                    return true;
-                } catch {
-                    return false;
-                }
+        const timeout = typeof options === 'number' ? options : options?.timeout;
+        if (typeof timeout === 'number' && timeout > 0) {
+            const startTime = Date.now();
+            while (Date.now() - startTime < timeout) {
+                if (await locator.isVisible()) return true;
+                await this.page.waitForTimeout(250);
             }
+            return false;
         }
         return await locator.isVisible();
     }

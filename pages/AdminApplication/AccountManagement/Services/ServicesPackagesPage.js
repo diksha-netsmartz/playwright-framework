@@ -105,13 +105,13 @@ export default class ServicesPackagesPage extends BasePage {
             await this.waitForVisible(this.serviceCodeInput);
             await this.fill(this.serviceCodeInput, this.serviceCode);
 
-            if (await this.isVisible(this.discountPriceInput)) {
+            if (await this.isVisible(this.discountPriceInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.discountPriceInput, data.discountPrice);
             }
-            if (await this.isVisible(this.btwCostHrInput)) {
+            if (await this.isVisible(this.btwCostHrInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.btwCostHrInput, data.btwCostHr);
             }
-            if (await this.isVisible(this.onlineCostPerModuleInput)) {
+            if (await this.isVisible(this.onlineCostPerModuleInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.onlineCostPerModuleInput, data.onlineCostPerModule);
             }
 
@@ -122,22 +122,22 @@ export default class ServicesPackagesPage extends BasePage {
             await this.click(this.statusOptionActive);
 
             // Select Service Item / Product if visible
-            if (await this.isVisible(this.selectableServiceItem)) {
+            if (await this.isVisible(this.selectableServiceItem, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.selectableServiceItem);
             }
 
             // Select Location if visible
-            if (await this.isVisible(this.selectableLocation)) {
+            if (await this.isVisible(this.selectableLocation, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.selectableLocation);
             }
 
             // Select Add ON Services if visible
-            if (await this.isVisible(this.selectableAddOnServices)) {
+            if (await this.isVisible(this.selectableAddOnServices, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.selectableAddOnServices);
             }
 
             // Select Discount if visible
-            if (await this.isVisible(this.selectableDiscount)) {
+            if (await this.isVisible(this.selectableDiscount, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.selectableDiscount);
             }
 
@@ -149,16 +149,16 @@ export default class ServicesPackagesPage extends BasePage {
             // Select Purchase through portal as No
             await this.click(this.allowPurchaseThroughPortalNoRadioButton);
 
-            if (await this.isVisible(this.bypassClassSelectionYesRadioButton)) {
+            if (await this.isVisible(this.bypassClassSelectionYesRadioButton, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.bypassClassSelectionYesRadioButton);
             }
-            if (await this.isVisible(this.CDLRoadTrainingYesRadioButton)) {
+            if (await this.isVisible(this.CDLRoadTrainingYesRadioButton, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.CDLRoadTrainingYesRadioButton);
             }
-            if (await this.isVisible(this.CDLClassroomNoRadioButton)) {
+            if (await this.isVisible(this.CDLClassroomNoRadioButton, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.CDLClassroomNoRadioButton);
             }
-            if (await this.isVisible(this.serviceForCertificationYesRadioButton)) {
+            if (await this.isVisible(this.serviceForCertificationYesRadioButton, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.serviceForCertificationYesRadioButton);
             }
 
@@ -179,7 +179,7 @@ export default class ServicesPackagesPage extends BasePage {
             await this.fill(this.webDescriptionTextarea, webDescription);
             await this.fill(this.notesTextarea, notes);
             await this.fill(this.emailContentTextarea, emailContent);
-            if (await this.isVisible(this.emailContentTextarea2)) {
+            if (await this.isVisible(this.emailContentTextarea2, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.emailContentTextarea2, emailContent)
             }
 
@@ -205,7 +205,7 @@ export default class ServicesPackagesPage extends BasePage {
     async verifyServiceAddedSuccessfully() {
         await test.step('Verify "Service (Package) information updated successfully." message', async () => {
             const successMsg = this.page.getByText('Service (Package) information updated successfully.');
-            if (await this.isVisible(successMsg)) {
+            if (await this.isVisible(successMsg, { timeout: 3000 }).catch(() => false)) {
                 await this.verifyVisible(successMsg);
             }
 

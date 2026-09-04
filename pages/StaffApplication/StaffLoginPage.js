@@ -56,7 +56,8 @@ export default class StaffLoginPage extends BasePage {
         await this.page.addLocatorHandler(
             this.mobilePopUp,
             async () => {
-                await this.mobilePopupCloseButton.click();
+                await this.jsClick(this.mobilePopupCloseButton).catch(() => { });
+                await this.mobilePopUp.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => { });
             }
         );
     }

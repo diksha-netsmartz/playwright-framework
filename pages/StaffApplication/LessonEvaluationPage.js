@@ -1,5 +1,5 @@
 import BasePage from '../../utils/BasePage';
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Lesson Evaluation Page in Staff Portal.
@@ -23,8 +23,8 @@ export default class LessonEvaluationPage extends BasePage {
         this.privateNotesTxt = page.locator('#txtAreaPrivateLesson');
         this.studentSignatureCanvas = page.locator('#canvasStudentSignature');
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
-        this.completeLessonSendEmailBtn = page.getByRole('button', {name: 'Complete Lesson (Send Email)'});
-        this.completeLessonBtn = page.getByRole('button', {name: 'Complete Lesson'})
+        this.completeLessonSendEmailBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
+        this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson' })
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.questionsDropdowns = page.locator("(//div[contains(@id,'divEvalQuestionNumber')])[1]");
         this.successMessageDiv = page.locator('#GlobalErrorSuccessDiv');
@@ -36,12 +36,12 @@ export default class LessonEvaluationPage extends BasePage {
     async clickProcess() {
         await test.step('Click PROCESS button', async () => {
             await this.waitForLoaders();
-            await this.page.waitForTimeout(10000)
-            if (await this.isVisible(this.processBtn)) {
+            // await this.page.waitForTimeout(10000)
+            if (await this.isVisible(this.processBtn, { timeout: 10000 }).catch(() => false)) {
                 await this.click(this.processBtn);
                 await this.waitForHidden(this.processBtn);
                 await this.waitForLoaders();
-                await this.page.waitForLoadState('load', {timeout: 5000})
+                await this.page.waitForLoadState('load', { timeout: 5000 })
             }
         });
     }
@@ -50,7 +50,7 @@ export default class LessonEvaluationPage extends BasePage {
      * Opens the evaluation dropdown and selects the last evaluation type.
      **/
     async selectEvaluation() {
-        if (await this.isVisible(this.selectEvaluationBtn)) {
+        if (await this.isVisible(this.selectEvaluationBtn, { timeout: 5000 }).catch(() => false)) {
             await test.step('Select evaluation template from dropdown', async () => {
                 await this.click(this.selectEvaluationBtn);
                 await this.click(this.selectEvalutionDropdownValue);
@@ -67,7 +67,7 @@ export default class LessonEvaluationPage extends BasePage {
     async selectQuestionByText(questionNumber, optionText) {
         const dropdownBtn = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[@class='filter-option pull-left']`);
         const dropdownValue = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[text()='${optionText}']`);
-        if (await this.isVisible(dropdownBtn)) {
+        if (await this.isVisible(dropdownBtn, { timeout: 5000 }).catch(() => false)) {
             await this.click(dropdownBtn);
             await this.click(dropdownValue);
         }
@@ -106,7 +106,7 @@ export default class LessonEvaluationPage extends BasePage {
      * Selects the 15-minute travel time option.
      **/
     async selectTravelTime() {
-        if (await this.isVisible(this.travelTime)) {
+        if (await this.isVisible(this.travelTime, { timeout: 5000 }).catch(() => false)) {
             await test.step('Select 15 min travel time option', async () => {
                 await this.check(this.travelTime);
             });
@@ -146,7 +146,7 @@ export default class LessonEvaluationPage extends BasePage {
 
         await this.page.mouse.move(startX, startY);
         await this.page.mouse.down();
-        await this.page.mouse.move(endX, endY, {steps: 10});
+        await this.page.mouse.move(endX, endY, { steps: 10 });
         await this.page.mouse.up();
     }
 
@@ -173,9 +173,9 @@ export default class LessonEvaluationPage extends BasePage {
      **/
     async completeLesson() {
         await test.step('Click Complete Lesson button', async () => {
-            if (await this.isVisible(this.completeLessonSendEmailBtn)) {
+            if (await this.isVisible(this.completeLessonSendEmailBtn, { timeout: 3000 }).catch(() => false)) {
                 await this.click(this.completeLessonSendEmailBtn);
-            } else if (await this.isVisible(this.completeLessonBtn)) {
+            } else if (await this.isVisible(this.completeLessonBtn, { timeout: 3000 }).catch(() => false)) {
                 await this.click(this.completeLessonBtn);
             }
         });
@@ -196,8 +196,8 @@ export default class LessonEvaluationPage extends BasePage {
      **/
     async verifyLessonCompletedSuccessfully() {
         await test.step('Verify "Success! Lesson completed and evaluation saved." message', async () => {
-            await this.waitForVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', {exact: true}));
-            await this.verifyVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', {exact: true}));
+            await this.waitForVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', { exact: true }));
+            await this.verifyVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', { exact: true }));
         });
     }
 }

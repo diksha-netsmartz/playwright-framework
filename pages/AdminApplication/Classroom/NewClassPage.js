@@ -159,7 +159,7 @@ export default class NewClassPage extends BasePage {
      **/
     async selectLocation() {
 
-        if (await this.isVisible(this.locationDropdownBtn)) {
+        if (await this.isVisible(this.locationDropdownBtn, { timeout: 5000 }).catch(() => false)) {
             await test.step('Select Classroom Location', async () => {
                 await this.click(this.locationDropdownBtn);
                 await this.waitForVisible(this.locationOption);
@@ -295,19 +295,19 @@ export default class NewClassPage extends BasePage {
                 await this.click(this.confirmYesBtn);
                 // await this.waitForLoaders();
                 // await this.page.waitForTimeout(2000);
-                if (await this.isVisible(this.teacherRemovedMessage)) {
+                if (await this.isVisible(this.teacherRemovedMessage, { timeout: 2000 }).catch(() => false)) {
                     await this.waitForVisible(this.teacherRemovedMessage);
                     await this.verifyVisible(this.teacherRemovedMessage);
                 }
                 await this.page.waitForTimeout(2000);
-                if (await this.isVisible(this.teacherAvailableMessage)) {
+                if (await this.isVisible(this.teacherAvailableMessage, { timeout: 2000 }).catch(() => false)) {
                     await this.verifyVisible(this.teacherAvailableMessage);
                     await this.click(this.closeTeacherAvailableModal);
                     await this.waitForHidden(this.closeTeacherAvailableModal);
                 }
                 await this.waitForLoaders();
             }
-            else if (await this.isVisible(this.teacherAvailableMessage)) {
+            else if (await this.isVisible(this.teacherAvailableMessage, { timeout: 5000 }).catch(() => false)) {
                 await this.verifyVisible(this.teacherAvailableMessage);
                 await this.click(this.closeTeacherAvailableModal);
                 await this.waitForHidden(this.closeTeacherAvailableModal);

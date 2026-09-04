@@ -110,7 +110,7 @@ export default class StaffPage extends BasePage {
             await this.page.waitForTimeout(1000);
 
             // Click Save button on the crop modal if visible
-            if (await this.saveImageButton.isVisible().catch(() => false)) {
+            if (await this.saveImageButton.isVisible({ timeout: 5000 }).catch(() => false)) {
                 await this.click(this.saveImageButton);
                 await this.waitForLoaders();
                 await this.page.waitForTimeout(500);
@@ -210,10 +210,10 @@ export default class StaffPage extends BasePage {
             await this.fill(this.reEnterPasswordInput, this.password);
 
             // 13. Optional Checkboxes
-            if (await this.assignAppointmentColorCheckbox.isVisible().catch(() => false)) {
+            if (await this.assignAppointmentColorCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
                 await this.click(this.assignAppointmentColorCheckbox);
             }
-            if (await this.requireManualEnablingOfZoomButton.isVisible().catch(() => false)) {
+            if (await this.requireManualEnablingOfZoomButton.isVisible({ timeout: 5000 }).catch(() => false)) {
                 await this.click(this.requireManualEnablingOfZoomButton);
             }
 

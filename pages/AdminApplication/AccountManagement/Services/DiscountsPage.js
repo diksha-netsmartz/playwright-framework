@@ -83,10 +83,10 @@ export default class DiscountsPage extends BasePage {
             await this.waitForVisible(this.discountCodeInput);
             await this.fill(this.discountCodeInput, this.discountCode);
 
-            if (await this.isVisible(this.discountAmountInput)) {
+            if (await this.isVisible(this.discountAmountInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.discountAmountInput, discountAmount);
             }
-            else if (await this.isVisible(this.feeAmountInput)) {
+            else if (await this.isVisible(this.feeAmountInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.feeAmountInput, feeAmount);
             }
 
@@ -183,10 +183,10 @@ export default class DiscountsPage extends BasePage {
             // await this.waitForVisible(this.discountAmountInput);
             // await this.fill(this.discountAmountInput, updatedAmount);
 
-            if (await this.isVisible(this.discountAmountInput)) {
+            if (await this.isVisible(this.discountAmountInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.discountAmountInput, updatedAmount);
             }
-            else if (await this.isVisible(this.feeAmountInput)) {
+            else if (await this.isVisible(this.feeAmountInput, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.feeAmountInput, updatedAmount);
             }
 

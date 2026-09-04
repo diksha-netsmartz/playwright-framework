@@ -94,10 +94,10 @@ export default class NonGraphicalPage extends BasePage {
                 await this.page.waitForLoadState('load', { timeout: 5000 })
 
                 // Wait for the slots table to refresh after selecting the date
-                await this.page.waitForTimeout(5000);
+                // await this.page.waitForTimeout(5000);
 
-                const hasNoRecords = await this.isVisible(this.noRecordsFound);
-                const hasSlot = await this.isVisible(this.firstSlotCheckbox);
+                const hasNoRecords = await this.isVisible(this.noRecordsFound, { timeout: 5000 }).catch(() => false);
+                const hasSlot = await this.isVisible(this.firstSlotCheckbox, { timeout: 5000 }).catch(() => false);
 
                 if (hasSlot) {
                     console.log(`Found available slots on highlighted date #${i + 1}`);
@@ -179,47 +179,73 @@ export default class NonGraphicalPage extends BasePage {
     }
 
     /**
-     * Clicks the 'Schedule Student Into Slot(s)' button and confirms the action.
+     * Clicks the 'Schedule Student Into Slot(s)' button, confirms the action, and verifies success toast.
     **/
     async scheduleIntoSlot() {
         await test.step('Schedule student into slot and confirm', async () => {
             await this.click(this.scheduleIntoSlotButton);
+
+            // 1. Setup MutationObserver before confirming scheduling
+            const toastAppeared = this.page.evaluate((expectedText) => {
+                return new Promise((resolve) => {
+                    const getToast = () => {
+                        const matches = /scheduled successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
+                        if (!matches) return null;
+                        const el = document.querySelector('#toast-container .toast-message, .toast-message');
+                        return el && el.textContent ? el.textContent.trim() : expectedText;
+                    };
+                    const initial = getToast();
+                    if (initial) return resolve(initial);
+
+                    const observer = new MutationObserver(() => {
+                        const text = getToast();
+                        if (text) {
+                            observer.disconnect();
+                            resolve(text);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve('');
+                    }, 10000);
+                });
+            }, 'Appointment(s) scheduled successfully.').catch(() => '');
+
             await this.click(this.confirmYesButton);
-        });
-    }
 
-    /**
-     * Verifies that the toast success message 'Appointment(s) scheduled successfully.' is visible.
-     * If an error toast appears, extracts the error message and slot warning tooltip (data-original-title) and fails the test immediately.
-    **/
-    async verifyToastMessageSuccessful() {
-        await test.step('Verify "Appointment(s) scheduled successfully." message', async () => {
-            const toastLocator = this.page.locator('#toast-container .toast-message').last();
-            await this.waitForVisible(toastLocator);
+            // 2. Verify scheduling toast
+            const toastMessage = await toastAppeared;
+            console.log(`Captured toast message: "${toastMessage}"`);
 
-            const errorToast = this.page.locator('#toast-container .toast-error').last();
-            if (await this.isVisible(errorToast)) {
-                const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
-
-                const warningIcon = this.page.locator("xpath=(//i[@data-toggle='tooltip' and contains(@id,'ErrorOpenSlot')])[1]");
-                let tooltipError = '';
-                if (await warningIcon.count() > 0) {
-                    tooltipError = await warningIcon.getAttribute('data-original-title');
-                }
-
-                const detailedError = tooltipError ? `${errorMessage} (Reason: ${tooltipError})` : errorMessage;
-                console.log(`Scheduling failed with error toast: "${errorMessage}"`);
-                if (tooltipError) {
-                    console.log(`Error detail from data-original-title: "${tooltipError}"`);
-                }
-                throw new Error(`Scheduling failed with error: "${detailedError}"`);
-            } else {
-                const successToast = this.page.locator('#toast-container .toast-success .toast-message').last();
-                await this.verifyVisible(successToast);
-                await this.verifyText(successToast, 'Appointment(s) scheduled successfully.');
+            if (toastMessage) {
                 console.log('Appointment(s) scheduled successfully.');
+                await test.step('Toast message "Appointment(s) scheduled successfully." appeared', async () => { });
+            } else {
+                const errorToast = this.page.locator('#toast-container .toast-error').last();
+                if (await this.isVisible(errorToast).catch(() => false)) {
+                    const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
+                    const warningIcon = this.page.locator("xpath=(//i[@data-toggle='tooltip' and contains(@id,'ErrorOpenSlot')])[1]");
+                    let tooltipError = '';
+                    if (await warningIcon.count() > 0) {
+                        tooltipError = await warningIcon.getAttribute('data-original-title') || '';
+                    }
+                    const detailedError = tooltipError ? `${errorMessage} (Reason: ${tooltipError})` : errorMessage;
+                    console.log(`Scheduling failed with error toast: "${errorMessage}"`);
+                    if (tooltipError) {
+                        console.log(`Error detail from data-original-title: "${tooltipError}"`);
+                    }
+                    throw new Error(`Scheduling failed with error: "${detailedError}"`);
+                }
+
+                await test.step('Toast message "Appointment(s) scheduled successfully." did NOT appear', async () => {
+                    expect(toastMessage, 'Notification "Appointment(s) scheduled successfully." did not appear on page within 10 seconds').toBeTruthy();
+                });
             }
         });
     }
+
 }
 

@@ -112,7 +112,7 @@ export default class OnlineQuizTestsPage extends BasePage {
             await this.toggleSwitch('Final Exam');
 
             // Associate with Class Sessions if visible
-            if (await this.isVisible(this.associateWithClassSessionsInput)) {
+            if (await this.isVisible(this.associateWithClassSessionsInput, { timeout: 2000 }).catch(() => false)) {
                 await this.fill(this.associateWithClassSessionsInput, associateSessions);
             }
 
@@ -137,12 +137,12 @@ export default class OnlineQuizTestsPage extends BasePage {
             await this.toggleSwitch('Delay Next Attempts If Student Failed');
 
             // Select Product if selectable items are present
-            if (await this.isVisible(this.productSelectable)) {
+            if (await this.isVisible(this.productSelectable, { timeout: 5000 }).catch(() => false)) {
                 await this.click(this.productSelectable);
             }
 
             // Select CR Product if selectable items are present
-            if (await this.isVisible(this.crProductSelectable)) {
+            if (await this.isVisible(this.crProductSelectable, { timeout: 5000 }).catch(() => false)) {
                 await this.click(this.crProductSelectable);
             }
 
