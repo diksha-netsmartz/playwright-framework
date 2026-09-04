@@ -11,7 +11,11 @@
     "types": [
       "node",
       "@playwright/test"
-    ]
+    ],
+    "maxNodeModuleJsDepth": 0,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "useUnknownInCatchVariables": false
   },
   "include": [
     "fixtures/**/*.js",

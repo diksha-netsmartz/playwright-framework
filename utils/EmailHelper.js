@@ -5,7 +5,7 @@ import gmailAccount from '../test-data/json/gmailAccount.json';
 export default class EmailHelper {
     /**
      * Polls the inbox for the latest email received after a specified timestamp and extracts the Reset Password link.
-     * @param {string|object} options - Recipient email string OR options object { recipientEmail, subject, timeoutMs, sentAfter }
+     * @param {string|{recipientEmail?: string, subject?: string|string[], timeoutMs?: number, sentAfter?: number}|any} [options={}] - Recipient email string OR options object
      * @param {number} [timeoutMs=45000] - Max wait time in milliseconds
      * @returns {Promise<string>} The reset password URL
      */
@@ -127,7 +127,7 @@ export default class EmailHelper {
     /**
      * Marks all unread emails matching optional recipient and subject(s) as seen.
      * Supports passing a single subject string or an array of subjects.
-     * @param {object} [options={}] - Options { recipientEmail, subject }
+     * @param {{recipientEmail?: string, subject?: string|string[]}|any} [options={}] - Options { recipientEmail, subject }
      */
     static async markAllUnreadAsRead(options = {}) {
         const client = new ImapFlow({

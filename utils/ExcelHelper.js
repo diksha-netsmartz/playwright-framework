@@ -54,7 +54,7 @@ export default class ExcelHelper {
                 ? downloadOrPath
                 : await downloadOrPath.path();
 
-            if (!filePath || !fs.existsSync(filePath)) return '';
+            if (!filePath || !fs.existsSync(filePath)) return [];
 
             const buffer = fs.readFileSync(filePath);
 
@@ -307,7 +307,7 @@ export default class ExcelHelper {
 
         // Attach downloaded Excel file
         try {
-            const fileName = options.fileName || (typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'ExportReport.xlsx');
+            const fileName = options.fileName || (typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'ExportReport.xlsx');
             const filePath = typeof download === 'string' ? download : await download.path();
             if (filePath) {
                 await test.info().attach(fileName, {
@@ -417,7 +417,7 @@ export default class ExcelHelper {
         expect(content.length, 'Downloaded Excel file should not be empty').toBeGreaterThan(0);
 
         const rows = await this.readRows(download);
-        const fileName = options.fileName || (typeof download.suggestedFilename === 'function' ? download.suggestedFilename() : 'Report.xlsx');
+        const fileName = options.fileName || (typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'Report.xlsx');
         const expectedSheetName = options.expectedSheetName || '';
 
         // Auto-detect header row index
@@ -562,9 +562,10 @@ export default class ExcelHelper {
      * Parses raw files inside XLSX ZIP buffer using Central Directory and Local Headers.
      * Handles both Windows backslashes and Unix forward slashes.
      * @param {Buffer} buffer - Raw XLSX ZIP buffer.
-     * @returns {Object<string, string>} Map of extracted normalized file path to UTF-8 XML string.
+     * @returns {Record<string, string>} Map of extracted normalized file path to UTF-8 XML string.
      */
     static extractZipEntries(buffer) {
+        /** @type {Record<string, string>} */
         const entries = {};
 
         // 1. Try Central Directory first (most accurate for streamed / standard ZIPs)

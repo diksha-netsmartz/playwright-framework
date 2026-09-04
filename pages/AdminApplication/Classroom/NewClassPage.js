@@ -358,7 +358,7 @@ export default class NewClassPage extends BasePage {
      * Classroom ID is randomly generated automatically if not provided.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createMultiSessionClassroom(classData = {}, instructorName) {
+    async createMultiSessionClassroom(classData = {}, instructorName = '') {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Multi Session Class');
         await this.selectClassroomService();
@@ -382,7 +382,7 @@ export default class NewClassPage extends BasePage {
      * Classroom ID is randomly generated automatically if not provided.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createSingleSessionClassroom(classData = {}, instructorName) {
+    async createSingleSessionClassroom(classData = {}, instructorName = '') {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Single Session Class');
         await this.selectClassroomService();

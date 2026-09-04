@@ -94,9 +94,9 @@
       "password": "Session@123"
     },
     "classroomInstructor": {
-      "name": "automation_instructor_donotuse",
-      "username": "automation_instructor_donotuse",
-      "password": "Session@123"
+      "name": "dsstestsep4inst",
+      "username": "dsstestsep4inst",
+      "password": "Staffing@*123321"
     }
   },
   "coredev": {

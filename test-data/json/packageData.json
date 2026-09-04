@@ -9,7 +9,7 @@
     "btwAndCrPackage": "BTW AND CR Package",
     "crPackage": "CR + Additional CR package",
     "rtPackage": "WA RT Package",
-    "btwPackage": "BTW package"
+    "btwPackage": "ABTestBTWServ"
   },
   "staging": {
     "btwAndCrPackage": "BTW and CR Package",

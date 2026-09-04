@@ -37,12 +37,10 @@ const cmd = isWindows ? 'npx.cmd' : 'npx';
 try {
     if (isWindows) {
         execSync('powershell -Command "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -match \'allure.*open\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"', {
-            shell: true,
             stdio: 'ignore'
         });
     } else {
         execSync('pkill -f "allure.*open" || true', {
-            shell: true,
             stdio: 'ignore'
         });
     }
