@@ -19,10 +19,13 @@ export default class ClassroomAttendancePage extends BasePage {
         this.selectedAttendanceAction = null;
         this.beforeCheckedCount = 0;
 
-        // Session selection
+        // Session selection & Pagination
         this.sessionRadioBtn = page.locator('.radioinner').first();
         this.sessionRadioBtns = page.locator('.radioinner');
         this.noRecordMessage = page.getByText('No record exists.', { exact: true });
+        this.sessionsPagination = page.locator("#attendanceTakenDta_wrapper ul.pagination").first();
+        this.sessionsNextPageBtn = page.locator("//div[@id='attendanceTakenDta_wrapper']//ul[contains(@class,'pagination')]//li[contains(@class,'next') and not(contains(@class,'disabled'))]//a").first();
+        this.sessionsActivePage = page.locator("//div[@id='attendanceTakenDta_wrapper']//ul[contains(@class,'pagination')]//li[contains(@class,'active')]//a").first();
 
         // Student search & addition
         // this.searchStudentInput = page.getByRole('textbox', { name: 'Search Student' });
@@ -65,29 +68,68 @@ export default class ClassroomAttendancePage extends BasePage {
 
 
     /**
-     * Selects a session radio button. If 'No record exists.' appears, clicks next sessions until records are found.
+     * Selects a session radio button. If 'No record exists.' appears, checks all sessions
+     * on the current page and navigates through all pagination pages until records are found.
      **/
     async selectSession() {
         return await test.step('Select a classroom session with student records', async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load');
             await this.waitForVisible(this.sessionRadioBtns.first());
-            const count = await this.sessionRadioBtns.count();
-            console.log(`Found ${count} sessions.`);
-            for (let i = 0; i < count; i++) {
-                const sessionRadio = this.sessionRadioBtns.nth(i);
-                await this.click(sessionRadio);
+
+            const studentRowOrNoRecord = this.page.locator("//span[@class='checkstudentp1'] | //span[@class='checkstudenta1'] | //*[text()='No record exists.']");
+
+            let pageNum = 1;
+            while (true) {
                 await this.waitForLoaders();
-                await this.page.waitForLoadState('load');
-                await this.page.waitForTimeout(5000);
-                const isNoRecord = await this.noRecordMessage.isVisible({ timeout: 5000 }).catch(() => false);
-                if (!isNoRecord) {
-                    console.log(`Selected session #${i + 1} which has student records.`);
-                    return;
+                await this.waitForVisible(this.sessionRadioBtns.first());
+                const count = await this.sessionRadioBtns.count();
+                console.log(`[Classroom Attendance] Page ${pageNum}: Found ${count} sessions.`);
+
+                for (let i = 0; i < count; i++) {
+                    const sessionRadio = this.sessionRadioBtns.nth(i);
+                    await this.click(sessionRadio);
+                    await this.page.waitForTimeout(1000);
+                    await this.waitForLoaders();
+
+                    // Wait for student rows or 'No record exists.' message to appear
+                    await this.waitForVisible(studentRowOrNoRecord.first(), { timeout: 5000 }).catch(() => false);
+
+                    const isNoRecord = await this.noRecordMessage.isVisible().catch(() => false);
+                    if (!isNoRecord) {
+                        const hasStudents = await this.page.locator("//span[@class='checkstudentp1'] | //span[@class='checkstudenta1']").first().isVisible().catch(() => false);
+                        if (hasStudents) {
+                            console.log(`Selected session #${i + 1} on page ${pageNum} which has student records.`);
+                            return;
+                        }
+                    }
+                    console.log(`Session #${i + 1} on page ${pageNum} has 'No record exists.'. Trying next session...`);
                 }
-                console.log(`Session #${i + 1} has 'No record exists.'. Trying next session...`);
+
+                // If all sessions on current page have no records, check if next page is available
+                const isNextAvailable = await this.sessionsNextPageBtn.isVisible().catch(() => false);
+                console.log(`[Classroom Attendance] Checking next page availability: ${isNextAvailable}`);
+                if (isNextAvailable) {
+                    const currentActiveText = await this.sessionsActivePage.textContent().catch(() => String(pageNum));
+                    pageNum++;
+                    console.log(`Navigating to page ${pageNum} of classroom sessions...`);
+                    try {
+                        await this.click(this.sessionsNextPageBtn);
+                    } catch {
+                        await this.jsClick(this.sessionsNextPageBtn);
+                    }
+                    await this.waitForLoaders();
+                    if (currentActiveText) {
+                        await expect(this.sessionsActivePage).not.toHaveText(currentActiveText, { timeout: 7000 }).catch(() => { });
+                    }
+                    await this.waitForLoaders();
+                    await this.page.waitForTimeout(1000);
+                } else {
+                    break;
+                }
             }
-            throw new Error('No session with student records found.');
+
+            throw new Error('No session with student records found across all pages.');
         });
     }
 
