@@ -19,14 +19,17 @@ export default class LessonEvaluationPage extends BasePage {
         this.selectEvaluationBtn = page.locator("xpath=//button[@title='Select Evaluation']");
         this.selectEvalutionDropdownValue = page.locator("xpath=(//button[@title='Select Evaluation']//parent::div//li)[last()]");
         this.travelTime = page.locator("xpath=//input[@name='travel' and @value='15']//following-sibling::ins");
-        this.publicNotesTxt = page.locator('#txtAreaLessonNotes');
-        this.privateNotesTxt = page.locator('#txtAreaPrivateLesson');
-        this.studentSignatureCanvas = page.locator('#canvasStudentSignature');
-        this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature');
+        this.publicNotesTxt = page.locator("//textarea[contains(@id,'txtPublicLessonNotes') or @id='txtAreaLessonNotes']");
+        this.privateNotesTxt = page.locator("//textarea[contains(@id,'txtAreaPrivateLesson')]");
+        this.studentSignatureCanvas = page.locator("(//canvas[contains(@id,'canvasStudentSignature')])[1]");
+        this.instructorSignatureCanvas = page.locator("(//canvas[contains(@id,'canvasInstructorSignature')])[1]");
         this.completeLessonSendEmailBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
         this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson' })
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.questionsDropdowns = page.locator("(//div[contains(@id,'divEvalQuestionNumber')])[1]");
+        this.questionCheckboxes = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//input[@type='checkbox']//following-sibling::ins");
+        this.durationBtn = page.locator("xpath=(//button[@title='Duration'])[1]");
+        this.durationOption = page.locator("xpath=((//button[@title='Duration'])[1]//parent::div//li//a//span[1][not(text()='Duration')])[1]");
         this.successMessageDiv = page.locator('#GlobalErrorSuccessDiv');
     }
 
@@ -50,7 +53,7 @@ export default class LessonEvaluationPage extends BasePage {
      * Opens the evaluation dropdown and selects the last evaluation type.
      **/
     async selectEvaluation() {
-        if (await this.isVisible(this.selectEvaluationBtn, { timeout: 5000 }).catch(() => false)) {
+        if (await this.isVisible(this.selectEvaluationBtn, { timeout: 2000 }).catch(() => false)) {
             await test.step('Select evaluation template from dropdown', async () => {
                 await this.click(this.selectEvaluationBtn);
                 await this.click(this.selectEvalutionDropdownValue);
@@ -67,46 +70,60 @@ export default class LessonEvaluationPage extends BasePage {
     async selectQuestionByText(questionNumber, optionText) {
         const dropdownBtn = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[@class='filter-option pull-left']`);
         const dropdownValue = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[text()='${optionText}']`);
-        if (await this.isVisible(dropdownBtn, { timeout: 5000 }).catch(() => false)) {
-            await this.click(dropdownBtn);
-            await this.click(dropdownValue);
-        }
+        // if (await this.isVisible(dropdownBtn, { timeout: 500 }).catch(() => false)) {
+        await this.click(dropdownBtn);
+        await this.click(dropdownValue);
+        // }
     }
 
     /**
      * Fills out answers for all evaluation questions (Q1 through Q20) with predefined rubric ratings.
      **/
     async answerAllEvaluationQuestions() {
-        await test.step('Answer all evaluation questions (Q1 - Q20)', async () => {
-            await this.selectQuestionByText(1, '0-Safety Risk');         // Q1
-            await this.selectQuestionByText(2, '1-Improvement Needed');  // Q2
-            await this.selectQuestionByText(3, '0-Safety Risk');         // Q3
-            await this.selectQuestionByText(4, '1-Improvement Needed');  // Q4
-            await this.selectQuestionByText(5, '1-Improvement Needed');  // Q5
-            await this.selectQuestionByText(6, '2-Beginning');           // Q6
-            await this.selectQuestionByText(7, '4-Competent');           // Q7
-            await this.selectQuestionByText(8, '5-Exemplary');           // Q8
-            await this.selectQuestionByText(9, '5-Exemplary');           // Q9
-            await this.selectQuestionByText(10, '4-Competent');          // Q10
-            await this.selectQuestionByText(11, '2-Beginning');          // Q11
-            await this.selectQuestionByText(12, '3-Progressing');        // Q12
-            await this.selectQuestionByText(13, '2-Beginning');          // Q13
-            await this.selectQuestionByText(14, '3-Progressing');
-            await this.selectQuestionByText(15, '3-Progressing');        // Q14
-            await this.selectQuestionByText(16, '0-Safety Risk');        // Q16
-            await this.selectQuestionByText(17, '3-Progressing');        // Q17
-            await this.selectQuestionByText(18, '2-Beginning');          // Q18
-            await this.selectQuestionByText(19, '4-Competent');          // Q19
-            await this.selectQuestionByText(20, '1-Improvement Needed'); // Q20
+        if (await this.isVisible(this.page.locator("(//div[contains(@id,'divEvalQuestionNumber')]//span[@class='filter-option pull-left'])[1]"), { timeout: 2000 }).catch(() => false)) {
+            await test.step('Answer all evaluation questions (Q1 - Q20)', async () => {
+                await this.selectQuestionByText(1, '0-Safety Risk');         // Q1
+                await this.selectQuestionByText(2, '1-Improvement Needed');  // Q2
+                await this.selectQuestionByText(3, '0-Safety Risk');         // Q3
+                await this.selectQuestionByText(4, '1-Improvement Needed');  // Q4
+                await this.selectQuestionByText(5, '1-Improvement Needed');  // Q5
+                await this.selectQuestionByText(6, '2-Beginning');           // Q6
+                await this.selectQuestionByText(7, '4-Competent');           // Q7
+                await this.selectQuestionByText(8, '5-Exemplary');           // Q8
+                await this.selectQuestionByText(9, '5-Exemplary');           // Q9
+                await this.selectQuestionByText(10, '4-Competent');          // Q10
+                await this.selectQuestionByText(11, '2-Beginning');          // Q11
+                await this.selectQuestionByText(12, '3-Progressing');        // Q12
+                await this.selectQuestionByText(13, '2-Beginning');          // Q13
+                await this.selectQuestionByText(14, '3-Progressing');
+                await this.selectQuestionByText(15, '3-Progressing');        // Q14
+                await this.selectQuestionByText(16, '0-Safety Risk');        // Q16
+                await this.selectQuestionByText(17, '3-Progressing');        // Q17
+                await this.selectQuestionByText(18, '2-Beginning');          // Q18
+                await this.selectQuestionByText(19, '4-Competent');          // Q19
+                await this.selectQuestionByText(20, '1-Improvement Needed'); // Q20
 
-        });
+            });
+        }
+        else if (await this.isVisible(this.questionCheckboxes.first(), { timeout: 2500 }).catch(() => false)) {
+            await test.step('Check all evaluation question checkboxes and select duration', async () => {
+                const count = await this.questionCheckboxes.count();
+                for (let i = 0; i < count; i++) {
+                    await this.click(this.questionCheckboxes.nth(i));
+                    await this.waitForVisible(this.durationBtn);
+                    await this.click(this.durationBtn);
+                    await this.click(this.durationOption);
+                }
+            });
+        }
+
     }
 
     /**
      * Selects the 15-minute travel time option.
      **/
     async selectTravelTime() {
-        if (await this.isVisible(this.travelTime, { timeout: 5000 }).catch(() => false)) {
+        if (await this.isVisible(this.travelTime, { timeout: 2000 }).catch(() => false)) {
             await test.step('Select 15 min travel time option', async () => {
                 await this.check(this.travelTime);
             });
@@ -118,18 +135,22 @@ export default class LessonEvaluationPage extends BasePage {
      * Enters public notes visible to student and parents in the evaluation form.
      **/
     async enterPublicNotes() {
+        // if (await this.isVisible(this.publicNotesTxt, { timeout: 2000 }).catch(() => false)) {
         await test.step('Enter public notes', async () => {
             await this.fill(this.publicNotesTxt, 'public notes');
         });
+        // }
     }
 
     /**
      * Enters private staff-only notes in the evaluation form.
      **/
     async enterPrivateNotes() {
+        // if (await this.isVisible(this.privateNotesTxt, { timeout: 2000 }).catch(() => false)) {
         await test.step('Enter private notes', async () => {
             await this.fill(this.privateNotesTxt, 'private notes');
         });
+        // }
     }
 
     /**
@@ -173,9 +194,9 @@ export default class LessonEvaluationPage extends BasePage {
      **/
     async completeLesson() {
         await test.step('Click Complete Lesson button', async () => {
-            if (await this.isVisible(this.completeLessonSendEmailBtn, { timeout: 3000 }).catch(() => false)) {
+            if (await this.isVisible(this.completeLessonSendEmailBtn, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.completeLessonSendEmailBtn);
-            } else if (await this.isVisible(this.completeLessonBtn, { timeout: 3000 }).catch(() => false)) {
+            } else if (await this.isVisible(this.completeLessonBtn, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.completeLessonBtn);
             }
         });
@@ -192,12 +213,13 @@ export default class LessonEvaluationPage extends BasePage {
     }
 
     /**
-     * Verifies that the success alert 'Success! Lesson completed and evaluation saved.' is visible.
+     * Verifies that the success alert message is visible (either template).
      **/
     async verifyLessonCompletedSuccessfully() {
-        await test.step('Verify "Success! Lesson completed and evaluation saved." message', async () => {
-            await this.waitForVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', { exact: true }));
-            await this.verifyVisible(this.page.getByText('Success! Lesson completed and evaluation saved.', { exact: true }));
+        await test.step('Verify lesson completed success message', async () => {
+            const successMessage = this.page.getByText(/Success! Lesson completed and evaluation saved|Student evaluation saved successfully and lesson marked as Completed/i).first();
+            await this.waitForVisible(successMessage);
+            await this.verifyVisible(successMessage);
         });
     }
 }
