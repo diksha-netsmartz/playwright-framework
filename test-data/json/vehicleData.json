@@ -1,0 +1,16 @@
+{
+  "vehicleNamePrefix": "Vehicle",
+  "description": "Vehicle_Description",
+  "vehicleMake": "Toyota",
+  "licensePlatePrefix": "LP",
+  "vinPrefix": "VIN",
+  "odometerValue": "1500",
+  "initialMileage": "900",
+  "notes": "Automated Vehicle Note",
+  "imageName": "vehicle.png",
+  "updatedNotes": "Updated Automated Vehicle Note",
+  "updatedInitialMileage": "950",
+  "updatedVin": "VIN12345",
+  "updatedLicensePlate": "LP12345",
+  "updatedOdometerValue": "1550"
+}
