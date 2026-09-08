@@ -1,0 +1,17 @@
+{
+  "firstNamePrefix": "Lead",
+  "middleName": "Auto",
+  "lastName": "Test",
+  "address": "123 Test Street",
+  "city": "Los Angeles",
+  "zipCode": "90001",
+  "email": "lead@gmail.com",
+  "studentType": "ADULT",
+  "homePhone": "5551234567",
+  "cellPhone": "5559876543",
+  "parentPhone": "5554561234",
+  "otherPhone": "5557894560",
+  "medicalConditions": "None",
+  "studentNotes": "Add Lead Test",
+  "preferredDateandTime": "05/09/2026"
+}
