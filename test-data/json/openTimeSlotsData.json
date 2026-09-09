@@ -1,0 +1,12 @@
+{
+  "appointmentType": "Combined Appointment (Driver and Observer)",
+  "staff": "111 1",
+  "location": "Location A",
+  "vehicle": "Vehicle E",
+  "puLocation": "PU Location",
+  "service": "Test 1",
+  "instruction": "Instructions1",
+  "durationHours": "1",
+  "durationMinutes": "60",
+  "startTime": "8:30 AM"
+}
