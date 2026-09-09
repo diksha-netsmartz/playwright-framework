@@ -279,6 +279,14 @@ export default class BasePage {
     }
 
     /**
+ * Asserts that the page URL matches the expected URL.
+ * @param {string|RegExp} text - Expected text in page URL.
+ */
+    async verifyURLContainsText(text) {
+        await expect(this.page.url()).toContain(text)
+    }
+
+    /**
      * Gets current page title.
      * @returns {Promise<string>} Page title.
      */

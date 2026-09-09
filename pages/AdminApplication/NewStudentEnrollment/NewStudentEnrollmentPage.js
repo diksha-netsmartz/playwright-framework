@@ -386,7 +386,9 @@ export default class NewStudentEnrollmentPage extends BasePage {
             await this.click(this.permitExpirationDateCalendarIcon);
             await this.click(this.permitExpireDateSelectInCalendar);
             await this.fill(this.medicalConditions, data.medicalConditions);
-            await this.fill(this.studentNotes, data.studentNotes);
+            if (await this.isVisible(this.studentNotes, { timeout: 1000 }).catch(() => false)) {
+                await this.fill(this.studentNotes, data.studentNotes);
+            }
             if (await this.isVisible(this.studentDrivingNotes, { timeout: 1000 }).catch(() => false)) {
                 await this.fill(this.studentDrivingNotes, data.studentDrivingNotes || data.drivingNotes);
             }

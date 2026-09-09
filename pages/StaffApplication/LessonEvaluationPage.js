@@ -26,7 +26,7 @@ export default class LessonEvaluationPage extends BasePage {
         this.completeLessonSendEmailBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
         this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson' })
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
-        this.questionsDropdowns = page.locator("(//div[contains(@id,'divEvalQuestionNumber')])[1]");
+        this.questionsDropdowns = page.locator("//button[@title='Select']");
         this.questionCheckboxes = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//input[@type='checkbox']//following-sibling::ins");
         this.durationBtn = page.locator("xpath=(//button[@title='Duration'])[1]");
         this.durationOption = page.locator("xpath=((//button[@title='Duration'])[1]//parent::div//li//a//span[1][not(text()='Duration')])[1]");
@@ -80,7 +80,7 @@ export default class LessonEvaluationPage extends BasePage {
      * Fills out answers for all evaluation questions (Q1 through Q20) with predefined rubric ratings.
      **/
     async answerAllEvaluationQuestions() {
-        if (await this.isVisible(this.page.locator("(//div[contains(@id,'divEvalQuestionNumber')]//span[@class='filter-option pull-left'])[1]"), { timeout: 2000 }).catch(() => false)) {
+        if (await this.isVisible(this.page.locator("(//div[contains(@id,'divEvalQuestionNumber1')]//span[@class='filter-option pull-left'])[1]"), { timeout: 2000 }).catch(() => false)) {
             await test.step('Answer all evaluation questions (Q1 - Q20)', async () => {
                 await this.selectQuestionByText(1, '0-Safety Risk');         // Q1
                 await this.selectQuestionByText(2, '1-Improvement Needed');  // Q2
