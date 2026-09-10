@@ -210,7 +210,7 @@ Run only smoke-tagged tests across modules without needing separate folders:
 
 ## ☁️ Running Tests via GitHub Actions (CI/CD)
 
-The framework includes an on-demand workflow ([`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)) with **4-shard parallel matrix execution** that runs tests in headless **1920x1080 desktop resolution** across 4 independent GitHub cloud runners concurrently, cutting execution time from ~40 minutes down to ~8–10 minutes, and delivers a unified Allure execution report via email.
+The framework includes an on-demand workflow ([`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)) that runs tests in headless **1920x1080 desktop resolution** on GitHub's cloud runners and sends an automated Allure execution report via email.
 
 ### How to Trigger a Run on GitHub:
 1. Open the repository on GitHub in your browser.
@@ -218,7 +218,7 @@ The framework includes an on-demand workflow ([`.github/workflows/playwright.yml
 3. In the left sidebar under *Workflows*, select **`Playwright Tests (Main)`**.
 4. Click the **"Run workflow"** button on the right.
 5. Configure your execution options:
-   - **Branch:** Select `main` (or your active feature branch).
+   - **Branch:** Select `main`.
    - **Environment:** Select the target environment (`coreServer2` [default], `coreServer1`, `uat`, or `staging`).
    - **Tag or pattern to filter tests (`grep`):** 
      - Leave blank to run all tests.
@@ -229,14 +229,19 @@ The framework includes an on-demand workflow ([`.github/workflows/playwright.yml
 6. Click the green **"Run workflow"** button to start execution.
 
 ### What Happens After Execution:
-- Tests are split evenly across **4 parallel runner machines** (Shards 1/4, 2/4, 3/4, 4/4) running simultaneously.
-- A downstream job automatically downloads and merges all 4 shard results into a single consolidated Allure report.
-- The combined Allure results and report are preserved in GitHub Actions Artifacts.
-- An automated email notification is sent to the specified recipients containing:
+- The entire run executes in the cloud without using your local machine resources.
+- Playwright HTML and Allure results are uploaded as build artifacts.
+- An email notification is sent to the specified recipients containing:
   - Status summary badge (**PASSED** / **FAILED**).
-  - Consolidated test count breakdown table (**Total**, **Passed**, **Failed**, **Skipped** across all shards).
+  - Test count breakdown table (**Total**, **Passed**, **Failed**, **Skipped**).
   - Direct link to the GitHub Actions Run and Artifacts.
-  - Attached **`Allure-Report.zip`** (extract and double-click `index.html` to view the full interactive Allure dashboard).
+  - Attached **`Allure-Report.zip`** (extract and double-click `index.html` to view the interactive Allure report).
+
+### 🌅 Daily Scheduled Regression (Server 2 & Server 1):
+A dedicated scheduled workflow ([`.github/workflows/daily-servers.yml`](.github/workflows/daily-servers.yml)) runs automatically every morning at **6:00 AM IST (00:30 UTC)**:
+1. Executes all tests on **`coreServer2`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+2. Once finished, executes all tests on **`coreServer1`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+3. Can also be triggered manually on demand via **Actions** $\rightarrow$ **`Daily Regression (Server 2 & 1)`** $\rightarrow$ **"Run workflow"**.
 
 ---
 
