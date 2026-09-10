@@ -7,100 +7,100 @@ const nodemailer = require('nodemailer');
  * Parses test results from 'allure-results' folder to produce summary stats.
  */
 function getTestSummary(allureResultsDir) {
-    let passed = 0;
-    let failed = 0;
-    let broken = 0;
-    let skipped = 0;
-    let total = 0;
+  let passed = 0;
+  let failed = 0;
+  let broken = 0;
+  let skipped = 0;
+  let total = 0;
 
-    if (fs.existsSync(allureResultsDir)) {
-        const files = fs.readdirSync(allureResultsDir);
-        for (const file of files) {
-            if (file.endsWith('-result.json')) {
-                try {
-                    const data = JSON.parse(fs.readFileSync(path.join(allureResultsDir, file), 'utf8'));
-                    total++;
-                    if (data.status === 'passed') passed++;
-                    else if (data.status === 'failed') failed++;
-                    else if (data.status === 'broken') broken++;
-                    else if (data.status === 'skipped') skipped++;
-                    else passed++;
-                } catch (_) {
-                    // Ignore malformed individual JSON
-                }
-            }
+  if (fs.existsSync(allureResultsDir)) {
+    const files = fs.readdirSync(allureResultsDir);
+    for (const file of files) {
+      if (file.endsWith('-result.json')) {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(allureResultsDir, file), 'utf8'));
+          total++;
+          if (data.status === 'passed') passed++;
+          else if (data.status === 'failed') failed++;
+          else if (data.status === 'broken') broken++;
+          else if (data.status === 'skipped') skipped++;
+          else passed++;
+        } catch (_) {
+          // Ignore malformed individual JSON
         }
+      }
     }
-    return { total, passed, failed, broken, skipped };
+  }
+  return { total, passed, failed, broken, skipped };
 }
 
 async function sendEmail() {
-    const rootDir = path.resolve(__dirname, '..');
-    const allureResultsDir = path.join(rootDir, 'allure-results');
-    const singleReportDir = path.join(rootDir, 'allure-single-report');
-    const zipPath = path.join(rootDir, 'Allure-Report.zip');
+  const rootDir = path.resolve(__dirname, '..');
+  const allureResultsDir = path.join(rootDir, 'allure-results');
+  const singleReportDir = path.join(rootDir, 'allure-single-report');
+  const zipPath = path.join(rootDir, 'Allure-Report.zip');
 
-    const jobStatus = (process.env.JOB_STATUS || 'success').toLowerCase();
-    const isSuccess = jobStatus === 'success';
-    const envName = process.env.ENV || 'coreServer2';
-    const repo = process.env.GITHUB_REPOSITORY || '';
-    const runId = process.env.GITHUB_RUN_ID || '';
-    const runUrl = repo && runId ? `https://github.com/${repo}/actions/runs/${runId}` : '';
+  const jobStatus = (process.env.JOB_STATUS || 'success').toLowerCase();
+  const isSuccess = jobStatus === 'success';
+  const envName = process.env.ENV || 'coreServer2';
+  const repo = process.env.GITHUB_REPOSITORY || '';
+  const runId = process.env.GITHUB_RUN_ID || '';
+  const runUrl = repo && runId ? `https://github.com/${repo}/actions/runs/${runId}` : '';
 
-    const summary = getTestSummary(allureResultsDir);
+  const summary = getTestSummary(allureResultsDir);
 
-    console.log('[Email] Generating Allure single-file report...');
-    let zipExists = false;
-    try {
-        if (fs.existsSync(allureResultsDir)) {
-            // Generate self-contained single-file HTML report (no standalone .js files, avoids Gmail 552 security block)
-            execSync(`npx allure generate --single-file "${allureResultsDir}" --clean -o "${singleReportDir}"`, {
-                cwd: rootDir,
-                stdio: 'inherit'
-            });
+  console.log('[Email] Generating Allure single-file report...');
+  let zipExists = false;
+  try {
+    if (fs.existsSync(allureResultsDir)) {
+      // Generate self-contained single-file HTML report (no standalone .js files, avoids Gmail 552 security block)
+      execSync(`npx allure generate --single-file "${allureResultsDir}" --clean -o "${singleReportDir}"`, {
+        cwd: rootDir,
+        stdio: 'inherit'
+      });
 
-            const indexHtml = path.join(singleReportDir, 'index.html');
-            if (fs.existsSync(indexHtml)) {
-                // Compress single index.html into zip
-                if (process.platform === 'win32') {
-                    execSync(`powershell -Command "Compress-Archive -Path '${indexHtml}' -DestinationPath '${zipPath}' -Force"`, {
-                        cwd: rootDir,
-                        stdio: 'inherit'
-                    });
-                } else {
-                    execSync(`cd "${singleReportDir}" && zip -r "${zipPath}" index.html`, {
-                        cwd: rootDir,
-                        stdio: 'inherit'
-                    });
-                }
-                zipExists = fs.existsSync(zipPath);
-                console.log(`[Email] Allure-Report.zip created (${(fs.statSync(zipPath).size / 1024 / 1024).toFixed(2)} MB).`);
-            }
+      const indexHtml = path.join(singleReportDir, 'index.html');
+      if (fs.existsSync(indexHtml)) {
+        // Compress single index.html into zip
+        if (process.platform === 'win32') {
+          execSync(`powershell -Command "Compress-Archive -Path '${indexHtml}' -DestinationPath '${zipPath}' -Force"`, {
+            cwd: rootDir,
+            stdio: 'inherit'
+          });
+        } else {
+          execSync(`cd "${singleReportDir}" && zip -r "${zipPath}" index.html`, {
+            cwd: rootDir,
+            stdio: 'inherit'
+          });
         }
-    } catch (err) {
-        console.warn('[Email] Warning: Could not generate Allure single-file report zip:', err.message);
+        zipExists = fs.existsSync(zipPath);
+        console.log(`[Email] Allure-Report.zip created (${(fs.statSync(zipPath).size / 1024 / 1024).toFixed(2)} MB).`);
+      }
     }
+  } catch (err) {
+    console.warn('[Email] Warning: Could not generate Allure single-file report zip:', err.message);
+  }
 
-    const emailUser = process.env.EMAIL_USERNAME || 'testingdata3011@gmail.com';
-    const emailPass = process.env.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj';
-    const rawRecipients = (process.env.EMAIL_TO || '').trim();
-    const emailTo = rawRecipients.length > 0 ? rawRecipients : 'diksha.gupta@netsmartz.com';
+  const emailUser = process.env.EMAIL_USERNAME || 'testingdata3011@gmail.com';
+  const emailPass = process.env.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj';
+  const rawRecipients = (process.env.EMAIL_TO || '').trim();
+  const emailTo = rawRecipients.length > 0 ? rawRecipients : 'diksha.gupta@netsmartz.com';
 
 
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-            user: emailUser,
-            pass: emailPass
-        }
-    });
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: emailUser,
+      pass: emailPass
+    }
+  });
 
-    const statusBadgeColor = isSuccess ? '#28a745' : '#dc3545';
-    const statusText = isSuccess ? 'PASSED' : 'FAILED';
+  const statusBadgeColor = isSuccess ? '#28a745' : '#dc3545';
+  const statusText = isSuccess ? 'PASSED' : 'FAILED';
 
-    const htmlBody = `
+  const htmlBody = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -172,37 +172,37 @@ async function sendEmail() {
     </html>
     `;
 
-    const attachments = [];
-    if (zipExists) {
-        attachments.push({
-            filename: 'Allure-Report.zip',
-            path: zipPath
-        });
-    }
+  const attachments = [];
+  if (zipExists) {
+    attachments.push({
+      filename: 'Allure-Report.zip',
+      path: zipPath
+    });
+  }
 
-    console.log(`[Email] Sending execution notification to: ${emailTo}`);
-    const mailOptions = {
-        from: `"Playwright Automation" <${emailUser}>`,
-        to: emailTo,
-        subject: `Playwright Test Run [${statusText}]: ${envName}`,
-        html: htmlBody,
-        attachments: attachments
-    };
+  console.log(`[Email] Sending execution notification to: ${emailTo}`);
+  const mailOptions = {
+    from: `"Playwright Automation" <${emailUser}>`,
+    to: emailTo,
+    subject: `DSS Playwright Test Run [${statusText}]: ${envName}`,
+    html: htmlBody,
+    attachments: attachments
+  };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`[Email] Notification successfully sent! Message ID: ${info.messageId}`);
-    } catch (error) {
-        console.error('[Email] Error sending email via SMTP:', error);
-        throw error;
-    }
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Email] Notification successfully sent! Message ID: ${info.messageId}`);
+  } catch (error) {
+    console.error('[Email] Error sending email via SMTP:', error);
+    throw error;
+  }
 }
 
 if (require.main === module) {
-    sendEmail().catch((err) => {
-        console.error('[Email] Script failed:', err);
-        process.exit(1);
-    });
+  sendEmail().catch((err) => {
+    console.error('[Email] Script failed:', err);
+    process.exit(1);
+  });
 }
 
 module.exports = sendEmail;
