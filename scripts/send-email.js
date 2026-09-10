@@ -83,7 +83,9 @@ async function sendEmail() {
 
     const emailUser = process.env.EMAIL_USERNAME || 'testingdata3011@gmail.com';
     const emailPass = process.env.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj';
-    const emailTo = process.env.EMAIL_TO || 'diksha.gupta@netsmartz.com';
+    const rawRecipients = (process.env.EMAIL_TO || '').trim();
+    const emailTo = rawRecipients.length > 0 ? rawRecipients : 'diksha.gupta@netsmartz.com';
+
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
