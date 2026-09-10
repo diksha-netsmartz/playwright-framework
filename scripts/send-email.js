@@ -83,8 +83,9 @@ async function sendEmail() {
 
   const emailUser = process.env.EMAIL_USERNAME || 'testingdata3011@gmail.com';
   const emailPass = process.env.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj';
+  const defaultRecipients = 'diksha.gupta@netsmartz.com, abhishek.gautam@netsmartz.net, manpreet.lamba@netsmartz.com, jitesh.bhardwaj@netsmartz.com, manjit.kumar@netsmartz.com';
   const rawRecipients = (process.env.EMAIL_TO || '').trim();
-  const emailTo = rawRecipients.length > 0 ? rawRecipients : 'diksha.gupta@netsmartz.com';
+  const emailTo = rawRecipients.length > 0 ? rawRecipients : defaultRecipients;
 
 
   const transporter = nodemailer.createTransport({
@@ -180,21 +181,28 @@ async function sendEmail() {
     });
   }
 
-  console.log(`[Email] Sending execution notification to: ${emailTo}`);
-  const mailOptions = {
-    from: `"Playwright Automation" <${emailUser}>`,
-    to: emailTo,
-    subject: `DSS Playwright Test Run [${statusText}]: ${envName}`,
-    html: htmlBody,
-    attachments: attachments
-  };
+  const recipientList = emailTo.split(',').map((e) => e.trim()).filter(Boolean);
+  console.log(`[Email] Sending execution notification to ${recipientList.length} recipient(s)...`);
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`[Email] Notification successfully sent! Message ID: ${info.messageId}`);
-  } catch (error) {
-    console.error('[Email] Error sending email via SMTP:', error);
-    throw error;
+  let successCount = 0;
+  for (const recipient of recipientList) {
+    try {
+      const info = await transporter.sendMail({
+        from: `"Playwright Automation" <${emailUser}>`,
+        to: recipient,
+        subject: `DSS Playwright Test Run [${statusText}]: ${envName}`,
+        html: htmlBody,
+        attachments: attachments
+      });
+      console.log(`[Email] Successfully delivered to: ${recipient} (Message ID: ${info.messageId})`);
+      successCount++;
+    } catch (recipientErr) {
+      console.error(`[Email] Failed to deliver to: ${recipient} - ${recipientErr.message}`);
+    }
+  }
+
+  if (successCount === 0 && recipientList.length > 0) {
+    throw new Error('Failed to deliver email to any of the specified recipients.');
   }
 }
 
