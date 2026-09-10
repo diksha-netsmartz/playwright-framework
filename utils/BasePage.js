@@ -150,6 +150,16 @@ export default class BasePage {
     }
 
     /**
+ * Retrieves the value of an element's attribute.
+ * @param {import('@playwright/test').Locator} locator - Target element locator.
+ * @param {string} attributeName - Attribute name.
+ * @param {string} expectedValue - Exepcted attribute value.
+ */
+    async matchAttributeValue(locator, attributeName, expectedValue) {
+        await expect(locator).toHaveAttribute(attributeName, expectedValue);
+    }
+
+    /**
      * Waits for an element to become visible on the page with optional timeout.
      * @param {import('@playwright/test').Locator} locator - Target element locator.
      * @param {number|Object} [options={}] - Timeout in ms or options object.

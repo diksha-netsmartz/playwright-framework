@@ -6,10 +6,10 @@ import { test } from '@playwright/test';
  * Handles completing lesson evaluations, answering evaluation rubrics (Q1-Q20),
  * selecting travel time, adding public/private notes, digital signatures, and lesson finalization.
  **/
-export default class LessonEvaluationPage extends BasePage {
+export default class ProcessLesson extends BasePage {
 
     /**
-     * Initializes locators for the Lesson Evaluation Page.
+     * Initializes locators for the Process Lesson page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
      **/
     constructor(page) {
@@ -19,18 +19,21 @@ export default class LessonEvaluationPage extends BasePage {
         this.selectEvaluationBtn = page.locator("xpath=//button[@title='Select Evaluation']");
         this.selectEvalutionDropdownValue = page.locator("xpath=(//button[@title='Select Evaluation']//parent::div//li)[last()]");
         this.travelTime = page.locator("xpath=//input[@name='travel' and @value='15']//following-sibling::ins");
-        this.publicNotesTxt = page.locator("//textarea[contains(@id,'txtPublicLessonNotes') or @id='txtAreaLessonNotes']");
-        this.privateNotesTxt = page.locator("//textarea[contains(@id,'txtAreaPrivateLesson')]");
-        this.studentSignatureCanvas = page.locator("(//canvas[contains(@id,'canvasStudentSignature')])[1]");
-        this.instructorSignatureCanvas = page.locator("(//canvas[contains(@id,'canvasInstructorSignature')])[1]");
+        this.publicNotesTxt = page.locator('#txtAreaLessonNotes')
+        this.privateNotesTxt = page.locator('#txtAreaPrivateLesson')
+        this.studentSignatureCanvas = page.locator('#canvasStudentSignature , #canvasObserverSignature')
+        this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature')
         this.completeLessonSendEmailBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
-        this.completeLessonBtn = page.getByRole('button', { name: 'Complete Lesson' })
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
-        this.questionsDropdowns = page.locator("//button[@title='Select']");
-        this.questionCheckboxes = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//input[@type='checkbox']//following-sibling::ins");
-        this.durationBtn = page.locator("xpath=(//button[@title='Duration'])[1]");
-        this.durationOption = page.locator("xpath=((//button[@title='Duration'])[1]//parent::div//li//a//span[1][not(text()='Duration')])[1]");
-        this.successMessageDiv = page.locator('#GlobalErrorSuccessDiv');
+        this.questionsDropdowns = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//button[@title='Select']");
+        this.questionsOptionSelect = page.locator("(//div[contains(@id,'divEvalQuestionNumber')]//button[@title='Select']//following-sibling::div//ul//li[not(@class='selected')])[1]");
+        this.actualStartTimeDropdown = page.locator("button[data-id='txt_odometer_starttime']");
+        this.actualStartTimeValue = page.locator("(//button[@data-id='txt_odometer_starttime']//parent::div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.actualEndTimeDropdown = page.locator("button[data-id='txt_odometer_endtime']");
+        this.actualEndTimeValue = page.locator("(//button[@data-id='txt_odometer_endtime']//parent::div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.odometerStartValue = page.locator('#txt_odometer_startNumber')
+        this.odometerEndValue = page.locator('#txt_odometer_endNumber')
+
     }
 
     /**
@@ -39,7 +42,7 @@ export default class LessonEvaluationPage extends BasePage {
     async clickProcess() {
         await test.step('Click PROCESS button', async () => {
             await this.waitForLoaders();
-            // await this.page.waitForTimeout(10000)
+            await this.page.waitForTimeout(5000);
             if (await this.isVisible(this.processBtn, { timeout: 10000 }).catch(() => false)) {
                 await this.click(this.processBtn);
                 await this.waitForHidden(this.processBtn);
@@ -63,61 +66,71 @@ export default class LessonEvaluationPage extends BasePage {
     }
 
     /**
-     * Selects a rating option for a specific evaluation question number.
-     * @param {number} questionNumber - 1-based question number index.
-     * @param {string} optionText - Option label text to select (e.g. '0-Safety Risk', '4-Competent').
-     **/
-    async selectQuestionByText(questionNumber, optionText) {
-        const dropdownBtn = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[@class='filter-option pull-left']`);
-        const dropdownValue = this.page.locator(`//div[@id='divEvalQuestionNumber${questionNumber}']//span[text()='${optionText}']`);
-        // if (await this.isVisible(dropdownBtn, { timeout: 500 }).catch(() => false)) {
-        await this.click(dropdownBtn);
-        await this.click(dropdownValue);
-        // }
+   * Select actual start and end time dropdown values
+   **/
+    async SelectActualStartAndEndTime() {
+        if (await this.isVisible(this.actualStartTimeDropdown, { timeout: 2000 }).catch(() => false)) {
+            await test.step('Select Actual start time from dropdown', async () => {
+                await this.click(this.actualStartTimeDropdown);
+                await this.click(this.actualStartTimeValue);
+            });
+        }
+
+        if (await this.isVisible(this.actualEndTimeDropdown, { timeout: 2000 }).catch(() => false)) {
+            await test.step('Select Actual end time from dropdown', async () => {
+                await this.click(this.actualEndTimeDropdown);
+                await this.click(this.actualEndTimeValue);
+            });
+        }
+
     }
 
     /**
-     * Fills out answers for all evaluation questions (Q1 through Q20) with predefined rubric ratings.
-     **/
-    async answerAllEvaluationQuestions() {
-        if (await this.isVisible(this.page.locator("(//div[contains(@id,'divEvalQuestionNumber1')]//span[@class='filter-option pull-left'])[1]"), { timeout: 2000 }).catch(() => false)) {
-            await test.step('Answer all evaluation questions (Q1 - Q20)', async () => {
-                await this.selectQuestionByText(1, '0-Safety Risk');         // Q1
-                await this.selectQuestionByText(2, '1-Improvement Needed');  // Q2
-                await this.selectQuestionByText(3, '0-Safety Risk');         // Q3
-                await this.selectQuestionByText(4, '1-Improvement Needed');  // Q4
-                await this.selectQuestionByText(5, '1-Improvement Needed');  // Q5
-                await this.selectQuestionByText(6, '2-Beginning');           // Q6
-                await this.selectQuestionByText(7, '4-Competent');           // Q7
-                await this.selectQuestionByText(8, '5-Exemplary');           // Q8
-                await this.selectQuestionByText(9, '5-Exemplary');           // Q9
-                await this.selectQuestionByText(10, '4-Competent');          // Q10
-                await this.selectQuestionByText(11, '2-Beginning');          // Q11
-                await this.selectQuestionByText(12, '3-Progressing');        // Q12
-                await this.selectQuestionByText(13, '2-Beginning');          // Q13
-                await this.selectQuestionByText(14, '3-Progressing');
-                await this.selectQuestionByText(15, '3-Progressing');        // Q14
-                await this.selectQuestionByText(16, '0-Safety Risk');        // Q16
-                await this.selectQuestionByText(17, '3-Progressing');        // Q17
-                await this.selectQuestionByText(18, '2-Beginning');          // Q18
-                await this.selectQuestionByText(19, '4-Competent');          // Q19
-                await this.selectQuestionByText(20, '1-Improvement Needed'); // Q20
-
+* Fill odometer start and end value
+**/
+    async FillOdometerStartAndEndValue() {
+        if (await this.isVisible(this.odometerStartValue, { timeout: 2000 }).catch(() => false)) {
+            await test.step('Fill odometer start value', async () => {
+                await this.fill(this.odometerStartValue, '1000');
             });
         }
-        else if (await this.isVisible(this.questionCheckboxes.first(), { timeout: 2500 }).catch(() => false)) {
-            await test.step('Check all evaluation question checkboxes and select duration', async () => {
-                const count = await this.questionCheckboxes.count();
-                for (let i = 0; i < count; i++) {
-                    await this.click(this.questionCheckboxes.nth(i));
-                    await this.waitForVisible(this.durationBtn);
-                    await this.click(this.durationBtn);
-                    await this.click(this.durationOption);
-                }
+
+        if (await this.isVisible(this.odometerEndValue, { timeout: 2000 }).catch(() => false)) {
+            await test.step('Fill odometer end value', async () => {
+                await this.fill(this.odometerEndValue, '1000');
             });
         }
 
     }
+
+
+
+    /**
+     * Fills out answers for all evaluation questions dynamically by finding all dropdowns
+     * with title 'Select' and selecting a valid option (other than 'Select' / 'Please Select').
+     * @param {'last' | 'first'} [preference='last'] - Select the last or first valid option in the dropdown.
+     **/
+    async answerAllEvaluationQuestions(preference = 'last') {
+        await test.step('Answer all evaluation questions', async () => {
+            await this.waitForLoaders();
+            const totalCount = await this.questionsDropdowns.count();
+
+            for (let i = 0; i < totalCount; i++) {
+                const remainingCount = await this.questionsDropdowns.count();
+                if (remainingCount === 0) break;
+
+                const dropdown = this.questionsDropdowns.first();
+                // await dropdown.scrollIntoViewIfNeeded();
+                await this.click(dropdown);
+                await this.waitForVisible(this.questionsOptionSelect, 3000)
+                await this.click(this.questionsOptionSelect);
+                await this.waitForLoaders();
+                await this.page.waitForTimeout(300);
+            }
+        });
+    }
+
+
 
     /**
      * Selects the 15-minute travel time option.
@@ -194,11 +207,8 @@ export default class LessonEvaluationPage extends BasePage {
      **/
     async completeLesson() {
         await test.step('Click Complete Lesson button', async () => {
-            if (await this.isVisible(this.completeLessonSendEmailBtn, { timeout: 1000 }).catch(() => false)) {
-                await this.click(this.completeLessonSendEmailBtn);
-            } else if (await this.isVisible(this.completeLessonBtn, { timeout: 1000 }).catch(() => false)) {
-                await this.click(this.completeLessonBtn);
-            }
+            await this.click(this.completeLessonSendEmailBtn);
+
         });
     }
 
@@ -217,8 +227,8 @@ export default class LessonEvaluationPage extends BasePage {
      **/
     async verifyLessonCompletedSuccessfully() {
         await test.step('Verify lesson completed success message', async () => {
-            const successMessage = this.page.getByText(/Success! Lesson completed and evaluation saved|Student evaluation saved successfully and lesson marked as Completed/i).first();
-            await this.waitForVisible(successMessage);
+            const successMessage = this.page.getByText(/Success! Lesson completed and evaluation saved/i).first();
+            await this.waitForVisible(successMessage, { timeout: 30000 });
             await this.verifyVisible(successMessage);
         });
     }
