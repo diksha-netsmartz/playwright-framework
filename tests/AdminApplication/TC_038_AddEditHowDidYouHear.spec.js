@@ -18,10 +18,10 @@ import howDidYouHearData from '../../test-data/json/howDidYouHearData.json';
  *   Step 6 - Update fields (Notes, Status) and save
  *   Step 7 - Verify How did you hear edited successfully
  * Expected Result:
- *   1. How do you hear should be created successfully
- *   2. How do you hear should be edited successfully
+ *   1. How did you hear should be created successfully
+ *   2. How did you hear should be edited successfully
  **/
-test('TC_038: C-Admin >> Account Management >> How do you hear - To verify user able to add / edit How do you hear', async ({ page }) => {
+test('TC_038: C-Admin >> Account Management >> How did you hear - To verify user able to add / edit How did you hear', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const howDidYouHearPage = new HowDidYouHearPage(page);

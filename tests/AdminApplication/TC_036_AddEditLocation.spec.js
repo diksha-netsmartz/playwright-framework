@@ -13,7 +13,7 @@ import locationData from '../../test-data/json/locationData.json';
  *   1. Location should be created successfully
  *   2. Location should be edited successfully
  **/
-test('TC_036: C-Admin >> Account Management >> Locations - To verify user able to add / edit location', async ({ page }) => {
+test('TC_036: C-Admin >> Account Management >> Locations - To verify user able to add / edit location', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const locationsPage = new LocationsPage(page);

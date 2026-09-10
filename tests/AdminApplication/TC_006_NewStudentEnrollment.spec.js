@@ -32,7 +32,7 @@ for (const { packageName, studentType } of packageScenarios) {
      * Test Case Title: Verify new student getting created and Packages are Enrolled.
      * Expected Result: New student should get created Enrollements should be done
      **/
-    test(`TC_006: C-admin > New student enrollment - Verify new student getting created and Packages are Enrolled (${packageName})`, { tag: '@smoke' }, async ({ page }) => {
+    test(`TC_006: C-admin > New student enrollment - Verify new student getting created and Packages are Enrolled (${packageName})`, { tag: ['@newStudentEnrollment', '@smoke'] }, async ({ page }) => {
         const loginPage = new LoginPage(page);
         const enrollmentPage = new NewStudentEnrollmentPage(page);
         const homePage = new HomePage(page);

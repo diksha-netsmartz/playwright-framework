@@ -21,7 +21,7 @@ import vehicleData from '../../test-data/json/vehicleData.json';
  *   1. Vehicle should be created successfully
  *   2. Vehicle should be edited successfully
  **/
-test('TC_039: C-Admin >> Account Management >> Vehicle >> Vehicle List - To verify user able to add / edit Vehicle', async ({ page }) => {
+test('TC_039: C-Admin >> Account Management >> Vehicle >> Vehicle List - To verify user able to add / edit Vehicle', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const vehicleListPage = new VehicleListPage(page);

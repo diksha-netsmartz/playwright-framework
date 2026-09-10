@@ -125,12 +125,11 @@ export default class OELeadPage extends BasePage {
 
     /**
      * Checks the checkbox under the DELETE column (.DeleteOELead).
-     * @param {number} [index=0] - 0-based index of the delete checkbox to check.
      **/
-    async checkDeleteLeadCheckbox(index = 0) {
+    async checkDeleteLeadCheckbox() {
         await test.step('Check the checkbox under DELETE column', async () => {
             await this.waitForLoaders().catch(() => { });
-            const checkbox = this.deleteLeadCheckbox.nth(index);
+            const checkbox = this.deleteLeadCheckbox.nth(0);
             await this.waitForVisible(checkbox);
             await checkbox.check();
         });
@@ -193,12 +192,11 @@ export default class OELeadPage extends BasePage {
 
     /**
      * Checks the checkbox under the ARCHIVE column (.ArchiveOELead).
-     * @param {number} [index=0] - 0-based index of the archive checkbox to check.
      **/
-    async checkArchiveLeadCheckbox(index = 0) {
+    async checkArchiveLeadCheckbox() {
         await test.step('Check the checkbox under ARCHIVE column', async () => {
             await this.waitForLoaders().catch(() => { });
-            const checkbox = this.archiveLeadCheckbox.nth(index);
+            const checkbox = this.archiveLeadCheckbox.nth(0);
             await this.waitForVisible(checkbox);
             await checkbox.check();
         });

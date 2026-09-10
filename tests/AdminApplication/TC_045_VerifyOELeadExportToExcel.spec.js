@@ -17,7 +17,7 @@ import login from '../../test-data/json/login.json';
  * Expected Result:
  *   File should be downloaded successfully
  **/
-test('TC_045: C-Admin >> Student Leads >> OE Lead - To verify Export to Excel', async ({ page }) => {
+test('TC_045: C-Admin >> Student Leads >> OE Lead - To verify Export to Excel', { tag: '@studentLeads' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const oeLeadPage = new OELeadPage(page);

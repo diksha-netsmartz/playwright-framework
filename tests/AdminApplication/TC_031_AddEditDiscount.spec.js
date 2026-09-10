@@ -21,7 +21,7 @@ import discountData from '../../test-data/json/discountData.json';
  *   1. Discounts should be created successfully
  *   2. Discounts should be edited successfully
  **/
-test('TC_031: C-Admin >> Account Management >> Services >> Discount - To verify user able to add/edit Discount', async ({page}) => {
+test('TC_031: C-Admin >> Account Management >> Services >> Discount - To verify user able to add/edit Discount', { tag: '@accountManagement' }, async ({page}) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const discountsPage = new DiscountsPage(page);

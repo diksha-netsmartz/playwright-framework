@@ -30,7 +30,7 @@ import openTimeSlotsData from '../../test-data/json/openTimeSlotsData.json';
  *   2. Open Time slots appointments should be edited successfully
  *   3. Open Time slots appointments should be deleted successfully
  **/
-test('TC_049_050_051: C-Admin >> Scheduling >> Manage time slot >> Open time slot - To verify user able to Create, Edit and Delete open time slot', async ({ page }) => {
+test('TC_049_050_051: C-Admin >> Scheduling >> Manage time slot >> Open time slot - To verify user able to Create, Edit and Delete open time slot', { tag: '@scheduling' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const openTimeSlotsPage = new OpenTimeSlotsPage(page);

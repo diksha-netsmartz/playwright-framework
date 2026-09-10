@@ -11,7 +11,7 @@ import classroomData from '../../test-data/json/classroomData.json';
  * Precondition: User should have valid admin login credentials
  * Expected Result: Single-Session classroom should get created and appear on the right side of the page
  **/
-test('TC_024: C-admin > Classroom > New Class - Add Single Session Class', async ({ page }) => {
+test('TC_024: C-admin > Classroom > New Class - Add Single Session Class', { tag: '@classroom' }, async ({ page }) => {
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
   const newClassPage = new NewClassPage(page);

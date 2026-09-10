@@ -19,7 +19,7 @@ import login from '../../test-data/json/login.json';
  * Expected Result:
  *   OE LEADS records should appear for both ACTIVE and SHOW ALL filter options.
  **/
-test('TC_042: C-Admin >> Student Leads >> OE Lead - To verify OE lead appear', async ({ page }) => {
+test('TC_042: C-Admin >> Student Leads >> OE Lead - To verify OE lead appear', { tag: '@studentLeads' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const oeLeadPage = new OELeadPage(page);

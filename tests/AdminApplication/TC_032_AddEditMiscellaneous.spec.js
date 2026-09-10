@@ -21,7 +21,7 @@ import miscData from '../../test-data/json/miscellaneousData.json';
  *   1. Miscellaneous item should be created successfully
  *   2. Miscellaneous item should be edited successfully
  **/
-test('TC_032: C-Admin >> Account Management >> Services >> Misc - To verify user able to add /Edit Misc', async ({page}) => {
+test('TC_032: C-Admin >> Account Management >> Services >> Misc - To verify user able to add /Edit Misc', { tag: '@accountManagement' }, async ({page}) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const miscPage = new MiscellaneousPage(page);

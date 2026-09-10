@@ -17,7 +17,7 @@ import login from '../../test-data/json/login.json';
  * Expected Result:
  *   List of students should display
  **/
-test('TC_046: C-Admin >> Advance Search - To Verify Advance Search', async ({ page }) => {
+test('TC_046: C-Admin >> Advance Search - To Verify Advance Search', { tag: '@advancedSearch' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const advancedSearchPage = new AdvancedSearchPage(page);

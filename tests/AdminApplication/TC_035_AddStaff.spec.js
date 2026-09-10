@@ -20,7 +20,7 @@ import staffData from '../../test-data/json/staffData.json';
  *   1. "Information saved successfully." message should display
  *   2. Staff should be visible in the grid
  **/
-test('TC_035: C-Admin >> Account Management >> Staff - To verify user is able to add staff', async ({ page }) => {
+test('TC_035: C-Admin >> Account Management >> Staff - To verify user is able to add staff', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const staffPage = new StaffPage(page);

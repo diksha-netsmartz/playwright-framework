@@ -18,7 +18,7 @@ import servicesData from '../../test-data/json/servicesPackagesData.json';
  * Expected Result:
  *   Service should be created successfully and visible on the grid
  **/
-test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify user able to add Services', async ({ page }) => {
+test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify user able to add Services', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const servicesPage = new ServicesPackagesPage(page);
