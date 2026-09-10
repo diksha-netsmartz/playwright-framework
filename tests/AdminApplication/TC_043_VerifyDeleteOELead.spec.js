@@ -12,7 +12,7 @@ import login from '../../test-data/json/login.json';
  *   Step 1 - Login to Admin Portal with valid credentials
  *   Step 2 - From the side menu, navigate to Student Leads
  *   Step 3 - Go to OE LEADS tab
- *   Step 4 - Select ACTIVE option from dropdown
+ *   Step 4 - Select Show All option from dropdown
  *   Step 5 - Check the checkbox under DELETE column
  *   Step 6 - Scroll down to bottom and click on DELETE SELECTED button
  *   Step 7 - Press YES option in confirmation message
@@ -39,8 +39,8 @@ test('TC_043: C-Admin >> Student Leads >> OE Lead - To verify Delete', { tag: '@
         await oeLeadPage.clickOELeadsTab();
     });
 
-    await test.step('Step 4: Select ACTIVE option from dropdown', async () => {
-        await oeLeadPage.selectOELeadStatus('Active');
+    await test.step('Step 4: Select Show All option from dropdown', async () => {
+        await oeLeadPage.selectOELeadStatus('Show All');
         await oeLeadPage.verifyOELeadsGridVisible();
     });
 

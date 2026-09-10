@@ -2,8 +2,14 @@ name: Syntax Check
 
 on:
   pull_request:
+    branches: [ main ]
   push:
     branches: [ main ]
+
+# Cancel previous runs if you push new commits to the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   Syntax:
@@ -25,3 +31,12 @@ jobs:
 
       - name: Run syntax check
         run: npm run check
+
+      - name: Validate Playwright test files
+        run: npx playwright test --list
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Validate module tags on all spec files
+        run: npm run check:tags

@@ -7,7 +7,7 @@ import OnlineEnrollmentPage from '../../pages/OnlineEnrollmentApplication/Online
  * Test Case Title: Verify new student able to register
  * Expected Result: Receipt Page should appear and student should be Registered and Enrollment should be done
  **/
-test('TC_015: COE RT - Verify new student able to register', { tag: '@smoke' }, async ({ page }) => {
+test('TC_015: COE RT - Verify new student able to register', { tag: ['@onlineEnrollment', '@smoke'] }, async ({ page }) => {
 
     const onlineEnrollmentPage = new OnlineEnrollmentPage(page);
 

@@ -95,6 +95,25 @@ export default class ExcelHelper {
         const content = await this.readContent(download);
         expect(content.length, 'Downloaded Excel file should not be empty').toBeGreaterThan(0);
 
+        const fileName = options.fileName || (typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'StudentDataExportReport.xlsx');
+        const isNoRecord = /no\s*records?\s*(\(s\))?\s*(found|exists)?/i.test(content) || content.toLowerCase().includes('no record');
+        if (isNoRecord) {
+            const message = `No record(s) found in Excel report (${fileName}).`;
+            console.log(`[ExcelHelper] No records found: Excel report (${fileName}) contains no records.`);
+            try {
+                test.info().annotations.push({
+                    type: 'Notice',
+                    description: message
+                });
+                await test.info().attach('Excel_Report_Status.txt', {
+                    body: 'No record(s) found.',
+                    contentType: 'text/plain'
+                });
+            } catch { }
+            expect(isNoRecord, message).toBe(false);
+            return;
+        }
+
         const rows = await this.readRows(download);
         console.log(`[ExcelHelper] Parsed ${rows.length} rows from Excel spreadsheet.`);
 
@@ -419,6 +438,24 @@ export default class ExcelHelper {
         const rows = await this.readRows(download);
         const fileName = options.fileName || (typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'Report.xlsx');
         const expectedSheetName = options.expectedSheetName || '';
+
+        const isNoRecord = /no\s*records?\s*(\(s\))?\s*(found|exists)?/i.test(content) || content.toLowerCase().includes('no record');
+        if (isNoRecord) {
+            const message = `No record(s) found in Excel report (${fileName}).`;
+            console.log(`[ExcelHelper] No records found: Excel report (${fileName}) contains no records.`);
+            try {
+                test.info().annotations.push({
+                    type: 'Notice',
+                    description: message
+                });
+                await test.info().attach('Excel_Report_Status.txt', {
+                    body: 'No record(s) found.',
+                    contentType: 'text/plain'
+                });
+            } catch { }
+            expect(isNoRecord, message).toBe(false);
+            return;
+        }
 
         // Auto-detect header row index
         let headerRowIndex = 0;
