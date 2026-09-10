@@ -34,9 +34,35 @@ function getTestSummary(allureResultsDir) {
   return { total, passed, failed, broken, skipped };
 }
 
+/**
+ * Recursively copies allure-results while excluding heavy video (.webm, .mp4) and trace (.zip) files
+ * to ensure the single-file Allure report stays well under Gmail's 25 MB email limit.
+ */
+function copyResultsExcludingMedia(srcDir, destDir) {
+  if (!fs.existsSync(destDir)) {
+    fs.mkdirSync(destDir, { recursive: true });
+  }
+  const items = fs.readdirSync(srcDir, { withFileTypes: true });
+  for (const item of items) {
+    const srcPath = path.join(srcDir, item.name);
+    const destPath = path.join(destDir, item.name);
+    if (item.isDirectory()) {
+      copyResultsExcludingMedia(srcPath, destPath);
+    } else {
+      const ext = path.extname(item.name).toLowerCase();
+      // Exclude heavy video recordings and trace archives from email report
+      if (ext === '.webm' || ext === '.mp4' || ext === '.zip') {
+        continue;
+      }
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 async function sendEmail() {
   const rootDir = path.resolve(__dirname, '..');
   const allureResultsDir = path.join(rootDir, 'allure-results');
+  const emailResultsDir = path.join(rootDir, 'email-allure-results');
   const singleReportDir = path.join(rootDir, 'allure-single-report');
   const zipPath = path.join(rootDir, 'Allure-Report.zip');
 
@@ -49,19 +75,26 @@ async function sendEmail() {
 
   const summary = getTestSummary(allureResultsDir);
 
-  console.log('[Email] Generating Allure single-file report...');
+  const MAX_EMAIL_ATTACHMENT_MB = 20; // Safe threshold below Gmail's 25 MB limit
   let zipExists = false;
+  let zipSizeMB = 0;
+  let attachZip = false;
+
   try {
     if (fs.existsSync(allureResultsDir)) {
-      // Generate self-contained single-file HTML report (no standalone .js files, avoids Gmail 552 security block)
-      execSync(`npx allure generate --single-file "${allureResultsDir}" --clean -o "${singleReportDir}"`, {
+      console.log('[Email] Preparing lightweight Allure results (excluding heavy video/trace files)...');
+      fs.rmSync(emailResultsDir, { recursive: true, force: true });
+      copyResultsExcludingMedia(allureResultsDir, emailResultsDir);
+
+      console.log('[Email] Generating Allure single-file report...');
+      execSync(`npx allure generate --single-file "${emailResultsDir}" --clean -o "${singleReportDir}"`, {
         cwd: rootDir,
         stdio: 'inherit'
       });
+      fs.rmSync(emailResultsDir, { recursive: true, force: true });
 
       const indexHtml = path.join(singleReportDir, 'index.html');
       if (fs.existsSync(indexHtml)) {
-        // Compress single index.html into zip
         if (process.platform === 'win32') {
           execSync(`powershell -Command "Compress-Archive -Path '${indexHtml}' -DestinationPath '${zipPath}' -Force"`, {
             cwd: rootDir,
@@ -73,8 +106,16 @@ async function sendEmail() {
             stdio: 'inherit'
           });
         }
-        zipExists = fs.existsSync(zipPath);
-        console.log(`[Email] Allure-Report.zip created (${(fs.statSync(zipPath).size / 1024 / 1024).toFixed(2)} MB).`);
+        if (fs.existsSync(zipPath)) {
+          zipSizeMB = fs.statSync(zipPath).size / (1024 * 1024);
+          zipExists = true;
+          if (zipSizeMB <= MAX_EMAIL_ATTACHMENT_MB) {
+            attachZip = true;
+            console.log(`[Email] Allure-Report.zip created (${zipSizeMB.toFixed(2)} MB) - will be attached.`);
+          } else {
+            console.warn(`[Email] Allure-Report.zip (${zipSizeMB.toFixed(2)} MB) exceeds ${MAX_EMAIL_ATTACHMENT_MB} MB email limit. Omitting attachment to ensure delivery.`);
+          }
+        }
       }
     }
   } catch (err) {
@@ -156,7 +197,7 @@ async function sendEmail() {
           <ul class="info-list">
             <li><strong>Environment:</strong> ${envName}</li>
             <li><strong>Target Branch:</strong> main</li>
-            <li><strong>Report Attachment:</strong> ${zipExists ? 'Allure-Report.zip attached (self-contained HTML report)' : 'Available in GitHub Actions artifacts'}</li>
+            <li><strong>Report:</strong> ${attachZip ? `Allure-Report.zip attached (${zipSizeMB.toFixed(1)} MB)` : (zipExists ? `Allure Report (${zipSizeMB.toFixed(1)} MB) exceeds 20 MB email limit. Available in GitHub Actions artifacts below.` : 'Available in GitHub Actions artifacts')}</li>
           </ul>
 
           ${runUrl ? `<div style="text-align: center; margin: 24px 0;"><a href="${runUrl}" class="btn" target="_blank">View GitHub Actions Run</a></div>` : ''}
@@ -174,7 +215,7 @@ async function sendEmail() {
     `;
 
   const attachments = [];
-  if (zipExists) {
+  if (attachZip) {
     attachments.push({
       filename: 'Allure-Report.zip',
       path: zipPath
