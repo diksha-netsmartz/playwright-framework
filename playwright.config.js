@@ -217,7 +217,7 @@ module.exports = defineConfig({
          *   - 'retain-on-failure'  (save video only for failed tests).
          *   - 'on-first-retry'     (record video only on retry).
          */
-        video: 'retain-on-failure',
+        // video: 'retain-on-failure',
 
         /**
          * ignoreHTTPSErrors: Ignores SSL/TLS certificate errors.
