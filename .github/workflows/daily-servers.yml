@@ -1,0 +1,168 @@
+name: Daily Regression (Server 2 & 1)
+
+on:
+  schedule:
+    # Runs at 11:45 PM IST (18:15 UTC)
+    - cron: '15 18 * * *'
+
+  workflow_dispatch:
+    inputs:
+      grep:
+        description: 'Tag or pattern to filter tests (e.g. @smoke, leave empty for all)'
+        required: false
+        default: ''
+        type: string
+      recipients:
+        description: 'Recipient email(s) for test report (comma-separated)'
+        required: false
+        default: 'diksha.gupta@netsmartz.com'
+        type: string
+
+concurrency:
+  group: daily-servers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  coreServer2:
+    name: 1. coreServer2 Tests
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      HEADLESS: 'true'
+      VIEWPORT_WIDTH: '1920'
+      VIEWPORT_HEIGHT: '1080'
+      ENV: 'coreServer2'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Set up Java (for Allure Report generation)
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers and OS dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright Tests on coreServer2
+        env:
+          HEADLESS: 'true'
+          VIEWPORT_WIDTH: '1920'
+          VIEWPORT_HEIGHT: '1080'
+          ENV: 'coreServer2'
+        run: |
+          GREP="${{ github.event.inputs.grep }}"
+          CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 ENV=coreServer2 npx playwright test"
+
+          if [ -n "$GREP" ]; then
+            CMD="$CMD --grep ${GREP}"
+          fi
+
+          echo "Executing on coreServer2: $CMD"
+          eval $CMD
+
+      - name: Upload Allure Results & Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-coreServer2
+          path: |
+            allure-results/
+            allure-reports/
+          retention-days: 14
+
+      - name: Send Email with Allure Report Attachment
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ENV: 'coreServer2'
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
+          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
+        run: node scripts/send-email.js
+
+  coreServer1:
+    name: 2. coreServer1 Tests
+    needs: coreServer2
+    if: always()
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      HEADLESS: 'true'
+      VIEWPORT_WIDTH: '1920'
+      VIEWPORT_HEIGHT: '1080'
+      ENV: 'coreServer1'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Set up Java (for Allure Report generation)
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers and OS dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright Tests on coreServer1
+        env:
+          HEADLESS: 'true'
+          VIEWPORT_WIDTH: '1920'
+          VIEWPORT_HEIGHT: '1080'
+          ENV: 'coreServer1'
+        run: |
+          GREP="${{ github.event.inputs.grep }}"
+          CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 ENV=coreServer1 npx playwright test"
+
+          if [ -n "$GREP" ]; then
+            CMD="$CMD --grep ${GREP}"
+          fi
+
+          echo "Executing on coreServer1: $CMD"
+          eval $CMD
+
+      - name: Upload Allure Results & Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-coreServer1
+          path: |
+            allure-results/
+            allure-reports/
+          retention-days: 14
+
+      - name: Send Email with Allure Report Attachment
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ENV: 'coreServer1'
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
+          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
+        run: node scripts/send-email.js

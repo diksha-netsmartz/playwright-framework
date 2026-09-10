@@ -31,14 +31,9 @@ concurrency:
 
 jobs:
   test:
-    name: Shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
-    timeout-minutes: 60
+    name: Run All Playwright Tests
+    timeout-minutes: 180
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shardIndex: [1, 2, 3, 4]
-        shardTotal: [4]
 
     env:
       CI: true
@@ -48,50 +43,10 @@ jobs:
       ENV: ${{ github.event.inputs.environment || 'coreServer2' }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (main branch)
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: 24
-          cache: 'npm'
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Install Playwright Browsers and OS dependencies
-        run: npx playwright install --with-deps chromium
-
-      - name: Run Playwright Tests (Shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
-        run: |
-          GREP="${{ github.event.inputs.grep }}"
-          CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}"
-
-          if [ -n "$GREP" ]; then
-            CMD="$CMD --grep ${GREP}"
-          fi
-
-          echo "Executing: $CMD"
-          eval $CMD
-
-      - name: Upload Shard Allure Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: allure-results-shard-${{ matrix.shardIndex }}
-          path: allure-results/
-          retention-days: 1
-
-  report:
-    name: Generate Allure Report & Send Email
-    needs: test
-    if: always()
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          ref: main
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -108,31 +63,44 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Download all shard results
-        uses: actions/download-artifact@v4
-        with:
-          path: allure-results
-          pattern: allure-results-shard-*
-          merge-multiple: true
+      - name: Install Playwright Browsers and OS dependencies
+        run: npx playwright install --with-deps chromium
 
-      - name: Send Email with Allure Report Attachment
-        if: always()
+      - name: Run Playwright Tests (Headless 1920x1080 Desktop)
         env:
-          JOB_STATUS: ${{ needs.test.result }}
-          ENV: ${{ github.event.inputs.environment || 'coreServer2' }}
-          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
-          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com, abhishek.gautam@netsmartz.net, manpreet.lamba@netsmartz.com, jitesh.bhardwaj@netsmartz.com, manjit.kumar@netsmartz.com' }}
-        run: node scripts/send-email.js
+          HEADLESS: 'true'
+          VIEWPORT_WIDTH: '1920'
+          VIEWPORT_HEIGHT: '1080'
+        run: |
+          GREP="${{ github.event.inputs.grep }}"
+          CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test"
 
-      - name: Upload Combined Allure Results & Report
+          if [ -n "$GREP" ]; then
+            CMD="$CMD --grep ${GREP}"
+          fi
+
+          echo "Executing: $CMD"
+          eval $CMD
+
+
+      - name: Upload Allure Results & Reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: allure-results
           path: |
             allure-results/
-            Allure-Report.zip
+            allure-reports/
           retention-days: 14
+
+      - name: Send Email with Allure Report Attachment
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ENV: ${{ github.event.inputs.environment || 'coreServer2' }}
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
+          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com, abhishek.gautam@netsmartz.net, manpreet.lamba@netsmartz.com, jitesh.bhardwaj@netsmartz.com, manjit.kumar@netsmartz.com' }}
+        run: node scripts/send-email.js
 
 
