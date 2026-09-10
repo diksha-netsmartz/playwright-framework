@@ -22,6 +22,7 @@ export default class ClassroomAttendancePage extends BasePage {
         // Session selection & Pagination
         this.sessionRadioBtn = page.locator('.radioinner').first();
         this.sessionRadioBtns = page.locator('.radioinner');
+        this.sessionsPageLengthSelect = page.locator('select[name="attendanceTakenDta_length"]').first();
         this.noRecordMessage = page.getByText('No record exists.', { exact: true });
         this.sessionsPagination = page.locator("#attendanceTakenDta_wrapper ul.pagination").first();
         this.sessionsNextPageBtn = page.locator("//div[@id='attendanceTakenDta_wrapper']//ul[contains(@class,'pagination')]//li[contains(@class,'next') and not(contains(@class,'disabled'))]//a").first();
@@ -77,6 +78,15 @@ export default class ClassroomAttendancePage extends BasePage {
             await this.page.waitForLoadState('load');
             await this.waitForVisible(this.sessionRadioBtns.first());
 
+            // Set show entries dropdown to 100 to display maximum sessions on the page
+            if (await this.sessionsPageLengthSelect.isVisible().catch(() => false)) {
+                await this.selectOption(this.sessionsPageLengthSelect, '100');
+                await this.waitForLoaders();
+                await this.page.waitForTimeout(500);
+            }
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load');
+            await this.waitForVisible(this.sessionRadioBtns.first());
             const studentRowOrNoRecord = this.page.locator("//span[@class='checkstudentp1'] | //span[@class='checkstudenta1'] | //*[text()='No record exists.']");
 
             let pageNum = 1;
