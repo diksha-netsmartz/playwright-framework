@@ -7,7 +7,7 @@ const { defineConfig } = require('@playwright/test');
  * - 'true'  => Headless mode with fixed 1920x1080 desktop viewport dimension.
  * - 'false' / default => UI / Headed mode with null viewport and '--start-maximized' for true full-screen mode.
  */
-const isHeadless = process.env.HEADLESS === 'true';
+const isHeadless = process.env.HEADLESS === 'true' || !!process.env.CI;
 
 module.exports = defineConfig({
 
@@ -181,7 +181,9 @@ module.exports = defineConfig({
          * Why: Maximizes the browser window to full screen when running in UI/headed mode.
          */
         launchOptions: {
-            args: isHeadless ? [] : ['--start-maximized'],
+            args: isHeadless
+                ? [`--window-size=${process.env.VIEWPORT_WIDTH || '1920'},${process.env.VIEWPORT_HEIGHT || '1080'}`]
+                : ['--start-maximized'],
         },
 
         /**
@@ -215,7 +217,7 @@ module.exports = defineConfig({
          *   - 'retain-on-failure'  (save video only for failed tests).
          *   - 'on-first-retry'     (record video only on retry).
          */
-        // video: 'retain-on-failure',
+        video: 'retain-on-failure',
 
         /**
          * ignoreHTTPSErrors: Ignores SSL/TLS certificate errors.
