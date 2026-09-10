@@ -324,11 +324,20 @@ export default class NewStudentEnrollmentPage extends BasePage {
     async fillTeenStudentInformation(data) {
         await test.step('Fill Teen Student Information', async () => {
             await this.waitForLoaders();
+            // Personal Information
             await this.selectStudentType("Teen");
             await this.waitForVisible(this.firstName);
             await this.fill(this.firstName, data.firstName);
-            await this.fill(this.middleName, data.middleName);
-            await this.fill(this.lastName, data.lastName);
+
+
+            if (await this.isVisible(this.middleName, { timeout: 1000 }).catch(() => false) && data.middleName) {
+                await this.fill(this.middleName, data.middleName);
+            }
+            if (await this.isVisible(this.lastName, { timeout: 1000 }).catch(() => false) && data.lastName) {
+                await this.fill(this.lastName, data.lastName);
+            }
+
+            // Address & Location
             if (await this.isVisible(this.address, { timeout: 5000 }).catch(() => false) && data.address) {
                 await this.pressSequentially(this.address, data.address);
                 if (!await this.isVisible(this.addressSelectionDropdown, { timeout: 5000 }).catch(() => false)) {
@@ -337,66 +346,129 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 }
                 await this.waitForVisible(this.addressSelectionDropdown);
                 await this.click(this.addressSelectionDropdown);
+
             }
-            // await this.click(this.city);
             if (await this.isVisible(this.stateDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.stateDropdown);
                 if (await this.isVisible(this.stateOptionValue, { timeout: 3000 }).catch(() => false)) {
                     await this.click(this.stateOptionValue);
                 }
             }
-            // await this.click(this.stateOptionValue);
-            await this.fill(this.address, data.address);
-            await this.fill(this.zipCode, data.zipCode);
-            await this.fill(this.homePhone, data.homePhone);
-            if (await this.isVisible(this.studentCellPhone, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.address, { timeout: 1000 }).catch(() => false) && data.address) {
+                await this.fill(this.address, data.address);
+            }
+            if (await this.isVisible(this.zipCode, { timeout: 1000 }).catch(() => false) && data.zipCode) {
+                await this.fill(this.zipCode, data.zipCode);
+            }
+
+            // Contact Information
+            if (await this.isVisible(this.homePhone, { timeout: 1000 }).catch(() => false) && data.homePhone) {
+                await this.fill(this.homePhone, data.homePhone);
+            }
+            if (await this.isVisible(this.studentCellPhone, { timeout: 1000 }).catch(() => false) && data.studentCellPhone) {
                 await this.fill(this.studentCellPhone, data.studentCellPhone);
             }
-            await this.fill(this.studentEmail, data.studentEmail);
-            await this.fill(this.parentName, data.parentName);
-            await this.fill(this.parentCellPhone, data.parentCellPhone);
-            await this.fill(this.parentEmail, data.parentEmail);
-            if (await this.isVisible(this.parentName2, { timeout: 1000 }).catch(() => false)) {
-                await this.fill(this.parentName2, data.parentName2);
-                await this.fill(this.parentPhone2, data.parentPhone2);
-
+            if (await this.isVisible(this.studentEmail, { timeout: 1000 }).catch(() => false) && data.studentEmail) {
+                await this.fill(this.studentEmail, data.studentEmail);
             }
-            await this.fill(this.parentEmail2, data.parentEmail2);
-            if (await this.isVisible(this.socialSecurityNumber, { timeout: 1000 }).catch(() => false)) {
+
+            // Parent 1 Information
+            if (await this.isVisible(this.parentName, { timeout: 1000 }).catch(() => false) && data.parentName) {
+                await this.fill(this.parentName, data.parentName);
+            }
+            if (await this.isVisible(this.parentCellPhone, { timeout: 1000 }).catch(() => false) && data.parentCellPhone) {
+                await this.fill(this.parentCellPhone, data.parentCellPhone);
+            }
+            if (await this.isVisible(this.parentEmail, { timeout: 1000 }).catch(() => false) && data.parentEmail) {
+                await this.fill(this.parentEmail, data.parentEmail);
+            }
+
+            // Parent 2 Information
+            if (await this.isVisible(this.parentName2, { timeout: 1000 }).catch(() => false) && data.parentName2) {
+                await this.fill(this.parentName2, data.parentName2);
+                if (await this.isVisible(this.parentPhone2, { timeout: 1000 }).catch(() => false) && data.parentPhone2) {
+                    await this.fill(this.parentPhone2, data.parentPhone2);
+                }
+            }
+            if (await this.isVisible(this.parentEmail2, { timeout: 1000 }).catch(() => false) && data.parentEmail2) {
+                await this.fill(this.parentEmail2, data.parentEmail2);
+            }
+
+            // SSN & Signature
+            if (await this.isVisible(this.socialSecurityNumber, { timeout: 1000 }).catch(() => false) && data.socialSecurityNumber) {
                 await this.fill(this.socialSecurityNumber, data.socialSecurityNumber);
             }
-            if (await this.isVisible(this.studentSignature, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.studentSignature, { timeout: 1000 }).catch(() => false) && data.studentSignature) {
                 await this.fill(this.studentSignature, data.studentSignature);
             }
-            if (await this.isVisible(this.emergencyName, { timeout: 1000 }).catch(() => false)) {
+
+            // Emergency Contact
+            if (await this.isVisible(this.emergencyName, { timeout: 1000 }).catch(() => false) && data.emergencyName) {
                 await this.fill(this.emergencyName, data.emergencyName);
-                await this.fill(this.emergencyRelationship, data.emergencyRelationship);
-                await this.fill(this.emergencyPhone, data.emergencyPhone);
+                if (await this.isVisible(this.emergencyRelationship, { timeout: 1000 }).catch(() => false) && data.emergencyRelationship) {
+                    await this.fill(this.emergencyRelationship, data.emergencyRelationship);
+                }
+                if (await this.isVisible(this.emergencyPhone, { timeout: 1000 }).catch(() => false) && data.emergencyPhone) {
+                    await this.fill(this.emergencyPhone, data.emergencyPhone);
+                }
             }
-            await this.click(this.highSchoolDropdown);
-            await this.click(this.highSchoolDropdownSelection);
+
+            // School & Physical Attributes
+            if (await this.isVisible(this.highSchoolDropdown, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.highSchoolDropdown);
+                if (await this.isVisible(this.highSchoolDropdownSelection, { timeout: 3000 }).catch(() => false)) {
+                    await this.click(this.highSchoolDropdownSelection);
+                }
+            }
             if (await this.isVisible(this.wearGlassesDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.wearGlassesDropdown);
-                await this.click(this.wearGlassesDropdownSelection);
+                if (await this.isVisible(this.wearGlassesDropdownSelection, { timeout: 3000 }).catch(() => false)) {
+                    await this.click(this.wearGlassesDropdownSelection);
+                }
             }
-            await this.check(this.maleCheckbox);
-            await this.fill(this.permitNumber, data.permitNumber);
-            await this.click(this.permitIssuedDateCalendarIcon);
-            await this.click(this.permitIssueDateSelectInCalendar);
-            await this.click(this.permitExpirationDateCalendarIcon);
-            await this.click(this.permitExpireDateSelectInCalendar);
-            await this.fill(this.medicalConditions, data.medicalConditions);
-            if (await this.isVisible(this.studentNotes, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.maleCheckbox, { timeout: 1000 }).catch(() => false)) {
+                await this.check(this.maleCheckbox);
+            }
+
+            // Permit Information
+            if (await this.isVisible(this.permitNumber, { timeout: 1000 }).catch(() => false) && data.permitNumber) {
+                await this.fill(this.permitNumber, data.permitNumber);
+            }
+            if (await this.isVisible(this.permitIssuedDateCalendarIcon, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.permitIssuedDateCalendarIcon);
+                if (await this.isVisible(this.permitIssueDateSelectInCalendar, { timeout: 3000 }).catch(() => false)) {
+                    await this.click(this.permitIssueDateSelectInCalendar);
+                }
+            }
+            if (await this.isVisible(this.permitExpirationDateCalendarIcon, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.permitExpirationDateCalendarIcon);
+                if (await this.isVisible(this.permitExpireDateSelectInCalendar, { timeout: 3000 }).catch(() => false)) {
+                    await this.click(this.permitExpireDateSelectInCalendar);
+                }
+            }
+
+            // Medical & Notes
+            if (await this.isVisible(this.medicalConditions, { timeout: 1000 }).catch(() => false) && data.medicalConditions) {
+                await this.fill(this.medicalConditions, data.medicalConditions);
+            }
+            if (await this.isVisible(this.studentNotes, { timeout: 1000 }).catch(() => false) && data.studentNotes) {
                 await this.fill(this.studentNotes, data.studentNotes);
             }
-            if (await this.isVisible(this.studentDrivingNotes, { timeout: 1000 }).catch(() => false)) {
-                await this.fill(this.studentDrivingNotes, data.studentDrivingNotes || data.drivingNotes);
+            const drivingNotes = data.studentDrivingNotes || data.drivingNotes;
+            if (await this.isVisible(this.studentDrivingNotes, { timeout: 1000 }).catch(() => false) && drivingNotes) {
+                await this.fill(this.studentDrivingNotes, drivingNotes);
             }
+
+            // Lead Source & Terms
             if (await this.isVisible(this.leadDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.leadDropdown);
-                await this.click(this.leadDropdownSelection);
+                if (await this.isVisible(this.leadDropdownSelection, { timeout: 3000 }).catch(() => false)) {
+                    await this.click(this.leadDropdownSelection);
+                }
             }
-            await this.check(this.termsConditionsCheckbox);
+            if (await this.isVisible(this.termsConditionsCheckbox, { timeout: 1000 }).catch(() => false)) {
+                await this.check(this.termsConditionsCheckbox);
+            }
         });
     }
 
