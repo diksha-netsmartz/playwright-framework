@@ -98,21 +98,17 @@ export default class AdvancedSearchPage extends BasePage {
 
     /**
      * Verifies that student records are returned in the search results table.
-     * Logs a warning if no records are found instead of failing, as data availability
-     * depends on the environment state.
+     * Fails if resultsTable contains "No record exists.".
      **/
     async verifyStudentListDisplayed() {
         await test.step('Verify student list is displayed in results table', async () => {
             await this.waitForVisible(this.resultsTable);
+            const hasNoRecord = await this.resultsTable.getByText('No record exists.', { exact: false }).isVisible({ timeout: 2000 }).catch(() => false);
+            expect(hasNoRecord, 'Advanced Search results table displays "No record exists."').toBe(false);
 
-            const noRecords = await this.noRecordsCell.isVisible({ timeout: 3000 }).catch(() => false);
-            if (noRecords) {
-                console.warn('Advanced Search returned no records for the selected filters.');
-            } else {
-                const rowCount = await this.recordRows.count();
-                console.log(`Advanced Search returned ${rowCount} record cell(s).`);
-                expect(rowCount).toBeGreaterThan(0);
-            }
+            const rowCount = await this.recordRows.count();
+            console.log(`Advanced Search returned ${rowCount} record cell(s).`);
+            expect(rowCount).toBeGreaterThan(0);
         });
     }
 }

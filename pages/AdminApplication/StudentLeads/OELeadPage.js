@@ -76,6 +76,8 @@ export default class OELeadPage extends BasePage {
         await test.step('Verify OE Leads records grid is visible', async () => {
             await this.waitForVisible(this.oeLeadsGrid);
             await this.verifyVisible(this.oeLeadsGrid);
+            const hasNoRecord = await this.oeLeadsGrid.getByText('No record exists.', { exact: false }).isVisible({ timeout: 2000 }).catch(() => false);
+            expect(hasNoRecord, 'OE Leads grid displays "No record exists."').toBe(false);
         });
     }
 
