@@ -208,6 +208,37 @@ Run only smoke-tagged tests across modules without needing separate folders:
 
 ---
 
+## ☁️ Running Tests via GitHub Actions (CI/CD)
+
+The framework includes an on-demand workflow ([`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)) that runs tests in headless **1920x1080 desktop resolution** on GitHub's cloud runners and sends an automated Allure execution report via email.
+
+### How to Trigger a Run on GitHub:
+1. Open the repository on GitHub in your browser.
+2. Click the **Actions** tab in the top navigation bar.
+3. In the left sidebar under *Workflows*, select **`Playwright Tests (Main)`**.
+4. Click the **"Run workflow"** button on the right.
+5. Configure your execution options:
+   - **Branch:** Select `main`.
+   - **Environment:** Select the target environment (`coreServer2` [default], `coreServer1`, `uat`, or `staging`).
+   - **Tag or pattern to filter tests (`grep`):** 
+     - Leave blank to run all tests.
+     - Or enter a tag/title to filter (e.g. `@smoke`, `@reportCenter`, or `TC_022`).
+   - **Recipient email(s) (`recipients`):**
+     - Defaults to team members: `diksha.gupta@netsmartz.com`, `abhishek.gautam@netsmartz.net`, `manpreet.lamba@netsmartz.com`, `jitesh.bhardwaj@netsmartz.com`, `manjit.kumar@netsmartz.com`.
+     - Or modify/add custom comma-separated emails.
+6. Click the green **"Run workflow"** button to start execution.
+
+### What Happens After Execution:
+- The entire run executes in the cloud without using your local machine resources.
+- Playwright HTML and Allure results are uploaded as build artifacts.
+- An email notification is sent to the specified recipients containing:
+  - Status summary badge (**PASSED** / **FAILED**).
+  - Test count breakdown table (**Total**, **Passed**, **Failed**, **Skipped**).
+  - Direct link to the GitHub Actions Run and Artifacts.
+  - Attached **`Allure-Report.zip`** (extract and double-click `index.html` to view the interactive Allure report).
+
+---
+
 ## 📊 Viewing Test Reports & Traces
 
 ### 1. View Playwright HTML Report
@@ -268,6 +299,9 @@ npx playwright show-trace test-results/<path-to-trace.zip>
 | `npm run test:smoke:headless` | `cross-env HEADLESS=true npx playwright test --grep @smoke` | Run all `@smoke` test cases in headless mode |
 | `npm run test:ui` | `npx playwright test --ui` | Launch Playwright Interactive UI dashboard |
 | `npm run test:debug` | `npx playwright test --debug` | Run tests with Playwright Inspector |
+| `npm run check` | `tsc -p jsconfig.json --noEmit` | Validate TypeScript types & syntax without emitting JS |
+| `npm run lint` | `eslint tests/` | Run ESLint validation across all test specs |
+| `npm run check:tags` | `node scripts/validate-spec-tags.js` | Validate module tags on all test specification files |
 | `npm run allure:open` | `node scripts/open-latest-allure.js` | Open the latest generated Allure report in browser |
 | `npm run allure:serve` | `allure serve allure-results` | Serve live Allure report from raw results |
 | `npm run allure:generate` | `allure generate allure-results --clean -o allure-report` | Compile results to static Allure HTML report |
@@ -279,12 +313,23 @@ npx playwright show-trace test-results/<path-to-trace.zip>
 The framework includes built-in helper modules located in `utils/` for handling complex automation tasks:
 
 - **`BasePage.js`**: Core page object wrapper providing robust click, fill, dropdown selection, wait utilities, and table interaction methods.
+- **`DateHelper.js`**: Date formatting, manipulation, date picker automation, and time calculation utilities.
 - **`EmailHelper.js`**: Built on `imapflow` and `mailparser` to programmatically connect to IMAP mailboxes, search emails, and extract OTPs / password reset links.
-- **`PdfHelper.js`**: Utilizes `pdf-to-img` to convert and verify PDF reports and roster downloads.
-- **`ExcelHelper.js`**: Reads and parses data from downloaded or fixture Excel sheets.
+- **`ExcelHelper.js`**: Reads, parses, and validates data from downloaded or fixture Excel sheets.
+- **`PdfHelper.js`**: Utilizes `pdf-to-img` to convert, extract, and verify PDF reports and roster downloads.
 - **`TestDataGenerator.js`**: Generates unique dynamic test data (names, emails, phone numbers, timestamps, addresses) for isolated test runs.
-- **`global-setup.js`**: Runs before tests begin to cleanly clear previous Allure raw results.
-- **`global-teardown.js`**: Runs after all tests finish to compile a timestamped Allure HTML report in `allure-reports/` and launch it in the default browser.
+
+---
+
+## 📜 Framework Scripts (`scripts/`)
+
+Automation lifecycle and CI/CD utility scripts located in `scripts/`:
+
+- **`global-setup.js`**: Runs before test execution to automatically clean stale Allure results.
+- **`global-teardown.js`**: Runs after test execution finishes to generate timestamped Allure HTML reports and open them in the browser.
+- **`open-latest-allure.js`**: Locates and launches the most recently generated Allure report.
+- **`send-email.js`**: Compiles self-contained Allure report ZIPs, computes test metrics, and sends automated execution summary emails via Gmail SMTP.
+- **`validate-spec-tags.js`**: Verifies that every spec file includes required module and suite tags for test discovery.
 
 ---
 
@@ -292,6 +337,10 @@ The framework includes built-in helper modules located in `utils/` for handling 
 
 ```text
 ClientPlaywrightFramework/
+├── .github/                     # GitHub Actions CI/CD workflows
+│   └── workflows/
+│       ├── playwright.yml          # On-demand cloud test execution & email reporting
+│       └── syntax.yml              # Automated syntax, lint, & tag validation on PR/push
 ├── config/                      # Global environment configurations & base URLs (config.js)
 ├── pages/                       # Page Object Models (POM)
 │   ├── AdminApplication/           # Admin portal pages (Scheduling, Billing, Classroom, etc.)
@@ -301,7 +350,9 @@ ClientPlaywrightFramework/
 ├── scripts/                     # Framework automation & lifecycle scripts
 │   ├── global-setup.js             # Pre-test run setup & report cleanup
 │   ├── global-teardown.js          # Post-test report generation & auto-open
-│   └── open-latest-allure.js       # Finds and launches the most recent Allure report
+│   ├── open-latest-allure.js       # Finds and launches the most recent Allure report
+│   ├── send-email.js               # Allure single-file zip builder & SMTP email sender
+│   └── validate-spec-tags.js       # Validates test module tags across all spec files
 ├── test-data/                   # Test data directory
 │   ├── json/                       # JSON fixtures (logins, student data, services, fees, etc.)
 │   └── uploads/                    # Upload assets (sample images, documents, PDFs)
@@ -312,6 +363,7 @@ ClientPlaywrightFramework/
 │   └── StudentApplication/         # Student portal test specs
 ├── utils/                       # Framework helper utilities
 │   ├── BasePage.js                 # Reusable Playwright interaction methods
+│   ├── DateHelper.js               # Date formatting, picker, & calculation utilities
 │   ├── EmailHelper.js              # IMAP email extraction & OTP verification
 │   ├── ExcelHelper.js              # Excel parsing utility
 │   ├── PdfHelper.js                # PDF verification & conversion utility

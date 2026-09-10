@@ -19,9 +19,9 @@ on:
         default: ''
         type: string
       recipients:
-        description: 'Recipient email(s) for test report (comma-separated, defaults to diksha.gupta@netsmartz.com)'
+        description: 'Recipient email(s) for test report (comma-separated)'
         required: false
-        default: 'diksha.gupta@netsmartz.com'
+        default: 'diksha.gupta@netsmartz.com, abhishek.gautam@netsmartz.net, manpreet.lamba@netsmartz.com, jitesh.bhardwaj@netsmartz.com, manjit.kumar@netsmartz.com'
         type: string
 
 
@@ -51,7 +51,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       - name: Set up Java (for Allure Report generation)
@@ -107,7 +107,7 @@ jobs:
           ENV: ${{ github.event.inputs.environment || 'coreServer2' }}
           EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
-          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
+          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com, abhishek.gautam@netsmartz.net, manpreet.lamba@netsmartz.com, jitesh.bhardwaj@netsmartz.com, manjit.kumar@netsmartz.com' }}
         run: node scripts/send-email.js
 
 
