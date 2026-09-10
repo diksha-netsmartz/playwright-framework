@@ -18,6 +18,12 @@ on:
         required: false
         default: ''
         type: string
+      recipients:
+        description: 'Recipient email(s) for test report (comma-separated, defaults to diksha.gupta@netsmartz.com)'
+        required: false
+        default: 'diksha.gupta@netsmartz.com'
+        type: string
+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -101,7 +107,7 @@ jobs:
           ENV: ${{ github.event.inputs.environment || 'coreServer2' }}
           EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
-          EMAIL_TO: 'diksha.gupta@netsmartz.com'
+          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
         run: node scripts/send-email.js
 
 
