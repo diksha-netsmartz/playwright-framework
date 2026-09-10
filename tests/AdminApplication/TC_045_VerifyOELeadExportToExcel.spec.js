@@ -39,6 +39,7 @@ test('TC_045: C-Admin >> Student Leads >> OE Lead - To verify Export to Excel', 
 
     await test.step('Step 4: Select Show All from dropdown', async () => {
         await oeLeadPage.selectOELeadStatus('Show All');
+        await oeLeadPage.verifyOELeadsGridVisible();
     });
 
     await test.step('Step 5: Click Export To Excel and verify file downloaded successfully', async () => {

@@ -24,6 +24,12 @@ function getTimestamp() {
  * are cleanly closed first.
  */
 async function globalTeardown() {
+    // In CI environments, skip local Allure generation & opening to avoid redundant execution per shard.
+    // The dedicated 'report' job handles merged Allure generation and email dispatch.
+    if (process.env.CI) {
+        return;
+    }
+
     const rootDir = path.resolve(__dirname, '..');
     const allureResultsDir = path.join(rootDir, 'allure-results');
     const baseReportsDir = path.join(rootDir, 'allure-reports');

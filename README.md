@@ -210,7 +210,7 @@ Run only smoke-tagged tests across modules without needing separate folders:
 
 ## ☁️ Running Tests via GitHub Actions (CI/CD)
 
-The framework includes an on-demand workflow ([`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)) that runs tests in headless **1920x1080 desktop resolution** on GitHub's cloud runners and sends an automated Allure execution report via email.
+The framework includes an on-demand workflow ([`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)) with **4-shard parallel matrix execution** that runs tests in headless **1920x1080 desktop resolution** across 4 independent GitHub cloud runners concurrently, cutting execution time from ~40 minutes down to ~8–10 minutes, and delivers a unified Allure execution report via email.
 
 ### How to Trigger a Run on GitHub:
 1. Open the repository on GitHub in your browser.
@@ -218,7 +218,7 @@ The framework includes an on-demand workflow ([`.github/workflows/playwright.yml
 3. In the left sidebar under *Workflows*, select **`Playwright Tests (Main)`**.
 4. Click the **"Run workflow"** button on the right.
 5. Configure your execution options:
-   - **Branch:** Select `main`.
+   - **Branch:** Select `main` (or your active feature branch).
    - **Environment:** Select the target environment (`coreServer2` [default], `coreServer1`, `uat`, or `staging`).
    - **Tag or pattern to filter tests (`grep`):** 
      - Leave blank to run all tests.
@@ -229,13 +229,14 @@ The framework includes an on-demand workflow ([`.github/workflows/playwright.yml
 6. Click the green **"Run workflow"** button to start execution.
 
 ### What Happens After Execution:
-- The entire run executes in the cloud without using your local machine resources.
-- Playwright HTML and Allure results are uploaded as build artifacts.
-- An email notification is sent to the specified recipients containing:
+- Tests are split evenly across **4 parallel runner machines** (Shards 1/4, 2/4, 3/4, 4/4) running simultaneously.
+- A downstream job automatically downloads and merges all 4 shard results into a single consolidated Allure report.
+- The combined Allure results and report are preserved in GitHub Actions Artifacts.
+- An automated email notification is sent to the specified recipients containing:
   - Status summary badge (**PASSED** / **FAILED**).
-  - Test count breakdown table (**Total**, **Passed**, **Failed**, **Skipped**).
+  - Consolidated test count breakdown table (**Total**, **Passed**, **Failed**, **Skipped** across all shards).
   - Direct link to the GitHub Actions Run and Artifacts.
-  - Attached **`Allure-Report.zip`** (extract and double-click `index.html` to view the interactive Allure report).
+  - Attached **`Allure-Report.zip`** (extract and double-click `index.html` to view the full interactive Allure dashboard).
 
 ---
 
