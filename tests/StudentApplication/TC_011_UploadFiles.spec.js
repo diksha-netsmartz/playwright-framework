@@ -30,7 +30,7 @@ test('TC_011: CSP - Verify that the file is getting uploaded', { tag: ['@CSPHome
         await studentHomePage.verifyUploadSuccess();
     });
 
-    await test.step('Verify uploaded file under C-Admin -> Uploaded Files widget', async () => {
+    await test.step('Step 5: Verify uploaded file under C-Admin -> Uploaded Files widget', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
         await adminHomePage.clickShowFilesToConfirm(credentials.studentUser.name);

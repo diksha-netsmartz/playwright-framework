@@ -42,9 +42,7 @@ test('TC_028: C-admin > Classroom > Attendance - To verify send Session Email', 
         await attendancePage.fillAndSendEmail('CR Session Notification', 'This is an automated CR Session notification email.');
     });
 
-
-
-    await test.step('Verify CR Session email is sent successfully', async () => {
+    await test.step('Step 9: Verify CR Session email is sent successfully', async () => {
         // await attendancePage.verifySendEmailResponse();
         await attendancePage.verifyEmailSentSuccessfully();
     });

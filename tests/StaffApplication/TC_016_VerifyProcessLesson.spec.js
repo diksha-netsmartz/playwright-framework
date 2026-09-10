@@ -58,7 +58,7 @@ test('TC_016: CSM - Verify process lesson functionality', { tag: ['@CSMHomepage'
         await processLessonPage.confirmLessonCompletion();
     });
 
-    await test.step('Verify lesson completed successfully message', async () => {
+    await test.step('Step 14: Verify lesson completed successfully message', async () => {
         await processLessonPage.verifyLessonCompletedSuccessfully();
     });
 });

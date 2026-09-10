@@ -5,7 +5,7 @@ import OELeadPage from '../../pages/AdminApplication/StudentLeads/OELeadPage';
 import login from '../../test-data/json/login.json';
 
 /**
- * TC0043: C-Admin >> Student Leads >> OE Lead
+ * TC_043: C-Admin >> Student Leads >> OE Lead
  * Test Case Title: To verify Delete
  * Precondition: User should have valid admin login credentials
  * Steps:

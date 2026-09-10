@@ -32,11 +32,11 @@ test('TC_012: CSP - Verify student is able to Enroll Package', { tag: ['@CSPEnro
         await studentEnrollPage.clickPayLater();
     });
 
-    await test.step('Verify student enrollment success', async () => {
+    await test.step('Step 5: Verify student enrollment success', async () => {
         await studentEnrollPage.verifyEnrollmentSuccess();
     });
 
-    await test.step('Step 5: Click Print Receipt and verify receipt page', async () => {
+    await test.step('Step 6: Click Print Receipt and verify receipt page', async () => {
         receiptPage = await studentEnrollPage.clickPrintReceipt();
         await studentEnrollPage.verifyReceiptPage(receiptPage);
     });

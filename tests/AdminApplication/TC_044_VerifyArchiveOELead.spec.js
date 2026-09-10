@@ -5,7 +5,7 @@ import OELeadPage from '../../pages/AdminApplication/StudentLeads/OELeadPage';
 import login from '../../test-data/json/login.json';
 
 /**
- * TC0044: C-Admin >> Student Leads >> OE Lead
+ * TC_044: C-Admin >> Student Leads >> OE Lead
  * Test Case Title: To verify Archive
  * Precondition: User should have valid admin login credentials
  * Steps:
