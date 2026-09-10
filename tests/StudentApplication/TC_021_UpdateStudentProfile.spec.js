@@ -10,7 +10,7 @@ import login from '../../test-data/json/login.json';
  * Test Case Title: Verify student is able to update the profile
  * Expected Result: Fields should be updated successfully
  **/
-test('TC_021: CSP - Verify student is able to update the profile', { tag: '@smoke' }, async ({ page }) => {
+test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSPMyAccount', '@smoke'] }, async ({ page }) => {
 
     const studentLoginPage = new StudentLoginPage(page);
     const studentHomePage = new StudentHomePage(page);

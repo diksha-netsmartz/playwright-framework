@@ -9,7 +9,7 @@ import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePag
  * Test Case Title: Verify student is able to Enroll Package
  * Expected Result: Student should be enrolled to selected Package and Receipt should appear
  **/
-test('TC_012: CSP - Verify student is able to Enroll Package', { tag: '@smoke' }, async ({ page }) => {
+test('TC_012: CSP - Verify student is able to Enroll Package', { tag: ['@CSPEnroll', '@smoke'] }, async ({ page }) => {
 
     const studentLoginPage = new StudentLoginPage(page);
     const studentEnrollPage = new StudentEnrollPage(page);
@@ -32,11 +32,11 @@ test('TC_012: CSP - Verify student is able to Enroll Package', { tag: '@smoke' }
         await studentEnrollPage.clickPayLater();
     });
 
-    await test.step('Verify student enrollment success', async () => {
+    await test.step('Step 5: Verify student enrollment success', async () => {
         await studentEnrollPage.verifyEnrollmentSuccess();
     });
 
-    await test.step('Step 5: Click Print Receipt and verify receipt page', async () => {
+    await test.step('Step 6: Click Print Receipt and verify receipt page', async () => {
         receiptPage = await studentEnrollPage.clickPrintReceipt();
         await studentEnrollPage.verifyReceiptPage(receiptPage);
     });

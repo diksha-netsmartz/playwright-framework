@@ -11,7 +11,7 @@ import classroomData from '../../test-data/json/classroomData.json';
  * Precondition: User should have valid admin login credentials
  * Expected Result: Classroom should be created and saved successfully with confirmation message
  **/
-test('TC_023: C-admin > Classroom > New Class - Add Multi Session Classroom', async ({ page }) => {
+test('TC_023: C-admin > Classroom > New Class - Add Multi Session Classroom', { tag: '@classroom' }, async ({ page }) => {
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
   const newClassPage = new NewClassPage(page);

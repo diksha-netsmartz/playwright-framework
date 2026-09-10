@@ -5,7 +5,7 @@ import OELeadPage from '../../pages/AdminApplication/StudentLeads/OELeadPage';
 import login from '../../test-data/json/login.json';
 
 /**
- * TC0044: C-Admin >> Student Leads >> OE Lead
+ * TC_044: C-Admin >> Student Leads >> OE Lead
  * Test Case Title: To verify Archive
  * Precondition: User should have valid admin login credentials
  * Steps:
@@ -21,7 +21,7 @@ import login from '../../test-data/json/login.json';
  * Expected Result:
  *   OE LEADS records should be Archived successfully and appear under Archived status.
  **/
-test('TC_044: C-Admin >> Student Leads >> OE Lead - To verify Archive', async ({ page }) => {
+test('TC_044: C-Admin >> Student Leads >> OE Lead - To verify Archive', { tag: '@studentLeads' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const oeLeadPage = new OELeadPage(page);
@@ -49,7 +49,7 @@ test('TC_044: C-Admin >> Student Leads >> OE Lead - To verify Archive', async ({
 
     await test.step('Step 5: Get 1st lead name and check the checkbox under ARCHIVE column', async () => {
         leadNameToArchive = await oeLeadPage.getFirstArchiveLeadName();
-        await oeLeadPage.checkArchiveLeadCheckbox(0);
+        await oeLeadPage.checkArchiveLeadCheckbox();
     });
 
     await test.step('Step 6-8: Click on ARCHIVE SELECTED button, confirm with YES and verify archiving', async () => {

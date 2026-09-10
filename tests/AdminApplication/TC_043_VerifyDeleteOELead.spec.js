@@ -5,7 +5,7 @@ import OELeadPage from '../../pages/AdminApplication/StudentLeads/OELeadPage';
 import login from '../../test-data/json/login.json';
 
 /**
- * TC0043: C-Admin >> Student Leads >> OE Lead
+ * TC_043: C-Admin >> Student Leads >> OE Lead
  * Test Case Title: To verify Delete
  * Precondition: User should have valid admin login credentials
  * Steps:
@@ -19,7 +19,7 @@ import login from '../../test-data/json/login.json';
  * Expected Result:
  *   OE LEADS records should be Deleted successfully ("OE Lead Deleted successfully.")
  **/
-test('TC_043: C-Admin >> Student Leads >> OE Lead - To verify Delete', async ({ page }) => {
+test('TC_043: C-Admin >> Student Leads >> OE Lead - To verify Delete', { tag: '@studentLeads' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const oeLeadPage = new OELeadPage(page);
@@ -45,7 +45,7 @@ test('TC_043: C-Admin >> Student Leads >> OE Lead - To verify Delete', async ({ 
     });
 
     await test.step('Step 5: Check the checkbox under DELETE column', async () => {
-        await oeLeadPage.checkDeleteLeadCheckbox(0);
+        await oeLeadPage.checkDeleteLeadCheckbox();
     });
 
     await test.step('Step 6-8: Click on DELETE SELECTED button, confirm with YES and verify deletion', async () => {

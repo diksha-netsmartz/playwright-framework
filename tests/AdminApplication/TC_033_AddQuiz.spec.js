@@ -21,7 +21,7 @@ import quizData from '../../test-data/json/quizData.json';
  *   1. "Quiz Added successfully.Now you can add questions." message should display
  *   2. The added quiz should be visible in the grid
  **/
-test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To verify user able to Add Quiz', async ({page}) => {
+test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To verify user able to Add Quiz', { tag: '@accountManagement' }, async ({page}) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const quizPage = new OnlineQuizTestsPage(page);

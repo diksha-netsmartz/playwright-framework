@@ -21,7 +21,7 @@ import feeData from '../../test-data/json/feeData.json';
  *   1. Fee should be created successfully
  *   2. Fee should be edited successfully
  **/
-test('TC_030: C-Admin >> Account Management >> Services >> Fee - To verify user able to add/edit Fee', async ({page}) => {
+test('TC_030: C-Admin >> Account Management >> Services >> Fee - To verify user able to add/edit Fee', { tag: '@accountManagement' }, async ({page}) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const feesPage = new FeesPage(page);

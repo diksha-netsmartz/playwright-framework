@@ -22,7 +22,7 @@ import corporateTimeOffData from '../../test-data/json/corporateTimeOffData.json
  *   1. Corporate Time Off should be created successfully
  *   2. Corporate Time Off should be edited successfully
  **/
-test('TC_047: C-Admin >> Scheduling >> Corporate Time Off - To verify user able to add / edit Corporate Time Off', async ({ page }) => {
+test('TC_047: C-Admin >> Scheduling >> Corporate Time Off - To verify user able to add / edit Corporate Time Off', { tag: '@scheduling' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const corporateTimeOffPage = new CorporateTimeOffPage(page);

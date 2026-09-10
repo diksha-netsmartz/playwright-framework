@@ -18,7 +18,7 @@ import leadData from '../../test-data/json/leadData.json';
  * Expected Result:
  *   1. Lead should be added successfully with confirmation message 'Lead added successfully.'
  **/
-test('TC_040: C-Admin >> Student Leads >> Add Lead - To verify user able to add a Lead', async ({ page }) => {
+test('TC_040: C-Admin >> Student Leads >> Add Lead - To verify user able to add a Lead', { tag: '@studentLeads' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const leadPage = new LeadPage(page);

@@ -12,7 +12,7 @@ import login from '../../test-data/json/login.json';
  * - CR attendance report should be exported successfully in PDF format
  * - CR attendance report should be exported successfully in EXCEL format
  **/
-test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', async ({ page }) => {
+test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', { tag: '@classroom' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);

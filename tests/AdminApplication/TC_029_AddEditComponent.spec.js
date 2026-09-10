@@ -13,7 +13,7 @@ import componentData from '../../test-data/json/componentData.json';
  *   1. Components (Products) should be created successfully
  *   2. Components (Products) should be edited successfully
  **/
-test('TC_029: C-Admin >> Account Management >> Services >> Component - To verify user able to add/edit component', async ({page}) => {
+test('TC_029: C-Admin >> Account Management >> Services >> Component - To verify user able to add/edit component', { tag: '@accountManagement' }, async ({page}) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const componentsPage = new ComponentsPage(page);

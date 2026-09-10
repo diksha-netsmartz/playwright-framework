@@ -244,7 +244,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.enrollButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForLoaders();
-            await this.waitForVisible(this.page.getByText('Enrolled successfully.', { exact: true }));
+            await this.waitForVisible(this.page.getByText('Enrolled successfully.', { exact: true }), { timeout: 10000 });
             await this.verifyVisible(this.page.getByText('Enrolled successfully.', { exact: true }));
         });
     }
@@ -298,7 +298,11 @@ export default class EnrollmentBillingPage extends BasePage {
                 packageId = await this.getText(this.getLatestPackageID);
             }
             console.log("package id : " + packageId);
-            await this.waitForVisible(this.deleteLink(packageId));
+            await this.waitForVisible(this.deleteLink(packageId), { timeout: 5000 });
+            if (!await this.isVisible(this.deleteLink(packageId))) {
+                await this.click(this.editButton);
+                await this.click(this.editButton);
+            }
             await this.deleteLink(packageId).click({ force: true });
             await this.click(this.yesConfirmationButton);
         });

@@ -21,7 +21,7 @@ import highSchoolData from '../../test-data/json/highSchoolData.json';
  *   1. High School should be created successfully
  *   2. High School should be edited successfully
  **/
-test('TC_037: C-Admin >> Account Management >> High School - To verify user able to add / edit High School', async ({ page }) => {
+test('TC_037: C-Admin >> Account Management >> High School - To verify user able to add / edit High School', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const highSchoolsPage = new HighSchoolsPage(page);

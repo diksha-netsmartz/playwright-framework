@@ -13,7 +13,7 @@ import login from '../../test-data/json/login.json';
  *  Step 4: Click on Pay button
  * Expected Result: Payment should be made successfully
  **/
-test('TC_013: CSP - Verify Student is able to make Payment', { tag: '@smoke' }, async ({ page }) => {
+test('TC_013: CSP - Verify Student is able to make Payment', { tag: ['@CSPHomepage', '@smoke'] }, async ({ page }) => {
 
     const studentLoginPage = new StudentLoginPage(page);
     const studentHomePage = new StudentHomePage(page);
