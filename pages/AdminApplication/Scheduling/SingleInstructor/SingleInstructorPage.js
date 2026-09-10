@@ -192,6 +192,7 @@ export default class SingleInstructorPage extends BasePage {
         await test.step('Click Get Schedule to load timetable', async () => {
             await this.click(this.getScheduleBtn);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 20000 });
         });
     }
 
@@ -206,6 +207,8 @@ export default class SingleInstructorPage extends BasePage {
             const today = new Date();
             const monthDiff = (today.getFullYear() - targetDate.getFullYear()) * 12 + (today.getMonth() - targetDate.getMonth());
 
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 20000 });
             for (let i = 0; i < monthDiff; i++) {
                 await this.click(this.calendarPrevBtn);
                 await this.page.waitForTimeout(300);

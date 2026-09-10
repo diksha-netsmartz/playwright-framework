@@ -295,10 +295,10 @@ export default class NewClassPage extends BasePage {
                 await this.click(this.confirmYesBtn);
                 // await this.waitForLoaders();
                 // await this.page.waitForTimeout(2000);
-                if (await this.isVisible(this.teacherRemovedMessage, { timeout: 2000 }).catch(() => false)) {
-                    // await this.waitForVisible(this.teacherRemovedMessage);
-                    await this.verifyVisible(this.teacherRemovedMessage);
-                }
+                // if (await this.isVisible(this.teacherRemovedMessage, { timeout: 2000 }).catch(() => false)) {
+                //     // await this.waitForVisible(this.teacherRemovedMessage);
+                //     await this.verifyVisible(this.teacherRemovedMessage);
+                // }
                 await this.page.waitForTimeout(2000);
                 if (await this.isVisible(this.teacherAvailableMessage, { timeout: 2000 }).catch(() => false)) {
                     await this.verifyVisible(this.teacherAvailableMessage);
