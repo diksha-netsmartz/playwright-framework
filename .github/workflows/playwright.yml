@@ -1,0 +1,139 @@
+name: Playwright Tests (Main)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        required: true
+        default: 'coreServer2'
+        type: choice
+        options:
+          - coreServer2
+          - coreServer1
+          - uat
+          - staging
+      grep:
+        description: 'Tag or pattern to filter tests (e.g. @smoke, @reportCenter, leave empty for all)'
+        required: false
+        default: ''
+        type: string
+      recipients:
+        description: 'Comma-separated recipient emails (leave blank to use default)'
+        required: false
+        default: 'diksha.gupta@netsmartz.com'
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Run All Playwright Tests
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      HEADLESS: 'true'
+      VIEWPORT_WIDTH: '1920'
+      VIEWPORT_HEIGHT: '1080'
+      ENV: ${{ github.event.inputs.environment || 'coreServer2' }}
+
+    steps:
+      - name: Checkout repository (main branch)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Set up Java (for Allure Report generation)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers and OS dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright Tests (Headless 1920x1080 Desktop)
+        env:
+          HEADLESS: 'true'
+          VIEWPORT_WIDTH: '1920'
+          VIEWPORT_HEIGHT: '1080'
+        run: |
+          GREP="${{ github.event.inputs.grep }}"
+          CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test"
+
+          if [ -n "$GREP" ]; then
+            CMD="$CMD --grep ${GREP}"
+          fi
+
+          echo "Executing: $CMD"
+          eval $CMD
+
+      - name: Upload Playwright HTML Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload Allure Results & Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results
+          path: |
+            allure-results/
+            allure-reports/
+          retention-days: 14
+
+      - name: Compress Allure Report to ZIP
+        if: always()
+        run: |
+          LATEST_REPORT=$(ls -td allure-reports/report_* 2>/dev/null | head -n 1)
+          if [ -d "$LATEST_REPORT" ]; then
+            echo "Compressing latest Allure report from $LATEST_REPORT"
+            zip -r Allure-Report.zip "$LATEST_REPORT"
+          elif [ -d "allure-results" ]; then
+            echo "Generating Allure report from allure-results"
+            npx allure generate allure-results --clean -o allure-report
+            zip -r Allure-Report.zip allure-report/
+          fi
+
+      - name: Send Email with Allure Report Attachment
+        uses: dawidd6/action-send-mail@v3
+        if: always()
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
+          password: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
+          subject: "Playwright Test Run (${{ job.status }}): ${{ github.event.inputs.environment || 'coreServer2' }}"
+          to: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
+          from: "Playwright Automation <testingdata3011@gmail.com>"
+          body: |
+            Hi Diksha,
+
+            The Playwright automated test run has completed on the main branch.
+
+            - Execution Status: ${{ job.status }}
+            - Environment: ${{ github.event.inputs.environment || 'coreServer2' }}
+            - Target Branch: main
+            - Workflow Run URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Please find the Allure execution report attached as a ZIP file.
+          attachments: Allure-Report.zip
+

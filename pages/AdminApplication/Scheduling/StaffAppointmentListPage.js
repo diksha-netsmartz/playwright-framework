@@ -69,27 +69,20 @@ export default class StaffAppointmentListPage extends BasePage {
     }
 
     /**
-     * Verifies that the appointments results area is visible after filtering.
-     * - If "No record exists." message is shown  → passes with a warning (valid outcome).
-     * - If result rows are present               → passes and logs row count.
-     * - If neither condition is met              → fails the test.
+     * Verifies that the appointments results area is visible and populated after filtering.
+     * Fails if "No record exists." or empty message is displayed on screen.
      **/
     async verifyAppointmentsResultsDisplayed() {
-        await test.step('Verify staff appointment results are displayed', async () => {
+        await test.step('Verify staff appointment results are displayed and populated', async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load');
 
             const noRecords = await this.noRecordMsg.isVisible({ timeout: 5000 }).catch(() => false);
-            const rowCount = noRecords ? 0 : await this.recordRows.count();
+            expect(noRecords, 'Search returned "No record exists." for the selected filters.').toBe(false);
 
-            if (noRecords) {
-                console.warn('Search returned no records for the selected filters.');
-            } else if (rowCount > 0) {
-                console.log(`Search returned ${rowCount} record(s).`);
-            } else {
-                // Neither the no-record message nor any rows were found — fail the test.
-                expect(false, 'Expected either appointment records or "No record exists." message to be displayed, but neither was found.').toBe(true);
-            }
+            const rowCount = await this.recordRows.count();
+            console.log(`Search returned ${rowCount} record(s).`);
+            expect(rowCount, 'Expected appointment records to be displayed').toBeGreaterThan(0);
         });
     }
 }

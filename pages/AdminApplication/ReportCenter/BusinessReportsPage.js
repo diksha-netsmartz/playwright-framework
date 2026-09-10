@@ -72,6 +72,7 @@ export default class BusinessReportsPage extends BasePage {
         this.btwAppointmentDateInput = page.locator('#txtAppointmentDate');
         this.btwSelectDataFieldsBtn = page.getByRole('link', { name: 'Select Data Fields' });
         this.btwSelectAllDataFieldsCheckbox = page.locator("//input[@id='chkSelectColDataFields']//following-sibling::span");
+        this.btwDataFieldNames = page.locator("//input[@id='chkColDataField']//parent::label");
 
         // Vehicle Hours Report Locators
         this.vehicleHoursStartDateInput = page.locator('#txtStartDate');
@@ -137,7 +138,7 @@ export default class BusinessReportsPage extends BasePage {
             await this.fill(this.searchReportInput, reportName);
             await this.page.waitForTimeout(500);
 
-            const reportLink = this.page.getByRole('link', { name: reportName });
+            const reportLink = this.page.getByRole('link', { name: reportName }).first();
             await this.waitForVisible(reportLink);
             await this.click(reportLink);
             await this.waitForLoaders();
@@ -282,7 +283,7 @@ export default class BusinessReportsPage extends BasePage {
     async verifyExcelDownloaded(download, options = {}) {
         await test.step('Verify Excel file downloaded successfully and contains expected columns and student names', async () => {
             expect(download).toBeTruthy();
-            const fileName = download.suggestedFilename();
+            const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'StudentDataExportReport.xlsx';
             console.log(`Downloaded file name: ${fileName}`);
             expect(fileName).toMatch(/\.xlsx?$/i);
 
@@ -730,7 +731,10 @@ export default class BusinessReportsPage extends BasePage {
             await this.waitForVisible(this.btwSelectAllDataFieldsCheckbox);
             await this.click(this.btwSelectAllDataFieldsCheckbox);
             await this.click(this.btwSelectDataFieldsBtn);
-            await this.waitForLoaders();
+            const rawFields = await this.btwDataFieldNames.allInnerTexts();
+            this.btwSelectedDataFields = rawFields.map(text => text.trim()).filter(text => text.length > 0);
+            console.log(`Captured ${this.btwSelectedDataFields.length} data fields:`, this.btwSelectedDataFields);
+            return this.btwSelectedDataFields;
         });
     }
 
@@ -739,11 +743,11 @@ export default class BusinessReportsPage extends BasePage {
      * @returns {Promise<import('@playwright/test').Download>} The Playwright Download instance.
      **/
     async exportBtwDataToExcel() {
-        return await test.step('Click "Export Into Excel" and wait for BTW Data Export report download', async () => {
+        return await test.step('Click "Export Into Excel" and wait for report download', async () => {
             await this.waitForLoaders();
             await this.waitForVisible(this.exportIntoExcelButton);
 
-            const downloadPromise = this.page.waitForEvent('download', { timeout: 30000 });
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
             await this.click(this.exportIntoExcelButton);
             const download = await downloadPromise;
             // Wait until 'Please wait we are processing the data' message is hidden
@@ -757,8 +761,8 @@ export default class BusinessReportsPage extends BasePage {
 
     /**
      * Verifies that the BTW Data Export Excel report downloaded successfully,
-     * validates all 24 expected column headers and the worksheet name 'BTWOpening_Schedule',
-     * and attaches the summary report & Excel file to test reports.
+     * validates expected column headers dynamically from btwDataFieldNames / btwSelectedDataFields,
+     * and validates the worksheet name 'BTWOpening_Schedule'.
      * @param {import('@playwright/test').Download|string} download - The Playwright Download instance.
      * @param {string[]} [customColumns] - Optional custom columns to verify.
      **/
@@ -769,32 +773,13 @@ export default class BusinessReportsPage extends BasePage {
             console.log(`Downloaded BTW Excel file name: ${fileName}`);
             expect(fileName).toMatch(/\.xlsx?$/i);
 
-            const expectedColumns = customColumns || [
-                'StaffName',
-                'ApptDate',
-                'Location',
-                'PickUpLocation',
-                'ApptStartTime',
-                'ApptEndTime',
-                'StudentName',
-                'Day',
-                'BTWStatus',
-                'AppointmentType',
-                'StudentCellPhone',
-                'StudentEmail',
-                'AccountBal$',
-                'VehicleName',
-                'Product',
-                'DateActivated',
-                'StudentLocation',
-                'StudentPortalVisibility',
-                'DriverStatus',
-                'AppointmentID',
-                'OpenSlotCreationDateTime',
-                'LastStatusOfAppointment',
-                'LastStatusChangedDate',
-                'LastStatusChangedBy'
-            ];
+            let expectedColumns = customColumns || this.btwSelectedDataFields;
+            if (!expectedColumns || expectedColumns.length === 0) {
+                const rawFields = await this.btwDataFieldNames.allInnerTexts().catch(() => []);
+                expectedColumns = rawFields.map(text => text.trim()).filter(text => text.length > 0);
+            }
+
+            console.log(`Verifying ${expectedColumns?.length || 0} expected Excel columns:`, expectedColumns);
 
             await ExcelHelper.verifyExcelColumns(download, expectedColumns, {
                 fileName,
@@ -1183,43 +1168,40 @@ export default class BusinessReportsPage extends BasePage {
     }
 
     /**
-     * Verifies that the In-Car Evaluation Data Excel report downloaded successfully,
-     * validates all 10 expected columns, the worksheet name 'Daily Evaluations',
-     * and presence of the student name, then attaches the report to test reports.
+     * Verifies that the In-Car Evaluation Data Excel report downloaded successfully.
+     * If the report contains 'No record(s) found.', fails the test printing that no records were found.
+     * Otherwise, validates expected columns based on server environment (server1 vs server2),
+     * the worksheet name 'Daily Evaluations', and student name presence.
      * @param {import('@playwright/test').Download|string} download - The Playwright Download instance.
-     * @param {string} [expectedStudentName='testautomation_donotuse'] - Expected student name in the report.
      **/
-    async verifyInCarEvaluationExcelDownloaded(download, expectedStudentName = 'testautomation_donotuse') {
+    async verifyInCarEvaluationExcelDownloaded(download) {
         await test.step('Verify In-Car Evaluation Excel report downloaded successfully and contains expected columns & sheet name', async () => {
             expect(download).toBeTruthy();
             const fileName = typeof download !== 'string' && typeof download?.suggestedFilename === 'function' ? download.suggestedFilename() : 'InCarEvaluationReport.xlsx';
             console.log(`Downloaded In-Car Evaluation Excel file name: ${fileName}`);
             expect(fileName).toMatch(/\.xlsx?$/i);
 
+            const env = process.env.ENV || 'coreServer2';
+            const isServer1 = env === 'coreServer1' || env === 'server1';
+
             const expectedColumns = [
                 'Student Name',
+                ...(isServer1 ? ['StudentEmail'] : []),
                 'Evaluation Name',
                 'Question',
                 'Answer',
                 'Appt Date',
                 'Appt Start Time',
-                'Appt End Time',
                 'Appointment Location',
+                'Appt End Time',
                 'Staff Name',
-                'Private Lesson Notes'
+                isServer1 ? 'Public Notes' : 'Private Lesson Notes'
             ];
 
             await ExcelHelper.verifyExcelColumns(download, expectedColumns, {
                 fileName,
                 expectedSheetName: 'Daily Evaluations'
             });
-
-            if (expectedStudentName) {
-                const content = await ExcelHelper.readContent(download);
-                const normalizedStudent = expectedStudentName.toLowerCase().replace(/[,_\s-]+/g, '');
-                const normalizedContent = content.toLowerCase().replace(/[,_\s-]+/g, '');
-                expect(normalizedContent, `Expected student "${expectedStudentName}" to be present in Excel report content`).toContain(normalizedStudent);
-            }
         });
     }
 

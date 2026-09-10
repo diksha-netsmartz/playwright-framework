@@ -12,7 +12,7 @@ import login from '../../test-data/json/login.json';
  *   Step 1 - Login to Admin Portal with valid credentials
  *   Step 2 - From the side menu, navigate to Student Leads
  *   Step 3 - Go to OE LEADS tab
- *   Step 4 - Select ACTIVE option from dropdown
+ *   Step 4 - Select Show All option from dropdown
  *   Step 5 - On the top right side, click on Export To Excel button
  * Expected Result:
  *   File should be downloaded successfully
@@ -37,8 +37,8 @@ test('TC_045: C-Admin >> Student Leads >> OE Lead - To verify Export to Excel', 
         await oeLeadPage.clickOELeadsTab();
     });
 
-    await test.step('Step 4: Select ACTIVE from dropdown', async () => {
-        await oeLeadPage.selectOELeadStatus('Active');
+    await test.step('Step 4: Select Show All from dropdown', async () => {
+        await oeLeadPage.selectOELeadStatus('Show All');
     });
 
     await test.step('Step 5: Click Export To Excel and verify file downloaded successfully', async () => {
