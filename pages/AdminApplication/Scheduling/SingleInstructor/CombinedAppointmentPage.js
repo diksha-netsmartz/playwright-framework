@@ -492,13 +492,13 @@ export default class CombinedAppointmentPage extends BasePage {
                     setTimeout(() => {
                         observer.disconnect();
                         resolve('');
-                    }, 20000);
+                    }, 30000);
                 });
             }, 'Appointment created successfully').catch(() => '');
 
             await this.click(this.confirmYesButton);
 
-            if (await this.isVisible(this.submitButtonPopup, { timeout: 2500 }).catch(() => false)) {
+            if (await this.isVisible(this.submitButtonPopup, { timeout: 4000 }).catch(() => false)) {
                 await this.click(this.submitButtonPopup);
                 await this.waitForLoaders();
             }
