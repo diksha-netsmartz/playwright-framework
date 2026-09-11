@@ -162,9 +162,11 @@ export default class ServicesPackagesPage extends BasePage {
                 await this.click(this.serviceForCertificationYesRadioButton);
             }
 
-            await this.click(this.visibleToStudentTypeDropdown);
-            await this.waitForVisible(this.visibleToStudentTypeDropdownOptionAll);
-            await this.click(this.visibleToStudentTypeDropdownOptionAll);
+            if (await this.isVisible(this.visibleToStudentTypeDropdown, { timeout: 1000 })) {
+                await this.click(this.visibleToStudentTypeDropdown);
+                await this.waitForVisible(this.visibleToStudentTypeDropdownOptionAll);
+                await this.click(this.visibleToStudentTypeDropdownOptionAll);
+            }
 
             // Select Contract as No Contract Needed if dropdown present
             await this.click(this.contractDropdown);

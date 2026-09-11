@@ -304,10 +304,13 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {string} dropdownName - Dropdown data-id identifier.
      **/
     async selectDropdown(dropdownName) {
-        await test.step(`Select dropdown option for: "${dropdownName}"`, async () => {
-            await this.click(this.getDropdownButton(dropdownName));
-            await this.click(this.getFirstDropdownOption(dropdownName));
-        });
+        if (await this.isVisible(this.getDropdownButton(dropdownName), { timeout: 1000 })) {
+            await test.step(`Select dropdown option for: "${dropdownName}"`, async () => {
+                await this.click(this.getDropdownButton(dropdownName));
+                await this.click(this.getFirstDropdownOption(dropdownName));
+
+            });
+        }
     }
 
     /**

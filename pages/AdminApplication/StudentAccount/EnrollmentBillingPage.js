@@ -38,6 +38,10 @@ export default class EnrollmentBillingPage extends BasePage {
         this.cashDrawerLocationDropdownInPackageSelection = page.getByRole('button', { name: 'Select Cash Drawer Location' })
         this.cashDrawerLocationSelectionInPackageSelection = page.locator("(//div[@id='drp_CashdrawerLocation']//li//span[1][not(contains(text(),'Select'))])[1]");
         this.addPackageButton = page.getByRole('button', { name: 'Add Package' });
+        this.soldByDropdown = page.locator('#btnSelectSoldBy')
+        this.soldByDropdownSelection = page.locator("(//div[@id='dvSoldBy']//li//a[1][not(contains(text(),'Select'))])[1]");
+
+
 
         // Location / Appointment
         this.selectLocation = page.getByRole('link', { name: 'Select Location' });
@@ -203,12 +207,28 @@ export default class EnrollmentBillingPage extends BasePage {
     }
 
     /**
+* Opens the sold by dropdown and selects the sold by .
+**/
+    async selectSoldByDropdown() {
+        if (await this.isVisible(this.soldByDropdown, { timeout: 2000 }).catch(() => false)) {
+            await test.step(`Select Sold By`, async () => {
+                await this.click(this.soldByDropdown);
+                await this.waitForVisible(this.soldByDropdownSelection);
+                await this.click(this.soldByDropdownSelection);
+                await this.page.waitForTimeout(2000);
+
+            });
+        }
+    }
+
+    /**
      * Completes the entire workflow to add a CR Package to cart (location, filter, select slot, additional details).
     **/
     async addCRPackage() {
         await test.step('Add CR Package to cart', async () => {
             await this.selectPackage('CR Package');
             await this.selectCashDrawerLocation();
+            await this.selectSoldByDropdown();
             await this.click(this.addPackageButton);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 5000 })
@@ -360,7 +380,9 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.fill(this.last4Digits, paymentData.swipedTransaction.last4Digits);
             await this.click(this.cardTypeSelectDropdown);
             await this.click(this.discover);
-            await this.click(this.doNotSendEmailCheckbox);
+            if (await this.isVisible(this.doNotSendEmailCheckbox, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.doNotSendEmailCheckbox);
+            }
             await this.fill(this.transactionNumber, paymentData.swipedTransaction.transactionNumber);
             await this.fill(this.receiptNumber, paymentData.swipedTransaction.receiptNumber);
             if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 1000 }).catch(() => false)) {
@@ -411,7 +433,9 @@ export default class EnrollmentBillingPage extends BasePage {
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
             }
-            await this.click(this.doNotSendEmailCheckbox);
+            if (await this.isVisible(this.doNotSendEmailCheckbox, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.doNotSendEmailCheckbox);
+            }
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
@@ -446,7 +470,9 @@ export default class EnrollmentBillingPage extends BasePage {
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
             }
-            await this.click(this.doNotSendEmailCheckbox);
+            if (await this.isVisible(this.doNotSendEmailCheckbox, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.doNotSendEmailCheckbox);
+            }
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
@@ -483,7 +509,9 @@ export default class EnrollmentBillingPage extends BasePage {
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
             }
-            await this.click(this.doNotSendEmailCheckbox);
+            if (await this.isVisible(this.doNotSendEmailCheckbox, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.doNotSendEmailCheckbox);
+            }
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
@@ -551,7 +579,9 @@ export default class EnrollmentBillingPage extends BasePage {
                 await this.waitForVisible(this.cashDrawerLocationDropdownOption);
                 await this.click(this.cashDrawerLocationDropdownOption);
             }
-            await this.click(this.doNotSendEmailCheckbox);
+            if (await this.isVisible(this.doNotSendEmailCheckbox, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.doNotSendEmailCheckbox);
+            }
             await this.click(this.saveButton);
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);

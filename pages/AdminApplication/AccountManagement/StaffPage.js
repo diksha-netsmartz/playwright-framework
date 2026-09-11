@@ -56,7 +56,7 @@ export default class StaffPage extends BasePage {
         this.certExpDateInput = page.locator('#date_CertExp');
 
         this.userNameInput = page.getByRole('textbox', { name: 'User Name' });
-        this.passwordInput = page.getByPlaceholder('Password', { exact: true });
+        this.passwordInput = page.locator("//input[contains(@name, 'Password') and not(contains(@name,'Re'))]")
         this.reEnterPasswordInput = page.getByPlaceholder('Re Enter Password');
 
         this.assignAppointmentColorCheckbox = page.locator("xpath=//input[@id='Bitappointmentcolor']//following-sibling::ins");
@@ -201,24 +201,29 @@ export default class StaffPage extends BasePage {
 
             // 11. Instructor Permit Number & Permit Dates
             await this.fill(this.instructorPermitNumberInput, this.instructorPermitNumber);
-            await this.fill(this.permitIssueDateInput, this.permitIssueDate);
-            await this.fill(this.certExpDateInput, this.certExpDate);
-
+            if (await this.isVisible(this.permitIssueDateInput), { timeout: 100 }) {
+                await this.fill(this.permitIssueDateInput, this.permitIssueDate);
+            }
+            if (await this.isVisible(this.certExpDateInput), { timeout: 100 }) {
+                await this.fill(this.certExpDateInput, this.certExpDate);
+            }
             // 12. User Credentials
             await this.fill(this.userNameInput, this.userName);
             await this.fill(this.passwordInput, this.password);
             await this.fill(this.reEnterPasswordInput, this.password);
 
             // 13. Optional Checkboxes
-            if (await this.assignAppointmentColorCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
+            if (await this.assignAppointmentColorCheckbox.isVisible({ timeout: 100 }).catch(() => false)) {
                 await this.click(this.assignAppointmentColorCheckbox);
             }
-            if (await this.requireManualEnablingOfZoomButton.isVisible({ timeout: 5000 }).catch(() => false)) {
+            if (await this.requireManualEnablingOfZoomButton.isVisible({ timeout: 100 }).catch(() => false)) {
                 await this.click(this.requireManualEnablingOfZoomButton);
             }
 
             // 14. Zoom PMI & Staff Survey Link
-            await this.fill(this.zoomPmiInput, this.zoomPmi);
+            if (await this.isVisible(this.zoomPmiInput), { timeout: 100 }) {
+                await this.fill(this.zoomPmiInput, this.zoomPmi);
+            }
             await this.fill(this.staffSurveyLinkInput, this.staffSurveyLink);
 
             // 15. Profile Picture Upload

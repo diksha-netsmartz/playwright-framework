@@ -177,7 +177,7 @@ export default class BulkProcessPage extends BasePage {
     /**
      * Verifies that the downloaded BTW History PDF contains the expected student details fields, title, and table columns.
      * @param {import('@playwright/test').Download|string} download - The downloaded PDF file or path.
-     * @param {string[]} [columns] - Optional custom list of field/column names.
+     * @param {(string | string[] | RegExp)[]} [columns] - Optional custom list of field/column names.
      **/
     async verifyBtwHistoryPdfColumns(download, columns) {
         const env = process.env.ENV || 'coreServer2';
@@ -190,7 +190,7 @@ export default class BulkProcessPage extends BasePage {
             'Student:',
             'Address:',
             'Student#:',
-            'City, StateZip:',
+            ['City, StateZip:', 'City,State,Zip:'],
             'Home:',
             'Cell:',
             'Parent:',

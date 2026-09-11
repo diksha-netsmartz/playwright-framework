@@ -12,15 +12,15 @@
     "btwPackage": "ABTestBTWServ"
   },
   "staging": {
-    "btwAndCrPackage": "BTW and CR Package",
-    "crPackage": "CR Package",
-    "rtPackage": "RT Package",
-    "btwPackage": "BTW Package"
+    "btwAndCrPackage": "BTW AND CR Package",
+    "crPackage": "CR + Additional CR package",
+    "rtPackage": "WA RT Package",
+    "btwPackage": "ABTestBTWServ"
   },
   "uat": {
-    "btwAndCrPackage": "BTW and CR Package",
+    "btwAndCrPackage": "BTW + CR Package",
     "crPackage": "CR Package",
     "rtPackage": "RT Package",
-    "btwPackage": "BTW Package"
+    "btwPackage": "ABTestBTWServ"
   }
 }

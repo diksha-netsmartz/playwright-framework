@@ -263,10 +263,10 @@ export default class ClassroomAttendancePage extends BasePage {
     }
 
     /**
-     * Verifies that an Excel file is downloaded successfully and contains the specified expected text.
+     * Verifies that an Excel file is downloaded successfully and contains the specified expected text or matches the regex pattern.
      * Attaches the Excel file to Allure and Playwright HTML reports.
      * @param {import('@playwright/test').Download} download - The Playwright Download instance.
-     * @param {string} expectedText - Text expected inside the downloaded Excel file (e.g., 'Attendance Report', 'Roster Report').
+     * @param {string | RegExp} expectedText - Text or RegExp pattern expected inside the downloaded Excel file (e.g., 'Attendance Report', 'Roster Report').
      **/
     async verifyExcelReportDownloaded(download, expectedText) {
         await test.step(`Verify downloaded Excel file contains text: "${expectedText}"`, async () => {
@@ -277,7 +277,11 @@ export default class ClassroomAttendancePage extends BasePage {
 
             const content = await ExcelHelper.readContent(download);
             console.log(`Verifying Excel content contains: "${expectedText}"`);
-            expect(content.toLowerCase()).toContain(expectedText.toLowerCase());
+            if (expectedText instanceof RegExp) {
+                expect(content).toMatch(expectedText);
+            } else {
+                expect(content.toLowerCase()).toContain(expectedText.toLowerCase());
+            }
             console.log(`Excel content "${expectedText}" verified successfully.`);
 
             // Attach Excel file to Playwright and Allure Reports
@@ -299,17 +303,22 @@ export default class ClassroomAttendancePage extends BasePage {
      * Verifies the Roster PDF report in a new tab, using a polling wait for the page title
      * to become non-empty before asserting. This handles slower PDF load times in headless mode.
      * @param {import('@playwright/test').Page} pdfPage - The popup Page instance.
-     * @param {string} expectedText - The expected text inside the PDF document (e.g., 'Roster Report').
+     * @param {string | RegExp} expectedText - The expected text or pattern inside the PDF document (e.g., 'Roster Report').
      * @param {string} [attachmentName] - Filename for the attached PDF in reports.
      **/
-    async verifyRosterPdfReport(pdfPage, expectedText, attachmentName = `${expectedText.replace(/\s+/g, '_')}.pdf`) {
+    async verifyRosterPdfReport(pdfPage, expectedText, attachmentName) {
+        const resolvedAttachmentName = attachmentName || (
+            expectedText instanceof RegExp
+                ? 'Roster_Report.pdf'
+                : `${String(expectedText).replace(/\s+/g, '_')}.pdf`
+        );
         await test.step(`Verify Roster PDF report tab is loaded`, async () => {
             await pdfPage.waitForFunction(() => document.title.trim().length > 0, { timeout: 30000 }).catch(() => {
                 console.log('Title did not become non-empty within 30s; proceeding with assertion.');
             });
             await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 15000 });
         });
-        await PdfHelper.downloadVerifyAndAttach(pdfPage, expectedText, attachmentName);
+        await PdfHelper.downloadVerifyAndAttach(pdfPage, expectedText, resolvedAttachmentName);
         await pdfPage.close().catch(() => {
         });
     }

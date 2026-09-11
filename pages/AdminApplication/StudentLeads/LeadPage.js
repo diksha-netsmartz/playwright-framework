@@ -33,7 +33,7 @@ export default class LeadPage extends BasePage {
         this.stateDropdown = page.locator("xpath=//select[@name='State']//parent::div//button");
         this.stateOptionCA = page.locator("xpath=//select[@name='State']//parent::div//ul//a[normalize-space(.)='CA']");
 
-        this.zipCodeInput = page.getByRole('textbox', { name: 'Zip/Postal Code' });
+        this.zipCodeInput = page.locator('#ZipPostalCode')
         this.emailInput = page.locator('#Email')
 
         // Stage Field (contenteditable / note area for lead pipeline stage)
@@ -147,37 +147,41 @@ export default class LeadPage extends BasePage {
             await this.waitForVisible(this.lastNameInput);
             await this.fill(this.lastNameInput, this.lastName);
 
-            await this.waitForVisible(this.addressInput);
-            await this.fill(this.addressInput, address);
+            if (await this.isVisible(this.addressInput, { timeout: 100 })) {
+                await this.fill(this.addressInput, address);
+            }
 
-            await this.waitForVisible(this.cityInput);
-            await this.fill(this.cityInput, city);
+            if (await this.isVisible(this.cityInput, { timeout: 100 })) {
+                await this.fill(this.cityInput, city);
+            }
 
-            await this.waitForVisible(this.stateDropdown);
-            await this.click(this.stateDropdown);
-            await this.waitForVisible(this.stateOptionCA);
-            await this.click(this.stateOptionCA);
+            if (await this.isVisible(this.stateDropdown, { timeout: 100 })) {
+                await this.click(this.stateDropdown);
+                await this.waitForVisible(this.stateOptionCA);
+                await this.click(this.stateOptionCA);
+            }
 
-            await this.waitForVisible(this.zipCodeInput);
-            await this.fill(this.zipCodeInput, zipCode);
+            if (await this.isVisible(this.zipCodeInput, { timeout: 100 })) {
+                await this.fill(this.zipCodeInput, zipCode);
+            }
 
             await this.waitForVisible(this.emailInput);
             await this.fill(this.emailInput, email);
 
 
-            if (await this.isVisible(this.dropdown27, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.dropdown27, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.dropdown27);
                 await this.waitForVisible(this.dropdown27Option);
                 await this.click(this.dropdown27Option);
             }
 
             await this.click(this.stageField);
-            if (await this.isVisible(this.genderMaleRadioButton, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.genderMaleRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.genderMaleRadioButton);
             }
 
             // Birth Date — Month, Day, Year dropdowns
-            if (await this.isVisible(this.birthMonthDropdown, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.birthMonthDropdown, { timeout: 100 }).catch(() => false)) {
                 await this.waitForVisible(this.birthMonthDropdown);
                 await this.click(this.birthMonthDropdown);
                 await this.waitForVisible(this.dobMonth);
@@ -194,30 +198,30 @@ export default class LeadPage extends BasePage {
                 await this.click(this.dobYear);
             }
 
-            if (await this.isVisible(this.homePhoneInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.homePhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.homePhoneInput, homePhone);
             }
 
-            if (await this.isVisible(this.cellPhoneInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.cellPhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.cellPhoneInput, cellPhone);
             }
 
-            if (await this.isVisible(this.parentPhoneInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentPhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.parentPhoneInput, parentPhone);
             }
 
-            if (await this.isVisible(this.otherPhoneInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.otherPhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.otherPhoneInput, otherPhone);
             }
 
-            if (await this.isVisible(this.medicalConditionsInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.medicalConditionsInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.medicalConditionsInput, data.medicalConditions)
             }
 
-            if (await this.isVisible(this.studentNotesInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.studentNotesInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.studentNotesInput, data.studentNotes)
             }
-            if (await this.isVisible(this.preferredDateandTimeInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.preferredDateandTimeInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.preferredDateandTimeInput, data.preferredDateandTime)
             }
 
@@ -227,6 +231,7 @@ export default class LeadPage extends BasePage {
                 email
             };
         });
+
     }
 
     /**
@@ -322,7 +327,7 @@ export default class LeadPage extends BasePage {
  * Add and save notes while updating lead
  **/
     async updateNotes(notes) {
-        if (await this.isVisible(this.notesTextarea)) {
+        if (await this.isVisible(this.notesTextarea, { timeout: 100 })) {
             await this.fill(this.notesTextarea, notes);
             await this.click(this.saveNoteButton);
             await this.waitForVisible(this.yesConfirmationButton);
@@ -337,7 +342,7 @@ export default class LeadPage extends BasePage {
 * Add and save task while updating lead
 **/
     async updateTask(taskSubject, taskNote) {
-        if (await this.isVisible(this.tasktab)) {
+        if (await this.isVisible(this.tasktab, { timeout: 100 })) {
             await this.click(this.tasktab);
             await this.waitForVisible(this.taskSubjext);
             await this.fill(this.taskSubjext, taskSubject);

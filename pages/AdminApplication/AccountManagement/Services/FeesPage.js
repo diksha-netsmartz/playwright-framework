@@ -26,6 +26,8 @@ export default class FeesPage extends BasePage {
         this.eligibleServiceSelection = page.locator("xpath=(//li[contains(@attrcolumn,'DiscountPackages')])[1]");
         this.feeAmountInput = page.getByRole('textbox', { name: 'Fee Amount' });
         this.notesInput = page.locator('#Notes');
+        this.allowWebPurchaseYesRadioButton = page.locator("xpath=//label[contains(text(),'Yes')]//input[@id='AllowWebPurchase']//following-sibling::ins");
+        this.allowPortalPurchaseNoRadioButton = page.locator("xpath=//label[contains(text(),'No')]//input[@id='AllowPortalPurchase']//following-sibling::ins");
 
         // Modal Action Buttons
         this.saveBtn = page.locator("xpath=//span[contains(@class,'FeesHeader')]//ancestor::div[contains(@class,'modal-content')]//button[contains(text(),'Save')]");
@@ -83,6 +85,12 @@ export default class FeesPage extends BasePage {
             await this.waitForVisible(this.notesInput);
             await this.fill(this.notesInput, notes);
 
+            if (await this.isVisible(this.allowWebPurchaseYesRadioButton, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.allowWebPurchaseYesRadioButton);
+            }
+            if (await this.isVisible(this.allowPortalPurchaseNoRadioButton, { timeout: 1000 }).catch(() => false)) {
+                await this.click(this.allowPortalPurchaseNoRadioButton);
+            }
             return this.feeName;
         });
     }

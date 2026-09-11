@@ -70,6 +70,7 @@ test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled",
         await combinedAppointmentPage.selectEndTimeDropdown();
         await combinedAppointmentPage.selectDropdown("Location");
         await combinedAppointmentPage.selectDropdown("Vehicle");
+        await combinedAppointmentPage.selectDropdown("Language");
         await combinedAppointmentPage.fillStudentDetails(1, student1);
         await combinedAppointmentPage.fillStudentDetails(2, student2);
         await combinedAppointmentPage.selectDuration();

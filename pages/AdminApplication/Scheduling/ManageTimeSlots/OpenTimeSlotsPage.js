@@ -439,8 +439,9 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.instruction2DropdownOption);
             await this.click(this.instruction2DropdownOption);
             await this.waitForLoaders();
-
-            await this.click(this.showInStudentCenterYesRadioButton);
+            if (await this.isVisible(this.showInStudentCenterYesRadioButton, { timeout: 100 })) {
+                await this.click(this.showInStudentCenterYesRadioButton);
+            }
             return this.puLocation;
         });
     }
@@ -613,7 +614,7 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.vehicleDropdownOptionLast);
             await this.click(this.vehicleDropdownOptionLast);
 
-            if (await this.showInStudentCenterNoRadioButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+            if (await this.showInStudentCenterNoRadioButton.isVisible({ timeout: 100 }).catch(() => false)) {
                 await this.click(this.showInStudentCenterNoRadioButton);
             }
             await this.waitForLoaders();
