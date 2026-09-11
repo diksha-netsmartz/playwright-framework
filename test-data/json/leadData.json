@@ -13,5 +13,15 @@
   "otherPhone": "5557894560",
   "medicalConditions": "None",
   "studentNotes": "Add Lead Test",
-  "preferredDateandTime": "05/09/2026"
+  "preferredDateandTime": "05/09/2026",
+  "editLead": {
+    "middleName": "AutoUpdated",
+    "address": "123 Test Street Updated",
+    "zipCode": "90002",
+    "email": "updatedlead@gmail.com",
+    "medicalConditions": "Updated med conditions",
+    "notes": "Notes added on edited lead",
+    "taskSubject": "automated task subject",
+    "taskNote": "automated task note"
+  }
 }
