@@ -135,6 +135,12 @@ export default class EnrollmentBillingPage extends BasePage {
         this.cardPostalCodeIframe = page.locator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]');
         this.postalCodeInIframe = page.frameLocator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]').locator('#postal');
 
+        // Payment Form / Gateway iframe locators (Next NP Gateway / Tokenizer)
+        this.paymentFormIframe = page.locator("//div[@id='payment-form']//iframe");
+        this.paymentFormCardNumber = page.frameLocator("//div[@id='payment-form']//iframe").locator("input.cc-input, input[placeholder='0000 0000 0000 0000']");
+        this.paymentFormExpiryDate = page.frameLocator("//div[@id='payment-form']//iframe").locator("input.exp-input, input[placeholder='MM/YY']");
+        this.paymentFormCvv = page.frameLocator("//div[@id='payment-form']//iframe").locator("input.cvv-input, input[placeholder='CVV']");
+
         // Billing amount caption (e.g. "Billing: $1275.00" or "Billing: $-1100.00")
         this.billingAmountCaption = page.locator("//div[@id='divBillingGrid']//div[contains(@class,'caption')]");
         // Common buttons
@@ -582,6 +588,17 @@ export default class EnrollmentBillingPage extends BasePage {
 
                 await this.click(this.cvvInIframe);
                 await this.pressSequentially(this.cvvInIframe, paymentData.processCreditCard.cvv);
+            } else if (await this.isVisible(this.paymentFormCardNumber, { timeout: 2000 }).catch(() => false)) {
+                await this.waitForVisible(this.paymentFormCardNumber);
+                await this.click(this.paymentFormCardNumber);
+                await this.pressSequentially(this.paymentFormCardNumber, paymentData.processCreditCard.cardNumber);
+
+                const expRaw = paymentData.processCreditCard.expiryDate;
+                const expFormatted = expRaw.length === 6 ? `${expRaw.slice(0, 2)}${expRaw.slice(4)}` : expRaw;
+                await this.click(this.paymentFormExpiryDate);
+                await this.pressSequentially(this.paymentFormExpiryDate, expFormatted);
+                await this.click(this.paymentFormCvv);
+                await this.pressSequentially(this.paymentFormCvv, paymentData.processCreditCard.cvv);
             } else {
                 if (await this.isVisible(this.cardNumber, { timeout: 100 }).catch(() => false)) {
                     await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
