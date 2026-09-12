@@ -92,6 +92,7 @@ export default class NewClassPage extends BasePage {
     async verifyNewClassroomPageIsDisplayed() {
         await test.step('Verify New Classroom page is displayed', async () => {
             await this.waitForLoaders();
+            await this.waitForVisible(this.classroomHeading, { timeout: 5000 })
             await this.verifyVisible(this.classroomHeading);
         });
     }

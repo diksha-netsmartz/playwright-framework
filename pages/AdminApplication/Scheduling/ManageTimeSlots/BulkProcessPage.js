@@ -115,7 +115,7 @@ export default class BulkProcessPage extends BasePage {
         await test.step('Select Complete checkbox for appointment', async () => {
             await this.page.waitForLoadState('load', { timeout: 10000 });
             await this.waitForLoaders();
-            await this.waitForVisible(this.completeCheckbox);
+            await this.waitForVisible(this.completeCheckbox, { timeout: 5000 });
             await this.click(this.completeCheckbox);
         });
     }
@@ -149,7 +149,9 @@ export default class BulkProcessPage extends BasePage {
      **/
     async selectPrintBtwHistoryCheckbox() {
         await test.step('Select Print BTW History checkbox for appointment', async () => {
-            await this.waitForVisible(this.printBtwHistoryCheckbox);
+            await this.page.waitForLoadState('load', { timeout: 10000 });
+            await this.waitForLoaders();
+            await this.waitForVisible(this.printBtwHistoryCheckbox, { timeout: 5000 });
             await this.click(this.printBtwHistoryCheckbox);
         });
     }
