@@ -316,6 +316,7 @@ export default class SingleInstructorPage extends BasePage {
             await this.selectDateInCalendar();
             await this.waitForLoaders().catch(() => { });
             await this.page.waitForTimeout(1000);
+            await this.page.waitForLoadState('load', { timeout: 20000 });
 
             const slot = await this.findAvailableSlot(0);
             await slot.click({ button: "right" });
