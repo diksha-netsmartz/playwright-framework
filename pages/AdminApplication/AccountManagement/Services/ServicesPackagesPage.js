@@ -44,7 +44,7 @@ export default class ServicesPackagesPage extends BasePage {
 
 
         this.visibleToStudentTypeDropdown = page.locator("xpath=//select[@name='VisibletoStudentType']//parent::div//button");
-        this.visibleToStudentTypeDropdownOptionAll = page.locator("xpath=//select[@name='VisibletoStudentType']//parent::div//div//span[text()='All']");
+        this.visibleToStudentTypeDropdownOptionAll = page.locator("xpath=(//select[@name='VisibletoStudentType']//parent::div//div//span[text()='All'])[1]");
 
         this.contractDropdown = page.locator("xpath=//select[contains(@id,'AssociateContract')]//parent::div//button");
         this.contractOptionNoContract = page.locator("xpath=//select[contains(@id,'AssociateContract')]//parent::div//div//span[text()='No Contract Needed']");
