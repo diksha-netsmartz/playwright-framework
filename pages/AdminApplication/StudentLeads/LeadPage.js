@@ -82,8 +82,8 @@ export default class LeadPage extends BasePage {
         this.taskNote = page.getByRole('textbox', { name: 'Note' });
         this.priorityButton = page.locator("(//div[@class='priority']//label)[1]")
         this.saveTaskButton = page.locator("(//button[contains(@id,'SaveUpdateTask')])[1]");
-        this.taskAssignToMeDropdown = page.locator("//button[contains(@data-id,'AssignTo')]");
-        this.taskAssignToMeDropdownValue = page.locator("(//button[contains(@data-id,'AssignTo')]//parent::div//following-sibling::div//li//a)[2]");
+        this.taskAssignToMeDropdown = page.locator("//button[contains(@data-id,'ProfileTAB_drpAssignTo')]");
+        this.taskAssignToMeDropdownValue = page.locator("(//button[contains(@data-id,'ProfileTAB_drpAssignTo')]//parent::div//following-sibling::div//li//a)[2]");
         this.dueDateCalendar = page.getByRole('textbox', { name: 'M/D/YYYY' });
         this.lastday = page.locator("(//td[@class='day'])[last()]");
         this.selectTime = page.getByRole('button', { name: 'Select Time' })
@@ -314,7 +314,7 @@ export default class LeadPage extends BasePage {
                 await this.fill(this.emailInput, updatedData.email);
             }
             if (updatedData.medicalConditions) {
-                if (await this.medicalConditionsInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+                if (await this.medicalConditionsInput.isVisible({ timeout: 1000 }).catch(() => false)) {
                     await this.fill(this.medicalConditionsInput, updatedData.medicalConditions);
                 }
             }
