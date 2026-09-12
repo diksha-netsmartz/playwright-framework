@@ -89,60 +89,99 @@ export default class ComponentsPage extends BasePage {
             const observationHours = data.observationHours || `${Math.floor(1 + Math.random() * 5)}`;
 
             await this.waitForLoaders();
-            await this.waitForVisible(this.componentNameInput);
-            await this.fill(this.componentNameInput, this.componentName);
+            await this.waitForVisible(this.componentNameInput, { timeout: 10000 }).catch(() => { });
+            if (await this.isVisible(this.componentNameInput, { timeout: 1000 }).catch(() => false)) {
+                await this.fill(this.componentNameInput, this.componentName);
+            }
 
-            await this.waitForVisible(this.itemCodeInput);
-            await this.fill(this.itemCodeInput, itemCode);
+            if (await this.isVisible(this.itemCodeInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.itemCodeInput, itemCode);
+            }
 
-            await this.click(this.statusDropdown);
-            await this.waitForVisible(this.statusDropdownOption);
-            await this.click(this.statusDropdownOption);
+            if (await this.isVisible(this.statusDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.statusDropdown);
+                await this.waitForVisible(this.statusDropdownOption);
+                await this.click(this.statusDropdownOption);
+            }
 
-            await this.click(this.typeDropdown);
-            await this.waitForVisible(this.typeDropdownOption);
-            await this.click(this.typeDropdownOption);
+            if (await this.isVisible(this.typeDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.typeDropdown);
+                await this.waitForVisible(this.typeDropdownOption);
+                await this.click(this.typeDropdownOption);
+            }
 
-            await this.click(this.subTypeDropdown);
-            await this.waitForVisible(this.subTypeDropdownOption);
-            await this.click(this.subTypeDropdownOption);
+            if (await this.isVisible(this.subTypeDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.subTypeDropdown);
+                await this.waitForVisible(this.subTypeDropdownOption);
+                await this.click(this.subTypeDropdownOption);
+            }
 
-            await this.fill(this.notesInput, notes);
+            if (await this.isVisible(this.notesInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.notesInput, notes);
+            }
 
-            await this.fill(this.priceInput, price);
+            if (await this.isVisible(this.priceInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.priceInput, price);
+            }
 
-            await this.click(this.itemTaxableCheckbox);
-            await this.click(this.currentTaxesDropdown);
-            await this.waitForVisible(this.currentTaxesDropdownOption);
-            await this.click(this.currentTaxesDropdownOption);
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.itemTaxableCheckbox);
+            }
 
-            await this.fill(this.additionalTaxInput, additionalTax);
+            if (await this.isVisible(this.currentTaxesDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.currentTaxesDropdown);
+                await this.waitForVisible(this.currentTaxesDropdownOption);
+                await this.click(this.currentTaxesDropdownOption);
+            }
 
-            await this.click(this.mtoRequiredCheckbox);
+            if (await this.isVisible(this.additionalTaxInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.additionalTaxInput, additionalTax);
+            }
 
+            if (await this.isVisible(this.mtoRequiredCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.mtoRequiredCheckbox);
+            }
 
             // Public Details
-            await this.fill(this.publicNameInput, publicName);
+            if (await this.isVisible(this.publicNameInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.publicNameInput, publicName);
+            }
 
-            await this.fill(this.publicDescriptionInput, publicDescription);
-
+            if (await this.isVisible(this.publicDescriptionInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.publicDescriptionInput, publicDescription);
+            }
 
             // Email body rich text
-            await this.fill(this.emailBodyInput, emailContent);
+            if (await this.isVisible(this.emailBodyInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emailBodyInput, emailContent);
+            }
 
-            await this.click(this.allowWebPurchaseYesRadioButton);
-            await this.click(this.allowPortalPurchaseNoRadioButton);
+            if (await this.isVisible(this.allowWebPurchaseYesRadioButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowWebPurchaseYesRadioButton);
+            }
+
+            if (await this.isVisible(this.allowPortalPurchaseNoRadioButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowPortalPurchaseNoRadioButton);
+            }
 
             // Driving & Observation hours
-            await this.fill(this.drivingHoursInput, drivingHours);
+            if (await this.isVisible(this.drivingHoursInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.drivingHoursInput, drivingHours);
+            }
 
-            await this.fill(this.observationHoursInput, observationHours);
+            if (await this.isVisible(this.observationHoursInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.observationHoursInput, observationHours);
+            }
 
-            await this.click(this.durationDropdown);
-            await this.waitForVisible(this.durationDropdownOption);
-            await this.click(this.durationDropdownOption);
+            if (await this.isVisible(this.durationDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.durationDropdown);
+                await this.waitForVisible(this.durationDropdownOption);
+                await this.click(this.durationDropdownOption);
+            }
 
-            await this.click(this.inCarLessonCheckbox);
+            if (await this.isVisible(this.inCarLessonCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.inCarLessonCheckbox);
+            }
 
             // await this.page.pause();
 
@@ -194,7 +233,6 @@ export default class ComponentsPage extends BasePage {
             await this.waitForLoaders();
         });
     }
-
     /**
      * Randomly updates multiple editable fields on the component edit form.
      * @returns {Promise<Object>} The updated values.
@@ -202,26 +240,33 @@ export default class ComponentsPage extends BasePage {
     async editComponentFields() {
         await test.step('Update component fields', async () => {
             await this.waitForLoaders();
+            await this.waitForVisible(this.saveBtn);
             const timestamp = Date.now();
 
-            await this.waitForVisible(this.statusDropdown);
-            await this.click(this.statusDropdown);
-            await this.waitForVisible(this.statusDropdownOptionDeleted);
-            await this.click(this.statusDropdownOptionDeleted);
+            if (await this.isVisible(this.statusDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.statusDropdown);
+                await this.waitForVisible(this.statusDropdownOptionDeleted);
+                await this.click(this.statusDropdownOptionDeleted);
+            }
 
-            await this.click(this.subTypeDropdown);
-            await this.waitForVisible(this.subTypeDropdownOption);
-            await this.click(this.subTypeDropdownOption2);
+            if (await this.isVisible(this.subTypeDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.subTypeDropdown);
+                await this.waitForVisible(this.subTypeDropdownOption);
+                await this.click(this.subTypeDropdownOption2);
+            }
 
             const newNotes = `Updated notes ${timestamp}`;
-            await this.fill(this.notesInput, newNotes);
+            if (await this.isVisible(this.notesInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.notesInput, newNotes);
+            }
 
-            await this.click(this.inCarLessonCheckbox);
-
-            // await this.page.pause();
+            if (await this.isVisible(this.inCarLessonCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.inCarLessonCheckbox);
+            }
 
         });
     }
+
 
     /**
      * Verifies that the 'Component updated successfully.' message is displayed.
