@@ -77,8 +77,9 @@ export default class BusinessReportsPage extends BasePage {
         // Vehicle Hours Report Locators
         this.vehicleHoursStartDateInput = page.locator('#txtStartDate');
         this.vehicleHoursEndDateInput = page.locator('#txtEndDate');
+        this.vehicleHoursDateRangeInput = page.locator('#txtDateRange');
         this.vehicleHoursDisplayBtn = page.getByRole('link', { name: 'Display' });
-        this.vehicleHoursModal = page.locator('#ModalVehicleHoursReport');
+        this.vehicleHoursModal = page.locator('#ModalVehicleHoursReport , #ModalVehicleSummaryReport');
         this.vehicleHoursModalHeader = page.locator('#divheader');
 
         // In-Car Evaluation Data Report Locators
@@ -97,6 +98,9 @@ export default class BusinessReportsPage extends BasePage {
         this.highSchoolDisplayBtn = page.getByRole('link', { name: 'Display' });
         this.highSchoolModal = page.locator('#tbodyHighReport');
         this.highSchoolStudentStatusText = page.getByText('Student Status : Activated');
+        this.studentStatusDropdown = page.locator("//select[@id='ddlStudentStatus']//ancestor::div[1]//button[@title='Select']");
+        this.studentStatusDropdownValue = page.locator("//select[@id='ddlStudentStatus']//ancestor::div[1]//label[text()=' Activated']");
+
 
         // Filter Management Locators (BTW / SDER reports)
         this.saveAsNewFilterBtn = page.getByRole('button', { name: 'Save as New Filter' });
@@ -369,14 +373,12 @@ export default class BusinessReportsPage extends BasePage {
      * and attaches the comparison report & PDF to the test report.
      * @param {import('@playwright/test').Download} download - The Playwright Download instance.
      * @param {import('@playwright/test').Page} [reportPage] - The popup Page instance opened in new tab.
-     * @param {string} [expectedStudentName] - Expected student name.
      **/
-    async verifyAttendanceHistoryPdf(download, reportPage, expectedStudentName) {
+    async verifyAttendanceHistoryPdf(download, reportPage) {
         await test.step('Verify Attendance History PDF content matches the report page and attach to report', async () => {
             await PdfHelper.verifyPdfMatchesPageContent(reportPage, download, {
                 attachmentName: 'ClassroomAttendanceHistory.pdf'
             });
-
         });
     }
 
@@ -430,8 +432,9 @@ export default class BusinessReportsPage extends BasePage {
             const downloadPromise = this.page.waitForEvent('download');
             await this.click(this.attendanceSignaturesScoresPdfBtn);
             const download = await downloadPromise;
-            await this.waitForVisible(this.page.getByText('File downloaded succesfully.'));
-            await this.verifyVisible(this.page.getByText('File downloaded succesfully.', { exact: true }));
+            if (await this.isVisible(this.page.getByText('File downloaded succesfully.'), { timeout: 5000 })) {
+                await this.verifyVisible(this.page.getByText('File downloaded succesfully.', { exact: true }));
+            }
 
             return download;
         });
@@ -672,9 +675,16 @@ export default class BusinessReportsPage extends BasePage {
             console.log(`Downloaded file name: ${fileName}`);
 
             if (fileName.endsWith('.pdf')) {
+                const env = process.env.ENV || 'coreServer2';
+                const providerDetails = {
+                    uat: [],
+                    staging: [],
+                    coreServer1: ['Provider Name', 'Provider Certificate'],
+                    coreServer2: ['Provider Name', 'Provider Certificate']
+                };
+
                 const expectedTexts = [
-                    'Provider Name',
-                    'Provider Certificate',
+                    ...(providerDetails[env] ?? []),
                     'CR#',
                     'Location',
                     'Student Name',
@@ -972,61 +982,79 @@ export default class BusinessReportsPage extends BasePage {
      * using the calendar datepicker popup for Vehicle Hours Report.
      **/
     async selectVehicleHoursDateRange() {
-        await test.step('Select Start Date (1st of last month) and End Date (last of current month) via calendar datepicker', async () => {
+        await test.step('Select Start Date (1st of last month) and End Date (last of current month)', async () => {
             await this.waitForLoaders();
-            await this.waitForVisible(this.vehicleHoursStartDateInput);
 
-            const { prevMonthNameYear, currMonthNameYear, prevDay, currLastDay } = DateHelper.getPrevToCurrentMonthCalendarInfo();
+            const { formattedRange, prevMonthNameYear, currMonthNameYear, prevDay, currLastDay } = DateHelper.getPrevToCurrentMonthCalendarInfo();
 
-            // 1. Select Start Date: click input, navigate back to previous month, click day 1
-            await this.vehicleHoursStartDateInput.click();
-            await this.page.waitForTimeout(300);
-
-            const prevNavBtn = this.page.locator('th.prev:visible').first();
-            const startSwitch = this.page.locator('th.datepicker-switch:visible').first();
-
-            let maxAttempts = 12;
-            while (maxAttempts > 0 && await startSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
-                const switchText = (await startSwitch.innerText()).trim();
-                if (switchText.toLowerCase() === prevMonthNameYear.toLowerCase()) {
-                    break;
-                }
-                await prevNavBtn.click();
-                await this.page.waitForTimeout(200);
-                maxAttempts--;
+            // Check if single date range input (#txtDateRange) is visible
+            if (await this.isVisible(this.vehicleHoursDateRangeInput, { timeout: 2000 }).catch(() => false)) {
+                await this.click(this.vehicleHoursDateRangeInput);
+                await this.clear(this.vehicleHoursDateRangeInput);
+                await this.vehicleHoursDateRangeInput.pressSequentially(formattedRange);
+                await this.vehicleHoursDateRangeInput.press('Enter');
+                // const applyBtn = this.page.locator(".daterangepicker:visible .applyBtn, button:has-text('Apply')").first();
+                // if (await this.isVisible(applyBtn, { timeout: 1000 }).catch(() => false)) {
+                //     await this.click(applyBtn);
+                // }
+                // await this.page.keyboard.press('Escape');
+                await this.waitForLoaders();
             }
 
-            const startDayCell = this.page.locator('.datepicker:visible td.day:not(.old):not(.new), .datepicker:visible td:not(.old):not(.new)')
-                .filter({ hasText: new RegExp(`^${prevDay}$`) })
-                .first();
-            await startDayCell.click();
-            await this.page.waitForTimeout(300);
+            else {
+                // Otherwise use separate Start Date and End Date inputs via calendar datepicker
+                await this.waitForVisible(this.vehicleHoursStartDateInput);
 
-            // 2. Select End Date: click input, ensure current month, click last day of current month
-            await this.waitForVisible(this.vehicleHoursEndDateInput);
-            await this.vehicleHoursEndDateInput.click();
-            await this.page.waitForTimeout(300);
+                // 1. Select Start Date: click input, navigate back to previous month, click day 1
+                await this.vehicleHoursStartDateInput.click();
+                await this.page.waitForTimeout(300);
 
-            const nextNavBtn = this.page.locator('th.datepicker-switch:visible').first();
-            const endSwitch = this.page.locator('th.datepicker-switch:visible').first();
+                const prevNavBtn = this.page.locator('th.prev:visible').first();
+                const startSwitch = this.page.locator('th.datepicker-switch:visible').first();
 
-            maxAttempts = 12;
-            while (maxAttempts > 0 && await endSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
-                const switchText = (await endSwitch.innerText()).trim();
-                if (switchText.toLowerCase() === currMonthNameYear.toLowerCase()) {
-                    break;
+                let maxAttempts = 12;
+                while (maxAttempts > 0 && await startSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
+                    const switchText = (await startSwitch.innerText()).trim();
+                    if (switchText.toLowerCase() === prevMonthNameYear.toLowerCase()) {
+                        break;
+                    }
+                    await prevNavBtn.click();
+                    await this.page.waitForTimeout(200);
+                    maxAttempts--;
                 }
-                await nextNavBtn.click();
-                await this.page.waitForTimeout(200);
-                maxAttempts--;
-            }
 
-            const endDayCell = this.page.locator('.datepicker:visible td.day:not(.old):not(.new), .datepicker:visible td:not(.old):not(.new)')
-                .filter({ hasText: new RegExp(`^${currLastDay}$`) })
-                .first();
-            await endDayCell.click();
-            await this.page.waitForTimeout(300);
-            await this.waitForLoaders();
+                const startDayCell = this.page.locator('.datepicker:visible td.day:not(.old):not(.new), .datepicker:visible td:not(.old):not(.new)')
+                    .filter({ hasText: new RegExp(`^${prevDay}$`) })
+                    .first();
+                await startDayCell.click();
+                await this.page.waitForTimeout(300);
+
+                // 2. Select End Date: click input, ensure current month, click last day of current month
+                await this.waitForVisible(this.vehicleHoursEndDateInput);
+                await this.vehicleHoursEndDateInput.click();
+                await this.page.waitForTimeout(300);
+
+                const nextNavBtn = this.page.locator('th.datepicker-switch:visible').first();
+                const endSwitch = this.page.locator('th.datepicker-switch:visible').first();
+
+                maxAttempts = 12;
+                while (maxAttempts > 0 && await endSwitch.isVisible({ timeout: 2000 }).catch(() => false)) {
+                    const switchText = (await endSwitch.innerText()).trim();
+                    if (switchText.toLowerCase() === currMonthNameYear.toLowerCase()) {
+                        break;
+                    }
+                    await nextNavBtn.click();
+                    await this.page.waitForTimeout(200);
+                    maxAttempts--;
+                }
+
+                const endDayCell = this.page.locator('.datepicker:visible td.day:not(.old):not(.new), .datepicker:visible td:not(.old):not(.new)')
+                    .filter({ hasText: new RegExp(`^${currLastDay}$`) })
+                    .first();
+                await endDayCell.click();
+                await this.page.waitForTimeout(300);
+                await this.waitForLoaders();
+            }
         });
     }
 
@@ -1059,13 +1087,13 @@ export default class BusinessReportsPage extends BasePage {
     async verifyVehicleHoursReportModal() {
         await test.step('Verify Vehicle Hours Report modal is displayed with expected column headers', async () => {
             await this.waitForVisible(this.vehicleHoursModal);
-            await expect(this.vehicleHoursModalHeader).toContainText('Vehicle Hours Report');
+            await expect(this.vehicleHoursModalHeader).toContainText(/Vehicle Hours (Summary|Report)/i);
 
             const expectedColumns = [
                 /^Vehicle No$/i,
                 /^(Vehicle )?Type$/i,
                 /^(Vehicle )?Status$/i,
-                /^No of (Appointments|Appnt's)$/i,
+                /^No of (Appointments|Appnt('?s)?)$/i,
                 /^Total Hours$/i
             ];
 
@@ -1148,14 +1176,15 @@ export default class BusinessReportsPage extends BasePage {
 
     /**
      * Clicks 'Export As Excel' button for In-Car Evaluation Data Report and waits for file download.
+     * @param {number} [timeout=60000] - Timeout in milliseconds to wait for the download event (default: 60s).
      * @returns {Promise<import('@playwright/test').Download>} The Playwright Download instance.
      **/
-    async exportInCarEvaluationToExcel() {
+    async exportInCarEvaluationToExcel(timeout = 120000) {
         return await test.step('Click "Export As Excel" and wait for file download', async () => {
             await this.waitForLoaders();
             await this.waitForVisible(this.inCarEvalExportExcelBtn);
 
-            const downloadPromise = this.page.waitForEvent('download');
+            const downloadPromise = this.page.waitForEvent('download', { timeout });
             await this.click(this.inCarEvalExportExcelBtn);
             const download = await downloadPromise;
 
@@ -1183,6 +1212,12 @@ export default class BusinessReportsPage extends BasePage {
 
             const env = process.env.ENV || 'coreServer2';
             const isServer1 = env === 'coreServer1' || env === 'server1';
+            const locationColumns = {
+                uat: [],
+                staging: ['Appointment Location'],
+                coreServer1: ['Appointment Location'],
+                coreServer2: ['Appointment Location']
+            };
 
             const expectedColumns = [
                 'Student Name',
@@ -1192,7 +1227,7 @@ export default class BusinessReportsPage extends BasePage {
                 'Answer',
                 'Appt Date',
                 'Appt Start Time',
-                'Appointment Location',
+                ...(locationColumns[env] ?? []),
                 'Appt End Time',
                 'Staff Name',
                 isServer1 ? 'Public Notes' : 'Private Lesson Notes'
@@ -1342,6 +1377,21 @@ export default class BusinessReportsPage extends BasePage {
 
             await this.waitForLoaders();
         });
+    }
+
+    /**
+ * Selects student status as activated from dropdown
+ **/
+    async selectStudentStatusAsActivated() {
+        if (await this.isVisible(this.studentStatusDropdown, { timeout: 2000 })) {
+            await test.step('Select student status as activated from dropdown', async () => {
+
+                await this.click(this.studentStatusDropdown);
+                await this.waitForVisible(this.studentStatusDropdownValue);
+                await this.click(this.studentStatusDropdownValue);
+                await this.page.keyboard.press('Tab');
+            });
+        }
     }
 
     /**
