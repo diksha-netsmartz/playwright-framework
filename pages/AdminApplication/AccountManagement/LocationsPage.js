@@ -197,10 +197,10 @@ export default class LocationsPage extends BasePage {
             // Notes, Survey Link, License
             await this.fill(this.notesInput, notes);
 
-            if (await this.isVisible(this.surveyLinkInput), { timeout: 100 }) {
+            if (await this.isVisible(this.surveyLinkInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.surveyLinkInput, surveyLink);
             }
-            if (await this.isVisible(this.licenseNumberInput), { timeout: 100 }) {
+            if (await this.isVisible(this.licenseNumberInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.licenseNumberInput, licenseNumber);
             }
         });
