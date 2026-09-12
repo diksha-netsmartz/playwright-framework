@@ -36,7 +36,7 @@ export default class AdminPortalHomePage extends BasePage {
         //student account
         this.studentAccount = page.getByRole('link', { name: /Student Account/i });
         this.profileLink = page.locator('#li_StudentAccount_Profile');
-        this.enrollmentBilling = page.getByRole('link', { name: 'Enrollment/Billing' });
+        this.enrollmentBilling = page.locator("#li_StudentAccount_EnrollmentBilling")
         this.filesLink = page.locator("#li_StudentAccount_Files");
 
 
@@ -80,6 +80,11 @@ export default class AdminPortalHomePage extends BasePage {
         // Advanced Search
         this.advancedSearchLink = page.getByRole('link', { name: 'Advanced Search' });
 
+        // Configuration
+        this.configurationMenu = page.locator('#ConfigurationSideMenu');
+        this.integratePaymentLink = page.locator('span:has-text("Integrate Payment")');
+        this.marketplaceLink = page.getByText('Marketplace', { exact: true });
+        this.zipCodeLink = page.getByRole('link', { name: 'Zip Code' });
 
     }
 
@@ -613,4 +618,49 @@ export default class AdminPortalHomePage extends BasePage {
             await this.verifyTitle("BusinessReports")
         });
     }
+    /**
+     * Clicks on Integrate Payment under Configuration and verifies Company Info title.
+     **/
+    async navigateToIntegratePayment() {
+        await test.step('Click on Integrate Payment', async () => {
+            await this.waitForVisible(this.configurationMenu);
+            await this.click(this.configurationMenu);
+            await this.waitForVisible(this.integratePaymentLink);
+            await this.click(this.integratePaymentLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+            await this.verifyTitle(/Company Info/i);
+        });
+    }
+
+    /**
+     * Clicks on Marketplace under Configuration and verifies Company Info title.
+     **/
+    async navigateToMarketplace() {
+        await test.step('Click on Marketplace', async () => {
+            await this.waitForVisible(this.configurationMenu);
+            await this.click(this.configurationMenu);
+            await this.waitForVisible(this.marketplaceLink);
+            await this.click(this.marketplaceLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+            await this.verifyTitle(/Company Info/i);
+        });
+    }
+
+    /**
+     * Navigates to Configuration > Zip Code via side menu.
+     **/
+    async navigateToZipCode() {
+        await test.step('Click on Zip Code', async () => {
+            await this.waitForVisible(this.configurationMenu);
+            await this.click(this.configurationMenu);
+            await this.waitForVisible(this.zipCodeLink);
+            await this.click(this.zipCodeLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+        });
+    }
+
+
 }
