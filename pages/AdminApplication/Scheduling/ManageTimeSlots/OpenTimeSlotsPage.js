@@ -65,9 +65,9 @@ export default class OpenTimeSlotsPage extends BasePage {
         this.durationMinutesDropdown = page.locator("button[data-id='drpOTSSlotsDuration']")
         this.durationMinutesOption = page.locator("xpath=(//select[@id='drpOTSSlotsDuration']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]")
         this.startTimeDropdown = page.locator("button[data-id='OTSFixedStartTime1']");
-        this.startTimeDropdownOption = page.locator("xpath=//select[@id='OTSFixedStartTime1']//parent::div//div//li//span[text()='6:00 AM']");
+        this.startTimeDropdownOption = page.locator("xpath=(//select[@id='OTSFixedStartTime1']//parent::div//div//li)[2]");
         this.startTimeDropdown2 = page.locator("button[data-id='OTSFixedStartTime2']");
-        this.startTimeDropdownOption2 = page.locator("xpath=//select[@id='OTSFixedStartTime2']//parent::div//div//li//span[text()='6:15 AM']");
+        this.startTimeDropdownOption2 = page.locator("xpath=(//select[@id='OTSFixedStartTime2']//parent::div//div//li)[3]");
 
 
         // Action Buttons
