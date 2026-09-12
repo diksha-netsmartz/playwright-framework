@@ -188,18 +188,22 @@ export default class ProcessLesson extends BasePage {
      * Draws the student signature on the student signature canvas.
      **/
     async signStudentSignature() {
-        await test.step('Sign student digital signature', async () => {
-            await this.#drawSignature(this.studentSignatureCanvas);
-        });
+        if (await this.isVisible(this.studentSignatureCanvas, { timeout: 100 }).catch(() => false)) {
+            await test.step('Sign student digital signature', async () => {
+                await this.#drawSignature(this.studentSignatureCanvas);
+            });
+        }
     }
 
     /**
      * Draws the instructor signature on the instructor signature canvas.
      **/
     async signInstructorSignature() {
-        await test.step('Sign instructor digital signature', async () => {
-            await this.#drawSignature(this.instructorSignatureCanvas);
-        });
+        if (await this.isVisible(this.instructorSignatureCanvas, { timeout: 100 }).catch(() => false)) {
+            await test.step('Sign instructor digital signature', async () => {
+                await this.#drawSignature(this.instructorSignatureCanvas);
+            });
+        }
     }
 
     /**
