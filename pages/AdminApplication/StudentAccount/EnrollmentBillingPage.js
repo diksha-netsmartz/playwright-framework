@@ -57,7 +57,9 @@ export default class EnrollmentBillingPage extends BasePage {
         // Edit
         this.editButton = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//ancestor::tr//a[@data-toggle='dropdown'])[1]");
         this.getLatestPackageID = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[4])[1]");
-        this.getLatestPackageId2 = page.locator("(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[text()='Package']//following-sibling::td)[1]")
+        this.getLatestPackageId2 = page.locator("(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[text()='Package']//following-sibling::td)[1]");
+        this.editIconDropdown = page.locator('.fa-edit:visible');
+        this.deleteIconDropdown = page.locator('.fa-trash:visible');
 
         // Update
         this.notesTextbox = page.locator('#txtpackageNotes');
@@ -234,7 +236,7 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.selectSoldByDropdown();
             await this.click(this.addPackageButton);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 5000 })
+            await this.page.waitForLoadState('load', { timeout: 5000 });
             // await this.page.waitForTimeout(2500);
             // if (await this.isVisible(this.selectLocationDropdown)) {
             //     await this.click(this.selectLocationDropdown);
@@ -246,7 +248,7 @@ export default class EnrollmentBillingPage extends BasePage {
             // await this.click(this.addToCartButton);
 
             // await this.page.waitForTimeout(3000);
-            if (await this.isVisible(this.skipSelectionButtonForClassSelection, { timeout: 3000 }).catch(() => false)) {
+            if (await this.isVisible(this.skipSelectionButtonForClassSelection, { timeout: 10000 }).catch(() => false)) {
                 await this.click(this.skipSelectionButtonForClassSelection);
                 await this.waitForHidden(this.skipSelectionButtonForClassSelection);
             }
@@ -278,17 +280,20 @@ export default class EnrollmentBillingPage extends BasePage {
     async editAndUpdateNotes() {
         await test.step('Edit package enrollment and update notes', async () => {
             await this.click(this.editButton);
-            let packageId = "";
-            if (await this.getLatestPackageId2.count() > 0) {
-                packageId = await this.getText(this.getLatestPackageId2);
+            // let packageId = "";
+            // if (await this.getLatestPackageId2.count() > 0) {
+            //     packageId = await this.getText(this.getLatestPackageId2);
 
-            }
-            else {
-                packageId = await this.getText(this.getLatestPackageID);
-            }
+            // }
+            // else {
+            //     packageId = await this.getText(this.getLatestPackageID);
+            // }
 
-            console.log("package id : " + packageId);
-            await this.click(this.editDetailsTab(packageId));
+            // console.log("package id : " + packageId);
+            // await this.click(this.editDetailsTab(packageId));
+            await this.waitForVisible(this.editIconDropdown, { timeout: 3000 });
+            await this.click(this.editIconDropdown);
+            await this.waitForLoaders();
             try {
                 await this.waitForVisible(this.skipSelectionButton);
                 await this.click(this.skipSelectionButton);
@@ -312,21 +317,23 @@ export default class EnrollmentBillingPage extends BasePage {
         await test.step('Delete package enrollment', async () => {
             await this.waitForVisible(this.editButton);
             await this.click(this.editButton);
-            let packageId = "";
-            if (await this.getLatestPackageId2.count() > 0) {
-                packageId = await this.getText(this.getLatestPackageId2);
+            // let packageId = "";
+            // if (await this.getLatestPackageId2.count() > 0) {
+            //     packageId = await this.getText(this.getLatestPackageId2);
 
-            }
-            else {
-                packageId = await this.getText(this.getLatestPackageID);
-            }
-            console.log("package id : " + packageId);
-            await this.waitForVisible(this.deleteLink(packageId), { timeout: 5000 });
-            if (!await this.isVisible(this.deleteLink(packageId))) {
-                await this.click(this.editButton);
-                await this.click(this.editButton);
-            }
-            await this.deleteLink(packageId).click({ force: true });
+            // }
+            // else {
+            //     packageId = await this.getText(this.getLatestPackageID);
+            // }
+            // console.log("package id : " + packageId);
+            // await this.waitForVisible(this.deleteLink(packageId), { timeout: 5000 });
+            // if (!await this.isVisible(this.deleteLink(packageId))) {
+            //     await this.click(this.editButton);
+            //     await this.click(this.editButton);
+            // }
+            // await this.deleteLink(packageId).click({ force: true });
+            await this.waitForVisible(this.deleteIconDropdown, { timeout: 3000 });
+            await this.click(this.deleteIconDropdown);
             await this.click(this.yesConfirmationButton);
         });
     }
@@ -414,8 +421,8 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 5000 });
             await this.page.waitForTimeout(3000);
             const amountAfter = await this.getBillingAmount();
-            console.log("amount before : " + amountBefore);
-            console.log("amount after : " + amountAfter);
+            // console.log("amount before : " + amountBefore);
+            // console.log("amount after : " + amountAfter);
             expect(amountAfter).not.toEqual(amountBefore);
         });
     }

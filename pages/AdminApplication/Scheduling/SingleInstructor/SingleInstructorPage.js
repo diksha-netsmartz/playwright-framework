@@ -473,6 +473,8 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async copyAppointment(studentName) {
         await test.step(`Copy and paste appointment for: "${this.getStudentSearchText(studentName)}"`, async () => {
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 15000 })
             await this.waitForVisible(this.listMenuOfCreatedAppointment(studentName));
             await this.click(this.listMenuOfCreatedAppointment(studentName));
             await this.page.waitForTimeout(2500);
@@ -602,7 +604,8 @@ export default class SingleInstructorPage extends BasePage {
 
             // const locator = this.page.locator(`xpath=//p[contains(text(),'${formattedName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
             const locator = this.page.locator(`xpath=//div[@data-formattedstudentname='${formattedName}' or @data-formattedstudentname2='${formattedName}']//img[contains(@src,'list')]`);
-
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 });
             await expect(locator).toHaveCount(2);
             await this.waitForLoaders();
         });

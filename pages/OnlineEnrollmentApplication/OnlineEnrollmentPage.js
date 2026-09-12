@@ -471,12 +471,13 @@ export default class OnlineEnrollmentPage extends BasePage {
     async verifyReceiptPage(expectedText, attachmentName) {
         await test.step(`Verify "${expectedText}" on receipt page`, async () => {
             await this.waitForLoaders().catch(() => { });
-            // await this.page.waitForLoadState('load', { timeout: 10000 });
+
             // await this.page.waitForTimeout(10000);
             await this.page.waitForFunction(() => document.title.trim().length > 0, { timeout: 30000 }).catch(() => {
                 console.log('Title did not become non-empty within 30s; proceeding with assertion.');
             });
             // await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 15000 });
+            await this.page.waitForLoadState('load', { timeout: 10000 });
             await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')));
             await this.verifyVisible(this.page.getByText(new RegExp(expectedText, 'i')));
         });

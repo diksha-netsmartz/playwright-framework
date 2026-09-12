@@ -70,7 +70,9 @@ export default class StaffHomePage extends BasePage {
         this.taskEditBtn = page.locator("(//div[contains(text(),'Tasks')]//ancestor::div[2]//span[contains(@class,'fa-edit')])[1]");
         this.taskModal = page.locator("//h4[contains(text(),'Update Task')]//ancestor::div[@class='modal-content']");
         this.taskNoteTextbox = page.getByRole('textbox', { name: 'Note' });
-        this.subjectTextbox = page.getByRole('textbox', { name: 'Subject' })
+        this.subjectTextbox = page.getByRole('textbox', { name: 'Subject' });
+        this.selectTimeDropdown = page.getByRole('button', { name: 'Select Time' });
+        this.selectTimeDropdownValue = page.locator("(//button[@title='Select Time ']//parent::div//li[not(contains(@class,'selected'))])[1]");
         this.taskStatusDropdown = page.locator("//button[contains(@data-id,'Status')]");
         this.taskSaveBtn = page.locator("//button[contains(@id,'SaveUpdateTask')]");
         this.taskCloseBtn = page.locator("button[onclick='CloseTaskPopUp()']")
@@ -672,10 +674,10 @@ export default class StaffHomePage extends BasePage {
      **/
     async viewTaskDetails() {
         await test.step('Click View Details on task and verify modal is displayed', async () => {
-            await this.waitForVisible(this.taskViewDetailBtn, 5000);
+            await this.waitForVisible(this.taskViewDetailBtn, 1000);
             await this.click(this.taskViewDetailBtn);
             await this.waitForLoaders();
-            await this.waitForVisible(this.viewTaskModal, 5000);
+            await this.waitForVisible(this.viewTaskModal, 1000);
         });
     }
 
@@ -684,13 +686,13 @@ export default class StaffHomePage extends BasePage {
      **/
     async deleteTask() {
         await test.step('Delete the first task', async () => {
-            await this.waitForVisible(this.deleteTaskIcon, 5000);
+            await this.waitForVisible(this.deleteTaskIcon, 2000);
             await this.click(this.deleteTaskIcon);
             await this.waitForLoaders();
-            await this.waitForVisible(this.taskConfirmYesBtn, 5000);
+            await this.waitForVisible(this.taskConfirmYesBtn, 1000);
             await this.click(this.taskConfirmYesBtn);
             await this.waitForLoaders();
-            await this.waitForVisible(this.taskSuccessNotification, 5000);
+            await this.waitForVisible(this.taskDeleteNotification, 5000);
         });
     }
 
@@ -699,7 +701,7 @@ export default class StaffHomePage extends BasePage {
      **/
     async closeViewTaskModal() {
         await test.step('Close View Details modal', async () => {
-            await this.waitForVisible(this.viewTaskCloseBtn, 5000);
+            await this.waitForVisible(this.viewTaskCloseBtn, 2000);
             await this.click(this.viewTaskCloseBtn);
             await this.waitForLoaders();
             await expect(this.viewTaskModal).toBeHidden({ timeout: 5000 }).catch(() => { });
@@ -745,6 +747,12 @@ export default class StaffHomePage extends BasePage {
                     }
                 }
             }
+            if (await this.isVisible(this.selectTimeDropdown, { timeout: 500 })) {
+                await this.click(this.selectTimeDropdown);
+                await this.waitForVisible(this.selectTimeDropdownValue, 1000);
+                await this.click(this.selectTimeDropdownValue);
+                await this.waitForLoaders();
+            }
         });
     }
 
@@ -753,11 +761,11 @@ export default class StaffHomePage extends BasePage {
      **/
     async saveTaskAndConfirm() {
         await test.step('Click Save on task and confirm Yes', async () => {
-            await this.waitForVisible(this.taskSaveBtn, 5000);
+            await this.waitForVisible(this.taskSaveBtn, 1000);
             await this.click(this.taskSaveBtn);
 
             // Wait for confirmation and click Yes
-            await this.waitForVisible(this.taskConfirmYesBtn, 5000);
+            await this.waitForVisible(this.taskConfirmYesBtn, 1000);
             await this.click(this.taskConfirmYesBtn);
             await this.waitForLoaders();
         });
