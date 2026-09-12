@@ -42,6 +42,9 @@ export default class OpenTimeSlotsPage extends BasePage {
         this.vehicleDropdownOption = page.locator("xpath=(//select[@id='drpAOTSVehicle']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[1]")
         this.vehicleDropdownOptionLast = page.locator("xpath=(//select[@id='drpAOTSVehicle']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[last()]");
         this.puLocationInput = page.getByRole('textbox', { name: 'PU Location' });
+        this.languageDropdown = page.locator("//select[@id='drpLanguage']//parent::div//button");
+        this.languageDropdownOption = page.locator("xpath=(//select[@id='drpLanguage']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[1]");
+        this.dropOffLocationInput = page.locator('#txtOTSDropOffLocation');
 
         this.instruction1Dropdown = page.locator("//select[@id='Instructions1']//parent::div//button");
         this.instruction1DropdownOption = page.locator("xpath=(//select[@id='Instructions1']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[1]");
@@ -427,7 +430,19 @@ export default class OpenTimeSlotsPage extends BasePage {
 
             // 7. Fill PU Location
             await this.fill(this.puLocationInput, this.puLocation);
+            if (await this.isVisible(this.dropOffLocationInput, { timeout: 100 })) {
+                await this.fill(this.dropOffLocationInput, "main street");
+            }
 
+            //8. Select Language
+            if (await this.isVisible(this.languageDropdown, { timeout: 100 })) {
+                await this.click(this.languageDropdown);
+                await this.waitForVisible(this.languageDropdownOption);
+                await this.click(this.languageDropdownOption);
+                await this.waitForLoaders();
+            }
+
+            //9. Select Instructions
             await this.waitForVisible(this.instruction1Dropdown);
             await this.click(this.instruction1Dropdown);
             await this.waitForVisible(this.instruction1DropdownOption);
