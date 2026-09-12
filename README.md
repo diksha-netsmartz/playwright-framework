@@ -237,11 +237,13 @@ The framework includes an on-demand workflow ([`.github/workflows/playwright.yml
   - Direct link to the GitHub Actions Run and Artifacts.
   - Attached **`Allure-Report.zip`** (extract and double-click `index.html` to view the interactive Allure report).
 
-### 🌅 Daily Scheduled Regression (Server 2 & Server 1):
-A dedicated scheduled workflow ([`.github/workflows/daily-servers.yml`](.github/workflows/daily-servers.yml)) runs automatically every morning at **6:00 AM IST (00:30 UTC)**:
+### 🌅 Daily Scheduled Regression:
+A dedicated scheduled workflow ([`.github/workflows/daily-servers.yml`](.github/workflows/daily-servers.yml)) runs automatically every day:
 1. Executes all tests on **`coreServer2`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
 2. Once finished, executes all tests on **`coreServer1`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
-3. Can also be triggered manually on demand via **Actions** $\rightarrow$ **`Daily Regression (Server 2 & 1)`** $\rightarrow$ **"Run workflow"**.
+3. Once finished, executes all tests on **`uat`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+4. Once finished, executes all tests on **`staging`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+5. Can also be triggered manually on demand via **Actions** $\rightarrow$ **`Daily Regression (Server 2, 1, UAT & Staging)`** $\rightarrow$ **"Run workflow"**.
 
 ---
 

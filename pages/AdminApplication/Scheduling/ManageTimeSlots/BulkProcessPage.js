@@ -104,6 +104,7 @@ export default class BulkProcessPage extends BasePage {
             await this.waitForVisible(this.filterButton);
             await this.click(this.filterButton);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 30000 });
         });
     }
 
@@ -112,7 +113,9 @@ export default class BulkProcessPage extends BasePage {
      **/
     async selectCompleteCheckbox() {
         await test.step('Select Complete checkbox for appointment', async () => {
-            await this.waitForVisible(this.completeCheckbox);
+            await this.page.waitForLoadState('load', { timeout: 10000 });
+            await this.waitForLoaders();
+            await this.waitForVisible(this.completeCheckbox, { timeout: 5000 });
             await this.click(this.completeCheckbox);
         });
     }
@@ -146,7 +149,9 @@ export default class BulkProcessPage extends BasePage {
      **/
     async selectPrintBtwHistoryCheckbox() {
         await test.step('Select Print BTW History checkbox for appointment', async () => {
-            await this.waitForVisible(this.printBtwHistoryCheckbox);
+            await this.page.waitForLoadState('load', { timeout: 10000 });
+            await this.waitForLoaders();
+            await this.waitForVisible(this.printBtwHistoryCheckbox, { timeout: 5000 });
             await this.click(this.printBtwHistoryCheckbox);
         });
     }
@@ -177,7 +182,7 @@ export default class BulkProcessPage extends BasePage {
     /**
      * Verifies that the downloaded BTW History PDF contains the expected student details fields, title, and table columns.
      * @param {import('@playwright/test').Download|string} download - The downloaded PDF file or path.
-     * @param {string[]} [columns] - Optional custom list of field/column names.
+     * @param {(string | string[] | RegExp)[]} [columns] - Optional custom list of field/column names.
      **/
     async verifyBtwHistoryPdfColumns(download, columns) {
         const env = process.env.ENV || 'coreServer2';
@@ -190,7 +195,7 @@ export default class BulkProcessPage extends BasePage {
             'Student:',
             'Address:',
             'Student#:',
-            'City, StateZip:',
+            ['City, StateZip:', 'City,State,Zip:'],
             'Home:',
             'Cell:',
             'Parent:',

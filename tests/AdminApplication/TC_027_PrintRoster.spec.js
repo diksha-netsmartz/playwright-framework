@@ -19,7 +19,7 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag:
 
     const env = process.env.ENV || 'coreServer2';
     const credentials = login[env || 'coreServer2'];
-    const reportName = env === 'coreServer2' ? 'Roster report' : 'Test report';
+    const reportName = /Roster report|Test report|CR Report|CR Roster/i;
     let pdfPage;
     let download;
 

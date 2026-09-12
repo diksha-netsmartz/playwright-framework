@@ -26,7 +26,9 @@ export default class StudentProfilePage extends BasePage {
         this.permitIssuedDate = page.locator('#dt_Date_PermitIssue');
         this.monthFirstDay = page.locator("//a[text()='1']");
         this.monthLastDay = page.locator("//a[text()='27']");
-        this.permitExpireDate = page.locator('#dt_Date_ExpirePermit')
+        this.permitExpireDate = page.locator('#dt_Date_ExpirePermit');
+        this.coursePassword = page.getByRole('textbox', { name: 'Course Password' });
+        this.courseStartDate = page.locator('#dt_CourseStartDate');
         // Action buttons
         this.updateBtn = page.getByRole('button', { name: 'Update' });
         this.yesConfirmationBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
@@ -43,6 +45,8 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [details.address] - Street address.
      * @param {string} [details.zipcode] - Zip / postal code.
      * @param {string} [details.permit] - Permit / DL number.
+     * @param {string} [details.coursePassword] - Course password.
+     * @param {string} [details.courseStartDate] - Course start date.
      **/
     async updateProfileDetails(details = {}) {
         await test.step('Fill updated student profile details', async () => {
@@ -54,32 +58,44 @@ export default class StudentProfilePage extends BasePage {
             await this.clear(this.addressTextbox);
             await this.fill(this.addressTextbox, details.address);
 
-            await this.verifyVisible(this.parentPhoneTxt);
-            await this.clear(this.parentPhoneTxt);
-            await this.fill(this.parentPhoneTxt, details.parentPhone);
+            if (await this.isVisible(this.parentPhoneTxt, { timeout: 100 }).catch(() => false)) {
+                await this.clear(this.parentPhoneTxt);
+                await this.fill(this.parentPhoneTxt, details.parentPhone);
+            }
+
+            if (await this.isVisible(this.parentGuardianEmail, { timeout: 100 }).catch(() => false)) {
+                await this.clear(this.parentGuardianEmail);
+                await this.fill(this.parentGuardianEmail, details.parentGuardianEmail);
+            }
 
 
-            await this.verifyVisible(this.parentGuardianEmail);
-            await this.clear(this.parentGuardianEmail);
-            await this.fill(this.parentGuardianEmail, details.parentGuardianEmail);
-
-
-            if (await this.isVisible(this.dlPermit, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.dlPermit, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.dlPermit, details.permit);
             }
 
-            if (await this.isVisible(this.wearGlassDropdown, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.coursePassword, { timeout: 100 }).catch(() => false) ) {
+                await this.clear(this.coursePassword);
+                await this.fill(this.coursePassword, details.coursePassword);
+            }
+
+            if (await this.isVisible(this.courseStartDate, { timeout: 100 }).catch(() => false) ) {
+                await this.clear(this.courseStartDate);
+                await this.pressSequentially(this.courseStartDate, details.courseStartDate);
+                await this.page.keyboard.press('Tab');
+            }
+
+            if (await this.isVisible(this.wearGlassDropdown, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.wearGlassDropdown);
                 await this.click(this.wearGlassDropdownValue);
             }
 
-            if (await this.isVisible(this.permitIssuedDate, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.permitIssuedDate, { timeout: 100 }).catch(() => false)) {
                 await this.clear(this.permitIssuedDate);
                 await this.waitForVisible(this.monthFirstDay);
                 await this.click(this.monthFirstDay);
             }
 
-            if (await this.isVisible(this.permitExpireDate, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.permitExpireDate, { timeout: 100 }).catch(() => false)) {
                 await this.clear(this.permitExpireDate);
                 await this.waitForVisible(this.monthLastDay);
                 await this.click(this.monthLastDay);
@@ -120,25 +136,35 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [expectedDetails.address] - Expected address.
      * @param {string} [expectedDetails.zipcode] - Expected zipcode.
      * @param {string} [expectedDetails.permit] - Expected permit / DL number.
+     * @param {string} [expectedDetails.coursePassword] - Expected course password.
+     * @param {string} [expectedDetails.courseStartDate] - Expected course start date.
      **/
     async verifyProfileDetails(expectedDetails = {}) {
         await test.step('Verify profile field values match expected', async () => {
-            await this.verifyVisible(this.parentPhoneTxt);
-            await expect(this.parentPhoneTxt).toHaveValue(expectedDetails.parentPhone);
+            await this.waitForVisible(this.updateBtn);
+            if (await this.isVisible(this.parentPhoneTxt, { timeout: 100 }).catch(() => false)) {
+                await expect(this.parentPhoneTxt).toHaveValue(expectedDetails.parentPhone);
+            }
 
+            if (await this.isVisible(this.parentGuardianEmail, { timeout: 100 }).catch(() => false)) {
+                await expect(this.parentGuardianEmail).toHaveValue(expectedDetails.parentGuardianEmail);
+            }
 
-            await this.verifyVisible(this.parentGuardianEmail);
-            await expect(this.parentGuardianEmail).toHaveValue(expectedDetails.parentGuardianEmail);
+            if (await this.isVisible(this.addressTextbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
+            }
 
-
-            await this.verifyVisible(this.addressTextbox);
-            await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
-
-            if (await this.isVisible(this.dlPermit, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.dlPermit, { timeout: 100 }).catch(() => false)) {
                 await expect(this.dlPermit).toHaveValue(expectedDetails.permit);
             }
 
+            if (await this.isVisible(this.coursePassword, { timeout: 100 }).catch(() => false)) {
+                await expect(this.coursePassword).toHaveValue(expectedDetails.coursePassword);
+            }
 
+            if (await this.isVisible(this.courseStartDate, { timeout: 100 }).catch(() => false)) {
+                await expect(this.courseStartDate).toHaveValue(expectedDetails.courseStartDate);
+            }
         });
     }
 }

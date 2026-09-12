@@ -9,6 +9,7 @@
     "middleName": "test1",
     "address": "new york",
     "zipCode": "10020",
+    "city": "new york",
     "homePhone": "3333333333",
     "studentCellPhone": "2222222222",
     "parentName": "rachel",
@@ -26,13 +27,19 @@
     "socialSecurityNumber": "123456789",
     "studentSignature": "test student signature",
     "apartment": "12345",
-    "datePicker": "12/22/2026"
+    "datePicker": "12/22/2026",
+    "coursePassword": "Session@123",
+    "courseStartDate": "10/12/2026",
+    "siblingName": "Sammie",
+    "siblingLicenseNumber": "11111111",
+    "membershipNumber": "1234567890"
   },
   "student2": {
     "pickup": "test PU123e",
     "notes": "note student2",
     "middleName": "test2",
     "address": "new york",
+    "city": "new york",
     "zipCode": "10020",
     "homePhone": "3333333333",
     "studentCellPhone": "2222222222",
@@ -51,7 +58,12 @@
     "socialSecurityNumber": "123456789",
     "studentSignature": "test student signature",
     "apartment": "12345",
-    "datePicker": "12/22/2026"
+    "datePicker": "12/22/2026",
+    "coursePassword": "Session@123",
+    "courseStartDate": "10/12/2026",
+    "siblingName": "Sammie",
+    "siblingLicenseNumber": "11111111",
+    "membershipNumber": "1234567890"
   },
   "appointmentDetails": {
     "appointmentType": " Create Combined Appointment (Driver and Observer)",

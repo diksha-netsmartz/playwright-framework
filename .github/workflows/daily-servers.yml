@@ -1,4 +1,4 @@
-name: Daily Regression (Server 2 & 1)
+name: Daily Regression (Server 2, 1, UAT & Staging)
 
 on:
   schedule:
@@ -166,3 +166,150 @@ jobs:
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
           EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
         run: node scripts/send-email.js
+
+  uat:
+    name: 3. uat Tests
+    needs: coreServer1
+    if: always()
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      HEADLESS: 'true'
+      VIEWPORT_WIDTH: '1920'
+      VIEWPORT_HEIGHT: '1080'
+      ENV: 'uat'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Set up Java (for Allure Report generation)
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers and OS dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright Tests on uat
+        env:
+          HEADLESS: 'true'
+          VIEWPORT_WIDTH: '1920'
+          VIEWPORT_HEIGHT: '1080'
+          ENV: 'uat'
+        run: |
+          GREP="${{ github.event.inputs.grep }}"
+          CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 ENV=uat npx playwright test"
+
+          if [ -n "$GREP" ]; then
+            CMD="$CMD --grep ${GREP}"
+          fi
+
+          echo "Executing on uat: $CMD"
+          eval $CMD
+
+      - name: Upload Allure Results & Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-uat
+          path: |
+            allure-results/
+            allure-reports/
+          retention-days: 14
+
+      - name: Send Email with Allure Report Attachment
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ENV: 'uat'
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
+          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
+        run: node scripts/send-email.js
+
+  staging:
+    name: 4. staging Tests
+    needs: uat
+    if: always()
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      HEADLESS: 'true'
+      VIEWPORT_WIDTH: '1920'
+      VIEWPORT_HEIGHT: '1080'
+      ENV: 'staging'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Set up Java (for Allure Report generation)
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers and OS dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright Tests on staging
+        env:
+          HEADLESS: 'true'
+          VIEWPORT_WIDTH: '1920'
+          VIEWPORT_HEIGHT: '1080'
+          ENV: 'staging'
+        run: |
+          GREP="${{ github.event.inputs.grep }}"
+          CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 ENV=staging npx playwright test"
+
+          if [ -n "$GREP" ]; then
+            CMD="$CMD --grep ${GREP}"
+          fi
+
+          echo "Executing on staging: $CMD"
+          eval $CMD
+
+      - name: Upload Allure Results & Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-staging
+          path: |
+            allure-results/
+            allure-reports/
+          retention-days: 14
+
+      - name: Send Email with Allure Report Attachment
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ENV: 'staging'
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
+          EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
+        run: node scripts/send-email.js
+

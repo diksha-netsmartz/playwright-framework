@@ -42,6 +42,9 @@ export default class OpenTimeSlotsPage extends BasePage {
         this.vehicleDropdownOption = page.locator("xpath=(//select[@id='drpAOTSVehicle']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[1]")
         this.vehicleDropdownOptionLast = page.locator("xpath=(//select[@id='drpAOTSVehicle']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[last()]");
         this.puLocationInput = page.getByRole('textbox', { name: 'PU Location' });
+        this.languageDropdown = page.locator("//select[@id='drpLanguage']//parent::div//button");
+        this.languageDropdownOption = page.locator("xpath=(//select[@id='drpLanguage']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[1]");
+        this.dropOffLocationInput = page.locator('#txtOTSDropOffLocation');
 
         this.instruction1Dropdown = page.locator("//select[@id='Instructions1']//parent::div//button");
         this.instruction1DropdownOption = page.locator("xpath=(//select[@id='Instructions1']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[1]");
@@ -65,9 +68,9 @@ export default class OpenTimeSlotsPage extends BasePage {
         this.durationMinutesDropdown = page.locator("button[data-id='drpOTSSlotsDuration']")
         this.durationMinutesOption = page.locator("xpath=(//select[@id='drpOTSSlotsDuration']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]")
         this.startTimeDropdown = page.locator("button[data-id='OTSFixedStartTime1']");
-        this.startTimeDropdownOption = page.locator("xpath=//select[@id='OTSFixedStartTime1']//parent::div//div//li//span[text()='6:00 AM']");
+        this.startTimeDropdownOption = page.locator("xpath=(//select[@id='OTSFixedStartTime1']//parent::div//div//li)[2]");
         this.startTimeDropdown2 = page.locator("button[data-id='OTSFixedStartTime2']");
-        this.startTimeDropdownOption2 = page.locator("xpath=//select[@id='OTSFixedStartTime2']//parent::div//div//li//span[text()='6:15 AM']");
+        this.startTimeDropdownOption2 = page.locator("xpath=(//select[@id='OTSFixedStartTime2']//parent::div//div//li)[3]");
 
 
         // Action Buttons
@@ -427,7 +430,19 @@ export default class OpenTimeSlotsPage extends BasePage {
 
             // 7. Fill PU Location
             await this.fill(this.puLocationInput, this.puLocation);
+            if (await this.isVisible(this.dropOffLocationInput, { timeout: 100 })) {
+                await this.fill(this.dropOffLocationInput, "main street");
+            }
 
+            //8. Select Language
+            if (await this.isVisible(this.languageDropdown, { timeout: 100 })) {
+                await this.click(this.languageDropdown);
+                await this.waitForVisible(this.languageDropdownOption);
+                await this.click(this.languageDropdownOption);
+                await this.waitForLoaders();
+            }
+
+            //9. Select Instructions
             await this.waitForVisible(this.instruction1Dropdown);
             await this.click(this.instruction1Dropdown);
             await this.waitForVisible(this.instruction1DropdownOption);
@@ -439,8 +454,9 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.instruction2DropdownOption);
             await this.click(this.instruction2DropdownOption);
             await this.waitForLoaders();
-
-            await this.click(this.showInStudentCenterYesRadioButton);
+            if (await this.isVisible(this.showInStudentCenterYesRadioButton, { timeout: 100 })) {
+                await this.click(this.showInStudentCenterYesRadioButton);
+            }
             return this.puLocation;
         });
     }
@@ -613,7 +629,7 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.vehicleDropdownOptionLast);
             await this.click(this.vehicleDropdownOptionLast);
 
-            if (await this.showInStudentCenterNoRadioButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+            if (await this.showInStudentCenterNoRadioButton.isVisible({ timeout: 100 }).catch(() => false)) {
                 await this.click(this.showInStudentCenterNoRadioButton);
             }
             await this.waitForLoaders();

@@ -34,7 +34,8 @@
       "password": "Student@*/123321"
     },
     "resetStudent": {
-      "username": "rachel",
+      "name": "testautomation_resetpwd_donotuse",
+      "username": "testautomation_resetpwd",
       "email": "testingdata3011@gmail.com"
     },
     "staffUser": {
@@ -59,7 +60,8 @@
       "password": "Student@*/123321"
     },
     "resetStudent": {
-      "username": "rachel",
+      "name": "testautomation_resetpwd_donotuse",
+      "username": "stu19514",
       "email": "testingdata3011@gmail.com"
     },
     "staffUser": {
@@ -97,31 +99,6 @@
       "name": "dsstestsep4inst",
       "username": "dsstestsep4inst",
       "password": "Staffing@*123321"
-    }
-  },
-  "coredev": {
-    "cadmin": {
-      "username": "testautomation",
-      "password": "Staffing@*123321"
-    },
-    "studentUser": {
-      "name": "testautomation_donotuse",
-      "username": "tes25266",
-      "password": "Student@*/123321"
-    },
-    "resetStudent": {
-      "username": "rachel",
-      "email": "testingdata3011@gmail.com"
-    },
-    "staffUser": {
-      "name": "automation_instructor_donotuse",
-      "username": "automation_instructor_donotuse",
-      "password": "Session@123"
-    },
-    "classroomInstructor": {
-      "name": "automation_instructor_donotuse",
-      "username": "automation_instructor_donotuse",
-      "password": "Session@123"
     }
   }
 }

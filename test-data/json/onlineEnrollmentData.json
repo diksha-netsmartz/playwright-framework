@@ -11,6 +11,7 @@
     "lastName": "gellar",
     "address": "new york",
     "state": "NY",
+    "city": "new york",
     "zipCode": "11111",
     "homePhone": "(222)222-2222",
     "cellPhone": "(555)555-5555",
@@ -29,6 +30,11 @@
     "collegeId": "44444",
     "smsNumber": "(999)999-9999",
     "parentsDriverLicense": "123456",
-    "apartment": "12345"
+    "apartment": "12345",
+    "coursePassword": "Session@123",
+    "courseStartDate": "10/12/2026",
+    "siblingName": "Sammie",
+    "siblingLicenseNumber": "11111111",
+    "membershipNumber": "1234567890"
   }
 }

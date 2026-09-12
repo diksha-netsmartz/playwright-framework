@@ -45,7 +45,7 @@ export default class PdfHelper {
      * Downloads/generates a PDF from the page (handles blob URLs, direct PDF URLs, and HTML pages),
      * extracts & verifies the text inside the PDF, prints the PDF text to console, and attaches it to reports.
      * @param {import('@playwright/test').Page & { pdfBuffer?: Buffer | null, pdfText?: string }} page - The Playwright Page instance.
-     * @param {string} expectedText - Text expected inside the PDF document.
+     * @param {string | RegExp} expectedText - Text or RegExp pattern expected inside the PDF document.
      * @param {string} attachmentName - Filename for the attached PDF in reports.
      */
     static async downloadVerifyAndAttach(page, expectedText, attachmentName) {
@@ -138,9 +138,11 @@ export default class PdfHelper {
                 console.log(pdfText.trim());
                 console.log(`==================================================================\n`);
 
-                expect(pdfText).toMatch(new RegExp(expectedText, 'i'));
+                const pattern = expectedText instanceof RegExp ? expectedText : new RegExp(expectedText, 'i');
+                expect(pdfText).toMatch(pattern);
             } else {
-                await expect(page.getByText(new RegExp(expectedText, 'i')).first()).toBeVisible();
+                const pattern = expectedText instanceof RegExp ? expectedText : new RegExp(expectedText, 'i');
+                await expect(page.getByText(pattern).first()).toBeVisible();
             }
         });
 
@@ -307,7 +309,7 @@ export default class PdfHelper {
      * and attaches the PDF document to the Playwright and Allure reports.
      * @param {import('@playwright/test').Download|string} downloadOrPath - The Download instance or file path.
      * @param {Object} [options] - Verification options.
-     * @param {string[]} [options.expectedTexts] - List of text strings expected inside the PDF.
+     * @param {(string | string[] | RegExp)[]} [options.expectedTexts] - List of text strings, alternative string arrays, or RegExp patterns expected inside the PDF.
      * @param {string} [options.attachmentName='Report.pdf'] - Suggested attachment name.
      */
     static async verifyPdfDownloaded(downloadOrPath, options = {}) {
@@ -345,22 +347,56 @@ export default class PdfHelper {
         const matchedTexts = [];
         const missingTexts = [];
 
-        for (const exp of expectedTexts) {
-            if (!exp || String(exp).trim().length === 0) continue;
-            const textToVerify = String(exp).trim();
+        const checkMatch = (target) => {
+            if (!target) return null;
+            if (target instanceof RegExp) {
+                return target.test(pdfText) || target.test(normalizedPdfText) ? target.toString() : null;
+            }
+            const textToVerify = String(target).trim();
+            if (textToVerify.length === 0) return null;
             const normalizedExp = textToVerify.replace(/\s+/g, ' ').toLowerCase();
             const compressedExp = normalizedExp.replace(/\s+/g, '');
 
             if (normalizedPdfText.includes(normalizedExp) || (compressedExp.length > 3 && compressedPdfText.includes(compressedExp))) {
-                matchedTexts.push(textToVerify);
-            } else {
-                // If multi-word, check if each word exists
-                const words = normalizedExp.split(/\s+/).filter(w => w.length > 1 && !['-', '|', ':', '#'].includes(w));
-                const allWordsPresent = words.length > 0 && words.every(word => normalizedPdfText.includes(word));
-                if (allWordsPresent) {
-                    matchedTexts.push(textToVerify);
+                return textToVerify;
+            }
+            const words = normalizedExp.split(/\s+/).filter(w => w.length > 1 && !['-', '|', ':', '#'].includes(w));
+            const allWordsPresent = words.length > 0 && words.every(word => normalizedPdfText.includes(word));
+            if (allWordsPresent) {
+                return textToVerify;
+            }
+            return null;
+        };
+
+        for (const exp of expectedTexts) {
+            if (!exp) continue;
+
+            if (Array.isArray(exp)) {
+                if (exp.length === 0) continue;
+                let matchedOption = null;
+                for (const option of exp) {
+                    matchedOption = checkMatch(option);
+                    if (matchedOption) break;
+                }
+                if (matchedOption) {
+                    matchedTexts.push(`${matchedOption} (from [${exp.join(' | ')}])`);
                 } else {
-                    missingTexts.push(textToVerify);
+                    missingTexts.push(`[${exp.join(' OR ')}]`);
+                }
+            } else if (exp instanceof RegExp) {
+                const matched = checkMatch(exp);
+                if (matched) {
+                    matchedTexts.push(matched);
+                } else {
+                    missingTexts.push(exp.toString());
+                }
+            } else {
+                if (String(exp).trim().length === 0) continue;
+                const matched = checkMatch(exp);
+                if (matched) {
+                    matchedTexts.push(matched);
+                } else {
+                    missingTexts.push(String(exp).trim());
                 }
             }
         }

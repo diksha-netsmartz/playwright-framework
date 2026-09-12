@@ -56,13 +56,20 @@ export default class StaffPage extends BasePage {
         this.certExpDateInput = page.locator('#date_CertExp');
 
         this.userNameInput = page.getByRole('textbox', { name: 'User Name' });
-        this.passwordInput = page.getByPlaceholder('Password', { exact: true });
+        this.passwordInput = page.locator("//input[contains(@name, 'Password') and not(contains(@name,'Re'))]")
         this.reEnterPasswordInput = page.getByPlaceholder('Re Enter Password');
 
+        this.appointmentColorCodeInput = page.getByRole('textbox', { name: 'Appointment Color Code' });
         this.assignAppointmentColorCheckbox = page.locator("xpath=//input[@id='Bitappointmentcolor']//following-sibling::ins");
         this.requireManualEnablingOfZoomButton = page.locator("xpath=//input[contains(@id,'Zoom')]//following-sibling::ins");
+        this.certificateNumberInput = page.getByRole('textbox', { name: 'Certificate Number' });
+        this.roadDistanceCoverageInput = page.getByRole('textbox', { name: 'Road distance coverage' });
+        this.instructorStaffLicenseNumberInput = page.getByRole('textbox', { name: 'Instructor/Staff Lincense#' });
 
         this.zoomPmiInput = page.getByRole('textbox', { name: 'Zoom PMI' });
+        this.zoomHostUrlInput = page.getByRole('textbox', { name: 'Zoom Host URL' });
+        this.zoomUserUrlInput = page.getByRole('textbox', { name: 'Zoom User URL' });
+        this.badgeInput = page.getByRole('textbox', { name: 'Badge' });
         this.staffSurveyLinkInput = page.getByRole('textbox', { name: 'Staff Survey Link' });
 
         // File / Picture Upload Locators
@@ -144,85 +151,167 @@ export default class StaffPage extends BasePage {
             this.permitIssueDate = data.permitIssueDate;
             this.certExpDate = data.certExpDate;
             this.instructorPermitNumber = data.instructorPermitNumber || `${Math.floor(100000000000 + Math.random() * 900000000000)}`;
+            this.certificateNumber = data.certificateNumber || 'CERT-12345';
+            this.roadDistanceCoverage = data.roadDistanceCoverage || '50';
+            this.instructorStaffLicenseNumber = data.instructorStaffLicenseNumber || 'LIC-987654';
             this.userName = `user_${this.uniqueId}`;
             this.password = data.password || 'Password@123';
+            this.appointmentColorCode = data.appointmentColorCode || '#4287f5';
             this.zoomPmi = data.zoomPmi || '8794561230';
+            this.zoomHostUrl = data.zoomHostUrl || 'https://zoom.us/j/8794561230?pwd=host';
+            this.zoomUserUrl = data.zoomUserUrl || 'https://zoom.us/j/8794561230';
+            this.badge = data.badge || 'BADGE-001';
             this.staffSurveyLink = data.staffSurveyLink || 'https://feedback.drivingschool.com/survey';
 
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load');
+            await this.waitForVisible(this.statusDropdown, { timeout: 10000 }).catch(() => { });
 
             // 1. Select Status -> Active
-            await this.click(this.statusDropdown);
-            await this.waitForVisible(this.statusOptionActive);
-            await this.click(this.statusOptionActive);
+            if (await this.isVisible(this.statusDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.statusDropdown);
+                await this.waitForVisible(this.statusOptionActive);
+                await this.click(this.statusOptionActive);
+            }
 
             // 2. Select Role -> Instructor
-            await this.click(this.roleDropdown);
-            await this.waitForVisible(this.roleOptionInstructor);
-            await this.click(this.roleOptionInstructor);
+            if (await this.isVisible(this.roleDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.roleDropdown);
+                await this.waitForVisible(this.roleOptionInstructor);
+                await this.click(this.roleOptionInstructor);
+            }
 
             // 3. Select Location
-            await this.click(this.locationDropdown);
-            await this.waitForVisible(this.locationDropdownOption);
-            await this.click(this.locationDropdownOption);
+            if (await this.isVisible(this.locationDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.locationDropdown);
+                await this.waitForVisible(this.locationDropdownOption);
+                await this.click(this.locationDropdownOption);
+            }
 
             // 4. Staff Code
-            await this.waitForVisible(this.staffCodeInput);
-            await this.fill(this.staffCodeInput, this.staffCode);
+            if (await this.isVisible(this.staffCodeInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.staffCodeInput, this.staffCode);
+            }
 
             // 5. Names
-            await this.waitForVisible(this.firstNameInput);
-            await this.fill(this.firstNameInput, this.firstName);
-            await this.fill(this.middleNameInput, this.middleName);
-            await this.fill(this.lastNameInput, this.lastName);
+            if (await this.isVisible(this.firstNameInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.firstNameInput, this.firstName);
+            }
+            if (await this.isVisible(this.middleNameInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.middleNameInput, this.middleName);
+            }
+            if (await this.isVisible(this.lastNameInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.lastNameInput, this.lastName);
+            }
 
             // 6. Address & City
-            await this.fill(this.addressInput, this.address);
-            await this.fill(this.cityInput, this.city);
+            if (await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.addressInput, this.address);
+            }
+            if (await this.isVisible(this.cityInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.cityInput, this.city);
+            }
 
             // 7. State -> DE
-            await this.click(this.stateDropdown);
-            await this.waitForVisible(this.stateOption);
-            await this.click(this.stateOption);
+            if (await this.isVisible(this.stateDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.stateDropdown);
+                await this.waitForVisible(this.stateOption);
+                await this.click(this.stateOption);
+            }
 
             // 8. Zip & Contacts
-            await this.fill(this.zipInput, this.zip);
-            await this.fill(this.emailInput, this.email);
-            await this.fill(this.homePhoneInput, this.homePhone);
-            await this.fill(this.cellPhoneInput, this.cellPhone);
+            if (await this.isVisible(this.zipInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.zipInput, this.zip);
+            }
+            if (await this.isVisible(this.emailInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emailInput, this.email);
+            }
+            if (await this.isVisible(this.homePhoneInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.homePhoneInput, this.homePhone);
+            }
+            if (await this.isVisible(this.cellPhoneInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.cellPhoneInput, this.cellPhone);
+            }
 
             // 9. Emergency Contact
-            await this.fill(this.emergencyContactNameInput, this.emergencyContactName);
-            await this.fill(this.emergencyContactRelationInput, this.emergencyContactRelation);
-            await this.fill(this.emergencyContactPhoneInput, this.emergencyContactPhone);
+            if (await this.isVisible(this.emergencyContactNameInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emergencyContactNameInput, this.emergencyContactName);
+            }
+            if (await this.isVisible(this.emergencyContactRelationInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emergencyContactRelationInput, this.emergencyContactRelation);
+            }
+            if (await this.isVisible(this.emergencyContactPhoneInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emergencyContactPhoneInput, this.emergencyContactPhone);
+            }
 
             // 10. Date of Birth
-            await this.fill(this.dateOfBirthInput, this.dateOfBirth);
+            if (await this.isVisible(this.dateOfBirthInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.dateOfBirthInput, this.dateOfBirth);
+            }
 
-            // 11. Instructor Permit Number & Permit Dates
-            await this.fill(this.instructorPermitNumberInput, this.instructorPermitNumber);
-            await this.fill(this.permitIssueDateInput, this.permitIssueDate);
-            await this.fill(this.certExpDateInput, this.certExpDate);
+            // 11. Instructor Permit Number & Permit Dates, License, Certificate, Road Distance
+            if (await this.isVisible(this.instructorPermitNumberInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.instructorPermitNumberInput, this.instructorPermitNumber);
+            }
+            if (await this.isVisible(this.permitIssueDateInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.permitIssueDateInput, this.permitIssueDate);
+            }
+            if (await this.isVisible(this.certExpDateInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.certExpDateInput, this.certExpDate);
+            }
+            if (await this.isVisible(this.certificateNumberInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.certificateNumberInput, this.certificateNumber);
+            }
+            if (await this.isVisible(this.instructorStaffLicenseNumberInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.instructorStaffLicenseNumberInput, this.instructorStaffLicenseNumber);
+            }
+            if (await this.isVisible(this.roadDistanceCoverageInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.roadDistanceCoverageInput, this.roadDistanceCoverage);
+            }
 
             // 12. User Credentials
-            await this.fill(this.userNameInput, this.userName);
-            await this.fill(this.passwordInput, this.password);
-            await this.fill(this.reEnterPasswordInput, this.password);
+            if (await this.isVisible(this.userNameInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.userNameInput, this.userName);
+            }
+            if (await this.isVisible(this.passwordInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.passwordInput, this.password);
+            }
+            if (await this.isVisible(this.reEnterPasswordInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.reEnterPasswordInput, this.password);
+            }
 
-            // 13. Optional Checkboxes
-            if (await this.assignAppointmentColorCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
+            // 13. Optional Checkboxes & Appointment Color
+            if (await this.isVisible(this.assignAppointmentColorCheckbox, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.assignAppointmentColorCheckbox);
             }
-            if (await this.requireManualEnablingOfZoomButton.isVisible({ timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.appointmentColorCodeInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.appointmentColorCodeInput, this.appointmentColorCode);
+            }
+            if (await this.isVisible(this.requireManualEnablingOfZoomButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.requireManualEnablingOfZoomButton);
             }
 
-            // 14. Zoom PMI & Staff Survey Link
-            await this.fill(this.zoomPmiInput, this.zoomPmi);
-            await this.fill(this.staffSurveyLinkInput, this.staffSurveyLink);
+            // 14. Zoom Details, Badge & Staff Survey Link
+            if (await this.isVisible(this.zoomPmiInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.zoomPmiInput, this.zoomPmi);
+            }
+            if (await this.isVisible(this.zoomHostUrlInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.zoomHostUrlInput, this.zoomHostUrl);
+            }
+            if (await this.isVisible(this.zoomUserUrlInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.zoomUserUrlInput, this.zoomUserUrl);
+            }
+            if (await this.isVisible(this.badgeInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.badgeInput, this.badge);
+            }
+            if (await this.isVisible(this.staffSurveyLinkInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.staffSurveyLinkInput, this.staffSurveyLink);
+            }
 
             // 15. Profile Picture Upload
-            await this.uploadProfilePicture(data.profilePicture || 'profilePicture.jpg');
+            if (await this.isVisible(this.selectImageBtn, { timeout: 100 }).catch(() => false)) {
+                await this.uploadProfilePicture(data.profilePicture || 'profilePicture.jpg');
+            }
 
             return {
                 staffCode: this.staffCode,

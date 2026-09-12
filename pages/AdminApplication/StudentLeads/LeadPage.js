@@ -1,5 +1,5 @@
 import BasePage from '../../../utils/BasePage';
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Add Lead Page in Admin Portal (Student Leads > Add Lead).
@@ -33,7 +33,7 @@ export default class LeadPage extends BasePage {
         this.stateDropdown = page.locator("xpath=//select[@name='State']//parent::div//button");
         this.stateOptionCA = page.locator("xpath=//select[@name='State']//parent::div//ul//a[normalize-space(.)='CA']");
 
-        this.zipCodeInput = page.getByRole('textbox', { name: 'Zip/Postal Code' });
+        this.zipCodeInput = page.locator('#ZipPostalCode')
         this.emailInput = page.locator('#Email')
 
         // Stage Field (contenteditable / note area for lead pipeline stage)
@@ -63,6 +63,43 @@ export default class LeadPage extends BasePage {
         // Yes Confirmation Button — shared XPath pattern used across Account Management pages
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
 
+        // Edit Lead Locators (TC_041)
+        this.staffValueDropdown = page.locator('span.valueSelected.staff-value');
+        this.showAllStaffLeads = page.getByRole('link', { name: 'Show All Staff Leads' });
+        this.editLeadModal = page.locator('#dealdetails');
+        this.notesTextarea = page.locator('div.note-editable');
+        this.saveNoteButton = page.locator("//button[contains(@id,'SaveNote')]");
+        this.editStageSelector = page.locator('#stage').last();
+        this.editSaveBtn = page.locator("//button[@data-toggle='confirmationUpdateProfile']");
+        this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
+        this.editCloseBtn = page.locator('button.close:visible')
+        this.detailsUpdatedToast = page.locator('#toast-container');
+
+        this.tasktab = page.locator('#taskTab_Li');
+        this.taskSubjext = page.getByRole('textbox', { name: 'Subject' });
+        this.taskStatusDropdown = page.locator("//button[contains(@data-id,'Status')]");
+        this.statusDropdownValueNew = page.locator("//button[contains(@data-id,'Status')]//parent::div//following-sibling::div//span[text()='New']");
+        this.taskNote = page.getByRole('textbox', { name: 'Note' });
+        this.priorityButton = page.locator("(//div[@class='priority']//label)[1]")
+        this.saveTaskButton = page.locator("(//button[contains(@id,'SaveUpdateTask')])[1]");
+        this.taskAssignToMeDropdown = page.locator("//button[contains(@data-id,'ProfileTAB_drpAssignTo')]");
+        this.taskAssignToMeDropdownValue = page.locator("(//button[contains(@data-id,'ProfileTAB_drpAssignTo')]//parent::div//following-sibling::div//li//a)[2]");
+        this.dueDateCalendar = page.getByRole('textbox', { name: 'M/D/YYYY' });
+        this.lastday = page.locator("(//td[@class='day'])[last()]");
+        this.selectTime = page.getByRole('button', { name: 'Select Time' })
+        this.taskTime = page.locator("(//button[contains(@data-id,'TaskTime')]//parent::div//following-sibling::div//li//a)[2]")
+        this.actionLogs = page.locator('#divStaffActionLogs').first();
+
+    }
+    /**
+ * Returns locator for the lead card locator
+ * @param {string} leadName - lead name.
+ * @returns {import('@playwright/test').Locator} lead card locator.
+ **/
+    openLeadCard(leadName) {
+        return this.page.locator(
+            `xpath=//*[contains(text(),'${leadName}')]//ancestor::div[@id='divStage1']`
+        );
     }
 
     /**
@@ -110,37 +147,41 @@ export default class LeadPage extends BasePage {
             await this.waitForVisible(this.lastNameInput);
             await this.fill(this.lastNameInput, this.lastName);
 
-            await this.waitForVisible(this.addressInput);
-            await this.fill(this.addressInput, address);
+            if (await this.isVisible(this.addressInput, { timeout: 100 })) {
+                await this.fill(this.addressInput, address);
+            }
 
-            await this.waitForVisible(this.cityInput);
-            await this.fill(this.cityInput, city);
+            if (await this.isVisible(this.cityInput, { timeout: 100 })) {
+                await this.fill(this.cityInput, city);
+            }
 
-            await this.waitForVisible(this.stateDropdown);
-            await this.click(this.stateDropdown);
-            await this.waitForVisible(this.stateOptionCA);
-            await this.click(this.stateOptionCA);
+            if (await this.isVisible(this.stateDropdown, { timeout: 100 })) {
+                await this.click(this.stateDropdown);
+                await this.waitForVisible(this.stateOptionCA);
+                await this.click(this.stateOptionCA);
+            }
 
-            await this.waitForVisible(this.zipCodeInput);
-            await this.fill(this.zipCodeInput, zipCode);
+            if (await this.isVisible(this.zipCodeInput, { timeout: 100 })) {
+                await this.fill(this.zipCodeInput, zipCode);
+            }
 
             await this.waitForVisible(this.emailInput);
             await this.fill(this.emailInput, email);
 
 
-            if (await this.isVisible(this.dropdown27, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.dropdown27, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.dropdown27);
                 await this.waitForVisible(this.dropdown27Option);
                 await this.click(this.dropdown27Option);
             }
 
             await this.click(this.stageField);
-            if (await this.isVisible(this.genderMaleRadioButton, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.genderMaleRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.genderMaleRadioButton);
             }
 
             // Birth Date — Month, Day, Year dropdowns
-            if (await this.isVisible(this.birthMonthDropdown, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.birthMonthDropdown, { timeout: 100 }).catch(() => false)) {
                 await this.waitForVisible(this.birthMonthDropdown);
                 await this.click(this.birthMonthDropdown);
                 await this.waitForVisible(this.dobMonth);
@@ -157,30 +198,30 @@ export default class LeadPage extends BasePage {
                 await this.click(this.dobYear);
             }
 
-            if (await this.isVisible(this.homePhoneInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.homePhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.homePhoneInput, homePhone);
             }
 
-            if (await this.isVisible(this.cellPhoneInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.cellPhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.cellPhoneInput, cellPhone);
             }
 
-            if (await this.isVisible(this.parentPhoneInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.parentPhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.parentPhoneInput, parentPhone);
             }
 
-            if (await this.isVisible(this.otherPhoneInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.otherPhoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.otherPhoneInput, otherPhone);
             }
 
-            if (await this.isVisible(this.medicalConditionsInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.medicalConditionsInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.medicalConditionsInput, data.medicalConditions)
             }
 
-            if (await this.isVisible(this.studentNotesInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.studentNotesInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.studentNotesInput, data.studentNotes)
             }
-            if (await this.isVisible(this.preferredDateandTimeInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.preferredDateandTimeInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.preferredDateandTimeInput, data.preferredDateandTime)
             }
 
@@ -190,6 +231,7 @@ export default class LeadPage extends BasePage {
                 email
             };
         });
+
     }
 
     /**
@@ -216,11 +258,175 @@ export default class LeadPage extends BasePage {
      **/
     async verifyLeadAddedSuccessfully() {
         await test.step('Verify "Lead added successfully." notification', async () => {
-
-
             const successMsg = this.page.getByText('Lead added successfully.');
             await this.waitForVisible(successMsg);
             await this.verifyVisible(successMsg);
+        });
+    }
+
+    /**
+     * Filters leads by selecting 'Show All Staff Leads' from staff dropdown.
+     **/
+    async filterShowAllStaffLeads() {
+        await test.step('Select "Show All Staff Leads" from staff value dropdown', async () => {
+            await this.waitForLoaders();
+            await this.click(this.staffValueDropdown);
+            await this.waitForVisible(this.showAllStaffLeads)
+            await this.click(this.showAllStaffLeads);
+            await this.waitForLoaders();
+            await this.waitForHidden(this.showAllStaffLeads);
+
+        });
+    }
+
+    /**
+     * Finds and clicks on a Lead card by lead name to open the edit modal.
+     * @param {string} leadName - Unique first name or full name of the lead.
+     **/
+    async openLeadForEdit(leadName) {
+        await test.step(`Open Lead card for "${leadName}" to edit`, async () => {
+            await this.waitForLoaders();
+
+            await this.waitForVisible(this.openLeadCard(leadName));
+            await this.click(this.openLeadCard(leadName));
+            await this.waitForLoaders();
+            await this.waitForVisible(this.editSaveBtn);
+        });
+    }
+
+    /**
+     * Updates the Lead fields with new values.
+     * @param {Object} updatedData - New field values to populate.
+     **/
+    async updateLeadFields(updatedData = {}) {
+        await test.step('Update Lead fields with new values', async () => {
+            await this.waitForVisible(this.editSaveBtn);
+            if (updatedData.middleName) {
+                await this.fill(this.middleNameInput, updatedData.middleName);
+            }
+            if (updatedData.address) {
+                await this.fill(this.addressInput, updatedData.address);
+            }
+            if (updatedData.zipCode) {
+                await this.fill(this.zipCodeInput, updatedData.zipCode);
+            }
+            if (updatedData.email) {
+                await this.fill(this.emailInput, updatedData.email);
+            }
+            if (updatedData.medicalConditions) {
+                if (await this.medicalConditionsInput.isVisible({ timeout: 1000 }).catch(() => false)) {
+                    await this.fill(this.medicalConditionsInput, updatedData.medicalConditions);
+                }
+            }
+            await this.click(this.editStageSelector);
+
+        });
+    }
+
+    /**
+ * Add and save notes while updating lead
+ **/
+    async updateNotes(notes) {
+        if (await this.isVisible(this.notesTextarea, { timeout: 100 })) {
+            await this.fill(this.notesTextarea, notes);
+            await this.click(this.saveNoteButton);
+            await this.waitForVisible(this.yesConfirmationButton);
+            await this.click(this.yesConfirmationButton);
+            const successMsg = this.page.getByText('Note added successfully.');
+            await this.waitForVisible(successMsg);
+            await this.verifyVisible(successMsg);
+        }
+    }
+
+    /**
+* Add and save task while updating lead
+**/
+    async updateTask(taskSubject, taskNote) {
+        if (await this.isVisible(this.tasktab, { timeout: 100 })) {
+            await this.click(this.tasktab);
+            await this.waitForVisible(this.taskSubjext);
+            await this.fill(this.taskSubjext, taskSubject);
+            await this.click(this.taskStatusDropdown);
+            await this.waitForVisible(this.statusDropdownValueNew);
+            await this.click(this.statusDropdownValueNew);
+            await this.click(this.dueDateCalendar);
+            await this.waitForVisible(this.lastday);
+            await this.click(this.lastday);
+            await this.click(this.selectTime);
+            await this.waitForVisible(this.taskTime);
+            await this.click(this.taskTime);
+            await this.click(this.taskAssignToMeDropdown)
+            await this.waitForVisible(this.taskAssignToMeDropdownValue);
+            await this.click(this.taskAssignToMeDropdownValue);
+            await this.click(this.priorityButton);
+            await this.fill(this.taskNote, taskNote);
+            await this.click(this.saveTaskButton);
+            await this.waitForVisible(this.yesConfirmationButton);
+            await this.click(this.yesConfirmationButton);
+            const successMsg = this.page.getByText('Task added successfully.').first();
+            await this.waitForVisible(successMsg);
+            await this.verifyVisible(successMsg);
+        }
+    }
+
+    /**
+     * Clicks Save in the edit modal and handles confirmation dialog.
+     **/
+    async saveEditedLead() {
+        await test.step('Save edited Lead and confirm', async () => {
+            await this.waitForVisible(this.editSaveBtn);
+            await this.click(this.editSaveBtn);
+            await this.waitForVisible(this.yesConfirmationButton)
+            await this.click(this.yesConfirmationButton);
+            await this.waitForLoaders();
+        });
+    }
+
+    /**
+     * Verifies that 'Details updated successfully.' notification appears and closes modal.
+     **/
+    async verifyLeadUpdatedSuccessfully() {
+        await test.step('Verify "Details updated successfully." toast message', async () => {
+            const successText = this.page.getByText('Details updated successfully.');
+            await this.waitForVisible(successText);
+            await this.verifyVisible(successText);
+            await this.click(this.editCloseBtn);
+            await this.waitForLoaders();
+        });
+    }
+
+    /**
+ * Verifies that the updated details are correctly populated in the form fields using the 'value' attribute.
+ * @param {Object} expectedData - Expected updated values.
+ **/
+    async verifyLeadDeatilsAreUpdatedSuccessfully(expectedData = {}) {
+        await test.step('Verify updated details are present using value attribute', async () => {
+            await this.waitForVisible(this.editSaveBtn);
+            if (expectedData.middleName) {
+                await expect(this.middleNameInput).toHaveAttribute('value', expectedData.middleName);
+            }
+            if (expectedData.address) {
+                await expect(this.addressInput).toHaveAttribute('value', expectedData.address);
+            }
+            if (expectedData.zipCode) {
+                await expect(this.zipCodeInput).toHaveAttribute('value', expectedData.zipCode);
+            }
+            if (expectedData.email) {
+                await expect(this.emailInput).toHaveAttribute('value', expectedData.email);
+            }
+            if (expectedData.medicalConditions) {
+                if (await this.medicalConditionsInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+                    await expect(this.medicalConditionsInput).toHaveAttribute('value', expectedData.medicalConditions);
+                }
+            }
+            if (expectedData.notes) {
+                await expect(this.actionLogs).toContainText(expectedData.notes);
+            }
+
+            if (expectedData.taskSubject) {
+                await expect(this.actionLogs).toContainText(expectedData.taskSubject);
+            }
+
         });
     }
 }

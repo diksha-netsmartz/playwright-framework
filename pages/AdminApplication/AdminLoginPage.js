@@ -45,7 +45,7 @@ export default class AdminLoginPage extends BasePage {
             await this.fill(this.usernameTxt, username);
             await this.fill(this.passwordTxt, password);
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
-            if (await this.isVisible(captcha, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(captcha, { timeout: 500 }).catch(() => false)) {
                 await this.click(captcha);
                 await this.verifyAttribute(captcha, "aria-checked", "true");
             }
@@ -67,15 +67,6 @@ export default class AdminLoginPage extends BasePage {
                 await this.mobilePopupCloseButton.click();
             }
         );
-        // await this.page.waitForTimeout(5000);
-        // if (await this.mobilePopUp.isVisible().catch(() => false)) {
-        //     await test.step('Close mobile number popup', async () => {
-        //         await this.verifyVisible(this.mobilePopUp);
-        //         await this.verifyVisible(this.mobilePopupCloseButton);
-        //         await this.click(this.mobilePopupCloseButton);
-        //         await this.waitForHidden(this.mobilePopupCloseButton);
-        //     });
-        // }
 
     }
 

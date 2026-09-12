@@ -142,7 +142,9 @@ export default class BulkAppointmentPage extends BasePage {
     **/
     async selectAppointment() {
         await test.step('Select appointment from grid', async () => {
-            await this.page.waitForTimeout(10000);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 });
+            await this.waitForVisible(this.selectAppointmentCheckbox, { timeout: 10000 })
             await this.click(this.selectAppointmentCheckbox);
         });
     }

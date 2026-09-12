@@ -3,6 +3,7 @@ import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
 import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage';
 import StudentProfilePage from '../../pages/StudentApplication/StudentProfilePage';
 import TestDataGenerator from '../../utils/TestDataGenerator';
+import DateHelper from '../../utils/DateHelper';
 import login from '../../test-data/json/login.json';
 
 /**
@@ -22,6 +23,8 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
     let dynamicAddress;
     let dynamicZipcode;
     let dynamicPermitNumber;
+    let dynamicCoursePassword;
+    let dynamicCourseStartDate;
 
     await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
         await studentLoginPage.navigateToLoginPage();
@@ -38,12 +41,16 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
         dynamicAddress = `${Math.floor(100 + Math.random() * 900)} Main Street`;
         dynamicZipcode = `${Math.floor(10000 + Math.random() * 90000)}`;
         dynamicPermitNumber = `PM${Math.floor(10000 + Math.random() * 90000)}`;
+        dynamicCoursePassword = TestDataGenerator.generateRandomPassword();
+        dynamicCourseStartDate = DateHelper.formatDate(new Date());
 
         await studentProfilePage.updateProfileDetails({
             parentPhone: dynamicParentPhone,
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
             permit: dynamicPermitNumber,
+            coursePassword: dynamicCoursePassword,
+            courseStartDate: dynamicCourseStartDate,
         });
     });
 
@@ -59,6 +66,8 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
             permit: dynamicPermitNumber,
+            coursePassword: dynamicCoursePassword,
+            courseStartDate: dynamicCourseStartDate,
         });
     });
 });

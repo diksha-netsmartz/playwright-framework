@@ -55,9 +55,9 @@ export default class NewClassPage extends BasePage {
         this.weekdayDropdown = page.locator("xpath=//button[@data-id='drp_WorkTiming_WeekDay']");
         this.weekdayOption = page.locator("xpath=(//span[normalize-space()='Monday'])[1]");
         this.startTimeDropdown = page.locator("xpath=//button[@title='Start Time']");
-        this.startTimeOption = page.locator("xpath=//button[@title='Start Time']//parent::div//span[normalize-space()='6:00 AM']");
+        this.startTimeOption = page.locator("xpath=(//button[@title='Start Time']//parent::div//li[not(contains(@class,'selected'))])[1]");
         this.endTimeDropdown = page.locator("xpath=//button[@title='End Time']");
-        this.endTimeOption = page.locator("xpath=//button[@title='End Time']//parent::div//span[normalize-space()='6:15 AM']");
+        this.endTimeOption = page.locator("xpath=(//button[@title='End Time']//parent::div//li[not(contains(@class,'selected'))])[5]");
         this.saveButton = page.locator("xpath=//div[@class='modal-footer']//button[text()='Save']");
         this.closeButton = page.locator("xpath=(//div[@class='modal-footer']//button[text()='Close' and @onclick])[1]")
         this.closeTeacherModal = page.locator("xpath=//h4[contains(@id,'Teacher')]//ancestor::div[@class='modal-content']//button[text()='Close']")
@@ -92,6 +92,7 @@ export default class NewClassPage extends BasePage {
     async verifyNewClassroomPageIsDisplayed() {
         await test.step('Verify New Classroom page is displayed', async () => {
             await this.waitForLoaders();
+            await this.waitForVisible(this.classroomHeading, { timeout: 5000 })
             await this.verifyVisible(this.classroomHeading);
         });
     }
