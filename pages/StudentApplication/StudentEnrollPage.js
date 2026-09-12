@@ -51,6 +51,7 @@ export default class StudentEnrollPage extends BasePage {
                 await this.click(this.contractSignatureSaveButton);
                 await this.click(this.yesConfirmationButton);
                 await this.waitForLoaders();
+                await this.page.waitForLoadState('load', { timeout: 10000 });
 
             }
         });
@@ -61,12 +62,8 @@ export default class StudentEnrollPage extends BasePage {
     **/
     async verifyEnrollmentSuccess() {
         await test.step('Verify "You have been enrolled successfully." message', async () => {
-            await this.verifyVisible(
-                this.page.getByText(
-                    'You have been enrolled successfully.',
-                    { exact: true }
-                ).first()
-            );
+            await this.waitForVisible(this.page.getByText('You have been enrolled successfully.', { exact: true }).first(), { timeout: 10000 });
+            await this.verifyVisible(this.page.getByText('You have been enrolled successfully.', { exact: true }).first());
         });
     }
 
