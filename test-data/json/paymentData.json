@@ -1,6 +1,6 @@
 {
   "swipedTransaction": {
-    "amount": "100",
+    "amount": "1",
     "last4Digits": "2222",
     "cardType": "Discover",
     "transactionNumber": "11111222223",
@@ -10,23 +10,24 @@
     "accountNickname": "card"
   },
   "checkPayment": {
-    "amount": "100",
+    "amount": "1",
     "checkNumber": "22222222222",
     "receiptNumber": "22222",
     "notes": "cheque payment"
   },
   "cashPayment": {
-    "amount": "100",
+    "amount": "1",
     "receiptNumber": "2222222",
     "notes": "cash payment"
   },
   "adjustment": {
-    "amount": "2000",
+    "amount": "2",
     "type": "Refund (Add to balance)",
     "receiptNumber": "2222",
     "notes": "adjustment for add to balance"
   },
   "processCreditCard": {
+    "amount": "1",
     "cardNumber": "4111111111111111",
     "expiryDate": "112030",
     "cvv": "076",
