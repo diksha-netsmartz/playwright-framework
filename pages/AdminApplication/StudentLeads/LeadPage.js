@@ -77,8 +77,8 @@ export default class LeadPage extends BasePage {
 
         this.tasktab = page.locator('#taskTab_Li');
         this.taskSubjext = page.getByRole('textbox', { name: 'Subject' });
-        this.taskStatusDropdown = page.locator("//button[contains(@data-id,'Status')]");
-        this.statusDropdownValueNew = page.locator("//button[contains(@data-id,'Status')]//parent::div//following-sibling::div//span[text()='New']");
+        this.taskStatusDropdown = page.locator("//button[contains(@data-id,'ProfileTAB_drpStatus')]");
+        this.statusDropdownValueNew = page.locator("//button[contains(@data-id,'ProfileTAB_drpStatus')]//parent::div//following-sibling::div//span[text()='New']");
         this.taskNote = page.getByRole('textbox', { name: 'Note' });
         this.priorityButton = page.locator("(//div[@class='priority']//label)[1]")
         this.saveTaskButton = page.locator("(//button[contains(@id,'SaveUpdateTask')])[1]");
@@ -301,22 +301,21 @@ export default class LeadPage extends BasePage {
     async updateLeadFields(updatedData = {}) {
         await test.step('Update Lead fields with new values', async () => {
             await this.waitForVisible(this.editSaveBtn);
-            if (updatedData.middleName) {
+            if (await this.isVisible(this.middleNameInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.middleNameInput, updatedData.middleName);
             }
-            if (updatedData.address) {
+            if (await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.addressInput, updatedData.address);
             }
-            if (updatedData.zipCode) {
+            if (await this.isVisible(this.zipCodeInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.zipCodeInput, updatedData.zipCode);
             }
-            if (updatedData.email) {
+            if (await this.isVisible(this.emailInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.emailInput, updatedData.email);
             }
-            if (updatedData.medicalConditions) {
-                if (await this.medicalConditionsInput.isVisible({ timeout: 1000 }).catch(() => false)) {
-                    await this.fill(this.medicalConditionsInput, updatedData.medicalConditions);
-                }
+            if (await this.isVisible(this.medicalConditionsInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.medicalConditionsInput, updatedData.medicalConditions);
+
             }
             await this.click(this.editStageSelector);
 

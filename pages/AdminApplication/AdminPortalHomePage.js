@@ -82,8 +82,8 @@ export default class AdminPortalHomePage extends BasePage {
 
         // Configuration
         this.configurationMenu = page.locator('#ConfigurationSideMenu');
-        this.integratePaymentLink = page.locator('span:has-text("Integrate Payment")');
-        this.marketplaceLink = page.getByText('Marketplace', { exact: true });
+        this.integratePaymentLink = page.locator('#configurationPaymentProcessing')
+        this.marketplaceLink = page.locator("#configurationMarketPlace")
         this.zipCodeLink = page.getByRole('link', { name: 'Zip Code' });
 
     }

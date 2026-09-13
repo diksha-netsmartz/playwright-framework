@@ -20,7 +20,7 @@ export default class OnlineEnrollmentPage extends BasePage {
         // Package selection
         this.btwPackageBtn = page.locator("xpath=(//p[contains(text(),'BTW Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
         this.rtPackageBtn = page.locator("xpath=(//p[contains(text(),'RT Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
-        this.btwCRPackage = page.locator("(//p[text()='BTW and CR Package' or text()='This is BTW and CR Package']//ancestor::tr//a)[1]");
+        this.btwCRPackage = page.locator("xpath=(//p[contains(text(),'BTW') and contains(text(),'CR')]//ancestor::tr//a)[1]");
         this.additionalPackageCheckbox = page.locator("(//input[@type='checkbox' and contains(@class,'AdditionalProduct')]//following-sibling::span)[1]");
         this.continueAdditionalProduct = page.locator('#btnContinueAdditionalProduct');
         this.showAppointmentButton = page.locator('#btnAvailableClass');
@@ -34,7 +34,7 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.firstNameTxt = page.getByRole('textbox', { name: 'First Name' });
         this.middlenameTxt = page.getByRole('textbox', { name: 'Middle Name' });
         this.lastNameTxt = page.getByRole('textbox', { name: 'Last Name' });
-        this.addressTxt = page.getByRole('textbox', { name: 'Address' });
+        this.addressTxt = page.locator('#Address');
         this.addressSelectionDropdown = page.locator("xpath=(//div[@class='pac-item']//span[text()='New York'])[1]");
         this.zipCodeTxt = page.locator('#ZipPostalCode');
         this.homePhoneTxt = page.getByRole('textbox', { name: 'Home Phone' });

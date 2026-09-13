@@ -56,9 +56,9 @@ export default class OpenTimeSlotsPage extends BasePage {
         this.specificDatesRadioBtn = page.locator("xpath=//input[@id='rdbtnSpecificDates']//following-sibling::span");
         this.dateInputbox = page.locator('#OTSMultiDateSelection');
         this.calendarDate = page.locator("xpath=(//td[contains(@class,'day') and text()='1'])[1]");
-        this.showInStudentCenterYesRadioButton = page.locator("xpath=//label[contains(text(),'Show In Student Center')]//parent::div//input[@value='1']//following-sibling::span");
-        this.showInStudentCenterNoRadioButton = page.locator("xpath=//label[contains(text(),'Show In Student Center')]//parent::div//input[@value='0']//following-sibling::span");
-
+        this.showInStudentCenterYesRadioButton = page.locator("xpath=//label[contains(text(),'In Student Center')]//parent::div//input[@value='1']//following-sibling::span");
+        this.showInStudentCenterNoRadioButton = page.locator("xpath=//label[contains(text(),'In Student Center')]//parent::div//input[@value='0']//following-sibling::span");
+        this.appointmentNotesInput = page.getByRole('textbox', { name: 'Appointment Notes' })
 
 
         // Duration Tab & Controls
@@ -413,20 +413,24 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.setCommonDuration();
 
             // 5. Select Location
-            await this.waitForVisible(this.locationDropdown);
-            await this.click(this.locationDropdown);
-            await this.waitForVisible(this.locationDropdownOption);
-            await this.click(this.locationDropdownOption);
-            await this.waitForLoaders();
+            if (await this.isVisible(this.locationDropdown, { timeout: 100 })) {
+                await this.click(this.locationDropdown);
+                await this.waitForVisible(this.locationDropdownOption);
+                await this.click(this.locationDropdownOption);
+                await this.waitForLoaders();
+            }
 
             // 6. Select Vehicle
-            await this.waitForVisible(this.showAllVehiclesCheckbox);
-            await this.click(this.showAllVehiclesCheckbox);
-            await this.waitForVisible(this.vehicleDropdown);
-            await this.click(this.vehicleDropdown);
-            await this.waitForVisible(this.vehicleDropdownOption);
-            await this.click(this.vehicleDropdownOption);
-            await this.waitForLoaders();
+            if (await this.isVisible(this.showAllVehiclesCheckbox, { timeout: 100 })) {
+                await this.click(this.showAllVehiclesCheckbox);
+            }
+            if (await this.isVisible(this.vehicleDropdown, { timeout: 100 })) {
+                await this.waitForVisible(this.vehicleDropdown);
+                await this.click(this.vehicleDropdown);
+                await this.waitForVisible(this.vehicleDropdownOption);
+                await this.click(this.vehicleDropdownOption);
+                await this.waitForLoaders();
+            }
 
             // 7. Fill PU Location
             await this.fill(this.puLocationInput, this.puLocation);
@@ -443,19 +447,24 @@ export default class OpenTimeSlotsPage extends BasePage {
             }
 
             //9. Select Instructions
-            await this.waitForVisible(this.instruction1Dropdown);
-            await this.click(this.instruction1Dropdown);
-            await this.waitForVisible(this.instruction1DropdownOption);
-            await this.click(this.instruction1DropdownOption);
-            await this.waitForLoaders();
+            if (await this.isVisible(this.instruction1Dropdown, { timeout: 100 })) {
+                await this.click(this.instruction1Dropdown);
+                await this.waitForVisible(this.instruction1DropdownOption);
+                await this.click(this.instruction1DropdownOption);
+                await this.waitForLoaders();
+            }
 
-            await this.waitForVisible(this.instruction2Dropdown);
-            await this.click(this.instruction2Dropdown);
-            await this.waitForVisible(this.instruction2DropdownOption);
-            await this.click(this.instruction2DropdownOption);
+            if (await this.isVisible(this.instruction2Dropdown, { timeout: 100 })) {
+                await this.click(this.instruction2Dropdown);
+                await this.waitForVisible(this.instruction2DropdownOption);
+                await this.click(this.instruction2DropdownOption);
+            }
             await this.waitForLoaders();
             if (await this.isVisible(this.showInStudentCenterYesRadioButton, { timeout: 100 })) {
                 await this.click(this.showInStudentCenterYesRadioButton);
+            }
+            if (await this.isVisible(this.appointmentNotesInput, { timeout: 100 })) {
+                await this.fill(this.appointmentNotesInput, "appointment notes");
             }
             return this.puLocation;
         });
@@ -612,24 +621,25 @@ export default class OpenTimeSlotsPage extends BasePage {
     async editOpenTimeSlotDetails(data = {}) {
         return await test.step('Update fields in Update Open Time Slot popup', async () => {
             await this.waitForLoaders();
-
+            await this.waitForVisible(this.puLocationInput);
             this.updatedPuLocation = `${(data && data.puLocation) || 'PU Location'} ${Date.now()}`;
             // if (await this.puLocationInput.isVisible({ timeout: 5000 }).catch(() => false)) {
             //     await this.fill(this.puLocationInput, this.updatedPuLocation);
             // }
+            if (await this.isVisible(this.locationDropdown, { timeout: 100 })) {
+                await this.click(this.locationDropdown);
+                await this.waitForVisible(this.locationDropdownOptionLast);
+                await this.click(this.locationDropdownOptionLast);
+                await this.waitForLoaders();
+            }
 
-            await this.waitForVisible(this.locationDropdown);
-            await this.click(this.locationDropdown);
-            await this.waitForVisible(this.locationDropdownOptionLast);
-            await this.click(this.locationDropdownOptionLast);
-            await this.waitForLoaders();
+            if (await this.isVisible(this.vehicleDropdown, { timeout: 100 })) {
+                await this.click(this.vehicleDropdown);
+                await this.waitForVisible(this.vehicleDropdownOptionLast);
+                await this.click(this.vehicleDropdownOptionLast);
+            }
 
-            await this.waitForVisible(this.vehicleDropdown);
-            await this.click(this.vehicleDropdown);
-            await this.waitForVisible(this.vehicleDropdownOptionLast);
-            await this.click(this.vehicleDropdownOptionLast);
-
-            if (await this.showInStudentCenterNoRadioButton.isVisible({ timeout: 100 }).catch(() => false)) {
+            if (await this.isVisible(this.showInStudentCenterNoRadioButton, { timeout: 100 })) {
                 await this.click(this.showInStudentCenterNoRadioButton);
             }
             await this.waitForLoaders();
