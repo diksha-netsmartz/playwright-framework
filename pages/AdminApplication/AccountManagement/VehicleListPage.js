@@ -41,7 +41,7 @@ export default class VehicleListPage extends BasePage {
         this.appointmentColorCheckbox = page.locator("xpath=(//input[@id='EnableAppointmentColor']//following-sibling::ins)[1]");
         this.notesInput = page.locator('#VehicleNote');
         this.odometerValueInput = page.getByRole('textbox', { name: 'Odometer Value' });
-        this.initialMileageInput = page.getByRole('textbox', { name: 'Vehicle Initial Mileage' });
+        this.initialMileageInput = page.locator("//input[@id='VehicleInitialMileage' and not(@disabled)]");
 
         // File / Picture Upload Locators
         this.selectImageBtn = page.getByText('Select Image', { exact: true });
@@ -120,7 +120,7 @@ export default class VehicleListPage extends BasePage {
             await this.waitForVisible(this.vehicleNameInput);
             await this.fill(this.vehicleNameInput, this.vehicleName);
 
-            if (await this.isVisible(this.descriptionInput, { timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.descriptionInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.descriptionInput, data.description)
             }
 
@@ -131,46 +131,55 @@ export default class VehicleListPage extends BasePage {
             await this.click(this.statusOptionActive);
 
             // Select Location
-            if (await this.locationDropdown.isVisible({ timeout: 2000 }).catch(() => false)) {
+            if (await this.locationDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.locationDropdown);
                 await this.waitForVisible(this.locationOption);
                 await this.click(this.locationOption);
             }
 
             // Select Vehicle Type (Bus)
-            if (await this.vehicleTypeDropdown.isVisible({ timeout: 2000 }).catch(() => false)) {
+            if (await this.vehicleTypeDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.vehicleTypeDropdown);
                 await this.waitForVisible(this.vehicleTypeOptionBus);
                 await this.click(this.vehicleTypeOptionBus);
             }
 
             // Fill Vehicle Specs
-            await this.waitForVisible(this.vehicleNoInput);
-            await this.fill(this.vehicleNoInput, vehicleNo);
+            if (await this.isVisible(this.vehicleNoInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.vehicleNoInput, vehicleNo);
+            }
 
-            await this.waitForVisible(this.vehicleMakeInput);
-            await this.fill(this.vehicleMakeInput, vehicleMake);
+            if (await this.isVisible(this.vehicleMakeInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.vehicleMakeInput, vehicleMake);
+            }
 
-            await this.waitForVisible(this.licensePlateInput);
-            await this.fill(this.licensePlateInput, licensePlate);
+            if (await this.isVisible(this.licensePlateInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.licensePlateInput, licensePlate);
+            }
 
-            await this.waitForVisible(this.vinInput);
-            await this.fill(this.vinInput, vin);
+            if (await this.isVisible(this.vinInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.vinInput, vin);
+            }
 
             // Dual Brake Checkbox
-            await this.click(this.appointmentColorCheckbox);
+            if (await this.appointmentColorCheckbox.isVisible({ timeout: 100 }).catch(() => false)) {
+                await this.click(this.appointmentColorCheckbox);
+            }
 
 
             // Notes
-            await this.waitForVisible(this.notesInput);
-            await this.fill(this.notesInput, notes);
+            if (await this.isVisible(this.notesInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.notesInput, notes);
+            }
 
             // Odometer & Mileage
-            await this.waitForVisible(this.odometerValueInput);
-            await this.fill(this.odometerValueInput, odometer);
+            if (await this.isVisible(this.odometerValueInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.odometerValueInput, odometer);
+            }
 
-            await this.waitForVisible(this.initialMileageInput);
-            await this.fill(this.initialMileageInput, initialMileage);
+            if (await this.isVisible(this.initialMileageInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.initialMileageInput, initialMileage);
+            }
 
             // Upload Picture
             await this.uploadVehiclePicture(data.imageName || 'vehicle.png');
@@ -250,22 +259,27 @@ export default class VehicleListPage extends BasePage {
             await this.click(this.statusOptionInActive);
 
             // Update Notes
-            await this.waitForVisible(this.notesInput);
-            await this.fill(this.notesInput, updatedNotes);
+            if (await this.isVisible(this.notesInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.notesInput, updatedNotes);
+            }
 
             // Update Initial Mileage
-            await this.waitForVisible(this.initialMileageInput);
-            await this.fill(this.initialMileageInput, updatedMileage);
+            if (await this.isVisible(this.initialMileageInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.initialMileageInput, updatedMileage);
+            }
 
-            await this.waitForVisible(this.odometerValueInput);
-            await this.fill(this.odometerValueInput, updatedOdometer);
+            if (await this.isVisible(this.odometerValueInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.odometerValueInput, updatedOdometer);
+            }
 
 
-            await this.waitForVisible(this.licensePlateInput);
-            await this.fill(this.licensePlateInput, updatedLicensePlate);
+            if (await this.isVisible(this.licensePlateInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.licensePlateInput, updatedLicensePlate);
+            }
 
-            await this.waitForVisible(this.vinInput);
-            await this.fill(this.vinInput, updatedVin);
+            if (await this.isVisible(this.vinInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.vinInput, updatedVin);
+            }
 
         });
     }

@@ -4,6 +4,7 @@
   "webName": "Web ServicePackage",
   "discountPrice": "10",
   "btwCostHr": "20",
+  "classroomCostHr": "20",
   "onlineCostPerModule": "30",
   "servicePrice": "100",
   "webDescription": "Automated Service Package Description",

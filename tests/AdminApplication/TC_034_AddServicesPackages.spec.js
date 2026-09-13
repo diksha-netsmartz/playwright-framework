@@ -40,8 +40,7 @@ test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify 
     });
 
     await test.step('Step 4: Click on Save button and verify message', async () => {
-        await servicesPage.clickSave();
-        await servicesPage.verifyServiceAddedSuccessfully();
+        await servicesPage.clickSaveAndVerifySuccessMessage();
     });
 
 

@@ -588,22 +588,23 @@ export default class EnrollmentBillingPage extends BasePage {
 
                 await this.click(this.cvvInIframe);
                 await this.pressSequentially(this.cvvInIframe, paymentData.processCreditCard.cvv);
-            } else if (await this.isVisible(this.paymentFormCardNumber, { timeout: 2000 }).catch(() => false)) {
-                await this.waitForVisible(this.paymentFormCardNumber);
-                await this.click(this.paymentFormCardNumber);
-                await this.pressSequentially(this.paymentFormCardNumber, paymentData.processCreditCard.cardNumber);
-
-                const expRaw = paymentData.processCreditCard.expiryDate;
-                const expFormatted = expRaw.length === 6 ? `${expRaw.slice(0, 2)}${expRaw.slice(4)}` : expRaw;
-                await this.click(this.paymentFormExpiryDate);
-                await this.pressSequentially(this.paymentFormExpiryDate, expFormatted);
-                await this.click(this.paymentFormCvv);
-                await this.pressSequentially(this.paymentFormCvv, paymentData.processCreditCard.cvv);
             } else {
                 if (await this.isVisible(this.cardNumber, { timeout: 100 }).catch(() => false)) {
                     await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
                     await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
                     await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+                }
+                else {
+                    if (await this.isVisible(this.paymentFormCardNumber, { timeout: 100 }).catch(() => false)) {
+                        await this.click(this.paymentFormCardNumber);
+                        await this.pressSequentially(this.paymentFormCardNumber, paymentData.processCreditCard.cardNumber);
+                        const expRaw = paymentData.processCreditCard.expiryDate;
+                        const expFormatted = expRaw.length === 6 ? `${expRaw.slice(0, 2)}${expRaw.slice(4)}` : expRaw;
+                        await this.click(this.paymentFormExpiryDate);
+                        await this.pressSequentially(this.paymentFormExpiryDate, expFormatted);
+                        await this.click(this.paymentFormCvv);
+                        await this.pressSequentially(this.paymentFormCvv, paymentData.processCreditCard.cvv);
+                    }
                 }
             }
 

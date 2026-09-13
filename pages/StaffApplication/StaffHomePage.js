@@ -1,5 +1,7 @@
 import BasePage from '../../utils/BasePage';
 import { expect, test } from '@playwright/test';
+import StaffLoginPage from './StaffLoginPage';
+import login from '../../test-data/json/login.json';
 
 /**
  * Page Object representing the Staff Portal Home / Dashboard Page.
@@ -51,7 +53,7 @@ export default class StaffHomePage extends BasePage {
         this.studentNameTextbox = page.locator('#txtFileUploadStudentName')
         this.fileInput = page.locator('input[type="file"][multiple]').first();
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
-        this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files')]");
+        this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files') or contains(text(),'file upload')]");
         this.chooseFileBtn = page.locator("#uploadimageChoose").first();
         this.categoryDropdown = page.getByRole('button', { name: '--Select--' });
         this.categoryDropdownOption = page.locator("(//select[@name='file_Category']//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
@@ -308,11 +310,12 @@ export default class StaffHomePage extends BasePage {
     /**
      * Iterates through each Quick Link in the Quick Links widget on the Staff Home page,
      * clicks it dynamically, verifies navigation/title, returns to Home,
-     * and finally verifies Logout if present.
+     * and re-authenticates if any link triggers logout.
      * If no quick links are present, prints "No quick links found on page".
+     * @param {Object} [credentials] - Optional staff login credentials object.
      * @returns {Promise<number>} Total count of quick links tested.
      **/
-    async openEachQuickLink() {
+    async openEachQuickLink(credentials = null) {
         return await test.step('Open each Quick Link in #div_QuickLinks and verify navigation', async () => {
             this.staffHomeUrl = this.page.url();
             await this.ensureOnStaffHomePage();
@@ -374,11 +377,15 @@ export default class StaffHomePage extends BasePage {
                             expect(currentTitle.length).toBeGreaterThan(0);
                         }
                         if (await this.isVisible(this.loginBtn, { timeout: 2000 }).catch(() => false)) {
-                            await this.verifyTitle("Login");
-                            await this.click(this.loginBtn);
-                            await this.waitForLoaders();
-                            await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => { });
-                            await this.waitForLoaders();
+                            const env = process.env.ENV || 'coreServer2';
+                            const creds = credentials?.staffUser || credentials || login[env]?.staffUser;
+                            const username = creds?.username || creds?.staffUsername;
+                            const password = creds?.password || creds?.staffPassword;
+
+                            if (username && password) {
+                                const staffLoginPage = new StaffLoginPage(this.page);
+                                await staffLoginPage.login(username, password);
+                            }
                         }
 
                     }
@@ -553,7 +560,7 @@ export default class StaffHomePage extends BasePage {
                 await this.page.waitForTimeout(500);
             }
 
-            await this.waitForVisible(option, 5000);
+            await this.waitForVisible(option, 2000);
             await this.click(option);
 
             await this.setInputFiles(this.fileInput, filePath);

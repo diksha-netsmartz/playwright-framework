@@ -27,8 +27,8 @@ export default class StudentProfilePage extends BasePage {
         this.submitButton = page.getByRole('button', { name: 'Submit' });
 
         // Update email locators
-        this.emailInput = page.locator('#Email');
-        this.openEmailPopupBtn = page.locator("xpath=//input[@id='Email']//ancestor::div[@class='input-group']//a[@onclick='OpenPopupForSendingEmailFromField(event)']");
+        this.emailInput = page.locator('input[name="StudentEmail"]').or(page.locator('#Email'));
+        this.openEmailPopupBtn = page.locator("xpath=//input[@id='Email' or @name='StudentEmail']//ancestor::div[@class='input-group']//a[@onclick='OpenPopupForSendingEmailFromField(event)']");
         this.popupStudentEmailInput = page.locator('#txt_StudentAccount_MessageTAB_StudentEmail');
         this.updateStudentEmailBtn = page.locator('#ancstudent');
         this.closePopup = page.locator('button.close:visible');
@@ -50,6 +50,7 @@ export default class StudentProfilePage extends BasePage {
 
             await this.click(this.goButton);
             await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 20000 });
         });
     }
 
@@ -59,6 +60,9 @@ export default class StudentProfilePage extends BasePage {
      **/
     async sendUsernamePasswordEmail() {
         await test.step('Send Username/Password email to student', async () => {
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 20000 });
+            await this.waitForVisible(this.sendUsernamePasswordEmailBtn, { timeout: 10000 });
             await this.verifyVisible(this.sendUsernamePasswordEmailBtn);
             await this.click(this.sendUsernamePasswordEmailBtn);
             await this.click(this.studentEmailCheckbox);
@@ -77,7 +81,9 @@ export default class StudentProfilePage extends BasePage {
      **/
     async updateEmailIfDifferent(specifiedEmail) {
         await test.step(`Update student email if different from: "${specifiedEmail}"`, async () => {
-            await this.waitForVisible(this.emailInput);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 20000 });
+            await this.waitForVisible(this.emailInput, { timeout: 10000 });
             await this.verifyVisible(this.emailInput);
             const currentEmail = (await this.getInputValue(this.emailInput)).trim();
 

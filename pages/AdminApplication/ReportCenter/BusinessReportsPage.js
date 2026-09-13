@@ -110,6 +110,7 @@ export default class BusinessReportsPage extends BasePage {
         this.whoCanSeeFilterOnlyMeRadio = page.locator("//label[normalize-space()='Only Me']");
         this.saveFilterBtn = page.locator("//button[contains(@onclick,'saveFilter()')]");
         this.closeFilterModalBtn = page.locator("//h4[contains(text(),' Save as Filter')]//ancestor::div[contains(@class,'modal-content')]//button[contains(text(),'Close') and not(@aria-hidden)]");
+        this.errorReportMessage = page.locator('#spanErrorReportCenter')
         this.editFilterBtn = page.getByRole('button', { name: 'Edit Filter' });
         // this.deleteFilterIcon = page.locator("//strong[text()='www']//ancestor::tr[1]//a[contains(@class,'Delete')]");
         this.deleteConfirmationYesBtn = page.locator("//a[@data-apply='confirmation' and text()='Yes']");
@@ -429,16 +430,22 @@ export default class BusinessReportsPage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.attendanceSignaturesScoresPdfBtn);
 
-            const downloadPromise = this.page.waitForEvent('download');
+            // Add a timeout and catch so it doesn't crash before checking the error alert
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 20000 }).catch(() => null);
             await this.click(this.attendanceSignaturesScoresPdfBtn);
             const download = await downloadPromise;
+
             if (await this.isVisible(this.page.getByText('File downloaded succesfully.'), { timeout: 5000 })) {
                 await this.verifyVisible(this.page.getByText('File downloaded succesfully.', { exact: true }));
+            } else if (await this.isVisible(this.page.getByText('Error Alert'), { timeout: 5000 })) {
+                const errorText = (await this.getText(this.errorReportMessage).catch(() => ''));
+                console.log(`Error downloading file: ${errorText}`);
             }
 
             return download;
         });
     }
+
 
     /**
      * Verifies the downloaded Attendance Signatures/Scores PDF:

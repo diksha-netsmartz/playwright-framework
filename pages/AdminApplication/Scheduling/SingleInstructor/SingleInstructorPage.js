@@ -319,6 +319,7 @@ export default class SingleInstructorPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 20000 });
 
             const slot = await this.findAvailableSlot(0);
+            await this.page.waitForLoadState('load', { timeout: 20000 });
             await slot.click({ button: "right" });
             await this.page.waitForTimeout(2500);
             try {
@@ -338,6 +339,8 @@ export default class SingleInstructorPage extends BasePage {
      **/
     async editAppointment(studentName) {
         await test.step(`Open action menu and click Edit Appointment for: "${this.getStudentSearchText(studentName)}"`, async () => {
+            await this.page.waitForTimeout(1000);
+            await this.page.waitForLoadState('load', { timeout: 20000 });
             await this.isVisible(this.listMenuOfCreatedAppointment(studentName), { timeout: 5000 }).catch(() => false);
             await this.listMenuOfCreatedAppointment(studentName).click({ force: true });
 

@@ -24,6 +24,7 @@ export default class ServicesPackagesPage extends BasePage {
         this.discountPriceInput = page.locator('#Discount');
         this.btwCostHrInput = page.locator('#BTWCostHr');
         this.onlineCostPerModuleInput = page.locator('#OnlineCostPerModule')
+        this.classroomCostHrInput = page.locator('#ClassroomCostHr')
 
         this.statusDropdown = page.locator("xpath=//select[@name='ServiceStatus']//parent::div//button");
         this.statusOptionActive = page.locator("xpath=//select[@name='ServiceStatus']//parent::div//div//span[text()='Active']");
@@ -105,13 +106,16 @@ export default class ServicesPackagesPage extends BasePage {
             await this.waitForVisible(this.serviceCodeInput);
             await this.fill(this.serviceCodeInput, this.serviceCode);
 
-            if (await this.isVisible(this.discountPriceInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.discountPriceInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.discountPriceInput, data.discountPrice);
             }
-            if (await this.isVisible(this.btwCostHrInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.btwCostHrInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.btwCostHrInput, data.btwCostHr);
             }
-            if (await this.isVisible(this.onlineCostPerModuleInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.classroomCostHrInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.classroomCostHrInput, data.classroomCostHr);
+            }
+            if (await this.isVisible(this.onlineCostPerModuleInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.onlineCostPerModuleInput, data.onlineCostPerModule);
             }
 
@@ -191,31 +195,38 @@ export default class ServicesPackagesPage extends BasePage {
     }
 
     /**
-     * Clicks the Save button to save the service.
+     * Clicks the Save button to save the service and verifies success message.
      **/
-    async clickSave() {
-        await test.step('Click Save button', async () => {
+    async clickSaveAndVerifySuccessMessage() {
+        await test.step('Click Save button and verify success message', async () => {
             await this.waitForVisible(this.saveBtn);
+
+            const toastPromise = this.page.evaluate(() => new Promise((resolve) => {
+                const text = 'Service (Package) information updated successfully.';
+                const hasMessage = () => (document.body && document.body.innerText || '').includes(text);
+
+                if (hasMessage()) return resolve(true);
+
+                const observer = new MutationObserver(() => {
+                    if (hasMessage()) {
+                        observer.disconnect();
+                        resolve(true);
+                    }
+                });
+
+                observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+                setTimeout(() => { observer.disconnect(); resolve(false); }, 10000);
+            }));
+
             await this.click(this.saveBtn);
-
-        });
-    }
-
-    /**
-     * Verifies that the 'Service (Package) information updated successfully.' notification message is displayed.
-     **/
-    async verifyServiceAddedSuccessfully() {
-        await test.step('Verify "Service (Package) information updated successfully." message', async () => {
-            const successMsg = this.page.getByText('Service (Package) information updated successfully.');
-            if (await this.isVisible(successMsg, { timeout: 3000 }).catch(() => false)) {
-                await this.verifyVisible(successMsg);
-            }
+            const toastAppeared = await toastPromise;
+            expect(toastAppeared, 'Expected "Service (Package) information updated successfully." message to appear').toBeTruthy();
 
             await this.waitForLoaders();
             await this.page.waitForLoadState('load');
         });
-
     }
+
 
 
     /**
