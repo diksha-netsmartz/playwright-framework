@@ -46,14 +46,14 @@ export default class CombinedAppointmentPage extends BasePage {
         this.duration15Minutes = page.getByLabel("15 Minutes");
 
         // Student 1
-        this.student1Textbox = page.getByRole("textbox", { name: "Student1: Enter at least two characters.", });
+        this.student1Textbox = page.locator('#FirstTypeAppointment_SearchStudent1')
 
         this.student1Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocation");
 
         this.student1Notes = page.getByRole("textbox", { name: "Notes Student 1", });
 
         // Student 2
-        this.student2Textbox = page.getByRole("textbox", { name: "Student2: Enter at least two characters.", });
+        this.student2Textbox = page.locator('#FirstTypeAppointment_SearchStudent2')
 
         this.student2Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocationStudent2");
 
@@ -132,7 +132,7 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     cancelAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=(//a[text()='Cancel Appointment' and @data-sname1='${studentName}' or @data-sname2='${studentName}'])[1]`
+            `xpath=(//a[text()='Cancel Appointment' and (@data-sname1='${studentName}' or @data-sname2='${studentName}')])[1]`
         );
     }
 
@@ -143,7 +143,7 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     noShowAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=(//a[text()='No Show' and @data-sname1='${studentName}' or @data-sname2='${studentName}'])[1]`
+            `xpath=(//a[text()='No Show' and (@data-sname1='${studentName}' or @data-sname2='${studentName}')])[1]`
         );
     }
 
@@ -623,6 +623,10 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.isVisible(this.cancelAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
             await this.click(this.cancelAppointmentButton(studentName));
             this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
+            if (!await this.isVisible(this.cancelAppointmentTextbox, { timeout: 3000 })) {
+                await this.click(this.cancelAppointmentButton(studentName));
+            }
+            await this.waitForVisible(this.cancelAppointmentTextbox, { timeout: 3000 })
             await this.fill(this.cancelAppointmentTextbox, this.cancelledNotes);
             await this.click(this.cancelAppointmentPopupButton);
 
@@ -670,6 +674,7 @@ export default class CombinedAppointmentPage extends BasePage {
                     expect(toastMessage, 'Toast message "Appointment cancelled successfully." did not appear on page within 10 seconds').toBeTruthy();
                 });
             }
+
         });
     }
 
@@ -686,6 +691,10 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.waitForVisible(this.noShowAppointmentButton(studentName));
             await this.click(this.noShowAppointmentButton(studentName));
             this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
+            if (!await this.isVisible(this.noShowAppointmentTextbox, { timeout: 3000 })) {
+                await this.click(this.noShowAppointmentButton(studentName));
+            }
+            await this.waitForVisible(this.noShowAppointmentTextbox);
             await this.fill(this.noShowAppointmentTextbox, this.noShowNotes);
             await this.click(this.noShowAppointmentPopupButton);
 
@@ -738,6 +747,7 @@ export default class CombinedAppointmentPage extends BasePage {
                     expect(toastMessage, 'Toast message "Appointment marked No Show successfully." did not appear on page within 10 seconds').toBeTruthy();
                 });
             }
+
         });
     }
 

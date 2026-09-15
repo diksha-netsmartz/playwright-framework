@@ -320,19 +320,28 @@ export default class SingleInstructorPage extends BasePage {
 
             const slot = await this.findAvailableSlot(0);
             await this.page.waitForLoadState('load', { timeout: 20000 });
-            await slot.click({ button: "right" });
+            if (this.page.url().includes("StaffMobile")) {
+                await slot.click();
+            }
+            else {
+                await slot.click({ button: "right" });
+            }
             await this.page.waitForTimeout(2500);
             try {
                 await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
             } catch {
-                console.log("right click menu options not visible, right clicking again");
-                await slot.click({ button: "right" });
+                console.log("click menu options not visible, clicking again");
+                if (this.page.url().includes("StaffMobile")) {
+                    await slot.click();
+                }
+                else {
+                    await slot.click({ button: "right" });
+                }
                 await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
             }
             await this.click(this.createAppointmentOnRightClick(appointmentType));
         });
     }
-
     /**
      * Opens the action menu on an appointment matching student name and clicks 'Edit Appointment'.
      * @param {Object|string} studentName - Student object or student name string.
@@ -372,14 +381,25 @@ export default class SingleInstructorPage extends BasePage {
                 const menu = menus.nth(i);
                 await this.waitForVisible(menu);
                 await menu.scrollIntoViewIfNeeded();
-                await menu.click({ button: "middle" });
+
+                if (this.page.url().includes("StaffMobile")) {
+                    await menu.click();
+                }
+                else {
+                    await menu.click({ button: "middle" });
+                }
                 await this.page.waitForTimeout(1000);
 
                 try {
                     await this.waitForVisible(this.editAppointmentLink);
                 } catch {
                     console.log(`Edit appointment link was not visible for appointment ${i + 1}. Re-clicking the list menu...`);
-                    await menu.click({ button: "middle" });
+                    if (this.page.url().includes("StaffMobile")) {
+                        await menu.click();
+                    }
+                    else {
+                        await menu.click({ button: "middle" });
+                    }
                     await this.waitForVisible(this.editAppointmentLink);
                 }
 
@@ -589,6 +609,127 @@ export default class SingleInstructorPage extends BasePage {
             throw new Error("Could not paste appointment: student not available in any of the tried slots");
         });
     }
+
+    /**
+     * Copies an existing appointment, finds available slots, pastes it via context menu, confirms modal, and verifies success toast.
+     * @param {Object|string} studentName - Student object or student name string.
+     **/
+    async copyAndPasteAppointment(studentName) {
+        await test.step(`Copy and paste appointment for: "${this.getStudentSearchText(studentName)}"`, async () => {
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 15000 })
+            await this.waitForVisible(this.listMenuOfCreatedAppointment(studentName));
+            await this.click(this.listMenuOfCreatedAppointment(studentName));
+            await this.page.waitForTimeout(2500);
+
+            try {
+                await this.waitForVisible(this.copyAppointmentLink);
+            } catch {
+                console.log("Copy appointment link was not visible. Re-clicking the list menu...");
+                await this.click(this.listMenuOfCreatedAppointment(studentName));
+                await this.waitForVisible(this.copyAppointmentLink);
+            }
+            await this.click(this.copyAppointmentLink);
+
+            const maxRetries = 20;
+
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                await this.page.waitForFunction(() => {
+                    const container = document.querySelector('#toast-container');
+                    return !container || Array.from(container.children).every(c => {
+                        const el = /** @type {HTMLElement} */ (c);
+                        return !el.offsetParent || getComputedStyle(el).display === 'none';
+                    });
+                }, { timeout: 8000 }).catch(() => { });
+
+                const slot = await this.findAvailableSlot(attempt);
+                await slot.click();
+                // Setup MutationObserver to capture toast message
+                const toastPromise = this.page.evaluate(() => {
+                    return new Promise((resolve) => {
+                        const getToast = () => {
+                            const toasts = Array.from(document.querySelectorAll('#toast-container .toast, .toast'));
+                            for (let i = toasts.length - 1; i >= 0; i--) {
+                                const toast = toasts[i];
+                                const style = window.getComputedStyle(toast);
+                                if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+                                    const msgEl = toast.querySelector('.toast-message');
+                                    const text = ((msgEl ? msgEl.textContent : toast.textContent) || '').trim();
+                                    if (text.length > 0) return text;
+                                }
+                            }
+                            const fallback = document.querySelector('#toast-container .toast-message, .toast-message');
+                            if (fallback) {
+                                const text = (fallback.textContent || '').trim();
+                                if (text.length > 0) return text;
+                            }
+                            return null;
+                        };
+
+                        const initial = getToast();
+                        if (initial) return resolve(initial);
+
+                        const observer = new MutationObserver(() => {
+                            const text = getToast();
+                            if (text) {
+                                observer.disconnect();
+                                resolve(text);
+                            }
+                        });
+
+                        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                        setTimeout(() => {
+                            observer.disconnect();
+                            resolve('');
+                        }, 5000);
+                    });
+                }).catch(() => '');
+
+                await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
+
+                try {
+                    await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 1500 });
+                    await this.click(this.submitButtonPopup);
+                } catch {
+                    console.log("Submit confirmation popup did not appear.");
+                }
+
+                const message = (await toastPromise) || '';
+
+                if (!message) {
+                    console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
+                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
+                    if (appointmentCount >= 2) {
+                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
+                        return;
+                    }
+                }
+
+                console.log(`Slot attempt ${attempt}: Toast message = "${message}"`);
+
+                if (message.includes("Appointment created successfully.")) {
+                    console.log(`Success on attempt ${attempt}: ${message}`);
+                    return;
+                } else {
+                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
+                    if (appointmentCount >= 2) {
+                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
+                        return;
+                    }
+
+                    console.log(`Non-success toast received: "${message}"`);
+                    await this.page.locator('#toast-container .toast').waitFor({
+                        state: 'hidden',
+                        timeout: 5000
+                    }).catch(() => { });
+                }
+            }
+
+            throw new Error("Could not paste appointment: student not available in any of the tried slots");
+        });
+    }
+
 
     /**
      * Verifies that the appointment was duplicated into 2 distinct instances in the scheduler matching student name.
