@@ -61,6 +61,7 @@ export default class StaffHomePage extends BasePage {
         this.schedulingMenu = page.locator('#Scheduling_li');
         this.scheduleLessonsSubLink = page.locator('#Schul_btwschedulingLessons_li');
         this.staffAppointmentListSubLink = page.locator("#Schul_DailyStaffSchedule_li");
+        this.calendarViewSubLink = page.locator("#Schul_Scheduler_li")
         this.myProfileLink = page.locator("#MyProfile_li");
 
         // Task widget locators
@@ -99,6 +100,9 @@ export default class StaffHomePage extends BasePage {
         return await test.step('Click Process in "Needs Attention" widget', async () => {
             await this.waitForVisible(this.needsAttentionWidget);
             await this.click(this.actionDropdownBtn);
+            if (!await this.isVisible(this.processLink, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.actionDropdownBtn);
+            }
             await this.click(this.processLink);
             await this.waitForLoaders();
 
@@ -123,8 +127,10 @@ export default class StaffHomePage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.needsAttentionWidget);
 
-
             await this.click(this.actionDropdownBtn);
+            if (!await this.isVisible(this.noShowLink, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.actionDropdownBtn);
+            }
             await this.click(this.noShowLink);
             await this.waitForVisible(this.noShowTextbox);
             await this.fill(this.noShowTextbox, "no show appointment");
@@ -178,6 +184,10 @@ export default class StaffHomePage extends BasePage {
             await this.waitForVisible(this.needsAttentionWidget);
 
             await this.click(this.actionDropdownBtn2);
+
+            if (!await this.isVisible(this.cancelLink, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.actionDropdownBtn2);
+            }
             await this.click(this.cancelLink);
             await this.waitForLoaders();
             await this.waitForVisible(this.cancelTextbox);
@@ -601,6 +611,22 @@ export default class StaffHomePage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
             await this.waitForLoaders();
             await this.verifyURLContainsText('BTWScheduling/Lessons');
+        });
+    }
+
+    /**
+     * Navigates to Scheduling -> Calendar View page.
+     **/
+    async navigateToCalendarView() {
+        await test.step('Navigate to Scheduling > Calendar View', async () => {
+            await this.waitForLoaders();
+            await this.click(this.schedulingMenu);
+            await this.waitForVisible(this.calendarViewSubLink, { timeout: 5000 })
+            await this.click(this.calendarViewSubLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
+            await this.waitForLoaders();
+            await this.verifyTitle('Single Instructor Scheduler');
         });
     }
 

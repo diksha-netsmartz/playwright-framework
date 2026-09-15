@@ -35,17 +35,11 @@ test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to S
         await nonGraphicalPage.clickSelectStudent();
     });
 
-    await test.step('Step 7 & 8: Select first available green date and slot', async () => {
+    await test.step('Step 7: Select first available green date', async () => {
         await nonGraphicalPage.selectFirstAvailableDate();
-        await nonGraphicalPage.selectSlot();
     });
 
-    await test.step('Step 9 & 10: Select Appointment Type and Status', async () => {
-        await nonGraphicalPage.selectAppointmentType();
-        await nonGraphicalPage.selectStatusType();
-    });
-
-    await test.step('Step 11: Schedule student into slot and verify success message', async () => {
+    await test.step('Step 8-11: Select slot, appointment type, status, schedule student and verify confirmation', async () => {
         await nonGraphicalPage.scheduleIntoSlot();
     });
 });

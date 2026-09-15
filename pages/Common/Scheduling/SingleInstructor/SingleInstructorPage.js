@@ -324,7 +324,7 @@ export default class SingleInstructorPage extends BasePage {
                 await slot.click();
             }
             else {
-                await slot.click({ button: "right" });
+                await slot.click({ button: "right", timeout: 30000 });
             }
             await this.page.waitForTimeout(2500);
             try {
@@ -335,7 +335,7 @@ export default class SingleInstructorPage extends BasePage {
                     await slot.click();
                 }
                 else {
-                    await slot.click({ button: "right" });
+                    await slot.click({ button: "right", timeout: 30000 });
                 }
                 await this.waitForVisible(this.createAppointmentOnRightClick(appointmentType));
             }

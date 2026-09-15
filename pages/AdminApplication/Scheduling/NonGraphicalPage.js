@@ -112,137 +112,183 @@ export default class NonGraphicalPage extends BasePage {
     }
 
     /**
-     * Checks the first available slot checkbox.
-    **/
-    async selectSlot() {
-        await test.step('Select first available time slot', async () => {
-            await this.waitForVisible(this.firstSlotCheckbox);
-            await this.click(this.firstSlotCheckbox);
-        });
-    }
+     * Iterates through available slots, selects a slot, chooses a valid appointment type and status,
+     * attempts to schedule, and if an error occurs (e.g. 'Student is not available'), deselects that slot
+     * and tries the next slot until scheduling succeeds with a confirmation toast.
+     **/
+    async scheduleIntoSlot() {
+        await test.step('Schedule student into slot with retry on next available slot', async () => {
+            const slotSpans = this.page.locator("//input[contains(@id,'BookSlot')]//following-sibling::span");
+            const slotInputs = this.page.locator("//input[contains(@id,'BookSlot')]");
 
-    /**
-     * Selects an available appointment product type from the appointment type dropdown (excluding 'Please select').
-    **/
-    async selectAppointmentType() {
-        await test.step('Select available appointment type from dropdown', async () => {
-            await this.waitForVisible(this.appointmentTypeDropdown);
+            await this.waitForVisible(slotSpans.first(), 10000);
+            const totalSlots = await slotSpans.count();
 
-            await this.page.waitForFunction(() => {
-                const select = /** @type {HTMLSelectElement|null} */ (document.querySelector('#drp_OpenSlotBookAppointment_product_0'));
-                if (!select || !select.options) return false;
-                return Array.from(select.options).some(opt => {
-                    const text = (opt.text || '').trim().toLowerCase();
-                    const value = (opt.value || '').trim().toLowerCase();
-                    return (
-                        value !== '' &&
-                        value !== '0' &&
-                        !value.includes('please select') &&
-                        !text.includes('please select') &&
-                        text !== 'select'
-                    );
-                });
-            }, { timeout: 10000 });
-
-            const validOptionValue = await this.appointmentTypeDropdown.evaluate((/** @type {HTMLSelectElement} */ select) => {
-                const validOptions = Array.from(select.options).filter(opt => {
-                    const text = (opt.text || '').trim().toLowerCase();
-                    const value = (opt.value || '').trim().toLowerCase();
-                    return (
-                        value !== '' &&
-                        value !== '0' &&
-                        !value.includes('please select') &&
-                        !text.includes('please select') &&
-                        text !== 'select'
-                    );
-                });
-                return validOptions.length > 0 ? validOptions.at(-1).value : null;
-            });
-
-            if (!validOptionValue) {
-                throw new Error("No valid appointment product type found in dropdown (only 'Please select' present).");
+            if (totalSlots === 0) {
+                throw new Error('No slots available to schedule on the selected date.');
             }
 
-            console.log("Selected appointment type option value:", validOptionValue);
-            await this.selectOption(this.appointmentTypeDropdown, validOptionValue);
-        });
-    }
+            console.log(`Found ${totalSlots} available slot(s) to attempt scheduling.`);
 
-    /**
-     * Selects 'Confirmed' status from the appointment status type dropdown.
-    **/
-    async selectStatusType() {
-        await test.step('Select appointment status: "Confirmed"', async () => {
-            await this.waitForVisible(this.statusTypeDropdown);
-            await this.selectOption(this.statusTypeDropdown, { label: 'Confirmed' });
-        });
-    }
+            for (let index = 0; index < totalSlots; index++) {
+                console.log(`--- Attempting slot row ${index + 1} of ${totalSlots} ---`);
 
-    /**
-     * Clicks the 'Schedule Student Into Slot(s)' button, confirms the action, and verifies success toast.
-    **/
-    async scheduleIntoSlot() {
-        await test.step('Schedule student into slot and confirm', async () => {
-            await this.click(this.scheduleIntoSlotButton);
+                // 1. Clear any old toast notifications from previous attempts
+                await this.page.evaluate(() => {
+                    const toasts = document.querySelectorAll('#toast-container .toast, .toast');
+                    toasts.forEach(t => t.remove());
+                }).catch(() => { });
 
-            // 1. Setup MutationObserver before confirming scheduling
-            const toastAppeared = this.page.evaluate((expectedText) => {
-                return new Promise((resolve) => {
-                    const getToast = () => {
-                        const matches = /scheduled successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
-                        if (!matches) return null;
-                        const el = document.querySelector('#toast-container .toast-message, .toast-message');
-                        return el && el.textContent ? el.textContent.trim() : expectedText;
-                    };
-                    const initial = getToast();
-                    if (initial) return resolve(initial);
+                // 2. Select the slot checkbox for row index (using Playwright's 0-indexed .nth())
+                const currentInput = slotInputs.nth(index);
+                const currentSpan = slotSpans.nth(index);
 
-                    const observer = new MutationObserver(() => {
-                        const text = getToast();
-                        if (text) {
-                            observer.disconnect();
-                            resolve(text);
-                        }
-                    });
-
-                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-
-                    setTimeout(() => {
-                        observer.disconnect();
-                        resolve('');
-                    }, 10000);
-                });
-            }, 'Appointment(s) scheduled successfully.').catch(() => '');
-
-            await this.click(this.confirmYesButton);
-
-            // 2. Verify scheduling toast
-            const toastMessage = await toastAppeared;
-            console.log(`Captured toast message: "${toastMessage}"`);
-
-            if (toastMessage) {
-                console.log('Appointment(s) scheduled successfully.');
-                await test.step('Toast message "Appointment(s) scheduled successfully." appeared', async () => { });
-            } else {
-                const errorToast = this.page.locator('#toast-container .toast-error').last();
-                if (await this.isVisible(errorToast).catch(() => false)) {
-                    const errorMessage = (await errorToast.locator('.toast-message').textContent())?.trim() || (await errorToast.textContent())?.trim();
-                    const warningIcon = this.page.locator("xpath=(//i[@data-toggle='tooltip' and contains(@id,'ErrorOpenSlot')])[1]");
-                    let tooltipError = '';
-                    if (await warningIcon.count() > 0) {
-                        tooltipError = await warningIcon.getAttribute('data-original-title') || '';
-                    }
-                    const detailedError = tooltipError ? `${errorMessage} (Reason: ${tooltipError})` : errorMessage;
-                    console.log(`Scheduling failed with error toast: "${errorMessage}"`);
-                    if (tooltipError) {
-                        console.log(`Error detail from data-original-title: "${tooltipError}"`);
-                    }
-                    throw new Error(`Scheduling failed with error: "${detailedError}"`);
+                await this.waitForVisible(currentSpan);
+                if (!await currentInput.isChecked().catch(() => false)) {
+                    await this.click(currentSpan);
+                    await this.waitForLoaders().catch(() => { });
                 }
 
-                await test.step('Toast message "Appointment(s) scheduled successfully." did NOT appear', async () => {
-                    expect(toastMessage, 'Notification "Appointment(s) scheduled successfully." did not appear on page within 10 seconds').toBeTruthy();
+                // 3. Select available appointment product type from dropdown for row index
+                const appointmentTypeDropdown = this.page.locator(`#drp_OpenSlotBookAppointment_product_${index}`);
+                await this.waitForVisible(appointmentTypeDropdown);
+
+                await this.page.waitForFunction((idx) => {
+                    const select = /** @type {HTMLSelectElement|null} */ (document.querySelector(`#drp_OpenSlotBookAppointment_product_${idx}`));
+                    if (!select || !select.options) return false;
+                    return Array.from(select.options).some(opt => {
+                        const text = (opt.text || '').trim().toLowerCase();
+                        const value = (opt.value || '').trim().toLowerCase();
+                        return (
+                            value !== '' &&
+                            value !== '0' &&
+                            !value.includes('please select') &&
+                            !text.includes('please select') &&
+                            text !== 'select'
+                        );
+                    });
+                }, index, { timeout: 10000 });
+
+                const validOptionValue = await appointmentTypeDropdown.evaluate((/** @type {HTMLSelectElement} */ select) => {
+                    const validOptions = Array.from(select.options).filter(opt => {
+                        const text = (opt.text || '').trim().toLowerCase();
+                        const value = (opt.value || '').trim().toLowerCase();
+                        return (
+                            value !== '' &&
+                            value !== '0' &&
+                            !value.includes('please select') &&
+                            !text.includes('please select') &&
+                            text !== 'select'
+                        );
+                    });
+                    return validOptions.length > 0 ? validOptions.at(-1).value : null;
                 });
+
+                if (!validOptionValue) {
+                    console.log(`No valid appointment product type found for slot row ${index + 1}. Trying next slot...`);
+                    if (await currentInput.isChecked().catch(() => false)) {
+                        await this.click(currentSpan);
+                        await this.waitForLoaders().catch(() => { });
+                    }
+                    continue;
+                }
+
+                console.log(`Selected appointment type option value for slot row ${index + 1}:`, validOptionValue);
+                await this.selectOption(appointmentTypeDropdown, validOptionValue);
+
+                // 4. Select appointment status for row index
+                const statusTypeDropdown = this.page.locator(`#drp_OpenSlotBookAppointment_AppointmentStatus_${index}`);
+                await this.waitForVisible(statusTypeDropdown);
+                await this.selectOption(statusTypeDropdown, { label: 'Confirmed' });
+
+                // 5. Setup toast observer before confirming scheduling
+                const scheduleResultPromise = this.page.evaluate(() => {
+                    return new Promise((resolve) => {
+                        const checkToasts = () => {
+                            const successToast = document.querySelector('#toast-container .toast-success, .toast-success');
+                            const isSuccess = /scheduled successfully/i.test(document.body.innerText || '') ||
+                                (successToast && /scheduled successfully/i.test(successToast.textContent || ''));
+                            if (isSuccess) {
+                                const msgEl = document.querySelector('#toast-container .toast-message, .toast-message');
+                                return { success: true, message: (msgEl ? msgEl.textContent : '') || 'Appointment(s) scheduled successfully.' };
+                            }
+
+                            const errorToast = document.querySelector('#toast-container .toast-error, .toast-error');
+                            if (errorToast) {
+                                const msgEl = errorToast.querySelector('.toast-message') || errorToast;
+                                return { success: false, message: (msgEl ? msgEl.textContent : '') || 'Scheduling error' };
+                            }
+
+                            return null;
+                        };
+
+                        const initial = checkToasts();
+                        if (initial) return resolve(initial);
+
+                        const observer = new MutationObserver(() => {
+                            const res = checkToasts();
+                            if (res) {
+                                observer.disconnect();
+                                resolve(res);
+                            }
+                        });
+
+                        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                        setTimeout(() => {
+                            observer.disconnect();
+                            resolve({ success: false, message: 'timeout' });
+                        }, 10000);
+                    });
+                }).catch(() => ({ success: false, message: 'evaluation error' }));
+
+                // 6. Click Schedule button and confirm
+                await this.click(this.scheduleIntoSlotButton);
+                await this.waitForVisible(this.confirmYesButton);
+                await this.click(this.confirmYesButton);
+
+                // 7. Await scheduling outcome
+                const result = await scheduleResultPromise;
+                console.log(`Slot row ${index + 1} scheduling outcome:`, result);
+
+                if (result.success) {
+                    console.log(`Appointment(s) scheduled successfully on slot row ${index + 1}.`);
+                    await test.step('Toast message "Appointment(s) scheduled successfully." appeared', async () => { });
+                    return;
+                }
+
+                // 8. If error occurred (e.g. "student is not available"):
+                console.log(`Slot row ${index + 1} failed with error: "${result.message}".`);
+
+                const warningIcon = this.page.locator(`#iErrorOpenSlotGrid_${index}`);
+                if (await warningIcon.count() > 0) {
+                    const tooltipError = (await warningIcon.getAttribute('data-original-title').catch(() => '')) ||
+                        (await warningIcon.getAttribute('title').catch(() => ''));
+                    if (tooltipError) {
+                        console.log(`Tooltip error detail: "${tooltipError}"`);
+                    }
+                }
+
+                // Dismiss error toast to clear screen
+                const errorToast = this.page.locator('#toast-container .toast-error').last();
+                if (await errorToast.isVisible().catch(() => false)) {
+                    await errorToast.click().catch(() => { });
+                }
+
+                // Deselect the failed slot checkbox immediately so next slot can be cleanly selected
+                console.log(`Deselecting failed slot row ${index + 1}...`);
+                if (await currentInput.isChecked().catch(() => true)) {
+                    await this.click(currentSpan);
+                    await this.waitForLoaders().catch(() => { });
+                    await this.page.waitForTimeout(300);
+                }
+
+                // If this is the last available slot, fail test with error
+                if (index === totalSlots - 1) {
+                    throw new Error(`All ${totalSlots} slot(s) failed to schedule. Last error: "${result.message}"`);
+                }
+
+                console.log(`Proceeding to next available slot (row ${index + 2})...`);
             }
         });
     }
