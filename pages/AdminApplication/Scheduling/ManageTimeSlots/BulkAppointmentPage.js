@@ -23,7 +23,7 @@ export default class BulkAppointmentPage extends BasePage {
         this.filterButton = page.getByRole('button', { name: 'Filter' }).first();
         this.selectStatusDropdown = page.locator('a:has-text("SELECT STATUS")').first();
         this.selectAppointmentCheckbox = page.locator("xpath=(//div[@class='icheckbox_square-grey']//input[contains(@class,'chkBulkApptsSelection')]//following-sibling::ins)[1]");
-        // this.selectAppointmentTypeDropdown = page.getByRole('link', {name: 'Select Appointment Type'});
+        this.selectAppointmentCheckedCheckbox = page.locator("(//div[@class='icheckbox_square-grey checked']//input[contains(@class,'chkBulkApptsSelection')]//following-sibling::ins)[1]");
 
         // Row action links (appear after row is selected)
         this.editAppointmentsLink = page.getByRole('link', { name: 'Edit Appointments' });
@@ -144,7 +144,8 @@ export default class BulkAppointmentPage extends BasePage {
         await test.step('Select appointment from grid', async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 10000 });
-            await this.waitForVisible(this.selectAppointmentCheckbox, { timeout: 10000 })
+            await this.waitForHidden(this.selectAppointmentCheckedCheckbox, { timeout: 5000 })
+            await this.waitForVisible(this.selectAppointmentCheckbox, { timeout: 5000 })
             await this.click(this.selectAppointmentCheckbox);
         });
     }
@@ -193,9 +194,6 @@ export default class BulkAppointmentPage extends BasePage {
             await this.click(this.cancelYesButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments cancelled successfully.', { exact: true }));
-            if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 2000 }).catch(() => false)) {
-                await this.click(this.closeSuccessMessageButton);
-            }
         });
     }
 
