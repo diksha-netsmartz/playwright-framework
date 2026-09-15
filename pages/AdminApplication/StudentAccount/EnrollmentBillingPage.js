@@ -545,10 +545,9 @@ export default class EnrollmentBillingPage extends BasePage {
 
             if (await this.isVisible(this.openBalanceEnrollmentsCheckbox, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.openBalanceEnrollmentsCheckbox);
-            } else {
-                await this.clear(this.cashAmountTextbox);
-                await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
             }
+            await this.clear(this.cashAmountTextbox);
+            await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
 
             await this.click(this.adjustmentTypeDropdown);
             await this.click(this.refundAddToBalance);

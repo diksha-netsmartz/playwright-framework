@@ -21,7 +21,7 @@
     "notes": "cash payment"
   },
   "adjustment": {
-    "amount": "200",
+    "amount": "1",
     "type": "Refund (Add to balance)",
     "receiptNumber": "2222",
     "notes": "adjustment for add to balance"
