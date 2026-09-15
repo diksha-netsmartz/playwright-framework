@@ -27,10 +27,10 @@ export default class ProcessLesson extends BasePage {
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.questionsDropdowns = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//button[@title='Select']");
         this.questionsOptionSelect = page.locator("(//div[contains(@id,'divEvalQuestionNumber')]//button[@title='Select']//following-sibling::div//ul//li[not(@class='selected')])[1]");
-        this.actualStartTimeDropdown = page.locator("button[data-id='txt_odometer_starttime']");
-        this.actualStartTimeValue = page.locator("(//button[@data-id='txt_odometer_starttime']//parent::div//ul//li[not (contains (@class,'selected'))])[1]");
-        this.actualEndTimeDropdown = page.locator("button[data-id='txt_odometer_endtime']");
-        this.actualEndTimeValue = page.locator("(//button[@data-id='txt_odometer_endtime']//parent::div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.actualStartTimeDropdown = page.locator("//button[@data-id='txt_odometer_starttime' and @title='SELECT']");
+        this.actualStartTimeValue = page.locator("(//button[@data-id='txt_odometer_starttime']//parent::div//ul//li//a//span[1][not(contains(text(),'SELECT'))])[1]");
+        this.actualEndTimeDropdown = page.locator("//button[@data-id='txt_odometer_endtime' and @title='SELECT']");
+        this.actualEndTimeValue = page.locator("(//button[@data-id='txt_odometer_endtime']//parent::div//ul//li//a//span[1][not(contains(text(),'SELECT'))])[1]");
         this.odometerStartValue = page.locator('#txt_odometer_startNumber')
         this.odometerEndValue = page.locator('#txt_odometer_endNumber')
 
@@ -60,6 +60,9 @@ export default class ProcessLesson extends BasePage {
             await test.step('Select evaluation template from dropdown', async () => {
                 await this.click(this.selectEvaluationBtn);
                 await this.click(this.selectEvalutionDropdownValue);
+                await this.waitForLoaders();
+                await this.page.waitForLoadState('load', { timeout: 5000 });
+                await this.waitForHidden(this.selectEvaluationBtn);
             });
         }
 
@@ -108,11 +111,12 @@ export default class ProcessLesson extends BasePage {
     /**
      * Fills out answers for all evaluation questions dynamically by finding all dropdowns
      * with title 'Select' and selecting a valid option (other than 'Select' / 'Please Select').
-     * @param {'last' | 'first'} [preference='last'] - Select the last or first valid option in the dropdown.
      **/
-    async answerAllEvaluationQuestions(preference = 'last') {
+    async answerAllEvaluationQuestions() {
         await test.step('Answer all evaluation questions', async () => {
             await this.waitForLoaders();
+
+            await this.waitForVisible(this.questionsDropdowns.first(), { timeout: 5000 }).catch(() => false)
             const totalCount = await this.questionsDropdowns.count();
 
             for (let i = 0; i < totalCount; i++) {
@@ -122,7 +126,7 @@ export default class ProcessLesson extends BasePage {
                 const dropdown = this.questionsDropdowns.first();
                 // await dropdown.scrollIntoViewIfNeeded();
                 await this.click(dropdown);
-                await this.waitForVisible(this.questionsOptionSelect, 3000)
+                await this.waitForVisible(this.questionsOptionSelect, { timeout: 3000 })
                 await this.click(this.questionsOptionSelect);
                 await this.waitForLoaders();
                 await this.page.waitForTimeout(300);
