@@ -120,20 +120,26 @@ export default class EnrollmentBillingPage extends BasePage {
         this.billingCity = page.getByRole('textbox', { name: 'Billing City' });
         this.billStateDropdown = page.locator("xpath=//div[contains(@id,'ddlBillState')]");
         this.billStateDropdownValue = page.locator("xpath=//div[@role='option' and text()='AK']");
-        this.billingZipCode = page.getByRole('textbox', { name: 'Zip Code' });
+        this.billingZipCode = page.getByRole('textbox', { name: 'Zip Code' }).or(page.locator('#stripe-postal-code'));
 
         // Clover iframe locators (Card Number, Expiration Date, CVV for other env)
         this.cardNumberIframe = page.locator('#CARD_NUMBER_ID, iframe[title="CARD NUMBER"]');
         this.cardNumberInIframe = page.frameLocator('#CARD_NUMBER_ID, iframe[title="CARD NUMBER"]').locator('#cardNumber');
-
         this.cardDateIframe = page.locator('#CARD_DATE_ID, iframe[title="CARD DATE"]');
         this.expiryDateInIframe = page.frameLocator('#CARD_DATE_ID, iframe[title="CARD DATE"]').locator('#date');
-
         this.cardCvvIframe = page.locator('#CARD_CVV_ID, iframe[title="CARD CVV"]');
         this.cvvInIframe = page.frameLocator('#CARD_CVV_ID, iframe[title="CARD CVV"]').locator('#cvv');
-
         this.cardPostalCodeIframe = page.locator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]');
         this.postalCodeInIframe = page.frameLocator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]').locator('#postal');
+
+        // Stripe iframe locators
+        this.stripeCardNumberIframe = page.locator("#card-number-element iframe[title='Secure card number input frame'], #card-number-element iframe[name^='__privateStripeFrame']").first();
+        this.stripeCardNumber = page.frameLocator("#card-number-element iframe[title='Secure card number input frame'], #card-number-element iframe[name^='__privateStripeFrame']").locator("input[name='cardnumber'], input[data-elements-stable-field-name='cardNumber']");
+        this.stripeExpiryDateIframe = page.locator("#card-expiry-element iframe[name^='__privateStripeFrame'], iframe[title*='expiration']").first();
+        this.stripeExpiryDate = page.frameLocator("#card-expiry-element iframe[name^='__privateStripeFrame'], iframe[title*='expiration']").locator("input[name='exp-date'], input[data-elements-stable-field-name='cardExpiry']");
+        this.stripeCvvIframe = page.locator("#card-cvc-element iframe[name^='__privateStripeFrame'], iframe[title='Secure CVC input frame']").first();
+        this.stripeCvv = page.frameLocator("#card-cvc-element iframe[name^='__privateStripeFrame'], iframe[title='Secure CVC input frame']").locator("input[name='cvc'], input[data-elements-stable-field-name='cardCvc']");
+
 
         // Payment Form / Gateway iframe locators (Next NP Gateway / Tokenizer)
         this.paymentFormIframe = page.locator("//div[@id='payment-form']//iframe");
@@ -392,11 +398,14 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.addNewBilling);
             await this.click(this.swipedTransaction);
             await this.waitForVisible(this.saveButton);
+
             if (await this.isVisible(this.openBalanceEnrollmentsCheckbox, { timeout: 100 }).catch(() => false)) {
-                await this.click(this.openBalanceEnrollmentsCheckbox)
+                await this.click(this.openBalanceEnrollmentsCheckbox);
+            } else {
+                await this.clear(this.swipeAmountTextbox);
+                await this.fill(this.swipeAmountTextbox, paymentData.swipedTransaction.amount);
             }
-            await this.clear(this.swipeAmountTextbox);
-            await this.fill(this.swipeAmountTextbox, paymentData.swipedTransaction.amount);
+
             await this.fill(this.last4Digits, paymentData.swipedTransaction.last4Digits);
             await this.click(this.cardTypeSelectDropdown);
             await this.click(this.discover);
@@ -443,11 +452,14 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.addNewBilling);
             await this.click(this.checkPayment);
             await this.waitForVisible(this.saveButton, { timeout: 3000 });
+
             if (await this.isVisible(this.openBalanceEnrollmentsCheckbox, { timeout: 100 }).catch(() => false)) {
-                await this.click(this.openBalanceEnrollmentsCheckbox)
+                await this.click(this.openBalanceEnrollmentsCheckbox);
+            } else {
+                await this.clear(this.checkAmount);
+                await this.fill(this.checkAmount, paymentData.checkPayment.amount);
             }
-            await this.clear(this.checkAmount);
-            await this.fill(this.checkAmount, paymentData.checkPayment.amount);
+
             await this.fill(this.checkNumber, paymentData.checkPayment.checkNumber);
             await this.fill(this.receiptNumber, paymentData.checkPayment.receiptNumber);
             await this.fill(this.chequeNotesTextbox, paymentData.checkPayment.notes);
@@ -486,11 +498,14 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.addNewBilling);
             await this.click(this.cashPayment);
             await this.waitForVisible(this.saveButton, { timeout: 3000 });
+
             if (await this.isVisible(this.openBalanceEnrollmentsCheckbox, { timeout: 100 }).catch(() => false)) {
-                await this.click(this.openBalanceEnrollmentsCheckbox)
+                await this.click(this.openBalanceEnrollmentsCheckbox);
+            } else {
+                await this.clear(this.cashAmountTextbox);
+                await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
             }
-            await this.clear(this.cashAmountTextbox);
-            await this.fill(this.cashAmountTextbox, paymentData.cashPayment.amount);
+
             await this.fill(this.receiptNumber, paymentData.cashPayment.receiptNumber);
             await this.fill(this.cashNotesTextbox, paymentData.cashPayment.notes);
             if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 100 }).catch(() => false)) {
@@ -527,11 +542,14 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.addNewBilling);
             await this.click(this.adjustment);
             await this.waitForVisible(this.saveButton, { timeout: 3000 });
+
             if (await this.isVisible(this.openBalanceEnrollmentsCheckbox, { timeout: 100 }).catch(() => false)) {
-                await this.click(this.openBalanceEnrollmentsCheckbox)
+                await this.click(this.openBalanceEnrollmentsCheckbox);
+            } else {
+                await this.clear(this.cashAmountTextbox);
+                await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
             }
-            await this.clear(this.cashAmountTextbox);
-            await this.fill(this.cashAmountTextbox, paymentData.adjustment.amount);
+
             await this.click(this.adjustmentTypeDropdown);
             await this.click(this.refundAddToBalance);
             await this.fill(this.receiptNumber, paymentData.adjustment.receiptNumber);
@@ -572,41 +590,49 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.waitForVisible(this.saveButton);
             await this.verifyVisible(this.saveButton)
             if (await this.isVisible(this.openBalanceEnrollmentsCheckbox, { timeout: 100 }).catch(() => false)) {
-                await this.click(this.openBalanceEnrollmentsCheckbox)
-            }
-            await this.clear(this.creditCardAmount);
-            await this.fill(this.creditCardAmount, paymentData.processCreditCard.amount);
-            if (await this.isVisible(this.cardNumberIframe, { timeout: 2000 }).catch(() => false)) {
-                await this.waitForVisible(this.cardNumberInIframe);
-                await this.click(this.cardNumberInIframe);
-                await this.pressSequentially(this.cardNumberInIframe, paymentData.processCreditCard.cardNumber);
-
-                const expRaw = paymentData.processCreditCard.expiryDate;
-                const expFormatted = expRaw.length === 6 ? `${expRaw.slice(0, 2)}${expRaw.slice(4)}` : expRaw;
-                await this.click(this.expiryDateInIframe);
-                await this.pressSequentially(this.expiryDateInIframe, expFormatted);
-
-                await this.click(this.cvvInIframe);
-                await this.pressSequentially(this.cvvInIframe, paymentData.processCreditCard.cvv);
+                await this.click(this.openBalanceEnrollmentsCheckbox);
             } else {
-                if (await this.isVisible(this.cardNumber, { timeout: 100 }).catch(() => false)) {
-                    await this.fill(this.cardNumber, paymentData.processCreditCard.cardNumber);
-                    await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
-                    await this.fill(this.cvv, paymentData.processCreditCard.cvv);
-                }
-                else {
-                    if (await this.isVisible(this.paymentFormCardNumber, { timeout: 100 }).catch(() => false)) {
-                        await this.click(this.paymentFormCardNumber);
-                        await this.pressSequentially(this.paymentFormCardNumber, paymentData.processCreditCard.cardNumber);
-                        const expRaw = paymentData.processCreditCard.expiryDate;
-                        const expFormatted = expRaw.length === 6 ? `${expRaw.slice(0, 2)}${expRaw.slice(4)}` : expRaw;
-                        await this.click(this.paymentFormExpiryDate);
-                        await this.pressSequentially(this.paymentFormExpiryDate, expFormatted);
-                        await this.click(this.paymentFormCvv);
-                        await this.pressSequentially(this.paymentFormCvv, paymentData.processCreditCard.cvv);
-                    }
-                }
+                await this.clear(this.creditCardAmount);
+                await this.fill(this.creditCardAmount, paymentData.processCreditCard.amount);
             }
+
+            // Wait for whichever card gateway renders first (Clover, Stripe, Payment Form, or Standard)
+            const cardGateway = this.cardNumberIframe
+                .or(this.stripeCardNumberIframe)
+                .or(this.paymentFormCardNumber)
+                .or(this.cardNumber);
+
+            await cardGateway.first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => { });
+
+
+
+            const expRaw = paymentData.processCreditCard.expiryDate;
+            const expFormatted = expRaw.length === 6 ? `${expRaw.slice(0, 2)}${expRaw.slice(4)}` : expRaw;
+
+
+            if (await this.stripeCardNumberIframe.isVisible().catch(() => false)) {
+                await this.waitForVisible(this.stripeCardNumber, { timeout: 5000 });
+                await this.click(this.stripeCardNumber);
+                await this.fill(this.stripeCardNumber, paymentData.processCreditCard.cardNumber);
+                await this.fill(this.stripeExpiryDate, expFormatted);
+                await this.fill(this.stripeCvv, paymentData.processCreditCard.cvv);
+            } else if (await this.cardNumberIframe.isVisible().catch(() => false)) {
+                await this.waitForVisible(this.cardNumberInIframe, { timeout: 5000 });
+                await this.click(this.cardNumberInIframe);
+                await this.fill(this.cardNumberInIframe, paymentData.processCreditCard.cardNumber);
+                await this.fill(this.expiryDateInIframe, expFormatted);
+                await this.fill(this.cvvInIframe, paymentData.processCreditCard.cvv);
+            } else if (await this.paymentFormCardNumber.isVisible().catch(() => false)) {
+                await this.click(this.paymentFormCardNumber);
+                await this.fill(this.paymentFormCardNumber, paymentData.processCreditCard.cardNumber);
+                await this.fill(this.paymentFormExpiryDate, expFormatted);
+                await this.fill(this.paymentFormCvv, paymentData.processCreditCard.cvv);
+            } else if (await this.cardNumber.isVisible().catch(() => false)) {
+                await this.pressSequentially(this.cardNumber, paymentData.processCreditCard.cardNumber);
+                await this.fill(this.expiryDate, paymentData.processCreditCard.expiryDate);
+                await this.fill(this.cvv, paymentData.processCreditCard.cvv);
+            }
+
 
             await this.fill(this.nameOnCard, paymentData.processCreditCard.nameOnCard);
             await this.fill(this.receiptNumber, paymentData.processCreditCard.receiptNumber);
