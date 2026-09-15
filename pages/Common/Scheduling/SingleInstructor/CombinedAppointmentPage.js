@@ -510,16 +510,10 @@ export default class CombinedAppointmentPage extends BasePage {
             const toastMessage = await toastPromise;
             console.log(`Captured toast message: "${toastMessage}"`);
 
-            // 3. If success toast appeared, log and proceed; otherwise check scheduler fallback or throw error
+            // 3. If success toast appeared, log and proceed, check scheduler  or throw error
             if (toastMessage && /appointment.*created successfully/i.test(toastMessage)) {
                 console.log(`Appointment created with message: ${toastMessage}`);
                 await test.step('Appointment created successfully.', async () => { });
-                await this.waitForLoaders().catch(() => { });
-            } else {
-                if (toastMessage) {
-                    console.log(`Non-success toast received: "${toastMessage}"`);
-                }
-
                 await this.waitForLoaders().catch(() => { });
                 const listMenu = this.listMenuOfCreatedAppointment(studentName);
                 let count = await listMenu.count();
@@ -534,10 +528,11 @@ export default class CombinedAppointmentPage extends BasePage {
                     } catch { }
                 }
 
-                if (count > 0) {
-                    console.log(`Appointment creation verified on scheduler`);
-                    await test.step(`Appointment created successfully.`, async () => { });
-                } else {
+                expect(count).toBeGreaterThan(0);
+            } else {
+                if (toastMessage) {
+                    console.log(`Non-success toast received: "${toastMessage}"`);
+
                     const errorMsg = toastMessage || 'Appointment creation failed: No success toast appeared and appointment was not found on scheduler';
                     console.log(`Appointment creation failed with error: "${errorMsg}"`);
                     throw new Error(`Appointment creation failed with error: "${errorMsg}"`);

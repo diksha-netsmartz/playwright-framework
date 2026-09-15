@@ -420,10 +420,6 @@ export default class SingleInstructorPage extends BasePage {
             await this.page.waitForTimeout(10000);
             await this.waitForLoaders();
 
-            const allAppointments = this.allListMenusOfCreatedAppointments(studentName);
-            const countBefore = await allAppointments.count();
-            console.log(`Appointments count before deletion: ${countBefore}`);
-
             await this.hover(this.listMenuOfCreatedAppointment(studentName));
             await this.isVisible(this.deleteAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
             await this.click(this.deleteAppointmentButton(studentName));
@@ -474,19 +470,25 @@ export default class SingleInstructorPage extends BasePage {
             await this.waitForLoaders();
 
             const toastMessage = (await toastPromise) || '';
-            console.log(`Captured toast message: "${toastMessage}"`);
+            console.log(`Appointment deleted with message: ${toastMessage}`);
 
-            if (toastMessage && /appointment.*deleted successfully/i.test(toastMessage)) {
-                console.log(`Appointment deleted with message: ${toastMessage}`);
-                await test.step(`Appointment deleted successfully.`, async () => { });
-            } else {
-                await this.waitForLoaders();
-                const expectedCount = Math.max(0, countBefore - 1);
-                await expect(allAppointments).toHaveCount(expectedCount);
-                console.log(`Appointments count after deletion: ${expectedCount}`);
-                console.log(`Toast not found. Appointment deletion verified on scheduler: count decremented from ${countBefore} to ${expectedCount}`);
-                await test.step(`Appointment deleted successfully.`, async () => { });
+            const listMenu = this.listMenuOfCreatedAppointment(studentName);
+            let count = await listMenu.count();
+
+            if (count > 0) {
+                try {
+                    await expect.poll(async () => {
+                        await this.waitForLoaders().catch(() => { });
+                        return await listMenu.count();
+                    }, { timeout: 10000 }).toBe(0);
+                    count = await listMenu.count();
+                } catch { }
             }
+
+            expect(count).toBe(0);
+
+            await test.step(`Appointment deleted successfully.`, async () => { });
+
         });
     }
 
