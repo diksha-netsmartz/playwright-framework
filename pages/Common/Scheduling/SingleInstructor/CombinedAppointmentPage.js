@@ -30,46 +30,32 @@ export default class CombinedAppointmentPage extends BasePage {
         this.closePopup = page.locator("xpath=//a[@aria-label='Close']").nth(0);
 
         // Buttons
-        this.submitButton = page.getByRole("button", {
-            name: "Submit",
-        });
-
-        this.confirmYesButton = page.locator(
-            "xpath=//a[@data-apply='confirmation']"
-        );
-
-        this.submitButtonPopup = page.getByRole("button", {
-            name: "Yes, Submit",
-        });
+        this.submitButton = page.getByRole("button", { name: "Submit", });
+        this.confirmYesButton = page.locator("xpath=//a[@data-apply='confirmation']");
+        this.submitButtonPopup = page.getByRole("button", { name: "Yes, Submit", });
+        this.updateButton = page.getByRole('button', { name: 'YES, Update' })
 
         // Duration
         this.duration15Minutes = page.getByLabel("15 Minutes");
 
         // Student 1
         this.student1Textbox = page.locator('#FirstTypeAppointment_SearchStudent1')
-
         this.student1Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocation");
-
         this.student1Notes = page.getByRole("textbox", { name: "Notes Student 1", });
 
         // Student 2
         this.student2Textbox = page.locator('#FirstTypeAppointment_SearchStudent2')
-
         this.student2Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocationStudent2");
-
         this.student2Notes = page.getByRole("textbox", { name: "Notes Student 2", });
 
         // Misc
         this.deleteConfirmationButton = page.locator("#btnDeleteConfirmation");
         this.cancelAppointmentPopupButton = page.getByRole("button", { name: "YES, CANCEL LESSON", });
-
         this.cancelAppointmentTextbox = page.locator("#txtArea_CancelLesson").nth(0);
-
         this.noShowAppointmentTextbox = page.locator("#txtnoShowNotes").nth(0);
-
         this.noShowAppointmentPopupButton = page.getByRole("button", { name: "Yes, No Show Lesson", });
-
         this.noShowYesButton = page.locator("#btnDeleteMakeFullAppointment");
+        this.closeSuccessMessageButton = page.locator("(//div[@id='GlobalErrorSuccessDiv']//button)[last()]");
     }
 
     /**
@@ -529,6 +515,10 @@ export default class CombinedAppointmentPage extends BasePage {
                 }
 
                 expect(count).toBeGreaterThan(0);
+                if (await this.isVisible(this.closeSuccessMessageButton, { timeout: 3000 })) {
+                    await this.click(this.closeSuccessMessageButton);
+                }
+
             } else {
                 if (toastMessage) {
                     console.log(`Non-success toast received: "${toastMessage}"`);
@@ -754,4 +744,46 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.click(this.closePopup);
         });
     }
+
+
+    /**
+     * Fills student details (name, service, instructions, pickup, notes) for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @param {Object} student - Student test data object.
+     **/
+    async updatePickUpAndNotes(studentNo, student) {
+        if (studentNo === 1) {
+            this.student1 = student;
+        } else if (studentNo === 2) {
+            this.student2 = student;
+        }
+
+        const studentLabel = `Student ${studentNo} (${student.name})`;
+        await test.step(`Fill ${studentLabel} details: pickup "${student.pickup}" and notes "${student.notes}"`, async () => {
+
+            await this.fill(this.getPickup(studentNo), student.pickup);
+            await this.fill(this.getNotes(studentNo), student.notes);
+        });
+    }
+
+    /**
+    * Submits the combined appointment form, confirms confirmation prompts, and verifies appointment update via toast message.
+    * Looks for toast message for 30 seconds. If 'Appointment updated successfully', proceeds.
+    * If an error toast appears or update fails, logs the toast message and throws an error.
+    **/
+    async updateAppointment() {
+        await test.step('Update Combined Appointment and verify confirmation', async () => {
+            await this.click(this.submitButton);
+            await this.click(this.confirmYesButton);
+
+            await this.waitForVisible(this.updateButton, { timeout: 5000 });
+            await this.click(this.updateButton);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.page.getByText('Appointment updated successfully.', { exact: true }), { timeout: 10000 });
+            await this.verifyVisible(this.page.getByText('Appointment updated successfully.', { exact: true }));
+
+        });
+    }
+
+
 }

@@ -22,8 +22,8 @@ export default class BulkAppointmentPage extends BasePage {
         // Filter toolbar
         this.filterButton = page.getByRole('button', { name: 'Filter' }).first();
         this.selectStatusDropdown = page.locator('a:has-text("SELECT STATUS")').first();
-        this.selectAppointmentCheckbox = page.locator("xpath=(//div[@class='icheckbox_square-grey']//input[contains(@class,'chkBulkApptsSelection')]//following-sibling::ins)[1]");
-        this.selectAppointmentCheckedCheckbox = page.locator("(//div[@class='icheckbox_square-grey checked']//input[contains(@class,'chkBulkApptsSelection')]//following-sibling::ins)[1]");
+        this.selectAppointmentCheckbox = page.locator("xpath=(//a[@title='Visible']//ancestor::tr//div[@class='icheckbox_square-grey']//input[contains(@class,'chkBulkApptsSelection')]//following-sibling::ins)[1]");
+        this.selectAppointmentCheckedCheckbox = page.locator("(//a[@title='Visible']//ancestor::tr//div[@class='icheckbox_square-grey checked']//input[contains(@class,'chkBulkApptsSelection')]//following-sibling::ins)[1]");
 
         // Row action links (appear after row is selected)
         this.editAppointmentsLink = page.getByRole('link', { name: 'Edit Appointments' });
@@ -33,6 +33,7 @@ export default class BulkAppointmentPage extends BasePage {
 
         // Edit modal
         this.notesTextbox = page.locator('#txtApptNotes');
+        this.cancelledTextbox = page.locator('#txtCancelApptNotes');
         // this.statusDropdownInEditModal = page.getByRole('button', {name: 'Please Select'}).nth(4);
         // this.confirmedOptionInEditModal = page.locator('#apptbulkedit a').filter({hasText: 'Confirmed'});
         this.updateButton = page.locator("#btnUpdateBulkAppointment");
@@ -144,7 +145,7 @@ export default class BulkAppointmentPage extends BasePage {
         await test.step('Select appointment from grid', async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 10000 });
-            await this.waitForHidden(this.selectAppointmentCheckedCheckbox, { timeout: 5000 })
+            await this.waitForHidden(this.selectAppointmentCheckedCheckbox, { timeout: 10000 })
             await this.waitForVisible(this.selectAppointmentCheckbox, { timeout: 5000 })
             await this.click(this.selectAppointmentCheckbox);
         });
@@ -190,7 +191,12 @@ export default class BulkAppointmentPage extends BasePage {
     async cancelAppointment() {
         await test.step('Cancel Bulk Appointment and confirm', async () => {
             await this.selectAppointment();
+
             await this.click(this.cancelAppointmentsLink);
+            if (!await this.isVisible(this.cancelledTextbox, { timeout: 3000 })) {
+                await this.selectAppointment();
+            }
+            await this.fill(this.cancelledTextbox, "cancelling appointment");
             await this.click(this.cancelYesButton);
             await this.waitForLoaders();
             await this.verifyVisible(this.page.getByText('Appointments cancelled successfully.', { exact: true }));

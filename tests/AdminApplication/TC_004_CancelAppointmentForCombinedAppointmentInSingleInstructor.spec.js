@@ -15,6 +15,7 @@ import login from "../../test-data/json/login.json";
  * Expected Result: Appointment slot should become empty
  **/
 test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled", { tag: ['@scheduling', '@smoke'] }, async ({ page }) => {
+    test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);

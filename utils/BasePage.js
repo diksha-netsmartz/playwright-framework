@@ -59,6 +59,18 @@ export default class BasePage {
     }
 
     /**
+     * Fills an input only if a value is provided and the element is visible on page.
+     * @param {import('@playwright/test').Locator} locator - Target element locator.
+     * @param {string} [value] - Text value to fill.
+     * @param {number} [timeout=1000] - Visibility timeout in ms.
+     **/
+    async fillIfAvailable(locator, value, timeout = 1000) {
+        if (value && await this.isVisible(locator, { timeout }).catch(() => false)) {
+            await this.fill(locator, value);
+        }
+    }
+
+    /**
      * Types text character by character with optional delay.
      * @param {import('@playwright/test').Locator} locator - Target element locator.
      * @param {string} text - Text to type.

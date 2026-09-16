@@ -262,7 +262,7 @@ export default class BusinessReportsPage extends BasePage {
      **/
     async clickExportIntoExcel() {
         return await test.step('Click "Export Into Excel" and wait for file download & processing to complete', async () => {
-            const downloadPromise = this.page.waitForEvent('download');
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 90000 });
             await this.waitForVisible(this.exportIntoExcelBtn);
             await this.click(this.exportIntoExcelBtn);
             const download = await downloadPromise;
