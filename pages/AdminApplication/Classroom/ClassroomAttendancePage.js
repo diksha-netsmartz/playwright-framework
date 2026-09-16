@@ -157,7 +157,7 @@ export default class ClassroomAttendancePage extends BasePage {
                 await this.waitForVisible(this.presentRadioBtn);
                 // this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTruePresent')]").count();
                 // console.log(`[Random Selection] Chose: Present. Checked Present count before: ${this.beforeCheckedCount}`);
-                await this.click(this.presentRadioBtn);
+                await this.jsClick(this.presentRadioBtn);
             });
         } else {
             await test.step(`Randomly mark student attendance as Absent`, async () => {
@@ -165,7 +165,7 @@ export default class ClassroomAttendancePage extends BasePage {
                 await this.waitForVisible(this.absentRadioBtn);
                 // this.beforeCheckedCount = await this.page.locator("xpath=//label[contains(@class,'checkedTrueAbsent')]").count();
                 // console.log(`[Random Selection] Chose: Absent. Checked Absent count before: ${this.beforeCheckedCount}`);
-                await this.click(this.absentRadioBtn);
+                await this.jsClick(this.absentRadioBtn);
             });
         }
 

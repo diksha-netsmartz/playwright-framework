@@ -85,6 +85,11 @@ export default class AdminPortalHomePage extends BasePage {
         this.integratePaymentLink = page.locator('#configurationPaymentProcessing')
         this.marketplaceLink = page.locator("#configurationMarketPlace")
         this.zipCodeLink = page.getByRole('link', { name: 'Zip Code' });
+        this.userRightsLink = page.locator('#masterSettings_GetUserRights_li');
+
+        // Communication
+        this.communicationMenu = page.getByText('Communication', { exact: true });
+        this.communicationCenterLink = page.locator("#settings_StudentCenter");
 
     }
 
@@ -283,7 +288,7 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForVisible(this.newClassLink);
             await this.click(this.newClassLink);
             await this.waitForLoaders();
-            await this.verifyTitle("Classroom");
+            await this.verifyURLContainsText("Classroom")
         });
     }
 
@@ -662,5 +667,35 @@ export default class AdminPortalHomePage extends BasePage {
         });
     }
 
+    /**
+     * Navigates to Configuration > User Rights via side menu.
+     **/
+    async navigateToUserRights() {
+        await test.step('Click on User Rights', async () => {
+            await this.waitForVisible(this.configurationMenu);
+            await this.click(this.configurationMenu);
+            await this.waitForVisible(this.userRightsLink);
+            await this.click(this.userRightsLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+            await this.verifyTitle("Settings");
+        });
+    }
+
+    /**
+     * Navigates to Communication > Communication Center via side menu.
+     **/
+    async navigateToCommunicationCenter() {
+        await test.step('Navigate to Communication -> Communication Center', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.communicationMenu);
+            await this.click(this.communicationMenu);
+            await this.waitForVisible(this.communicationCenterLink);
+            await this.click(this.communicationCenterLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+            await this.verifyTitle("Communication Center");
+        });
+    }
 
 }

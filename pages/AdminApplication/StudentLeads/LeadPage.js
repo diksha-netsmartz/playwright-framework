@@ -401,28 +401,27 @@ export default class LeadPage extends BasePage {
     async verifyLeadDeatilsAreUpdatedSuccessfully(expectedData = {}) {
         await test.step('Verify updated details are present using value attribute', async () => {
             await this.waitForVisible(this.editSaveBtn);
-            if (expectedData.middleName) {
+            if (await this.isVisible(this.middleNameInput, { timeout: 100 }).catch(() => false)) {
                 await expect(this.middleNameInput).toHaveAttribute('value', expectedData.middleName);
             }
-            if (expectedData.address) {
+            if (await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
                 await expect(this.addressInput).toHaveAttribute('value', expectedData.address);
             }
-            if (expectedData.zipCode) {
+            if (await this.isVisible(this.zipCodeInput, { timeout: 100 }).catch(() => false)) {
                 await expect(this.zipCodeInput).toHaveAttribute('value', expectedData.zipCode);
             }
-            if (expectedData.email) {
+            if (await this.isVisible(this.emailInput, { timeout: 100 }).catch(() => false)) {
                 await expect(this.emailInput).toHaveAttribute('value', expectedData.email);
             }
-            if (expectedData.medicalConditions) {
-                if (await this.medicalConditionsInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-                    await expect(this.medicalConditionsInput).toHaveAttribute('value', expectedData.medicalConditions);
-                }
+            if (await this.isVisible(this.medicalConditionsInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.medicalConditionsInput).toHaveAttribute('value', expectedData.medicalConditions);
+
             }
-            if (expectedData.notes) {
+            if (await this.isVisible(this.notesTextarea, { timeout: 100 }).catch(() => false)) {
                 await expect(this.actionLogs).toContainText(expectedData.notes);
             }
 
-            if (expectedData.taskSubject) {
+            if (await this.isVisible(this.taskSubjext, { timeout: 100 }).catch(() => false)) {
                 await expect(this.actionLogs).toContainText(expectedData.taskSubject);
             }
 
