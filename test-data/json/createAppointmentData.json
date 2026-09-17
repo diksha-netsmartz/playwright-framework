@@ -32,7 +32,8 @@
     "courseStartDate": "10/12/2026",
     "siblingName": "Sammie",
     "siblingLicenseNumber": "11111111",
-    "membershipNumber": "1234567890"
+    "membershipNumber": "1234567890",
+    "cidNumber": "1234567890"
   },
   "student2": {
     "pickup": "test PU123e",
@@ -63,7 +64,8 @@
     "courseStartDate": "10/12/2026",
     "siblingName": "Sammie",
     "siblingLicenseNumber": "11111111",
-    "membershipNumber": "1234567890"
+    "membershipNumber": "1234567890",
+    "cidNumber": "1234567890"
   },
   "appointmentDetails": {
     "appointmentType": " Create Combined Appointment (Driver and Observer)",
