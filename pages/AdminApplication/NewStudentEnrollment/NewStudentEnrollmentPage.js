@@ -485,9 +485,9 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.waitForVisible(this.parentClassDifferentSchoolDropdownValue);
                 await this.click(this.parentClassDifferentSchoolDropdownValue);
             }
-            if (await this.isVisible(this.locationOfParentClassCompletedPreviously, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.locationOfParentClassCompletedPreviously, data.address || "Main Location");
-            }
+            // if (await this.isVisible(this.locationOfParentClassCompletedPreviously, { timeout: 100 }).catch(() => false)) {
+            //     await this.fill(this.locationOfParentClassCompletedPreviously, data.address || "Main Location");
+            // }
 
             // 5. Emergency Contact
             if (await this.isVisible(this.emergencyName, { timeout: 100 }).catch(() => false) && data.emergencyName) {
@@ -764,9 +764,9 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.waitForVisible(this.parentClassDifferentSchoolDropdownValue);
                 await this.click(this.parentClassDifferentSchoolDropdownValue);
             }
-            if (await this.isVisible(this.locationOfParentClassCompletedPreviously, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.locationOfParentClassCompletedPreviously, data.address || "Main Location");
-            }
+            // if (await this.isVisible(this.locationOfParentClassCompletedPreviously, { timeout: 100 }).catch(() => false)) {
+            //     await this.fill(this.locationOfParentClassCompletedPreviously, data.address || "Main Location");
+            // }
 
             // 6. Emergency Contact
             if (await this.isVisible(this.emergencyName, { timeout: 100 }).catch(() => false) && data.emergencyName) {

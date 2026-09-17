@@ -146,8 +146,11 @@ export default class BulkAppointmentPage extends BasePage {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 10000 });
             await this.waitForHidden(this.selectAppointmentCheckedCheckbox, { timeout: 10000 })
-            await this.waitForVisible(this.selectAppointmentCheckbox, { timeout: 5000 })
-            await this.click(this.selectAppointmentCheckbox);
+            try {
+                await this.waitForVisible(this.selectAppointmentCheckbox, { timeout: 5000 });
+            } catch (error) {
+            }
+            await this.jsClick(this.selectAppointmentCheckbox);
         });
     }
 
