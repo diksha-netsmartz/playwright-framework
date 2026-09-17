@@ -640,7 +640,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
     async fillStudentInformation(data, studentType) {
         const typeLabel = studentType || "Student";
         await test.step(`Fill ${typeLabel} Information`, async () => {
-            this.uniqueId = `${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`;
+            this.uniqueId = `${Date.now()}${Math.floor(100000 + Math.random() * 900000)}`;
             await this.waitForLoaders().catch(() => { });
 
             // 1. Personal & Profile Information
@@ -649,10 +649,10 @@ export default class NewStudentEnrollmentPage extends BasePage {
             }
 
             await this.waitForVisible(this.firstName);
-            await this.fill(this.firstName, `${data.firstName}_${this.uniqueId}`);
+            await this.fill(this.firstName, `${data.firstName}${this.uniqueId}`);
 
             if (await this.isVisible(this.middleName, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.middleName, `${data.middleName}_${this.uniqueId}`);
+                await this.fill(this.middleName, `${data.middleName}${this.uniqueId}`);
             }
             if (await this.isVisible(this.lastName, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.lastName, data.lastName);
@@ -745,7 +745,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.fill(this.cellPhone, cellPhoneValue);
             }
             if (await this.isVisible(this.studentEmail, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.studentEmail, `${data.firstName}_${this.uniqueId}@gmail.com`);
+                await this.fill(this.studentEmail, `${data.firstName}${this.uniqueId}@gmail.com`);
             }
 
             // 5. Parent / Guardian Information
