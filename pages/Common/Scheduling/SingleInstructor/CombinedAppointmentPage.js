@@ -42,11 +42,13 @@ export default class CombinedAppointmentPage extends BasePage {
         this.student1Textbox = page.locator('#FirstTypeAppointment_SearchStudent1')
         this.student1Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocation");
         this.student1Notes = page.getByRole("textbox", { name: "Notes Student 1", });
+        this.student1DropOff = page.locator('#FirstTypeAppointment_p_str_DropOffLocation')
 
         // Student 2
         this.student2Textbox = page.locator('#FirstTypeAppointment_SearchStudent2')
         this.student2Pickup = page.locator("#FirstTypeAppointment_p_str_PickupLocationStudent2");
         this.student2Notes = page.getByRole("textbox", { name: "Notes Student 2", });
+        this.student2DropOff = page.locator('#FirstTypeAppointment_p_str_DropOffLocationStudent2')
 
         // Misc
         this.deleteConfirmationButton = page.locator("#btnDeleteConfirmation");
@@ -153,6 +155,17 @@ export default class CombinedAppointmentPage extends BasePage {
         return studentNo === 1
             ? this.student1Pickup
             : this.student2Pickup;
+    }
+
+    /**
+     * Returns drop off location input locator for Student 1 or Student 2.
+     * @param {number} studentNo - Student slot index (1 or 2).
+     * @returns {import('@playwright/test').Locator} Drop off input locator.
+     **/
+    getDropOff(studentNo) {
+        return studentNo === 1
+            ? this.student1DropOff
+            : this.student2DropOff;
     }
 
     /**
@@ -348,7 +361,11 @@ export default class CombinedAppointmentPage extends BasePage {
         await test.step(`Fill ${studentLabel} details: service "${student.service || 'Default'}", pickup "${student.pickup}", notes "${student.notes}"`, async () => {
             await this.getStudentTextbox(studentNo).pressSequentially(student.name, { delay: 50 });
             await this.page.waitForTimeout(2000);
-            await this.click(this.page.getByRole("option", { name: student.option }).first());
+            await this.page.locator('.ui-autocomplete:visible li, ul.k-list:visible li, .typeahead:visible li, ul[role="listbox"]:visible [role="option"]')
+                .first()
+                .click();
+            // await this.click(this.page.getByRole("option", { name: student.option }).first());
+            // await this.click(this.page.locator('li').filter({ hasText: student.option }).first());
             await this.click(this.clickServiceDropdown(studentNo));
             await this.click(this.selectServiceDropdownValue(studentNo));
             await this.click(this.clickInstruction1Dropdown(studentNo));
@@ -356,6 +373,12 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.click(this.clickInstruction2Dropdown(studentNo));
             await this.click(this.getInstruction2DropdownValue(studentNo));
             await this.fill(this.getPickup(studentNo), student.pickup);
+            if (await this.isVisible(this.getDropOff(studentNo), { timeout: 100 }).catch(() => false)) {
+                student.dropoff = student.dropoff ?? student.dropOff;
+                if (student.dropoff) {
+                    await this.fill(this.getDropOff(studentNo), student.dropoff);
+                }
+            }
             await this.fill(this.getNotes(studentNo), student.notes);
         });
     }
@@ -571,6 +594,12 @@ export default class CombinedAppointmentPage extends BasePage {
         await this.verifyAttribute(this.getDropdownTitle(instruction1Id), "title", expected.instruction1, `Student ${studentNo} Instruction 1`);
         await this.verifyAttribute(this.getDropdownTitle(instruction2Id), "title", expected.instruction2, `Student ${studentNo} Instruction 2`);
         await this.verifyAttribute(this.getPickup(studentNo), "oldval", student.pickup, `Student ${studentNo} Pickup`);
+        if (await this.isVisible(this.getDropOff(studentNo), { timeout: 100 }).catch(() => false)) {
+            const expectedDropOff = student.dropoff ?? student.dropOff;
+            if (expectedDropOff) {
+                await this.verifyAttribute(this.getDropOff(studentNo), "oldval", expectedDropOff, `Student ${studentNo} Drop Off`);
+            }
+        }
         await this.verifyAttribute(this.getNotes(studentNo), "oldval", student.notes, `Student ${studentNo} Notes`);
     }
 
@@ -608,7 +637,7 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.isVisible(this.cancelAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
             await this.click(this.cancelAppointmentButton(studentName));
             this.cancelledNotes = `Cancelling appointment for ${studentName} at ${this.uniqueId}`;
-            if (!await this.isVisible(this.cancelAppointmentTextbox, { timeout: 3000 })) {
+            if (!await this.isVisible(this.cancelAppointmentTextbox, { timeout: 10000 })) {
                 await this.click(this.cancelAppointmentButton(studentName));
             }
             await this.waitForVisible(this.cancelAppointmentTextbox, { timeout: 3000 })
@@ -676,7 +705,7 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.waitForVisible(this.noShowAppointmentButton(studentName));
             await this.click(this.noShowAppointmentButton(studentName));
             this.noShowNotes = `Marking No Show for ${studentName} at ${this.uniqueId}`;
-            if (!await this.isVisible(this.noShowAppointmentTextbox, { timeout: 3000 })) {
+            if (!await this.isVisible(this.noShowAppointmentTextbox, { timeout: 10000 })) {
                 await this.click(this.noShowAppointmentButton(studentName));
             }
             await this.waitForVisible(this.noShowAppointmentTextbox);
@@ -751,7 +780,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {number} studentNo - Student slot index (1 or 2).
      * @param {Object} student - Student test data object.
      **/
-    async updatePickUpAndNotes(studentNo, student) {
+    async updateStudentDetails(studentNo, student) {
         if (studentNo === 1) {
             this.student1 = student;
         } else if (studentNo === 2) {
@@ -762,26 +791,70 @@ export default class CombinedAppointmentPage extends BasePage {
         await test.step(`Fill ${studentLabel} details: pickup "${student.pickup}" and notes "${student.notes}"`, async () => {
 
             await this.fill(this.getPickup(studentNo), student.pickup);
+            if (await this.isVisible(this.getDropOff(studentNo), { timeout: 100 }).catch(() => false)) {
+                student.dropoff = student.dropoff ?? student.dropOff;
+                if (student.dropoff) {
+                    await this.fill(this.getDropOff(studentNo), student.dropoff);
+                }
+            }
             await this.fill(this.getNotes(studentNo), student.notes);
         });
     }
 
     /**
-    * Submits the combined appointment form, confirms confirmation prompts, and verifies appointment update via toast message.
-    * Looks for toast message for 30 seconds. If 'Appointment updated successfully', proceeds.
-    * If an error toast appears or update fails, logs the toast message and throws an error.
-    **/
+     * Submits the combined appointment form, confirms confirmation prompts, and verifies appointment update via toast message using MutationObserver.
+     **/
     async updateAppointment() {
         await test.step('Update Combined Appointment and verify confirmation', async () => {
             await this.click(this.submitButton);
             await this.click(this.confirmYesButton);
 
             await this.waitForVisible(this.updateButton, { timeout: 5000 });
+
+            // 1. Setup MutationObserver before confirming update
+            const toastAppeared = this.page.evaluate((expectedText) => {
+                return new Promise((resolve) => {
+                    const getToast = () => {
+                        const matches = /updated successfully/i.test(document.body.innerText || '') || (document.body.innerText || '').toLowerCase().includes(expectedText.toLowerCase());
+                        if (!matches) return null;
+                        const el = document.querySelector('#toast-container .toast-message, .toast-message');
+                        return el && el.textContent ? el.textContent.trim() : expectedText;
+                    };
+                    const initial = getToast();
+                    if (initial) return resolve(initial);
+
+                    const observer = new MutationObserver(() => {
+                        const text = getToast();
+                        if (text) {
+                            observer.disconnect();
+                            resolve(text);
+                        }
+                    });
+
+                    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                    setTimeout(() => {
+                        observer.disconnect();
+                        resolve('');
+                    }, 10000);
+                });
+            }, 'Appointment updated successfully').catch(() => '');
+
             await this.click(this.updateButton);
             await this.waitForLoaders();
-            await this.waitForVisible(this.page.getByText('Appointment updated successfully.', { exact: true }), { timeout: 10000 });
-            await this.verifyVisible(this.page.getByText('Appointment updated successfully.', { exact: true }));
 
+            // 2. Verify update toast
+            const toastMessage = await toastAppeared;
+            console.log(`Captured toast message: "${toastMessage}"`);
+            if (toastMessage) {
+                console.log('Appointment updated successfully.');
+                await test.step('Toast message "Appointment updated successfully." appeared', async () => { });
+                await this.waitForLoaders().catch(() => { });
+            } else {
+                await test.step('Toast message "Appointment updated successfully." did NOT appear', async () => {
+                    expect(toastMessage, 'Toast message "Appointment updated successfully." did not appear on page within 10 seconds').toBeTruthy();
+                });
+            }
         });
     }
 

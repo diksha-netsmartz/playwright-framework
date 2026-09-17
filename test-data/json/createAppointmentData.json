@@ -4,7 +4,8 @@
     "fillInfoMethod": "fillTeenStudentInformation"
   },
   "student1": {
-    "pickup": "test PU1231",
+    "pickup": "pickup location one",
+    "dropoff": "dropoff location one",
     "notes": "note student1",
     "middleName": "test1",
     "address": "new york",
@@ -32,10 +33,12 @@
     "courseStartDate": "10/12/2026",
     "siblingName": "Sammie",
     "siblingLicenseNumber": "11111111",
-    "membershipNumber": "1234567890"
+    "membershipNumber": "1234567890",
+    "cidNumber": "1234567890"
   },
   "student2": {
-    "pickup": "test PU123e",
+    "pickup": "pickup location two",
+    "dropoff": "dropoff location two",
     "notes": "note student2",
     "middleName": "test2",
     "address": "new york",
@@ -63,7 +66,8 @@
     "courseStartDate": "10/12/2026",
     "siblingName": "Sammie",
     "siblingLicenseNumber": "11111111",
-    "membershipNumber": "1234567890"
+    "membershipNumber": "1234567890",
+    "cidNumber": "1234567890"
   },
   "appointmentDetails": {
     "appointmentType": " Create Combined Appointment (Driver and Observer)",

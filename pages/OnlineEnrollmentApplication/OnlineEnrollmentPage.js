@@ -34,7 +34,8 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.firstNameTxt = page.getByRole('textbox', { name: 'First Name' });
         this.middlenameTxt = page.getByRole('textbox', { name: 'Middle Name' });
         this.lastNameTxt = page.getByRole('textbox', { name: 'Last Name' });
-        this.addressTxt = page.locator('#Address');
+        this.addressTxt = page.getByRole('textbox', { name: 'Address' });
+        this.addressRadar = page.getByRole('combobox', { name: 'Address' })
         this.addressSelectionDropdown = page.locator("xpath=(//div[@class='pac-item']//span[text()='New York'])[1]");
         this.zipCodeTxt = page.locator('#ZipPostalCode');
         this.homePhoneTxt = page.getByRole('textbox', { name: 'Home Phone' });
@@ -244,9 +245,14 @@ export default class OnlineEnrollmentPage extends BasePage {
         await test.step(`Fill address: "${address}"`, async () => {
             await this.pressSequentially(this.addressTxt, address);
             if (!await this.isVisible(this.addressSelectionDropdown, { timeout: 2000 }).catch(() => false)) {
-                await this.clear(this.addressTxt);
-                await this.pressSequentially(this.addressTxt, address);
-
+                if (await this.isVisible(this.addressTxt, { timeout: 100 }).catch(() => false)) {
+                    await this.clear(this.addressTxt);
+                    await this.pressSequentially(this.addressTxt, address);
+                }
+                else if (await this.isVisible(this.addressRadar, { timeout: 100 }).catch(() => false)) {
+                    await this.page.waitForSelector('.radar-autocomplete-results-item', { state: 'visible', timeout: 5000 });
+                    await this.page.locator('.radar-autocomplete-results-item', { hasText: address }).first().click();
+                }
             }
             if (await this.isVisible(this.addressSelectionDropdown, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.addressSelectionDropdown);
@@ -302,7 +308,7 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async fillStudentInfo() {
         await test.step(`Fill Online Enrollment Form`, async () => {
-            this.uniqueId = `${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`;
+            this.uniqueId = `${Date.now()}${Math.floor(100000 + Math.random() * 900000)}`;
             const data = oeData.student;
             const random7 = String(Math.floor(1000000 + Math.random() * 9000000));
             const phone = `(555)${random7.slice(0, 3)}-${random7.slice(3)}`;
@@ -312,7 +318,7 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.verifyVisible(this.studentInfoCaption);
 
             if (await this.isVisible(this.firstNameTxt, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.firstNameTxt, `${data.firstName}_${this.uniqueId}`);
+                await this.fill(this.firstNameTxt, `${data.firstName} ${this.uniqueId}`);
             }
             if (await this.isVisible(this.middlenameTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.middlenameTxt, data.middleName);
@@ -320,9 +326,11 @@ export default class OnlineEnrollmentPage extends BasePage {
             if (await this.isVisible(this.lastNameTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.lastNameTxt, data.lastName);
             }
+
             if (await this.isVisible(this.addressTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fillAddress(data.address);
             }
+
             if (await this.isVisible(this.homePhoneTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.homePhoneTxt, `(212)${random7.slice(0, 3)}-${random7.slice(3)}`);
             }
@@ -330,7 +338,7 @@ export default class OnlineEnrollmentPage extends BasePage {
                 await this.fill(this.cellPhoneTxt, phone);
             }
             if (await this.isVisible(this.emailTxt, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.emailTxt, `${data.firstName}_${this.uniqueId}@gmail.com`);
+                await this.fill(this.emailTxt, `${data.firstName}${this.uniqueId}@gmail.com`);
             }
             if (await this.isVisible(this.parentGuardianNameTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.parentGuardianNameTxt, data.parentGuardianName);
@@ -418,15 +426,7 @@ export default class OnlineEnrollmentPage extends BasePage {
             if (await this.isVisible(this.zipCodeTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.zipCodeTxt, data.zipCode);
             }
-            if (await this.isVisible(this.studentSignature, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.studentSignature, data.firstName);
-            }
-            if (await this.isVisible(this.parentSignature, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.parentSignature, data.parentName);
-            }
-            if (await this.isVisible(this.last6DigitsParentsDriverLicense, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
-            }
+
             if (await this.isVisible(this.siblingName, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.siblingName, data.siblingName || 'Sammie');
             }
@@ -442,11 +442,20 @@ export default class OnlineEnrollmentPage extends BasePage {
                 await this.jsClick(this.studentDrivingExperienceCheckbox);
             }
 
-            if (await this.isVisible(this.textsignature, { timeout: 2000 }).catch(() => false)) {
+            if (await this.isVisible(this.textsignature, { timeout: 1000 }).catch(() => false)) {
                 await this.click(this.textsignature);
                 await this.waitForLoaders().catch(() => { });
                 await this.waitForVisible(this.studentSignature);
+            }
+
+            if (await this.isVisible(this.studentSignature, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.studentSignature, data.firstName);
+            }
+            if (await this.isVisible(this.parentSignature, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.parentSignature, data.parentName);
+            }
+            if (await this.isVisible(this.last6DigitsParentsDriverLicense, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
             }
 
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');

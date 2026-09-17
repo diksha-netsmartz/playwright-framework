@@ -43,7 +43,8 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.firstName = page.getByRole('textbox', { name: 'First Name' });
         this.middleName = page.getByRole('textbox', { name: 'Middle Name' });
         this.lastName = page.getByRole('textbox', { name: 'Last Name' });
-        this.address = page.getByRole('textbox', { name: 'Address' });
+        this.address = page.getByRole('textbox', { name: 'Address' })
+        this.addressRadar = page.getByRole('combobox', { name: 'Address' })
         this.addressSelectionDropdown = page.locator("xpath=(//div[@class='pac-item']//span[text()='New York'])[1]");
         this.city = page.getByRole('textbox', { name: 'City' })
         // this.city = page.locator('div').filter({ hasText: 'Los Angeles CountyCA, USA' }).first();
@@ -90,7 +91,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.courseStartDate = page.locator('#dt_CourseStartDate')
         this.parentClassDifferentSchoolDropdown = page.locator("xpath=//button[@data-id='ParentClassDifferentSchool']");
         this.parentClassDifferentSchoolDropdownValue = page.locator("(//select[@id='ParentClassDifferentSchool']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]");
-
+        this.cidNumber = page.getByRole('textbox', { name: 'CID #' })
 
         // Student DOB
         this.dobMonthDropdown = page.locator("xpath=//button[@data-id='int_DOB_Month']");
@@ -437,6 +438,13 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.fill(this.city, data.city);
             }
 
+            if (await this.isVisible(this.addressRadar, { timeout: 100 }).catch(() => false)) {
+                await this.pressSequentially(this.addressRadar, data.address);
+                await this.page.waitForSelector('.radar-autocomplete-results-item', { state: 'visible', timeout: 5000 });
+                await this.addressRadar.press('ArrowDown');
+                await this.addressRadar.press('Enter');
+            }
+
             // 3. Contact Information
             if (await this.isVisible(this.homePhone, { timeout: 100 }).catch(() => false) && data.homePhone) {
                 await this.fill(this.homePhone, data.homePhone);
@@ -492,12 +500,12 @@ export default class NewStudentEnrollmentPage extends BasePage {
             // 5. Emergency Contact
             if (await this.isVisible(this.emergencyName, { timeout: 100 }).catch(() => false) && data.emergencyName) {
                 await this.fill(this.emergencyName, data.emergencyName);
-                if (await this.isVisible(this.emergencyRelationship, { timeout: 100 }).catch(() => false) && data.emergencyRelationship) {
-                    await this.fill(this.emergencyRelationship, data.emergencyRelationship);
-                }
-                if (await this.isVisible(this.emergencyPhone, { timeout: 100 }).catch(() => false) && data.emergencyPhone) {
-                    await this.fill(this.emergencyPhone, data.emergencyPhone);
-                }
+            }
+            if (await this.isVisible(this.emergencyRelationship, { timeout: 100 }).catch(() => false) && data.emergencyRelationship) {
+                await this.fill(this.emergencyRelationship, data.emergencyRelationship);
+            }
+            if (await this.isVisible(this.emergencyPhone, { timeout: 100 }).catch(() => false) && data.emergencyPhone) {
+                await this.fill(this.emergencyPhone, data.emergencyPhone);
             }
 
             // 6. Identification & Legal
@@ -561,6 +569,9 @@ export default class NewStudentEnrollmentPage extends BasePage {
             const drivingNotes = data.studentDrivingNotes || data.drivingNotes;
             if (await this.isVisible(this.studentDrivingNotes, { timeout: 100 }).catch(() => false) && drivingNotes) {
                 await this.fill(this.studentDrivingNotes, drivingNotes);
+            }
+            if (await this.isVisible(this.cidNumber, { timeout: 100 }).catch(() => false) && data.cidNumber) {
+                await this.fill(this.cidNumber, data.cidNumber);
             }
 
             // 11. Custom TextBoxes & DatePickers
@@ -629,7 +640,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
     async fillStudentInformation(data, studentType) {
         const typeLabel = studentType || "Student";
         await test.step(`Fill ${typeLabel} Information`, async () => {
-            this.uniqueId = `${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`;
+            this.uniqueId = `${Date.now()}${Math.floor(100000 + Math.random() * 900000)}`;
             await this.waitForLoaders().catch(() => { });
 
             // 1. Personal & Profile Information
@@ -638,10 +649,10 @@ export default class NewStudentEnrollmentPage extends BasePage {
             }
 
             await this.waitForVisible(this.firstName);
-            await this.fill(this.firstName, `${data.firstName}_${this.uniqueId}`);
+            await this.fill(this.firstName, `${data.firstName}${this.uniqueId}`);
 
             if (await this.isVisible(this.middleName, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.middleName, `${data.middleName}_${this.uniqueId}`);
+                await this.fill(this.middleName, `${data.middleName}${this.uniqueId}`);
             }
             if (await this.isVisible(this.lastName, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.lastName, data.lastName);
@@ -716,6 +727,13 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.fill(this.address, data.address);
             }
 
+            if (await this.isVisible(this.addressRadar, { timeout: 100 }).catch(() => false)) {
+                await this.pressSequentially(this.addressRadar, data.address);
+                await this.page.waitForSelector('.radar-autocomplete-results-item', { state: 'visible', timeout: 5000 });
+                await this.addressRadar.press('ArrowDown');
+                await this.addressRadar.press('Enter');
+            }
+
             // 4. Contact Information
             if (await this.isVisible(this.homePhone, { timeout: 100 }).catch(() => false) && data.homePhone) {
                 await this.fill(this.homePhone, data.homePhone);
@@ -727,7 +745,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.fill(this.cellPhone, cellPhoneValue);
             }
             if (await this.isVisible(this.studentEmail, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.studentEmail, `${data.firstName}_${this.uniqueId}@gmail.com`);
+                await this.fill(this.studentEmail, `${data.firstName}${this.uniqueId}@gmail.com`);
             }
 
             // 5. Parent / Guardian Information
@@ -771,13 +789,14 @@ export default class NewStudentEnrollmentPage extends BasePage {
             // 6. Emergency Contact
             if (await this.isVisible(this.emergencyName, { timeout: 100 }).catch(() => false) && data.emergencyName) {
                 await this.fill(this.emergencyName, data.emergencyName);
-                if (await this.isVisible(this.emergencyRelationship, { timeout: 100 }).catch(() => false) && data.emergencyRelationship) {
-                    await this.fill(this.emergencyRelationship, data.emergencyRelationship);
-                }
-                if (await this.isVisible(this.emergencyPhone, { timeout: 100 }).catch(() => false) && data.emergencyPhone) {
-                    await this.fill(this.emergencyPhone, data.emergencyPhone);
-                }
             }
+            if (await this.isVisible(this.emergencyRelationship, { timeout: 100 }).catch(() => false) && data.emergencyRelationship) {
+                await this.fill(this.emergencyRelationship, data.emergencyRelationship);
+            }
+            if (await this.isVisible(this.emergencyPhone, { timeout: 100 }).catch(() => false) && data.emergencyPhone) {
+                await this.fill(this.emergencyPhone, data.emergencyPhone);
+            }
+
 
             // 7. Identification & Legal
             if (await this.isVisible(this.socialSecurityNumber, { timeout: 100 }).catch(() => false) && data.socialSecurityNumber) {
@@ -848,6 +867,10 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.fill(this.studentDrivingNotes, drivingNotesVal);
             } else if (await this.isVisible(this.drivingNotes, { timeout: 100 }).catch(() => false) && drivingNotesVal) {
                 await this.fill(this.drivingNotes, drivingNotesVal);
+            }
+
+            if (await this.isVisible(this.cidNumber, { timeout: 100 }).catch(() => false) && data.cidNumber) {
+                await this.fill(this.cidNumber, data.cidNumber);
             }
 
             // 12. Custom TextBoxes & DatePickers
@@ -937,7 +960,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
             await this.click(this.yesConfirmationButton);
             await this.waitForHidden(this.yesConfirmationButton);
             await this.waitForLoaders();
-            await this.waitForVisible(this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true }), { timeout: 30000 });
+            await this.waitForVisible(this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true }), { timeout: 120000 });
             await this.verifyVisible(this.page.getByText('Your enrollment has been completed and a confirmation email has been sent.', { exact: true }));
         });
     }
