@@ -308,12 +308,12 @@ export default class InstructorPage extends BasePage {
     }
 
     /**
-     * Finds an unoccupied, visible grid slot in the SAME instructor column as the existing appointment (different time slot).
+     * Finds an unoccupied, visible grid slot in the for copying
      * @param {Object|string} studentName - Student object or student name string.
      * @param {number} [skipCount=0] - Number of free slots to skip in that column.
      * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell in the same column.
      **/
-    async findAvailableSlotInMultiInstructor(studentName, skipCount = 0) {
+    async findAvailableSlotForCopy(studentName, skipCount = 0) {
         const searchText = this.getStudentSearchText(studentName);
         const freeIndex = await this.page.evaluate(({ search, skip }) => {
             /** @type {HTMLTableCellElement[]} */
@@ -654,7 +654,7 @@ export default class InstructorPage extends BasePage {
                     });
                 }, { timeout: 8000 }).catch(() => { });
 
-                const slot = await this.findAvailableSlotInMultiInstructor(studentName, attempt - 1);
+                const slot = await this.findAvailableSlotForCopy(studentName, attempt - 1);
                 if (this.page.url().includes("StaffMobile")) {
                     await slot.click();
                 }
