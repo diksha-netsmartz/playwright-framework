@@ -43,7 +43,8 @@ export default class NewStudentEnrollmentPage extends BasePage {
         this.firstName = page.getByRole('textbox', { name: 'First Name' });
         this.middleName = page.getByRole('textbox', { name: 'Middle Name' });
         this.lastName = page.getByRole('textbox', { name: 'Last Name' });
-        this.address = page.locator('#Address');
+        this.address = page.getByRole('textbox', { name: 'Address' })
+        this.addressRadar = page.getByRole('combobox', { name: 'Address' })
         this.addressSelectionDropdown = page.locator("xpath=(//div[@class='pac-item']//span[text()='New York'])[1]");
         this.city = page.getByRole('textbox', { name: 'City' })
         // this.city = page.locator('div').filter({ hasText: 'Los Angeles CountyCA, USA' }).first();
@@ -437,6 +438,13 @@ export default class NewStudentEnrollmentPage extends BasePage {
                 await this.fill(this.city, data.city);
             }
 
+            if (await this.isVisible(this.addressRadar, { timeout: 100 }).catch(() => false)) {
+                await this.pressSequentially(this.addressRadar, data.address);
+                await this.page.waitForSelector('.radar-autocomplete-results-item', { state: 'visible', timeout: 5000 });
+                await this.addressRadar.press('ArrowDown');
+                await this.addressRadar.press('Enter');
+            }
+
             // 3. Contact Information
             if (await this.isVisible(this.homePhone, { timeout: 100 }).catch(() => false) && data.homePhone) {
                 await this.fill(this.homePhone, data.homePhone);
@@ -717,6 +725,13 @@ export default class NewStudentEnrollmentPage extends BasePage {
 
             if (await this.isVisible(this.address, { timeout: 100 }).catch(() => false) && data.address) {
                 await this.fill(this.address, data.address);
+            }
+
+            if (await this.isVisible(this.addressRadar, { timeout: 100 }).catch(() => false)) {
+                await this.pressSequentially(this.addressRadar, data.address);
+                await this.page.waitForSelector('.radar-autocomplete-results-item', { state: 'visible', timeout: 5000 });
+                await this.addressRadar.press('ArrowDown');
+                await this.addressRadar.press('Enter');
             }
 
             // 4. Contact Information

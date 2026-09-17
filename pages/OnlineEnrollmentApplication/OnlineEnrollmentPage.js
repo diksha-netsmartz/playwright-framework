@@ -34,7 +34,8 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.firstNameTxt = page.getByRole('textbox', { name: 'First Name' });
         this.middlenameTxt = page.getByRole('textbox', { name: 'Middle Name' });
         this.lastNameTxt = page.getByRole('textbox', { name: 'Last Name' });
-        this.addressTxt = page.locator('#Address');
+        this.addressTxt = page.getByRole('textbox', { name: 'Address' });
+        this.addressRadar = page.getByRole('combobox', { name: 'Address' })
         this.addressSelectionDropdown = page.locator("xpath=(//div[@class='pac-item']//span[text()='New York'])[1]");
         this.zipCodeTxt = page.locator('#ZipPostalCode');
         this.homePhoneTxt = page.getByRole('textbox', { name: 'Home Phone' });
@@ -323,6 +324,14 @@ export default class OnlineEnrollmentPage extends BasePage {
             if (await this.isVisible(this.addressTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fillAddress(data.address);
             }
+
+            if (await this.isVisible(this.addressRadar, { timeout: 100 }).catch(() => false)) {
+                await this.pressSequentially(this.addressRadar, data.address);
+                await this.page.waitForSelector('.radar-autocomplete-results-item', { state: 'visible', timeout: 5000 });
+                await this.addressRadar.press('ArrowDown');
+                await this.addressRadar.press('Enter');
+            }
+
             if (await this.isVisible(this.homePhoneTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.homePhoneTxt, `(212)${random7.slice(0, 3)}-${random7.slice(3)}`);
             }
