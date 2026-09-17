@@ -14,7 +14,7 @@ import discountData from '../../test-data/json/discountData.json';
  *   Step 2 - From the side menu, navigate to Account Management > Services > Discounts
  *   Step 3 - Click on "Add New" and fill all the discount details (Date.now() name & random code)
  *   Step 4 - Click on Save button and verify discount added successfully
- *   Step 5 - Search the created Discount and click on Edit
+ *   Step 5 - Search the created Discount, click on Edit, and verify added details
  *   Step 6 - Update discount fields (Amount, Notes, Status) and save edited Discount
  *   Step 7 - Verify discount updated successfully
  * Expected Result:
@@ -47,8 +47,9 @@ test('TC_031: C-Admin >> Account Management >> Services >> Discount - To verify 
         await discountsPage.verifyDiscountAddedSuccessfully();
     });
 
-    await test.step('Step 5: Search the created Discount and click on Edit', async () => {
+    await test.step('Step 5: Search the created Discount, click on Edit, and verify added details', async () => {
         await discountsPage.searchAndEditDiscount();
+        await discountsPage.verifyDiscountDetails(discountData);
     });
 
     await test.step('Step 6: Update fields and save edited Discount', async () => {
