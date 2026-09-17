@@ -2,7 +2,7 @@ import { test } from "@playwright/test";
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage";
-import SingleInstructorPage from "../../pages/Common/Scheduling/SingleInstructor/SingleInstructorPage";
+import InstructorPage from "../../pages/Common/Scheduling/SingleInstructor/InstructorPage";
 import CombinedAppointmentPage from "../../pages/Common/Scheduling/SingleInstructor/CombinedAppointmentPage";
 import TestDataGenerator from "../../utils/TestDataGenerator";
 import createAppointmentData from "../../test-data/json/createAppointmentData.json";
@@ -18,7 +18,7 @@ test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);
-    const instructorPage = new SingleInstructorPage(page);
+    const instructorPage = new InstructorPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];

@@ -1,7 +1,8 @@
 {
   "student1": {
     "name": "test student1",
-    "pickup": "test PU1231",
+    "pickup": "pickup location one",
+    "dropoff": "dropoff location one",
     "notes": "note student1",
     "firstName": "test",
     "middleName": "test1",
@@ -39,7 +40,8 @@
   },
   "student2": {
     "name": "test student2",
-    "pickup": "test PU123e",
+    "pickup": "pickup location two",
+    "dropoff": "dropoff location two",
     "notes": "note student2"
   }
 }

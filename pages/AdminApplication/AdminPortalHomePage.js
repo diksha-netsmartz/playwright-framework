@@ -22,9 +22,8 @@ export default class AdminPortalHomePage extends BasePage {
         this.newStudentEnrollment = page.locator('strong:has-text("New Student Enrollment")')
 
         // Scheduling
-        this.singleInstructorLink = page.locator("#scheduling_SingleInstructor_li").getByRole("link", {
-            name: "Single Instructor"
-        });
+        this.singleInstructorLink = page.locator("#scheduling_SingleInstructor_li").getByRole("link", { name: "Single Instructor" });
+        this.multiInstructorLink = page.locator("#scheduling_MultiInstructor_li").getByRole("link", { name: "Multi Instructor" });
         this.manageTimeSlotsLink = page.locator('b').filter({ hasText: 'Manage Time Slots' })
         this.bulkAppointmentLink = page.locator("#li_scheduling_managetimeslots_bulkappointments");
         this.bulkProcessLink = page.locator("#li_scheduling_managetimeslots_bulkprocess");
@@ -90,6 +89,7 @@ export default class AdminPortalHomePage extends BasePage {
         // Communication
         this.communicationMenu = page.getByText('Communication', { exact: true });
         this.communicationCenterLink = page.locator("#settings_StudentCenter");
+        this.emailTemplatesLink = page.locator("#settings_EmailTemplates");
 
     }
 
@@ -130,6 +130,21 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 60000 });
             await this.verifyTitle("Single Instructor Scheduler");
+        });
+    }
+
+    /**
+ * Navigates to the Multi-Instructor scheduling page via Scheduling menu.
+ **/
+    async navigateToMultiInstructor() {
+        await test.step('Navigate to Scheduling -> Multi Instructor', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schedulingMenu);
+            await this.click(this.schedulingMenu);
+            await this.click(this.multiInstructorLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 });
+            await this.verifyTitle("Multi Instructor Scheduler");
         });
     }
 
@@ -695,6 +710,22 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
             await this.verifyTitle("Communication Center");
+        });
+    }
+
+    /**
+         * Navigates to Communication > Email Templates via side menu.
+         **/
+    async navigateToEmailTemplates() {
+        await test.step('Navigate to Communication -> Email Templates', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.communicationMenu);
+            await this.click(this.communicationMenu);
+            await this.waitForVisible(this.emailTemplatesLink);
+            await this.click(this.emailTemplatesLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+            await this.verifyTitle("Email Templates");
         });
     }
 

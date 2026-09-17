@@ -34,7 +34,7 @@ export default class LocationsPage extends BasePage {
         this.addressInput = page.getByRole('textbox', { name: 'Address' });
         this.cityInput = page.getByRole('textbox', { name: 'City' });
         this.stateDropdown = page.locator("xpath=//select[@name='State']//parent::div//button");
-        this.stateOptionFL = page.locator("(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]");
+        this.stateOption = page.locator("(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]");
         this.zipInput = page.getByRole('textbox', { name: 'Zip' });
         this.mainPhoneInput = page.locator("#PhoneMain");
         this.countyInput = page.locator('#County');
@@ -136,37 +136,37 @@ export default class LocationsPage extends BasePage {
             await this.fill(this.cityInput, city);
 
             await this.click(this.stateDropdown);
-            await this.waitForVisible(this.stateOptionFL);
-            await this.click(this.stateOptionFL);
+            await this.waitForVisible(this.stateOption);
+            await this.click(this.stateOption);
             await this.fill(this.zipInput, zip);
             await this.fill(this.mainPhoneInput, mainPhone);
 
 
-            if (await this.isVisible(this.countyInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.countyInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.countyInput, data.county)
             }
 
-            if (await this.isVisible(this.faxInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.faxInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.faxInput, data.fax)
             }
 
-            if (await this.isVisible(this.locationManagerInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.locationManagerInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.locationManagerInput, data.locationManager)
             }
 
-            if (await this.isVisible(this.zoomMailInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.zoomMailInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.zoomMailInput, data.zoomEmail)
             }
 
-            if (await this.isVisible(this.providerLocationIdInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.providerLocationIdInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.providerLocationIdInput, data.providerLocationId)
             }
 
-            if (await this.isVisible(this.distanceCoverageInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.distanceCoverageInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.distanceCoverageInput, data.distanceCoverage)
             }
 
-            if (await this.isVisible(this.areaCoverageSelectableItem, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.areaCoverageSelectableItem, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.areaCoverageSelectableItem);
             }
 

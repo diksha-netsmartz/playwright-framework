@@ -4,14 +4,14 @@ import CombinedAppointmentPage from "./CombinedAppointmentPage";
 import DateHelper from "../../../../utils/DateHelper";
 
 /**
- * Page Object representing the Single Instructor Scheduler View in Admin Portal.
+ * Page Object representing the Instructor Scheduler View (Single & Multi Instructor) in Admin Portal.
  * Handles selecting instructors, finding unoccupied calendar slots, creating, editing, copying/pasting,
  * deleting active appointments, and managing cancelled/no-show appointment records.
  **/
-export default class SingleInstructorPage extends BasePage {
+export default class InstructorPage extends BasePage {
 
     /**
-     * Initializes locators for the Single Instructor Scheduler Page.
+     * Initializes locators for the Instructor Scheduler Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
      **/
     constructor(page) {
@@ -27,18 +27,12 @@ export default class SingleInstructorPage extends BasePage {
         // Buttons
         this.getScheduleBtn = page.getByRole("button", { name: "Get Schedule" });
         this.singleInstructorTextbox = page.locator("xpath=//button[contains(@data-id,'SingleInst')]//parent::div//input[@type='text']");
-
+        this.multiInstructorDropdown = page.locator("//div[@id='divInstructors']//button[@title='PLEASE SELECT']");
+        this.multiInstructorSelectAll = page.locator('label').filter({ hasText: 'Select All' }).first();
+        this.multiInstructorDropdownAfterSelection = page.locator("//div[@id='divInstructors']//span[contains(text(),'All selected')]");
         this.appointmentConfirmed = page.locator("xpath=//div[@data-statuss1='Confirmed' and @data-types='Appointment']");
-
-        this.timeSlot = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[10]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[1]");
-        this.timeSlot2 = page.locator("xpath=((//div[@id='scheduler']//tr[@role='row'])[10]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))])[2]");
-
-        this.allSlotsInRow = (rowIndex) => page.locator(
-            `xpath=(//div[@id='scheduler']//tr[@role='row'])[${rowIndex}]//td[@role='gridcell' and not(contains(@class,'k-nonwork-hour'))]`
-        );
-
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
-        this.calendarPrevBtn = page.getByRole('group').filter({ hasText: 'Single Instructor View:' }).getByLabel('Previous').first();
+        this.calendarPrevBtn = page.getByRole('group').filter({ hasText: /Instructor View:/ }).getByLabel('Previous').first();
         this.listMenuOfANoShowAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='No Show']//span[@data-types='Appointment']//img)[1]");
         this.listMenuOfCancelledAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//span[@data-types='Appointment']//img)[1]");
         this.deleteCancelledAppointmentButton = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//a[@href='cancelAppt'])[1]");
@@ -181,6 +175,21 @@ export default class SingleInstructorPage extends BasePage {
     }
 
     /**
+     * Selects All From Multi Instructor Dropdown if Multi Instructor Dropdown has no option selected.
+     **/
+    async selectAllFromMultiInstructor() {
+        if (await this.isVisible(this.multiInstructorDropdown, { timeout: 2000 })) {
+            await test.step(`Select All From Multi Instructor Dropdown`, async () => {
+                await this.click(this.multiInstructorDropdown);
+                await this.waitForVisible(this.multiInstructorSelectAll);
+                await this.click(this.multiInstructorSelectAll);
+                await this.click(this.multiInstructorDropdownAfterSelection);
+                await this.getSchedule();
+            });
+        }
+    }
+
+    /**
      * Clicks the 'Get Schedule' button to load the selected instructor's timetable grid.
      **/
     async getSchedule() {
@@ -256,9 +265,7 @@ export default class SingleInstructorPage extends BasePage {
     async findAvailableSlot(skipCount = 0) {
         const freeIndex = await this.page.evaluate((skip) => {
             const cells = Array.from(
-                // document.querySelectorAll("#scheduler td[role='gridcell']:not(.k-nonwork-hour)")
-                document.querySelectorAll("#scheduler td[role='gridcell']")
-
+                document.querySelectorAll("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell']")
             );
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
@@ -295,8 +302,136 @@ export default class SingleInstructorPage extends BasePage {
 
         if (freeIndex === -1) throw new Error("No available slot found in the scheduler");
         console.log(`Found available slot at index ${freeIndex}`);
-        // const slot = this.page.locator("#scheduler td[role='gridcell']:not(.k-nonwork-hour)").nth(freeIndex);
-        const slot = this.page.locator("#scheduler td[role='gridcell']").nth(freeIndex);
+        const slot = this.page.locator("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell']").nth(freeIndex);
+        await slot.scrollIntoViewIfNeeded();
+        return slot;
+    }
+
+    /**
+     * Finds an unoccupied, visible grid slot in the SAME instructor column as the existing appointment (different time slot).
+     * @param {Object|string} studentName - Student object or student name string.
+     * @param {number} [skipCount=0] - Number of free slots to skip in that column.
+     * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell in the same column.
+     **/
+    async findAvailableSlotInMultiInstructor(studentName, skipCount = 0) {
+        const searchText = this.getStudentSearchText(studentName);
+        const freeIndex = await this.page.evaluate(({ search, skip }) => {
+            /** @type {HTMLTableCellElement[]} */
+            const cells = Array.from(
+                document.querySelectorAll("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell']")
+            );
+            const appointments = Array.from(
+                document.querySelectorAll("div.k-event, div[data-types='Appointment']")
+            );
+
+            // Locate the target appointment element
+            const targetAppt = document.querySelector(
+                `div[data-formattedstudentname='${search}'], div[data-formattedstudentname2='${search}']`
+            ) || appointments.find(a => {
+                const s1 = a.getAttribute('data-formattedstudentname') || '';
+                const s2 = a.getAttribute('data-formattedstudentname2') || '';
+                const text = a.textContent || '';
+                return s1.includes(search) || s2.includes(search) || text.includes(search);
+            });
+
+            let targetCenterX = null;
+            let targetColIndex = null;
+            let targetApptBottom = null;
+
+            if (targetAppt) {
+                const rect = targetAppt.getBoundingClientRect();
+                targetCenterX = (rect.left + rect.right) / 2;
+                targetApptBottom = rect.bottom;
+
+                // Find the column index of the cell matching targetCenterX
+                for (const cell of cells) {
+                    const cRect = cell.getBoundingClientRect();
+                    if (cRect.width > 0 && cRect.left <= targetCenterX && cRect.right >= targetCenterX) {
+                        targetColIndex = cell.cellIndex !== undefined ? cell.cellIndex : null;
+                        break;
+                    }
+                }
+            }
+
+            let skipped = 0;
+
+            // First pass: Find free slot in the same column AFTER (below) the existing appointment
+            for (let i = 0; i < cells.length; i++) {
+                const cell = cells[i];
+                const cellBox = cell.getBoundingClientRect();
+
+                if (cellBox.width === 0 || cellBox.height === 0) continue;
+
+                if (targetCenterX !== null) {
+                    const cellCenterX = (cellBox.left + cellBox.right) / 2;
+                    const isSameCol = targetColIndex !== null
+                        ? (cell.cellIndex === targetColIndex || Math.abs(cellCenterX - targetCenterX) < 20)
+                        : Math.abs(cellCenterX - targetCenterX) < 20;
+
+                    if (!isSameCol) continue;
+
+                    // Prefer slots later in time than the appointment
+                    if (targetApptBottom !== null && cellBox.top < targetApptBottom - 5) {
+                        continue;
+                    }
+                }
+
+                const hasApptOverlap = appointments.some(appt => {
+                    const apptBox = appt.getBoundingClientRect();
+                    if (apptBox.width === 0 || apptBox.height === 0) return false;
+                    return (
+                        apptBox.left < cellBox.right &&
+                        apptBox.right > cellBox.left &&
+                        apptBox.top < cellBox.bottom &&
+                        apptBox.bottom > cellBox.top
+                    );
+                });
+
+                if (!hasApptOverlap) {
+                    if (skipped === skip) return i;
+                    skipped++;
+                }
+            }
+
+            // Second pass (fallback): Find ANY free slot in the same column (if none below)
+            if (targetCenterX !== null) {
+                skipped = 0;
+                for (let i = 0; i < cells.length; i++) {
+                    const cell = cells[i];
+                    const cellBox = cell.getBoundingClientRect();
+                    if (cellBox.width === 0 || cellBox.height === 0) continue;
+
+                    const cellCenterX = (cellBox.left + cellBox.right) / 2;
+                    const isSameCol = targetColIndex !== null
+                        ? (cell.cellIndex === targetColIndex || Math.abs(cellCenterX - targetCenterX) < 20)
+                        : Math.abs(cellCenterX - targetCenterX) < 20;
+
+                    if (!isSameCol) continue;
+
+                    const hasApptOverlap = appointments.some(appt => {
+                        const apptBox = appt.getBoundingClientRect();
+                        if (apptBox.width === 0 || apptBox.height === 0) return false;
+                        return (
+                            apptBox.left < cellBox.right &&
+                            apptBox.right > cellBox.left &&
+                            apptBox.top < cellBox.bottom &&
+                            apptBox.bottom > cellBox.top
+                        );
+                    });
+
+                    if (!hasApptOverlap) {
+                        if (skipped === skip) return i;
+                        skipped++;
+                    }
+                }
+            }
+
+            return -1;
+        }, { search: searchText, skip: skipCount });
+
+        if (freeIndex === -1) throw new Error(`No available slot found in the same column for student "${searchText}"`);
+        console.log(`Found available slot in same column at index ${freeIndex}`);
+        const slot = this.page.locator("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell']").nth(freeIndex);
         await slot.scrollIntoViewIfNeeded();
         return slot;
     }
@@ -604,6 +739,127 @@ export default class SingleInstructorPage extends BasePage {
             }
 
             throw new Error("Could not paste appointment: student not available in any of the tried slots");
+        });
+    }
+
+    /**
+     * Copies an existing appointment and pastes it into an available time slot in the SAME instructor column under Multi Instructor view.
+     * @param {Object|string} studentName - Student object or student name string.
+     **/
+    async copyAppointmentInMultiInstructor(studentName) {
+        await test.step(`Copy and paste appointment in Multi Instructor for: "${this.getStudentSearchText(studentName)}"`, async () => {
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 15000 });
+            await this.waitForVisible(this.listMenuOfCreatedAppointment(studentName));
+            await this.click(this.listMenuOfCreatedAppointment(studentName));
+            await this.page.waitForTimeout(2500);
+
+            try {
+                await this.waitForVisible(this.copyAppointmentLink);
+            } catch {
+                console.log("Copy appointment link was not visible. Re-clicking the list menu...");
+                await this.click(this.listMenuOfCreatedAppointment(studentName));
+                await this.waitForVisible(this.copyAppointmentLink);
+            }
+            await this.click(this.copyAppointmentLink);
+
+            const maxRetries = 20;
+
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                await this.page.waitForFunction(() => {
+                    const container = document.querySelector('#toast-container');
+                    return !container || Array.from(container.children).every(c => {
+                        const el = /** @type {HTMLElement} */ (c);
+                        return !el.offsetParent || getComputedStyle(el).display === 'none';
+                    });
+                }, { timeout: 8000 }).catch(() => { });
+
+                const slot = await this.findAvailableSlotInMultiInstructor(studentName, attempt - 1);
+                await slot.click({ button: "right" });
+
+                // Setup MutationObserver to capture toast message
+                const toastPromise = this.page.evaluate(() => {
+                    return new Promise((resolve) => {
+                        const getToast = () => {
+                            const toasts = Array.from(document.querySelectorAll('#toast-container .toast, .toast'));
+                            for (let i = toasts.length - 1; i >= 0; i--) {
+                                const toast = toasts[i];
+                                const style = window.getComputedStyle(toast);
+                                if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+                                    const msgEl = toast.querySelector('.toast-message');
+                                    const text = ((msgEl ? msgEl.textContent : toast.textContent) || '').trim();
+                                    if (text.length > 0) return text;
+                                }
+                            }
+                            const fallback = document.querySelector('#toast-container .toast-message, .toast-message');
+                            if (fallback) {
+                                const text = (fallback.textContent || '').trim();
+                                if (text.length > 0) return text;
+                            }
+                            return null;
+                        };
+
+                        const initial = getToast();
+                        if (initial) return resolve(initial);
+
+                        const observer = new MutationObserver(() => {
+                            const text = getToast();
+                            if (text) {
+                                observer.disconnect();
+                                resolve(text);
+                            }
+                        });
+
+                        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+                        setTimeout(() => {
+                            observer.disconnect();
+                            resolve('');
+                        }, 5000);
+                    });
+                }).catch(() => '');
+
+                await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
+
+                try {
+                    await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 1500 });
+                    await this.click(this.submitButtonPopup);
+                } catch {
+                    console.log("Submit confirmation popup did not appear.");
+                }
+
+                const message = (await toastPromise) || '';
+
+                if (!message) {
+                    console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
+                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
+                    if (appointmentCount >= 2) {
+                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
+                        return;
+                    }
+                }
+
+                console.log(`Slot attempt ${attempt}: Toast message = "${message}"`);
+
+                if (message.includes("Appointment created successfully.")) {
+                    console.log(`Success on attempt ${attempt}: ${message}`);
+                    return;
+                } else {
+                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
+                    if (appointmentCount >= 2) {
+                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
+                        return;
+                    }
+
+                    console.log(`Non-success toast received: "${message}"`);
+                    await this.page.locator('#toast-container .toast').waitFor({
+                        state: 'hidden',
+                        timeout: 5000
+                    }).catch(() => { });
+                }
+            }
+
+            throw new Error("Could not paste appointment in Multi Instructor: student not available in any of the tried slots in the same column");
         });
     }
 

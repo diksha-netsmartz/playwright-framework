@@ -182,9 +182,6 @@ export default class ComponentsPage extends BasePage {
             if (await this.isVisible(this.inCarLessonCheckbox, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.inCarLessonCheckbox);
             }
-
-            // await this.page.pause();
-
         });
 
     }
