@@ -58,7 +58,7 @@ export default class MiscellaneousPage extends BasePage {
      **/
     async fillMiscDetails(data = {}) {
         return await test.step('Fill miscellaneous item details', async () => {
-            const prefix = data.miscName || 'MiscItem';
+            const prefix = data.miscellaneousName || 'MiscItem';
             this.miscName = `${prefix}_${Date.now()}`;
             const price = data.price || '100.00';
 
@@ -73,13 +73,11 @@ export default class MiscellaneousPage extends BasePage {
 
 
             // Select Status to Active
-            await this.waitForVisible(this.statusDropdown);
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionActive);
             await this.click(this.statusDropdownOptionActive);
 
             // Fill Price
-            await this.waitForVisible(this.priceInput);
             await this.fill(this.priceInput, price);
 
             return this.miscName;
@@ -131,6 +129,22 @@ export default class MiscellaneousPage extends BasePage {
     }
 
     /**
+     * Verifies that the miscellaneous item details in the edit form match the values added during creation.
+     * @param {Object} data - Expected miscellaneous item data fixture.
+     **/
+    async verifyMiscDetails(data = {}) {
+        await test.step('Verify miscellaneous item details in edit form match added values', async () => {
+            await this.waitForVisible(this.miscNameInput, { timeout: 5000 });
+            await expect(this.miscNameInput).toHaveValue(this.miscName);
+            await expect(this.typeDropdown).toContainText('Apparel');
+            await expect(this.statusDropdown).toContainText('Active');
+            const actualPrice = await this.priceInput.inputValue();
+            expect(parseFloat(actualPrice)).toBe(parseFloat(data.price));
+
+        });
+    }
+
+    /**
      * Modifies the miscellaneous fields (Category, Status, Price) on the Edit form.
      * @param {Object} data - Update data from fixture.
      **/
@@ -147,13 +161,11 @@ export default class MiscellaneousPage extends BasePage {
             await this.click(this.typeOptionDVD);
 
             // Update Status to Deleted
-            await this.waitForVisible(this.statusDropdown);
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionDeleted);
             await this.click(this.statusDropdownOptionDeleted);
 
             // Update Price
-            await this.waitForVisible(this.priceInput);
             await this.fill(this.priceInput, updatedPrice);
         });
     }

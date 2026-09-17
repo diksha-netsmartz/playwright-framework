@@ -14,7 +14,7 @@ import miscData from '../../test-data/json/miscellaneousData.json';
  *   Step 2 - From the side menu, navigate to Account Management > Services > Miscellaneous
  *   Step 3 - Click on "Add New" and fill all the fields (prefix + Date.now() for item name)
  *   Step 4 - Click on Save button and verify miscellaneous item added successfully
- *   Step 5 - Navigate to the miscellaneous item created in above steps and click on edit button
+ *   Step 5 - Search the created Miscellaneous item, click on Edit, and verify added details
  *   Step 6 - Edit fields (Category, Status, Price) and save
  *   Step 7 - Verify miscellaneous item edited successfully
  * Expected Result:
@@ -47,8 +47,9 @@ test('TC_032: C-Admin >> Account Management >> Services >> Misc - To verify user
         await miscPage.verifyMiscAddedSuccessfully();
     });
 
-    await test.step('Step 5: Search the created Miscellaneous item and click on Edit', async () => {
+    await test.step('Step 5: Search the created Miscellaneous item, click on Edit, and verify added details', async () => {
         await miscPage.searchAndEditMisc();
+        await miscPage.verifyMiscDetails(miscData);
     });
 
     await test.step('Step 6: Update fields and save edited Miscellaneous item', async () => {
