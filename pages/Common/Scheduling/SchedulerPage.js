@@ -31,12 +31,8 @@ export default class SchedulerPage extends BasePage {
         this.multiInstructorSelectAll = page.locator('label').filter({ hasText: 'Select All' }).first();
         this.multiInstructorDropdownAfterSelection = page.locator("//div[@id='divInstructors']//span[contains(text(),'All selected')]");
         this.locationDropdownValueSelect = page.locator("(//button[contains(@data-id,'SingleLoc')]//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
-        this.appointmentConfirmed = page.locator("xpath=//div[@data-statuss1='Confirmed' and @data-types='Appointment']");
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
         this.calendarPrevBtn = page.getByRole('group').filter({ hasText: /Instructor View:/ }).getByLabel('Previous').first();
-        this.listMenuOfANoShowAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='No Show']//span[@data-types='Appointment']//img)[1]");
-        this.listMenuOfCancelledAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//span[@data-types='Appointment']//img)[1]");
-        this.deleteCancelledAppointmentButton = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//a[@href='cancelAppt'])[1]");
     }
 
     /**
@@ -71,17 +67,6 @@ export default class SchedulerPage extends BasePage {
      * @returns {import('@playwright/test').Locator} All matching action menu icons locator.
      **/
     allListMenusOfCreatedAppointments(studentName) {
-        const text = this.getStudentSearchText(studentName);
-        return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
-
-    }
-
-    /**
-     * Returns locator for all action menu icons matching an appointment with specified student name.
-     * @param {Object|string} studentName - Student object or name string.
-     * @returns {import('@playwright/test').Locator} Action menu locator.
-     **/
-    listMenuInAppointment(studentName) {
         const text = this.getStudentSearchText(studentName);
         return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
 
@@ -130,16 +115,6 @@ export default class SchedulerPage extends BasePage {
         });
     }
 
-    /**
-     * Returns locator for the last option item in the specified dropdown.
-     * @param {string} dropdownName - Dropdown data-id identifier.
-     * @returns {import('@playwright/test').Locator} Last dropdown list item locator.
-     **/
-    getLastDropdownOption(dropdownName) {
-        return this.page.locator(
-            `xpath=(//button[contains(@data-id,'${dropdownName}')]//parent::div//li)[last()]`
-        );
-    }
 
     /**
      * Returns locator for a dropdown option item matching text/name in the specified dropdown.
@@ -233,41 +208,6 @@ export default class SchedulerPage extends BasePage {
 
             await this.click(this.page.locator(`xpath=//a[@data-value="${dataValue}"]`).first());
         });
-    }
-
-    /**
-     * Evaluates in-browser whether a scheduler grid cell is currently overlapped by an existing appointment block.
-     * @param {import('@playwright/test').Locator} cell - Scheduler gridcell locator.
-     * @returns {Promise<boolean>} True if the slot is occupied, false otherwise.
-     **/
-    async isSlotOccupied(cell) {
-        const handle = await cell.elementHandle();
-        return this.page.evaluate((cellEl) => {
-            const cellBox = cellEl.getBoundingClientRect();
-            if (cellBox.width === 0 || cellBox.height === 0) return true;
-
-            const centerX = cellBox.left + cellBox.width / 2;
-            const centerY = cellBox.top + cellBox.height / 2;
-            const elAtCenter = document.elementFromPoint(centerX, centerY);
-            if (elAtCenter && !cellEl.contains(elAtCenter) && elAtCenter !== cellEl) {
-                return true;
-            }
-
-            const appointments = Array.from(
-                document.querySelectorAll("div.k-event, div[data-types='Appointment']")
-            );
-            for (const appt of appointments) {
-                const apptBox = appt.getBoundingClientRect();
-                if (apptBox.width === 0 || apptBox.height === 0) continue;
-                const overlaps =
-                    apptBox.left < cellBox.right &&
-                    apptBox.right > cellBox.left &&
-                    apptBox.top < cellBox.bottom &&
-                    apptBox.bottom > cellBox.top;
-                if (overlaps) return true;
-            }
-            return false;
-        }, handle);
     }
 
     /**
