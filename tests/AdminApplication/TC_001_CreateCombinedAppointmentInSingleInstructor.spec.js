@@ -2,8 +2,8 @@ import { test } from "@playwright/test";
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage";
-import InstructorPage from "../../pages/Common/Scheduling/SingleInstructor/InstructorPage";
-import CombinedAppointmentPage from "../../pages/Common/Scheduling/SingleInstructor/CombinedAppointmentPage";
+import SchedulerPage from "../../pages/Common/Scheduling/SchedulerPage";
+import CombinedAppointmentPage from "../../pages/Common/Scheduling/CombinedAppointmentPage";
 import TestDataGenerator from "../../utils/TestDataGenerator";
 import createAppointmentData from "../../test-data/json/createAppointmentData.json";
 import login from "../../test-data/json/login.json";
@@ -18,7 +18,7 @@ test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);
-    const instructorPage = new InstructorPage(page);
+    const schedulerPage = new SchedulerPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];
@@ -62,12 +62,12 @@ test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", {
     });
 
     await test.step('Step 6 & 7: Select instructor and click Get Schedule', async () => {
-        await instructorPage.selectInstructor(credentials.staffUser.username);
-        await instructorPage.getSchedule();
+        await schedulerPage.selectInstructor(credentials.staffUser.username);
+        await schedulerPage.getSchedule();
     });
 
     await test.step('Step 8: Open Create Combined Appointment form', async () => {
-        await instructorPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
+        await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
     });
 
     await test.step('Step 9: Select fields (Location, Vehicle, Students, Duration)', async () => {
@@ -88,7 +88,7 @@ test("TC_001: C-admin > Scheduling - Verify that the appt is getting created", {
     });
 
     await test.step('Step 11: Verify appointment is created successfully and values match runtime students', async () => {
-        await instructorPage.editAppointment(student1);
+        await schedulerPage.editAppointment(student1);
         await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues(student1, student2);
     });
 });

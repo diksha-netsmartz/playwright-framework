@@ -1,17 +1,17 @@
-import BasePage from "../../../../utils/BasePage";
+import BasePage from "../../../utils/BasePage";
 import { expect, test } from "@playwright/test";
 import CombinedAppointmentPage from "./CombinedAppointmentPage";
-import DateHelper from "../../../../utils/DateHelper";
+import DateHelper from "../../../utils/DateHelper";
 
 /**
- * Page Object representing the Instructor Scheduler View (Single & Multi Instructor) in Admin Portal.
+ * Page Object representing the Scheduler View.
  * Handles selecting instructors, finding unoccupied calendar slots, creating, editing, copying/pasting,
  * deleting active appointments, and managing cancelled/no-show appointment records.
  **/
-export default class InstructorPage extends BasePage {
+export default class SchedulerPage extends BasePage {
 
     /**
-     * Initializes locators for the Instructor Scheduler Page.
+     * Initializes locators for the Scheduler Page.
      * @param {import('@playwright/test').Page} page - Playwright Page instance.
      **/
     constructor(page) {
@@ -30,12 +30,9 @@ export default class InstructorPage extends BasePage {
         this.multiInstructorDropdown = page.locator("//div[@id='divInstructors']//button[@title='PLEASE SELECT']");
         this.multiInstructorSelectAll = page.locator('label').filter({ hasText: 'Select All' }).first();
         this.multiInstructorDropdownAfterSelection = page.locator("//div[@id='divInstructors']//span[contains(text(),'All selected')]");
-        this.appointmentConfirmed = page.locator("xpath=//div[@data-statuss1='Confirmed' and @data-types='Appointment']");
+        this.locationDropdownValueSelect = page.locator("(//button[contains(@data-id,'SingleLoc')]//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
         this.calendarPrevBtn = page.getByRole('group').filter({ hasText: /Instructor View:/ }).getByLabel('Previous').first();
-        this.listMenuOfANoShowAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='No Show']//span[@data-types='Appointment']//img)[1]");
-        this.listMenuOfCancelledAppointment = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//span[@data-types='Appointment']//img)[1]");
-        this.deleteCancelledAppointmentButton = page.locator("xpath=(//div[@data-types='Appointment' and @data-statuss1='Open']//a[@href='cancelAppt'])[1]");
     }
 
     /**
@@ -70,17 +67,6 @@ export default class InstructorPage extends BasePage {
      * @returns {import('@playwright/test').Locator} All matching action menu icons locator.
      **/
     allListMenusOfCreatedAppointments(studentName) {
-        const text = this.getStudentSearchText(studentName);
-        return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
-
-    }
-
-    /**
-     * Returns locator for all action menu icons matching an appointment with specified student name.
-     * @param {Object|string} studentName - Student object or name string.
-     * @returns {import('@playwright/test').Locator} Action menu locator.
-     **/
-    listMenuInAppointment(studentName) {
         const text = this.getStudentSearchText(studentName);
         return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
 
@@ -129,16 +115,6 @@ export default class InstructorPage extends BasePage {
         });
     }
 
-    /**
-     * Returns locator for the last option item in the specified dropdown.
-     * @param {string} dropdownName - Dropdown data-id identifier.
-     * @returns {import('@playwright/test').Locator} Last dropdown list item locator.
-     **/
-    getLastDropdownOption(dropdownName) {
-        return this.page.locator(
-            `xpath=(//button[contains(@data-id,'${dropdownName}')]//parent::div//li)[last()]`
-        );
-    }
 
     /**
      * Returns locator for a dropdown option item matching text/name in the specified dropdown.
@@ -190,6 +166,18 @@ export default class InstructorPage extends BasePage {
     }
 
     /**
+   * Selects location from location dropdown value
+   **/
+    async selectLocation() {
+        await test.step(`Select Single Location from dropdown`, async () => {
+            await this.waitForVisible(this.getDropdownButton("SingleLoc"), { timeout: 20000 });
+            await this.click(this.getDropdownButton("SingleLoc"));
+            await this.waitForVisible(this.locationDropdownValueSelect);
+            await this.click(this.locationDropdownValueSelect);
+        });
+    }
+
+    /**
      * Clicks the 'Get Schedule' button to load the selected instructor's timetable grid.
      **/
     async getSchedule() {
@@ -223,41 +211,6 @@ export default class InstructorPage extends BasePage {
     }
 
     /**
-     * Evaluates in-browser whether a scheduler grid cell is currently overlapped by an existing appointment block.
-     * @param {import('@playwright/test').Locator} cell - Scheduler gridcell locator.
-     * @returns {Promise<boolean>} True if the slot is occupied, false otherwise.
-     **/
-    async isSlotOccupied(cell) {
-        const handle = await cell.elementHandle();
-        return this.page.evaluate((cellEl) => {
-            const cellBox = cellEl.getBoundingClientRect();
-            if (cellBox.width === 0 || cellBox.height === 0) return true;
-
-            const centerX = cellBox.left + cellBox.width / 2;
-            const centerY = cellBox.top + cellBox.height / 2;
-            const elAtCenter = document.elementFromPoint(centerX, centerY);
-            if (elAtCenter && !cellEl.contains(elAtCenter) && elAtCenter !== cellEl) {
-                return true;
-            }
-
-            const appointments = Array.from(
-                document.querySelectorAll("div.k-event, div[data-types='Appointment']")
-            );
-            for (const appt of appointments) {
-                const apptBox = appt.getBoundingClientRect();
-                if (apptBox.width === 0 || apptBox.height === 0) continue;
-                const overlaps =
-                    apptBox.left < cellBox.right &&
-                    apptBox.right > cellBox.left &&
-                    apptBox.top < cellBox.bottom &&
-                    apptBox.bottom > cellBox.top;
-                if (overlaps) return true;
-            }
-            return false;
-        }, handle);
-    }
-
-    /**
      * Evaluates the scheduler DOM to find an unoccupied, visible grid slot in the viewport.
      * @param {number} [skipCount=0] - Number of free slots to skip before returning.
      * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell.
@@ -265,7 +218,7 @@ export default class InstructorPage extends BasePage {
     async findAvailableSlot(skipCount = 0) {
         const freeIndex = await this.page.evaluate((skip) => {
             const cells = Array.from(
-                document.querySelectorAll("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell']")
+                document.querySelectorAll("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']")
             );
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
@@ -302,7 +255,7 @@ export default class InstructorPage extends BasePage {
 
         if (freeIndex === -1) throw new Error("No available slot found in the scheduler");
         console.log(`Found available slot at index ${freeIndex}`);
-        const slot = this.page.locator("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell']").nth(freeIndex);
+        const slot = this.page.locator("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']").nth(freeIndex);
         await slot.scrollIntoViewIfNeeded();
         return slot;
     }
@@ -318,7 +271,7 @@ export default class InstructorPage extends BasePage {
         const freeIndex = await this.page.evaluate(({ search, skip }) => {
             /** @type {HTMLTableCellElement[]} */
             const cells = Array.from(
-                document.querySelectorAll("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell']")
+                document.querySelectorAll("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']")
             );
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
@@ -431,7 +384,7 @@ export default class InstructorPage extends BasePage {
 
         if (freeIndex === -1) throw new Error(`No available slot found in the same column for student "${searchText}"`);
         console.log(`Found available slot in same column at index ${freeIndex}`);
-        const slot = this.page.locator("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell']").nth(freeIndex);
+        const slot = this.page.locator("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']").nth(freeIndex);
         await slot.scrollIntoViewIfNeeded();
         return slot;
     }

@@ -2,8 +2,8 @@ import { test } from "@playwright/test";
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage";
-import InstructorPage from "../../pages/Common/Scheduling/SingleInstructor/InstructorPage";
-import CombinedAppointmentPage from "../../pages/Common/Scheduling/SingleInstructor/CombinedAppointmentPage";
+import SchedulerPage from "../../pages/Common/Scheduling/SchedulerPage";
+import CombinedAppointmentPage from "../../pages/Common/Scheduling/CombinedAppointmentPage";
 import TestDataGenerator from "../../utils/TestDataGenerator";
 import createAppointmentData from "../../test-data/json/createAppointmentData.json";
 import login from "../../test-data/json/login.json";
@@ -19,7 +19,7 @@ test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", { 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);
-    const instructorPage = new InstructorPage(page);
+    const schedulerPage = new SchedulerPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];
@@ -60,12 +60,12 @@ test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", { 
 
     await test.step('Step 5: Navigate to Scheduling > Single Instructor and select schedule', async () => {
         await homePage.navigateToSingleInstructor();
-        await instructorPage.selectInstructor(credentials.staffUser.username);
-        await instructorPage.getSchedule();
+        await schedulerPage.selectInstructor(credentials.staffUser.username);
+        await schedulerPage.getSchedule();
     });
 
     await test.step('Precondition / Setup: Create initial Combined Appointment', async () => {
-        await instructorPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
+        await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
         await combinedAppointmentPage.verifyPopup();
         await combinedAppointmentPage.selectMidTimeDropdown();
         await combinedAppointmentPage.selectEndTimeDropdown();
@@ -80,16 +80,16 @@ test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", { 
     });
 
     await test.step('Step 6: Copy created appointment', async () => {
-        await instructorPage.copyAppointment(student1);
+        await schedulerPage.copyAppointment(student1);
     });
 
     await test.step('Step 7: Paste last copied appointment', async () => {
-        await instructorPage.verifyAppointmentIsCopied(student1);
-        await instructorPage.verifyAppointmentIsCopied(student2);
+        await schedulerPage.verifyAppointmentIsCopied(student1);
+        await schedulerPage.verifyAppointmentIsCopied(student2);
     });
 
     await test.step('Step 8: Verify copied appointment data matches original', async () => {
-        await instructorPage.editAndVerifyDetailsForAllAppointments(student1, student2);
+        await schedulerPage.editAndVerifyDetailsForAllAppointments(student1, student2);
     });
 });
 
