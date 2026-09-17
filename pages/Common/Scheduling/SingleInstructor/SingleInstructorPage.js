@@ -67,7 +67,6 @@ export default class SingleInstructorPage extends BasePage {
      **/
     listMenuOfCreatedAppointment(studentName) {
         const text = this.getStudentSearchText(studentName);
-        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment' and not (@data-statuss1='No Show') and not (@data-statuss2='No Show')]//span[@data-types='Appointment']//img)[last()]`);
         return this.page.locator(`xpath=(//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')])[last()]`);
     }
 
@@ -78,7 +77,6 @@ export default class SingleInstructorPage extends BasePage {
      **/
     allListMenusOfCreatedAppointments(studentName) {
         const text = this.getStudentSearchText(studentName);
-        // return this.page.locator(`xpath=//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
         return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
 
     }
@@ -90,7 +88,6 @@ export default class SingleInstructorPage extends BasePage {
      **/
     listMenuInAppointment(studentName) {
         const text = this.getStudentSearchText(studentName);
-        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
         return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
 
     }
@@ -102,7 +99,6 @@ export default class SingleInstructorPage extends BasePage {
      **/
     listMenuOfNoShowAppointment(studentOrName) {
         const text = this.getStudentSearchText(studentOrName);
-        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img)`);
         return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
 
     }
@@ -114,7 +110,6 @@ export default class SingleInstructorPage extends BasePage {
      **/
     deleteAppointmentButton(studentName) {
         const text = this.getStudentSearchText(studentName);
-        // return this.page.locator(`xpath=(//p[contains(text(),'${text}')]//ancestor::div[@data-types='Appointment']//a[@href='cancelAppt'])[last()]`);
         return this.page.locator(`xpath=(//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//a[@href='cancelAppt'])[last()]`);
     }
 
@@ -756,43 +751,6 @@ export default class SingleInstructorPage extends BasePage {
             await this.waitForLoaders();
         });
     }
-
-    // /**
-    //  * Deletes an open/cancelled appointment slot and verifies success toast.
-    //  **/
-    // async deleteCancelledAppointment() {
-    //     await test.step('Delete cancelled appointment slot', async () => {
-    //         await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 2000 }).catch(() => false);
-    //         await this.hover(this.listMenuOfCancelledAppointment);
-    //         await this.isVisible(this.deleteCancelledAppointmentButton, { timeout: 2000 }).catch(() => false);
-    //         await this.click(this.deleteCancelledAppointmentButton);
-    //         await this.click(this.deleteButtonInPopup);
-    //         await this.waitForHidden(this.deleteButtonInPopup);
-    //         await this.waitForLoaders();
-    //         const toast = this.page.locator('#toast-container .toast-success .toast-message').first();
-    //         await this.verifyVisible(toast);
-    //         await this.verifyText(toast, 'Appointment deleted successfully.');
-    //     });
-    // }
-
-    // /**
-    //  * Opens the edit modal for a cancelled appointment from its action menu.
-    //  **/
-    // async editCancelledAppointment() {
-    //     await test.step('Open Edit modal for cancelled appointment', async () => {
-    //         await this.isVisible(this.listMenuOfCancelledAppointment, { timeout: 5000 }).catch(() => false);
-    //         await this.click(this.listMenuOfCancelledAppointment);
-
-    //         try {
-    //             await this.waitForVisible(this.editAppointmentLink);
-    //         } catch {
-    //             console.log("edit appointment link was not visible. Re-clicking the list menu...");
-    //             await this.click(this.listMenuOfCancelledAppointment);
-    //             await this.waitForVisible(this.editAppointmentLink);
-    //         }
-    //         await this.click(this.editAppointmentLink);
-    //     });
-    // }
 
     /**
      * Opens the edit modal for an appointment matching student name from its action menu.
