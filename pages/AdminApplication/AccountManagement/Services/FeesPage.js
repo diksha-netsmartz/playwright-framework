@@ -24,6 +24,7 @@ export default class FeesPage extends BasePage {
         this.statusDropdownOptionActive = page.locator("xpath=//select[@name='Status']//parent::div//div//span[text()='Active']");
         this.statusDropdownOptionDeleted = page.locator("xpath=//select[@name='Status']//parent::div//div//span[text()='Deleted']");
         this.eligibleServiceSelection = page.locator("xpath=(//li[contains(@attrcolumn,'DiscountPackages')])[1]");
+        this.selectedDiscountPackage = page.locator('.ms-elem-selection.ms-selected').first();
         this.feeAmountInput = page.getByRole('textbox', { name: 'Fee Amount' });
         this.notesInput = page.locator('#Notes');
         this.allowWebPurchaseYesRadioButton = page.locator("xpath=//label[contains(text(),'Yes')]//input[@id='AllowWebPurchase']//following-sibling::ins");
@@ -75,20 +76,18 @@ export default class FeesPage extends BasePage {
             await this.click(this.statusDropdownOptionActive);
 
             // Fill Amount & Notes
-            await this.waitForVisible(this.feeAmountInput);
             await this.fill(this.feeAmountInput, feeAmount);
 
-            if (await this.isVisible(this.eligibleServiceSelection, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.eligibleServiceSelection, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.eligibleServiceSelection)
             }
 
-            await this.waitForVisible(this.notesInput);
             await this.fill(this.notesInput, notes);
 
-            if (await this.isVisible(this.allowWebPurchaseYesRadioButton, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.allowWebPurchaseYesRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.allowWebPurchaseYesRadioButton);
             }
-            if (await this.isVisible(this.allowPortalPurchaseNoRadioButton, { timeout: 1000 }).catch(() => false)) {
+            if (await this.isVisible(this.allowPortalPurchaseNoRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.allowPortalPurchaseNoRadioButton);
             }
             return this.feeName;
@@ -140,10 +139,50 @@ export default class FeesPage extends BasePage {
     }
 
     /**
+     * Verifies that the fee details in the edit form match the values added during creation.
+     * @param {Object} data - Expected fee configuration data fixture.
+     **/
+    async verifyFeeDetails(data = {}) {
+        await test.step('Verify fee details in edit form match added values', async () => {
+            await this.waitForVisible(this.feeNameInput, { timeout: 5000 });
+            await expect(this.feeNameInput).toHaveValue(this.feeName || data.feeName);
+
+            if (await this.isVisible(this.feeAmountInput, { timeout: 100 }).catch(() => false)) {
+                const actualAmount = await this.feeAmountInput.inputValue();
+                expect(parseFloat(actualAmount)).toBe(parseFloat(data.feeAmount));
+            }
+
+            if (await this.isVisible(this.notesInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.notesInput).toHaveValue(data.notes);
+            }
+
+            if (await this.isVisible(this.statusDropdown, { timeout: 100 }).catch(() => false)) {
+                await expect(this.statusDropdown).toContainText('Active');
+            }
+            if (await this.isVisible(this.eligibleServiceSelection, { timeout: 100 }).catch(() => false)) {
+                await this.verifyVisible(this.selectedDiscountPackage);
+            }
+
+            if (await this.isVisible(this.allowWebPurchaseYesRadioButton, { timeout: 100 }).catch(() => false)) {
+                const yesWrapper = this.page.locator("xpath=//input[@id='AllowWebPurchase']//parent::div");
+                if (await yesWrapper.count() > 0) {
+                    await expect(yesWrapper).toHaveClass(/checked/);
+                }
+            }
+            if (await this.isVisible(this.allowPortalPurchaseNoRadioButton, { timeout: 100 }).catch(() => false)) {
+                const noWrapper = this.page.locator("xpath=//input[@id='AllowPortalPurchase']//parent::div");
+                if (await noWrapper.count() > 0) {
+                    await expect(noWrapper).toHaveClass(/checked/);
+                }
+            }
+        });
+    }
+
+    /**
      * Modifies the fee fields (Amount, Notes, Status) on the Edit form.
      * @param {Object} data - Update data from fixture.
      **/
-    async editFeeDetails(data = {}) {
+    async updateFeeDetails(data = {}) {
         await test.step('Update Fee fields (Amount, Notes, Status)', async () => {
             await this.waitForLoaders();
 
@@ -155,11 +194,9 @@ export default class FeesPage extends BasePage {
             await this.fill(this.feeAmountInput, updatedAmount);
 
             // Update Notes
-            await this.waitForVisible(this.notesInput);
             await this.fill(this.notesInput, updatedNotes);
 
             // Update Status (e.g. Deleted / Inactive / Active)
-            await this.waitForVisible(this.statusDropdown);
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionDeleted);
             await this.click(this.statusDropdownOptionDeleted);
