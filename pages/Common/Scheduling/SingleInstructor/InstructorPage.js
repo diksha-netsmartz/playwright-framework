@@ -623,131 +623,11 @@ export default class InstructorPage extends BasePage {
     }
 
     /**
-     * Copies an existing appointment, finds available slots, pastes it via context menu, confirms modal, and verifies success toast.
+     * Copies an existing appointment and pastes it into an available time slot.
      * @param {Object|string} studentName - Student object or student name string.
      **/
     async copyAppointment(studentName) {
-        await test.step(`Copy and paste appointment for: "${this.getStudentSearchText(studentName)}"`, async () => {
-            await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 15000 })
-            await this.waitForVisible(this.listMenuOfCreatedAppointment(studentName));
-            await this.click(this.listMenuOfCreatedAppointment(studentName));
-            await this.page.waitForTimeout(2500);
-
-            try {
-                await this.waitForVisible(this.copyAppointmentLink);
-            } catch {
-                console.log("Copy appointment link was not visible. Re-clicking the list menu...");
-                await this.click(this.listMenuOfCreatedAppointment(studentName));
-                await this.waitForVisible(this.copyAppointmentLink);
-            }
-            await this.click(this.copyAppointmentLink);
-
-            const maxRetries = 20;
-
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                await this.page.waitForFunction(() => {
-                    const container = document.querySelector('#toast-container');
-                    return !container || Array.from(container.children).every(c => {
-                        const el = /** @type {HTMLElement} */ (c);
-                        return !el.offsetParent || getComputedStyle(el).display === 'none';
-                    });
-                }, { timeout: 8000 }).catch(() => { });
-
-                const slot = await this.findAvailableSlot(attempt);
-                await slot.click({ button: "right" });
-                // Setup MutationObserver to capture toast message
-                const toastPromise = this.page.evaluate(() => {
-                    return new Promise((resolve) => {
-                        const getToast = () => {
-                            const toasts = Array.from(document.querySelectorAll('#toast-container .toast, .toast'));
-                            for (let i = toasts.length - 1; i >= 0; i--) {
-                                const toast = toasts[i];
-                                const style = window.getComputedStyle(toast);
-                                if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
-                                    const msgEl = toast.querySelector('.toast-message');
-                                    const text = ((msgEl ? msgEl.textContent : toast.textContent) || '').trim();
-                                    if (text.length > 0) return text;
-                                }
-                            }
-                            const fallback = document.querySelector('#toast-container .toast-message, .toast-message');
-                            if (fallback) {
-                                const text = (fallback.textContent || '').trim();
-                                if (text.length > 0) return text;
-                            }
-                            return null;
-                        };
-
-                        const initial = getToast();
-                        if (initial) return resolve(initial);
-
-                        const observer = new MutationObserver(() => {
-                            const text = getToast();
-                            if (text) {
-                                observer.disconnect();
-                                resolve(text);
-                            }
-                        });
-
-                        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-
-                        setTimeout(() => {
-                            observer.disconnect();
-                            resolve('');
-                        }, 5000);
-                    });
-                }).catch(() => '');
-
-                await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
-
-                try {
-                    await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 1500 });
-                    await this.click(this.submitButtonPopup);
-                } catch {
-                    console.log("Submit confirmation popup did not appear.");
-                }
-
-                const message = (await toastPromise) || '';
-
-                if (!message) {
-                    console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
-                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
-                    if (appointmentCount >= 2) {
-                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
-                        return;
-                    }
-                }
-
-                console.log(`Slot attempt ${attempt}: Toast message = "${message}"`);
-
-                if (message.includes("Appointment created successfully.")) {
-                    console.log(`Success on attempt ${attempt}: ${message}`);
-                    return;
-                } else {
-                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
-                    if (appointmentCount >= 2) {
-                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
-                        return;
-                    }
-
-                    console.log(`Non-success toast received: "${message}"`);
-                    await this.page.locator('#toast-container .toast').waitFor({
-                        state: 'hidden',
-                        timeout: 5000
-                    }).catch(() => { });
-                }
-            }
-
-            throw new Error("Could not paste appointment: student not available in any of the tried slots");
-        });
-    }
-
-    /**
-     * Copies an existing appointment and pastes it into an available time slot in the SAME instructor column under Multi Instructor view.
-     * @param {Object|string} studentName - Student object or student name string.
-     **/
-    async copyAppointmentInMultiInstructor(studentName) {
-        await test.step(`Copy and paste appointment in Multi Instructor for: "${this.getStudentSearchText(studentName)}"`, async () => {
+        await test.step(`Copy and paste appointment"`, async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 15000 });
             await this.waitForVisible(this.listMenuOfCreatedAppointment(studentName));
@@ -775,7 +655,12 @@ export default class InstructorPage extends BasePage {
                 }, { timeout: 8000 }).catch(() => { });
 
                 const slot = await this.findAvailableSlotInMultiInstructor(studentName, attempt - 1);
-                await slot.click({ button: "right" });
+                if (this.page.url().includes("StaffMobile")) {
+                    await slot.click();
+                }
+                else {
+                    await slot.click({ button: "right", timeout: 30000 });
+                }
 
                 // Setup MutationObserver to capture toast message
                 const toastPromise = this.page.evaluate(() => {
@@ -859,129 +744,10 @@ export default class InstructorPage extends BasePage {
                 }
             }
 
-            throw new Error("Could not paste appointment in Multi Instructor: student not available in any of the tried slots in the same column");
+            throw new Error("Could not paste appointment in: student not available in any of the tried slots in the same column");
         });
     }
 
-    /**
-     * Copies an existing appointment, finds available slots, pastes it via context menu, confirms modal, and verifies success toast.
-     * @param {Object|string} studentName - Student object or student name string.
-     **/
-    async copyAndPasteAppointment(studentName) {
-        await test.step(`Copy and paste appointment for: "${this.getStudentSearchText(studentName)}"`, async () => {
-            await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 15000 })
-            await this.waitForVisible(this.listMenuOfCreatedAppointment(studentName));
-            await this.click(this.listMenuOfCreatedAppointment(studentName));
-            await this.page.waitForTimeout(2500);
-
-            try {
-                await this.waitForVisible(this.copyAppointmentLink);
-            } catch {
-                console.log("Copy appointment link was not visible. Re-clicking the list menu...");
-                await this.click(this.listMenuOfCreatedAppointment(studentName));
-                await this.waitForVisible(this.copyAppointmentLink);
-            }
-            await this.click(this.copyAppointmentLink);
-
-            const maxRetries = 20;
-
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                await this.page.waitForFunction(() => {
-                    const container = document.querySelector('#toast-container');
-                    return !container || Array.from(container.children).every(c => {
-                        const el = /** @type {HTMLElement} */ (c);
-                        return !el.offsetParent || getComputedStyle(el).display === 'none';
-                    });
-                }, { timeout: 8000 }).catch(() => { });
-
-                const slot = await this.findAvailableSlot(attempt);
-                await slot.click();
-                // Setup MutationObserver to capture toast message
-                const toastPromise = this.page.evaluate(() => {
-                    return new Promise((resolve) => {
-                        const getToast = () => {
-                            const toasts = Array.from(document.querySelectorAll('#toast-container .toast, .toast'));
-                            for (let i = toasts.length - 1; i >= 0; i--) {
-                                const toast = toasts[i];
-                                const style = window.getComputedStyle(toast);
-                                if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
-                                    const msgEl = toast.querySelector('.toast-message');
-                                    const text = ((msgEl ? msgEl.textContent : toast.textContent) || '').trim();
-                                    if (text.length > 0) return text;
-                                }
-                            }
-                            const fallback = document.querySelector('#toast-container .toast-message, .toast-message');
-                            if (fallback) {
-                                const text = (fallback.textContent || '').trim();
-                                if (text.length > 0) return text;
-                            }
-                            return null;
-                        };
-
-                        const initial = getToast();
-                        if (initial) return resolve(initial);
-
-                        const observer = new MutationObserver(() => {
-                            const text = getToast();
-                            if (text) {
-                                observer.disconnect();
-                                resolve(text);
-                            }
-                        });
-
-                        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-
-                        setTimeout(() => {
-                            observer.disconnect();
-                            resolve('');
-                        }, 5000);
-                    });
-                }).catch(() => '');
-
-                await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
-
-                try {
-                    await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 1500 });
-                    await this.click(this.submitButtonPopup);
-                } catch {
-                    console.log("Submit confirmation popup did not appear.");
-                }
-
-                const message = (await toastPromise) || '';
-
-                if (!message) {
-                    console.log(`Slot attempt ${attempt}: No toast message detected within timeout.`);
-                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
-                    if (appointmentCount >= 2) {
-                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
-                        return;
-                    }
-                }
-
-                console.log(`Slot attempt ${attempt}: Toast message = "${message}"`);
-
-                if (message.includes("Appointment created successfully.")) {
-                    console.log(`Success on attempt ${attempt}: ${message}`);
-                    return;
-                } else {
-                    const appointmentCount = await this.allListMenusOfCreatedAppointments(studentName).count();
-                    if (appointmentCount >= 2) {
-                        console.log(`Appointment is duplicated in scheduler (count: ${appointmentCount}). Exiting loop as copied appointment is confirmed.`);
-                        return;
-                    }
-
-                    console.log(`Non-success toast received: "${message}"`);
-                    await this.page.locator('#toast-container .toast').waitFor({
-                        state: 'hidden',
-                        timeout: 5000
-                    }).catch(() => { });
-                }
-            }
-
-            throw new Error("Could not paste appointment: student not available in any of the tried slots");
-        });
-    }
 
 
     /**
