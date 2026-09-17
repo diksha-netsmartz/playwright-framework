@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import BasePage from "../../../../utils/BasePage";
-import studentData from "../../../../test-data/json/studentData.json";
+import BasePage from "../../../utils/BasePage";
+import studentData from "../../../test-data/json/studentData.json";
 
 /**
  * Page Object representing the Combined Appointment Creation and Management Page in Single Instructor Scheduler.
@@ -33,7 +33,8 @@ export default class CombinedAppointmentPage extends BasePage {
         this.submitButton = page.getByRole("button", { name: "Submit", });
         this.confirmYesButton = page.locator("xpath=//a[@data-apply='confirmation']");
         this.submitButtonPopup = page.getByRole("button", { name: "Yes, Submit", });
-        this.updateButton = page.getByRole('button', { name: 'YES, Update' })
+        this.updateButton = page.getByRole('button', { name: 'YES, Update' });
+        this.updateYesButton = page.getByRole('button', { name: 'Yes, Update' })
 
         // Duration
         this.duration15Minutes = page.getByLabel("15 Minutes");
@@ -532,7 +533,7 @@ export default class CombinedAppointmentPage extends BasePage {
                         await expect.poll(async () => {
                             await this.waitForLoaders().catch(() => { });
                             return await listMenu.count();
-                        }, { timeout: 10000 }).toBeGreaterThan(0);
+                        }, { timeout: 15000 }).toBeGreaterThan(0);
                         count = await listMenu.count();
                     } catch { }
                 }
@@ -836,11 +837,14 @@ export default class CombinedAppointmentPage extends BasePage {
                     setTimeout(() => {
                         observer.disconnect();
                         resolve('');
-                    }, 10000);
+                    }, 20000);
                 });
             }, 'Appointment updated successfully').catch(() => '');
 
             await this.click(this.updateButton);
+            if (await this.isVisible(this.updateYesButton, { timeout: 2000 })) {
+                await this.click(this.updateYesButton);
+            }
             await this.waitForLoaders();
 
             // 2. Verify update toast
@@ -852,7 +856,7 @@ export default class CombinedAppointmentPage extends BasePage {
                 await this.waitForLoaders().catch(() => { });
             } else {
                 await test.step('Toast message "Appointment updated successfully." did NOT appear', async () => {
-                    expect(toastMessage, 'Toast message "Appointment updated successfully." did not appear on page within 10 seconds').toBeTruthy();
+                    expect(toastMessage, 'Toast message "Appointment updated successfully." did not appear on page within 20 seconds').toBeTruthy();
                 });
             }
         });

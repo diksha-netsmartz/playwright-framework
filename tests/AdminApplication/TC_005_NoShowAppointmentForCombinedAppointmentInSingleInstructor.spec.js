@@ -2,8 +2,8 @@ import { test } from "@playwright/test";
 import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
 import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
 import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage";
-import InstructorPage from "../../pages/Common/Scheduling/SingleInstructor/InstructorPage";
-import CombinedAppointmentPage from "../../pages/Common/Scheduling/SingleInstructor/CombinedAppointmentPage";
+import SchedulerPage from "../../pages/Common/Scheduling/SchedulerPage";
+import CombinedAppointmentPage from "../../pages/Common/Scheduling/CombinedAppointmentPage";
 import TestDataGenerator from "../../utils/TestDataGenerator";
 import createAppointmentData from "../../test-data/json/createAppointmentData.json";
 import login from "../../test-data/json/login.json";
@@ -19,7 +19,7 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const enrollmentPage = new NewStudentEnrollmentPage(page);
-    const instructorPage = new InstructorPage(page);
+    const schedulerPage = new SchedulerPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
     const credentials = login[process.env.ENV || 'coreServer2'];
@@ -60,12 +60,12 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
 
     await test.step('Step 5: Navigate to Scheduling > Single Instructor and select schedule', async () => {
         await homePage.navigateToSingleInstructor();
-        await instructorPage.selectInstructor(credentials.staffUser.username);
-        await instructorPage.getSchedule();
+        await schedulerPage.selectInstructor(credentials.staffUser.username);
+        await schedulerPage.getSchedule();
     });
 
     await test.step('Precondition / Setup: Create initial Combined Appointment', async () => {
-        await instructorPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
+        await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
         await combinedAppointmentPage.verifyPopup();
         await combinedAppointmentPage.selectMidTimeDropdown();
         await combinedAppointmentPage.selectEndTimeDropdown();
@@ -79,12 +79,12 @@ test("TC_005: C-admin > Scheduling - Verify that the appt is getting marked as n
     });
 
     await test.step('Step 6-8: Mark appointment as No Show for Student 1 and verify', async () => {
-        await instructorPage.editNoShowAppointment(student1);
+        await schedulerPage.editNoShowAppointment(student1);
         await combinedAppointmentPage.markAppointmentAsNoShow(student1);
     });
 
     await test.step('Step 9: Mark appointment as No Show for Student 2 and verify', async () => {
-        await instructorPage.editNoShowAppointment(student2);
+        await schedulerPage.editNoShowAppointment(student2);
         await combinedAppointmentPage.markAppointmentAsNoShow(student2);
     });
 });
