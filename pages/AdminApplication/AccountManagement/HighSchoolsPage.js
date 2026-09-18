@@ -47,6 +47,18 @@ export default class HighSchoolsPage extends BasePage {
         this.searchTextbox = page.locator("input[type='search']").first();
         this.highSchoolTable = page.locator('#dtHighSchool');
         this.editIcon = page.getByTitle('Edit');
+
+        // Form State
+        this.uniqueId = '';
+        this.schoolName = '';
+        this.schoolCode = '';
+        this.address = '';
+        this.city = '';
+        this.selectedState = '';
+        this.selectedStatus = '';
+        this.zip = '';
+        this.email = '';
+        this.notes = '';
     }
 
     /**
@@ -72,11 +84,11 @@ export default class HighSchoolsPage extends BasePage {
             this.schoolName = `${data.schoolNamePrefix || 'HighSchool'}_${this.uniqueId}`;
             this.schoolCode = `${data.schoolCodePrefix || 'HS'}_${Math.floor(1000 + Math.random() * 9000)}`;
 
-            const address = data.address || '456 Academy Way';
-            const city = data.city || 'Hartford';
-            const zip = data.zip || '06101';
-            const email = data.email || `highschool_${this.uniqueId}@example.com`;
-            const notes = data.notes || 'Automated High School note';
+            this.address = data.address || '456 Academy Way';
+            this.city = data.city || 'Hartford';
+            this.zip = data.zip || '06101';
+            this.email = data.email || `highschool_${this.uniqueId}@example.com`;
+            this.notes = data.notes || 'Automated High School note';
 
             await this.waitForLoaders();
             await this.waitForVisible(this.schoolNameInput);
@@ -86,43 +98,83 @@ export default class HighSchoolsPage extends BasePage {
             await this.waitForVisible(this.statusDropdown);
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionActive);
+            this.selectedStatus = (await this.statusDropdownOptionActive.innerText()).trim();
             await this.click(this.statusDropdownOptionActive);
 
             // Fill Code & Address
-            await this.waitForVisible(this.schoolCodeInput);
             await this.fill(this.schoolCodeInput, this.schoolCode);
 
-            await this.waitForVisible(this.schoolAddressInput);
-            await this.fill(this.schoolAddressInput, address);
+            await this.fill(this.schoolAddressInput, this.address);
 
-            await this.waitForVisible(this.cityInput);
-            await this.fill(this.cityInput, city);
+            await this.fill(this.cityInput, this.city);
 
             // Select State (CT or from data)
-            await this.click(this.stateDropdown);
-            await this.waitForVisible(this.stateOption);
-            await this.click(this.stateOption);
-
-
-            // Fill Zip, Email & Notes
-            await this.waitForVisible(this.zipCodeInput);
-            await this.fill(this.zipCodeInput, zip);
-
-            if (await this.isVisible(this.emailInput, { timeout: 5000 }).catch(() => false)) {
-                await this.fill(this.emailInput, email);
+            if (await this.stateDropdown.isVisible({ timeout: 100 }).catch(() => false)) {
+                await this.click(this.stateDropdown);
+                await this.waitForVisible(this.stateOption);
+                this.selectedState = (await this.stateOption.innerText()).trim();
+                await this.click(this.stateOption);
             }
 
-            await this.waitForVisible(this.notesInput);
-            await this.fill(this.notesInput, notes);
+            // Fill Zip, Email & Notes
+            await this.fill(this.zipCodeInput, this.zip);
 
-            // if (await this.isVisible(this.teacherSelectableItem)) {
-            //     await this.click(this.teacherSelectableItem);
-            // }
+            if (await this.isVisible(this.emailInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emailInput, this.email);
+            }
+
+            await this.fill(this.notesInput, this.notes);
 
             return {
                 schoolName: this.schoolName,
                 schoolCode: this.schoolCode
             };
+        });
+    }
+
+    /**
+     * Verifies that the High School details in the form match the filled / expected values.
+     * @param {Object} [expectedDetails={}] - Optional expected high school details.
+     **/
+    async verifyHighSchoolDetails(expectedDetails = {}) {
+        await test.step('Verify High School details in form', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schoolNameInput);
+
+            const expectedSchoolName = expectedDetails.schoolName || this.schoolName;
+            const expectedSchoolCode = expectedDetails.schoolCode || expectedDetails.schoolCodePrefix || this.schoolCode;
+            const expectedAddress = expectedDetails.address || this.address;
+            const expectedCity = expectedDetails.city || this.city;
+            const expectedZip = expectedDetails.zip || expectedDetails.zipCode || this.zip;
+            const expectedEmail = expectedDetails.email || this.email;
+            const expectedNotes = expectedDetails.notes || this.notes;
+
+            await expect(this.schoolNameInput).toHaveValue(expectedSchoolName);
+
+            const actualStatus = (await this.statusDropdown.innerText()).trim().toLowerCase();
+            const expectedStatus = (expectedDetails.status || this.selectedStatus || 'Active').trim().toLowerCase();
+            expect(actualStatus).toContain(expectedStatus);
+
+            const actualSchoolCode = (await this.schoolCodeInput.inputValue()).trim();
+            expect(actualSchoolCode).toContain(expectedSchoolCode);
+
+            await expect(this.schoolAddressInput).toHaveValue(expectedAddress);
+            await expect(this.cityInput).toHaveValue(expectedCity);
+
+            const actualState = (await this.stateDropdown.innerText()).trim().toLowerCase();
+            const expectedState = (this.selectedState || expectedDetails.state || '').trim().toLowerCase();
+            if (expectedState) {
+                expect(actualState).toContain(expectedState);
+            }
+
+            await expect(this.zipCodeInput).toHaveValue(expectedZip);
+
+            if (await this.isVisible(this.emailInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.emailInput).toHaveValue(expectedEmail);
+            }
+
+            await expect(this.notesInput).toHaveValue(expectedNotes);
+
         });
     }
 
