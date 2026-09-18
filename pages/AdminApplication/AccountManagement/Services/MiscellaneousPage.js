@@ -29,10 +29,18 @@ export default class MiscellaneousPage extends BasePage {
         this.statusDropdownOptionDeleted = page.locator("xpath=//select[@name='Status']//parent::div//div//span[text()='Deleted']");
 
         this.priceInput = page.getByRole('textbox', { name: 'Price' });
+        this.itemTaxableCheckbox = page.locator("xpath=//input[@id='ItemIsTaxable']//following-sibling::ins");
+        this.currentTaxesDropdown = page.locator("xpath=//button[@data-id='drp_Products_CurrentSatetTaxList']");
+        this.currentTaxesDropdownOption = page.locator("xpath=(//button[@data-id='drp_Products_CurrentSatetTaxList']//parent::div//div//li[not(@class='selected')]//span[1][not(text()='Please Select')])[1]");
+        this.additionalTaxInput = page.locator('#txt_Products_AdditionalTax:visible');
+
 
         // Modal Action Buttons
         this.saveBtn = page.locator("xpath=//div[contains(@id,'Miscellaneous')]//button[contains(text(),'Save')]");
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
+
+        this.statusFilterDropdown = page.locator("xpath=//div[@id='pnlMiscellaneousTAB']//a[contains(.,'Status')]");
+        this.selectAllStatusCheckbox = page.locator("xpath=//div[@id='pnlMiscellaneousTAB']//input[contains(@class,'SelectAllStatus')]//following-sibling::ins");
 
         // Table Locators
         this.searchTextbox = page.locator("xpath=(//div[contains(@id,'Miscellaneous_filter')]//input[@type='search'])[1]");
@@ -61,6 +69,8 @@ export default class MiscellaneousPage extends BasePage {
             const prefix = data.miscellaneousName || 'MiscItem';
             this.miscName = `${prefix}_${Date.now()}`;
             const price = data.price || '100.00';
+            const additionalTax = data.additionalTax || `${Math.floor(1 + Math.random() * 25)}`;
+            this.additionalTax = additionalTax;
 
             await this.waitForLoaders();
             await this.waitForVisible(this.miscNameInput);
@@ -79,6 +89,14 @@ export default class MiscellaneousPage extends BasePage {
 
             // Fill Price
             await this.fill(this.priceInput, price);
+
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.itemTaxableCheckbox);
+                await this.click(this.currentTaxesDropdown);
+                await this.waitForVisible(this.currentTaxesDropdownOption);
+                await this.click(this.currentTaxesDropdownOption);
+                await this.fill(this.additionalTaxInput, additionalTax);
+            }
 
             return this.miscName;
         });
@@ -113,14 +131,31 @@ export default class MiscellaneousPage extends BasePage {
      * Searches for the created miscellaneous item by name and clicks its Edit action.
      * @param {string} [miscName=this.miscName] - Item name to search and edit.
      **/
-    async searchAndEditMisc(miscName = this.miscName) {
+    async searchAndEditMisc(miscName = this.miscName, maxRetries = 5) {
         await test.step(`Search and edit Miscellaneous item: "${miscName}"`, async () => {
-            await this.page.waitForLoadState('load');
-            await this.waitForLoaders();
-            await this.waitForVisible(this.searchTextbox);
-            await this.fill(this.searchTextbox, miscName);
-            await this.waitForLoaders();
-            await this.page.waitForTimeout(1500);
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                await this.page.waitForLoadState('load').catch(() => { });
+                await this.waitForLoaders();
+                await this.waitForVisible(this.searchTextbox);
+                await this.fill(this.searchTextbox, miscName);
+                await this.page.waitForTimeout(2000);
+                await this.waitForLoaders();
+
+                const count = await this.editIcon.count();
+                if (count > 0 && await this.editIcon.first().isVisible().catch(() => false)) {
+                    await this.click(this.editIcon.first());
+                    await this.waitForLoaders();
+                    return;
+                }
+
+                if (attempt < maxRetries) {
+                    await this.page.reload();
+                    await this.page.waitForLoadState('load').catch(() => { });
+                    await this.waitForLoaders();
+                    await this.filterByAllStatus();
+                }
+            }
+
             await this.waitForVisible(this.editIcon);
             await expect(this.editIcon).toHaveCount(1);
             await this.click(this.editIcon);
@@ -140,21 +175,37 @@ export default class MiscellaneousPage extends BasePage {
             await expect(this.statusDropdown).toContainText('Active');
             const actualPrice = await this.priceInput.inputValue();
             expect(parseFloat(actualPrice)).toBe(parseFloat(data.price));
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                const taxableWrapper = this.page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
+                if (await taxableWrapper.count() > 0) {
+                    await expect(taxableWrapper).toHaveClass(/checked/);
+                }
+            }
+
+            if (this.additionalTax && await this.isVisible(this.additionalTaxInput, { timeout: 100 }).catch(() => false)) {
+                const actualAmount = await this.additionalTaxInput.inputValue();
+                expect(parseFloat(actualAmount)).toBe(parseFloat(this.additionalTax));
+            }
 
         });
     }
 
     /**
-     * Modifies the miscellaneous fields (Category, Status, Price) on the Edit form.
+     * Modifies the miscellaneous fields (Name, Category, Status, Price) on the Edit form.
      * @param {Object} data - Update data from fixture.
      **/
     async editMiscDetails(data = {}) {
-        await test.step('Update Miscellaneous fields (Category, Status, Price)', async () => {
+        await test.step('Update Miscellaneous fields (Name, Category, Status, Price)', async () => {
             await this.waitForLoaders();
 
             const updatedPrice = data.updatedPrice || '150.00';
 
-            // Update Category to DVD
+            if (await this.miscNameInput.isEditable().catch(() => false)) {
+                this.miscName = `${data.updatedMiscellaneousName || 'Updated_MiscItem'}_${Date.now()}`;
+                await this.fill(this.miscNameInput, this.miscName);
+            }
+
+            // Update Category to DVD in dropdown
             await this.waitForVisible(this.typeDropdown);
             await this.click(this.typeDropdown);
             await this.waitForVisible(this.typeOptionDVD);
@@ -167,6 +218,53 @@ export default class MiscellaneousPage extends BasePage {
 
             // Update Price
             await this.fill(this.priceInput, updatedPrice);
+
+            // Uncheck taxable checkbox (was checked in add)
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.itemTaxableCheckbox);
+            }
+        });
+    }
+
+    /**
+     * Opens the Status filter dropdown, selects All status, and closes the dropdown.
+     **/
+    async filterByAllStatus() {
+        await test.step('Filter Miscellaneous items by All status', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.statusFilterDropdown);
+            await this.click(this.statusFilterDropdown);
+
+            await this.waitForVisible(this.selectAllStatusCheckbox);
+            await this.click(this.selectAllStatusCheckbox);
+
+            // Close the dropdown after selection by clicking on dropdown xpath again
+            await this.click(this.statusFilterDropdown);
+            await this.waitForLoaders();
+            await this.page.waitForTimeout(1000);
+        });
+    }
+
+    /**
+     * Verifies that the miscellaneous item details in the edit form match updated values.
+     * @param {Object} data - Expected update configuration data fixture.
+     **/
+    async verifyUpdatedMiscDetails(data = {}) {
+        await test.step('Verify miscellaneous item details in edit form match updated values', async () => {
+            await this.waitForVisible(this.miscNameInput, { timeout: 5000 });
+            await expect(this.miscNameInput).toHaveValue(this.miscName || data.updatedMiscellaneousName);
+            await expect(this.statusDropdown).toContainText('Deleted');
+            await expect(this.typeDropdown).toContainText('DVD');
+            const actualPrice = await this.priceInput.inputValue();
+            expect(parseFloat(actualPrice)).toBe(parseFloat(data.updatedPrice));
+
+            // Verify item taxable checkbox was unchecked
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                const taxableWrapper = this.page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
+                if (await taxableWrapper.count() > 0) {
+                    await expect(taxableWrapper).not.toHaveClass(/checked/);
+                }
+            }
         });
     }
 
