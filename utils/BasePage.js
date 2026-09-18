@@ -172,6 +172,36 @@ export default class BasePage {
     }
 
     /**
+     * Formats a 10-digit number or phone string into application mask format: (XXX) XXX-XXXX.
+     * @param {string} phone - Raw digits or phone string.
+     * @returns {string} Formatted phone string, e.g. "(555) 123-4567".
+     */
+    formatPhoneNumber(phone) {
+        if (!phone) return phone;
+        const digits = ('' + phone).replace(/\D/g, '');
+        if (digits.length === 10) {
+            return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+        }
+        return phone;
+    }
+
+    /**
+     * Formats an 8-digit date string (MMDDYYYY) into MM/DD/YYYY format.
+     * @param {string} date - Raw 8-digit date string or already formatted date.
+     * @returns {string} Formatted date string, e.g. "11/09/2027".
+     */
+    formatDateWithSlashes(date) {
+        if (!date) return date;
+        const str = '' + date;
+        if (str.includes('/')) return str;
+        const digits = str.replace(/\D/g, '');
+        if (digits.length === 8) {
+            return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+        }
+        return date;
+    }
+
+    /**
      * Waits for an element to become visible on the page with optional timeout.
      * @param {import('@playwright/test').Locator} locator - Target element locator.
      * @param {number|Object} [options={}] - Timeout in ms or options object.
