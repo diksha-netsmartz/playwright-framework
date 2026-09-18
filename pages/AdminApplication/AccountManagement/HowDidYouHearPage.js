@@ -28,11 +28,15 @@ export default class HowDidYouHearPage extends BasePage {
         this.expirationDateInput = page.getByRole('textbox', { name: 'MM/DD/YYYY' });
         this.notesInput = page.locator('#LeadNote');
         this.addressInput = page.locator('#LeadAddress');
-        this.phoneInput = page.locator('#LeadPhone')
+        this.phoneInput = page.locator('#LeadPhone');
+        this.visibleDuringOnlineEnrollment = page.locator("//div[contains(@class,'VisibleDuringOnlineEnrollment')]")
 
         // Form Action Buttons & Notifications
         this.saveBtn = page.locator("xpath=(//b[contains(text(),'How did you hear') or contains(text(),'HOW DID YOU HEAR')]//ancestor::div[contains(@class,'modal-content')]//a[contains(text(),'Save')])[1]");
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
+
+        this.statusFilterDropdown = page.locator("xpath=//div[@id='referals']//a[contains(.,'Status')]");
+        this.selectAllStatusCheckbox = page.locator("xpath=//div[@id='referals']//div[contains(@class,'dropdown')]//input//following-sibling::ins").first().or(page.locator("//div[@id='referals']").getByText('Show All'));
 
         // Data Table Locators
         this.searchTextbox = page.locator("input[type='search']").first()
@@ -95,6 +99,9 @@ export default class HowDidYouHearPage extends BasePage {
             if (await this.isVisible(this.phoneInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.phoneInput, this.phone);
             }
+            if (await this.isVisible(this.visibleDuringOnlineEnrollment, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.visibleDuringOnlineEnrollment);
+            }
 
             return {
                 leadName: this.leadName,
@@ -140,8 +147,12 @@ export default class HowDidYouHearPage extends BasePage {
             }
 
             await expect(this.expirationDateInput).toHaveValue(expectedExpirationDate);
-
             await expect(this.notesInput).toHaveValue(expectedNotes);
+            if (await this.isVisible(this.visibleDuringOnlineEnrollment, { timeout: 100 }).catch(() => false)) {
+                const isChecked = await this.visibleDuringOnlineEnrollment.getAttribute('class');
+                expect(isChecked.includes('switch-on')).toBe(true);
+            }
+
         });
     }
 
@@ -178,14 +189,30 @@ export default class HowDidYouHearPage extends BasePage {
      * Searches for the created Lead Source in the data table and clicks Edit.
      * @param {string} [leadName=this.leadName] - Lead source name to search.
      **/
-    async searchAndEditHowDidYouHear(leadName = this.leadName) {
+    async searchAndEditHowDidYouHear(leadName = this.leadName, maxRetries = 5) {
         await test.step(`Search and edit How did you hear: "${leadName}"`, async () => {
-            await this.page.waitForLoadState('load');
-            await this.waitForLoaders();
-            await this.waitForVisible(this.searchTextbox);
-            await this.fill(this.searchTextbox, leadName);
-            await this.waitForLoaders();
-            await this.page.waitForTimeout(1500);
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                await this.page.waitForLoadState('load').catch(() => { });
+                await this.waitForLoaders();
+                await this.waitForVisible(this.searchTextbox);
+                await this.fill(this.searchTextbox, leadName);
+                await this.page.waitForTimeout(2000);
+                await this.waitForLoaders();
+
+                const count = await this.editIcon.count();
+                if (count > 0 && await this.editIcon.first().isVisible().catch(() => false)) {
+                    await this.click(this.editIcon.first());
+                    await this.waitForLoaders();
+                    return;
+                }
+
+                if (attempt < maxRetries) {
+                    await this.page.reload();
+                    await this.page.waitForLoadState('load').catch(() => { });
+                    await this.waitForLoaders();
+                    await this.filterByAllStatus();
+                }
+            }
 
             await this.waitForVisible(this.editIcon);
             await expect(this.editIcon).toHaveCount(1);
@@ -195,24 +222,117 @@ export default class HowDidYouHearPage extends BasePage {
     }
 
     /**
-     * Modifies the Lead Source fields (Notes, Status) on the Edit form.
+     * Modifies all Lead Source fields (Name, Code, Expiration Date, Notes, Address, Phone, Status) on the Edit form.
      * @param {Object} data - Update data from fixture.
      **/
     async editHowDidYouHearDetails(data = {}) {
-        await test.step('Update How did you hear fields (Notes, Status)', async () => {
+        await test.step('Update How did you hear fields (Name, Code, Expiration Date, Notes, Address, Phone, Status)', async () => {
             await this.waitForLoaders();
 
-            const updatedNotes = data.updatedNotes || 'Updated How Did You Hear note';
+            // Update Lead Name
+            if (await this.leadNameInput.isEditable().catch(() => false)) {
+                this.leadName = `${data.updatedLeadNamePrefix || 'Updated_Lead'}_${this.uniqueId}`;
+                await this.fill(this.leadNameInput, this.leadName);
+            }
 
-            // Update Status to Deleted or specified status
+            // Update Lead Code
+            if (await this.leadCodeInput.isEditable().catch(() => false)) {
+                this.leadCode = `${data.updatedLeadCodePrefix || 'USRC'}_${Math.floor(1000 + Math.random() * 9000)}`;
+                await this.fill(this.leadCodeInput, this.leadCode);
+            }
+
+            // Update Expiration Date
+            if (await this.isVisible(this.expirationDateInput, { timeout: 500 }).catch(() => false)) {
+                this.expirationDate = data.updatedExpirationDate || '12/31/2099';
+                await this.fill(this.expirationDateInput, this.expirationDate);
+            }
+
+            // Update Notes
+            if (await this.isVisible(this.notesInput, { timeout: 500 }).catch(() => false)) {
+                this.notes = data.updatedNotes || 'Updated How Did You Hear note';
+                await this.fill(this.notesInput, this.notes);
+            }
+
+            // Update Address
+            if (await this.isVisible(this.addressInput, { timeout: 500 }).catch(() => false)) {
+                this.address = data.updatedAddress || '456 Oak Ave';
+                await this.fill(this.addressInput, this.address);
+            }
+
+            // Update Phone
+            if (await this.isVisible(this.phoneInput, { timeout: 500 }).catch(() => false)) {
+                this.phone = data.updatedPhone || '9876543210';
+                await this.fill(this.phoneInput, this.phone);
+            }
+
+            // Update Status to Deleted
             await this.waitForVisible(this.statusDropdown);
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionDeleted);
+            this.selectedStatus = 'Deleted';
             await this.click(this.statusDropdownOptionDeleted);
 
-            // Update Notes
-            await this.waitForVisible(this.notesInput);
-            await this.fill(this.notesInput, updatedNotes);
+            if (await this.isVisible(this.visibleDuringOnlineEnrollment, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.visibleDuringOnlineEnrollment);
+            }
+
+        });
+    }
+
+    /**
+     * Opens the Status filter dropdown, selects All status, and closes the dropdown.
+     **/
+    async filterByAllStatus() {
+        await test.step('Filter How did you hear by All status', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.statusFilterDropdown);
+            await this.click(this.statusFilterDropdown);
+
+            await this.waitForVisible(this.selectAllStatusCheckbox.first());
+            await this.click(this.selectAllStatusCheckbox.first(), { force: true });
+
+            // Close the dropdown after selection by clicking on dropdown xpath again
+            await this.click(this.statusFilterDropdown);
+            await this.waitForLoaders();
+            await this.page.waitForTimeout(1000);
+        });
+    }
+
+    /**
+     * Verifies that the How Did You Hear details in the form match the updated values.
+     * @param {Object} [expectedDetails={}] - Expected update details.
+     **/
+    async verifyUpdatedHowDidYouHearDetails(expectedDetails = {}) {
+        await test.step('Verify updated How did you hear details in form', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.leadNameInput);
+
+            await expect(this.leadNameInput).toHaveValue(this.leadName);
+
+            const actualStatus = (await this.statusDropdown.innerText()).trim().toLowerCase();
+            expect(actualStatus).toContain('deleted');
+
+            const actualLeadCode = (await this.leadCodeInput.inputValue()).trim();
+            expect(actualLeadCode).toContain(this.leadCode);
+
+            if (await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.addressInput).toHaveValue(this.address);
+            }
+            if (await this.isVisible(this.phoneInput, { timeout: 100 }).catch(() => false)) {
+                const digits = ('' + this.phone).replace(/\D/g, '');
+                const phonePattern = digits.length === 10
+                    ? new RegExp(`^\\(${digits.slice(0, 3)}\\)\\s*${digits.slice(3, 6)}-${digits.slice(6)}$`)
+                    : new RegExp(this.phone);
+                await expect(this.phoneInput).toHaveValue(phonePattern);
+            }
+
+            await expect(this.expirationDateInput).toHaveValue(this.expirationDate);
+            await expect(this.notesInput).toHaveValue(this.notes);
+
+            if (await this.isVisible(this.visibleDuringOnlineEnrollment, { timeout: 100 }).catch(() => false)) {
+                const isNotChecked = await this.visibleDuringOnlineEnrollment.getAttribute('class');
+                expect(isNotChecked.includes('switch-off')).toBe(true);
+            }
         });
     }
 
@@ -224,7 +344,6 @@ export default class HowDidYouHearPage extends BasePage {
             const successMessage = this.page.getByText('How did you hear information updated successfully.');
             await this.waitForVisible(successMessage);
             await this.verifyVisible(successMessage)
-
         });
     }
 }

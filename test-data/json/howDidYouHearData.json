@@ -5,5 +5,10 @@
   "address": "123 Main St",
   "phone": "1234567890",
   "expirationDate": "11/11/2099",
+  "updatedLeadNamePrefix": "Updated_Lead",
+  "updatedLeadCodePrefix": "USRC",
+  "updatedAddress": "456 Oak Ave",
+  "updatedPhone": "9876543210",
+  "updatedExpirationDate": "12/31/2099",
   "updatedNotes": "Updated How Did You Hear note"
 }
