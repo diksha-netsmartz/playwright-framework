@@ -28,6 +28,7 @@ export default class CombinedAppointmentPage extends BasePage {
         // Popup
         this.popupTitle = page.locator("#window1_wnd_title");
         this.closePopup = page.locator("xpath=//a[@aria-label='Close']").nth(0);
+        this.showAllVehiclesCheckbox = page.locator("//input[contains(@id,'chkShowAllVehicles')]//following-sibling::ins");
 
         // Buttons
         this.submitButton = page.getByRole("button", { name: "Submit", });
@@ -306,6 +307,9 @@ export default class CombinedAppointmentPage extends BasePage {
     async selectDropdown(dropdownName) {
         if (await this.isVisible(this.getDropdownButton(dropdownName), { timeout: 1000 })) {
             await test.step(`Select dropdown option for: "${dropdownName}"`, async () => {
+                if (dropdownName == 'Vehicle' && await this.isVisible(this.showAllVehiclesCheckbox, { timeout: 100 })) {
+                    await this.click(this.showAllVehiclesCheckbox);
+                }
                 await this.click(this.getDropdownButton(dropdownName));
                 await this.click(this.getFirstDropdownOption(dropdownName));
 
