@@ -60,4 +60,9 @@ test('TC_039: C-Admin >> Account Management >> Vehicle >> Vehicle List - To veri
     await test.step('Step 7: Verify Vehicle edited successfully', async () => {
         await vehicleListPage.verifyVehicleUpdatedSuccessfully();
     });
+
+    await test.step('Step 8: Search the updated Vehicle, click on Edit, and verify updated details', async () => {
+        await vehicleListPage.searchAndEditVehicle(vehicleListPage.updatedVehicleName || vehicleListPage.vehicleName, 5);
+        await vehicleListPage.verifyUpdatedVehicleDetails(vehicleData);
+    });
 });
