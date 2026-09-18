@@ -27,6 +27,8 @@ export default class HowDidYouHearPage extends BasePage {
         this.leadCodeInput = page.getByRole('textbox', { name: 'Lead Code' });
         this.expirationDateInput = page.getByRole('textbox', { name: 'MM/DD/YYYY' });
         this.notesInput = page.locator('#LeadNote');
+        this.addressInput = page.locator('#LeadAddress');
+        this.phoneInput = page.locator('#LeadPhone')
 
         // Form Action Buttons & Notifications
         this.saveBtn = page.locator("xpath=(//b[contains(text(),'How did you hear') or contains(text(),'HOW DID YOU HEAR')]//ancestor::div[contains(@class,'modal-content')]//a[contains(text(),'Save')])[1]");
@@ -70,6 +72,8 @@ export default class HowDidYouHearPage extends BasePage {
             this.leadCode = `${data.leadCodePrefix || 'SRC'}_${Math.floor(1000 + Math.random() * 9000)}`;
             this.expirationDate = data.expirationDate;
             this.notes = data.notes;
+            this.address = data.address;
+            this.phone = data.phone;
 
             await this.waitForLoaders();
             await this.waitForVisible(this.leadNameInput);
@@ -81,13 +85,16 @@ export default class HowDidYouHearPage extends BasePage {
             this.selectedStatus = (await this.statusDropdownOptionActive.innerText()).trim();
             await this.click(this.statusDropdownOptionActive);
 
-            // Fill Lead Code
             await this.fill(this.leadCodeInput, this.leadCode);
-
             await this.fill(this.expirationDateInput, this.expirationDate);
-
-            // Fill Notes
             await this.fill(this.notesInput, this.notes);
+
+            if (await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.addressInput, this.address);
+            }
+            if (await this.isVisible(this.phoneInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.phoneInput, this.phone);
+            }
 
             return {
                 leadName: this.leadName,
@@ -109,6 +116,8 @@ export default class HowDidYouHearPage extends BasePage {
             const expectedLeadCode = expectedDetails.leadCode || expectedDetails.leadCodePrefix || this.leadCode;
             const expectedExpirationDate = expectedDetails.expirationDate || this.expirationDate;
             const expectedNotes = expectedDetails.notes || this.notes;
+            const expectedAddress = expectedDetails.address || this.address;
+            const expectedPhone = expectedDetails.phone || this.phone;
 
             await expect(this.leadNameInput).toHaveValue(expectedLeadName);
 
@@ -118,6 +127,17 @@ export default class HowDidYouHearPage extends BasePage {
 
             const actualLeadCode = (await this.leadCodeInput.inputValue()).trim();
             expect(actualLeadCode).toContain(expectedLeadCode);
+
+            if (await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.addressInput).toHaveValue(expectedAddress);
+            }
+            if (await this.isVisible(this.phoneInput, { timeout: 100 }).catch(() => false)) {
+                const digits = ('' + expectedPhone).replace(/\D/g, '');
+                const phonePattern = digits.length === 10
+                    ? new RegExp(`^\\(${digits.slice(0, 3)}\\)\\s*${digits.slice(3, 6)}-${digits.slice(6)}$`)
+                    : new RegExp(expectedPhone);
+                await expect(this.phoneInput).toHaveValue(phonePattern);
+            }
 
             await expect(this.expirationDateInput).toHaveValue(expectedExpirationDate);
 
