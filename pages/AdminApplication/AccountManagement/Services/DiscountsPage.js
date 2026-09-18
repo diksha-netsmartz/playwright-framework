@@ -31,12 +31,12 @@ export default class DiscountsPage extends BasePage {
         this.currentTaxesDropdownOption = page.locator("xpath=(//button[@data-id='drp_Products_CurrentSatetTaxList']//parent::div//div//li[not(@class='selected')]//span[1][not(text()='Please Select')])[1]");
         this.additionalTaxInput = page.getByRole('textbox', { name: 'Additional Tax' });
 
-        this.eligibleServiceSelection = page.locator("xpath=(//li[contains(@attrcolumn,'DiscountPackages')])[1]");
-        this.selectedDiscountPackage = page.locator("(//li[contains(@attrcolumn,'DiscountPackages') and contains(@class,'ms-elem-selection ms-selected')])[1]")
-        this.eligibleClassesSelection = page.locator("xpath=(//li[contains(@attrcolumn,'DiscountClasses')])[1]");
-        this.selectedDiscountClasses = page.locator("(//li[contains(@attrcolumn,'DiscountClasses') and contains(@class,'ms-elem-selection ms-selected')])[1]")
-        this.eligibleLocationsSelection = page.locator("xpath=(//li[contains(@attrcolumn,'DiscountLocations')])[1]");
-        this.selectedDiscountLocations = page.locator("(//li[contains(@attrcolumn,'DiscountLocations') and contains(@class,'ms-elem-selection ms-selected')])[1]")
+        this.eligibleServiceSelection = page.locator("//div[contains(@class,'ms-selectable')]//li[contains(@attrcolumn,'DiscountPackages')]");
+        this.selectedServicePackage = page.locator("//div[contains(@class,'ms-selection')]//li[contains(@attrcolumn,'DiscountPackages') and contains(@class,'ms-selected')]");
+        this.eligibleClassesSelection = page.locator("//div[contains(@class,'ms-selectable')]//li[contains(@attrcolumn,'DiscountClasses')]");
+        this.selectedDiscountClasses = page.locator("//div[contains(@class,'ms-selection')]//li[contains(@attrcolumn,'DiscountClasses') and contains(@class,'ms-selected')]")
+        this.eligibleLocationsSelection = page.locator("//div[contains(@class,'ms-selectable')]//li[contains(@attrcolumn,'DiscountLocations')]");
+        this.selectedDiscountLocations = page.locator("//div[contains(@class,'ms-selection')]//li[contains(@attrcolumn,'DiscountLocations') and contains(@class,'ms-selected')]")
 
         this.discountExpirationTextbox = page.getByRole('textbox', { name: 'MM/DD/YYYY' });
         this.discountExpireDateSelectInCalendar = page.locator("xpath=(//div[contains(@class,'datepicker-days')]//td)[last()]");
@@ -46,6 +46,9 @@ export default class DiscountsPage extends BasePage {
         // Modal Action Buttons
         this.saveBtn = page.locator("xpath=(//div[contains(@id,'Discount')]//button[contains(text(),'Save')])[1]");
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
+
+        this.statusFilterDropdown = page.locator("xpath=//div[@id='pnlDiscountsTAB']//a[contains(.,'Status')]");
+        this.selectAllStatusCheckbox = page.locator("xpath=//div[@id='pnlDiscountsTAB']//input[contains(@class,'SelectAllStatus')]//following-sibling::ins");
 
         // Table Locators
         this.searchTextbox = page.locator("xpath=(//div[contains(@id,'Discounts')]//input[@type='search'])[1]");
@@ -98,17 +101,15 @@ export default class DiscountsPage extends BasePage {
             await this.waitForVisible(this.statusDropdownOptionActive);
             await this.click(this.statusDropdownOptionActive);
 
-            await this.click(this.eligibleServiceSelection)
-
             await this.click(this.itemTaxableCheckbox);
             await this.click(this.currentTaxesDropdown);
             await this.waitForVisible(this.currentTaxesDropdownOption);
             await this.click(this.currentTaxesDropdownOption);
             await this.fill(this.additionalTaxInput, additionalTax);
 
-            await this.click(this.eligibleClassesSelection)
-            await this.waitForVisible(this.eligibleLocationsSelection)
-            await this.click(this.eligibleLocationsSelection)
+            await this.click(this.eligibleServiceSelection.first());
+            await this.click(this.eligibleClassesSelection.first());
+            await this.click(this.eligibleLocationsSelection.first());
 
             await this.click(this.discountExpirationTextbox);
             await this.waitForVisible(this.discountExpireDateSelectInCalendar);
@@ -149,14 +150,31 @@ export default class DiscountsPage extends BasePage {
      * Searches for the created discount by name and clicks its Edit action.
      * @param {string} [discountName=this.discountName] - Discount name to search and edit.
      **/
-    async searchAndEditDiscount(discountName = this.discountName) {
+    async searchAndEditDiscount(discountName = this.discountName, maxRetries = 5) {
         await test.step(`Search and edit Discount: "${discountName}"`, async () => {
-            await this.page.waitForLoadState('load');
-            await this.waitForLoaders();
-            await this.waitForVisible(this.searchTextbox);
-            await this.fill(this.searchTextbox, discountName);
-            await this.waitForLoaders();
-            await this.page.waitForTimeout(1500);
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                await this.page.waitForLoadState('load').catch(() => { });
+                await this.waitForLoaders();
+                await this.waitForVisible(this.searchTextbox);
+                await this.fill(this.searchTextbox, discountName);
+                await this.page.waitForTimeout(2000);
+                await this.waitForLoaders();
+
+                const count = await this.editIcon.count();
+                if (count > 0 && await this.editIcon.first().isVisible().catch(() => false)) {
+                    await this.click(this.editIcon.first());
+                    await this.waitForLoaders();
+                    return;
+                }
+
+                if (attempt < maxRetries) {
+                    await this.page.reload();
+                    await this.page.waitForLoadState('load').catch(() => { });
+                    await this.waitForLoaders();
+                    await this.filterByAllStatus();
+                }
+            }
+
             await this.waitForVisible(this.editIcon);
             await expect(this.editIcon).toHaveCount(1);
             await this.click(this.editIcon);
@@ -202,15 +220,10 @@ export default class DiscountsPage extends BasePage {
                 expect(parseFloat(actualAmount)).toBe(parseFloat(this.additionalTax));
             }
 
-            if (await this.isVisible(this.eligibleServiceSelection, { timeout: 100 }).catch(() => false)) {
-                await this.verifyVisible(this.selectedDiscountPackage);
-            }
-            if (await this.isVisible(this.eligibleClassesSelection, { timeout: 100 }).catch(() => false)) {
-                await this.verifyVisible(this.selectedDiscountClasses);
-            }
-            if (await this.isVisible(this.eligibleLocationsSelection, { timeout: 100 }).catch(() => false)) {
-                await this.verifyVisible(this.selectedDiscountLocations);
-            }
+            await this.verifyVisible(this.selectedServicePackage.first());
+            await this.verifyVisible(this.selectedDiscountClasses.first());
+            await this.verifyVisible(this.selectedDiscountLocations.first());
+
             if (await this.isVisible(this.discountExpirationTextbox, { timeout: 100 }).catch(() => false)) {
                 await expect(this.discountExpirationTextbox).not.toHaveValue('');
             }
@@ -218,39 +231,112 @@ export default class DiscountsPage extends BasePage {
     }
 
     /**
-     * Modifies the discount fields (Amount, Notes, Status) on the Edit form.
+     * Modifies the discount fields (Name, Code, Amount, Notes, Status, Selectables) on the Edit form.
      * @param {Object} data - Update data from fixture.
      **/
     async editDiscountDetails(data = {}) {
-        await test.step('Update Discount fields (Amount, Notes, Status)', async () => {
+        await test.step('Update Discount fields (Name, Code, Amount, Notes, Status, Selectables)', async () => {
             await this.waitForLoaders();
 
             const updatedAmount = data.updatedDiscountAmount || '200.00';
             const updatedNotes = data.updatedNotes || `Updated Notes for ${this.discountName}`;
             await this.waitForVisible(this.statusDropdown);
 
-            // Update Discount Amount
-            // await this.waitForVisible(this.discountAmountInput);
-            // await this.fill(this.discountAmountInput, updatedAmount);
+            if (await this.discountNameInput.isEditable().catch(() => false)) {
+                this.discountName = `${data.updatedDiscountName || 'Updated_Discount'}_${Date.now()}`;
+                await this.fill(this.discountNameInput, this.discountName);
+            }
 
-            if (await this.isVisible(this.discountAmountInput, { timeout: 1000 }).catch(() => false)) {
+            if (await this.discountCodeInput.isEditable().catch(() => false)) {
+                this.discountCode = `${Math.floor(10000 + Math.random() * 90000)}`;
+                await this.fill(this.discountCodeInput, this.discountCode);
+            }
+
+            // Update Discount Amount
+            if (await this.isVisible(this.discountAmountInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.discountAmountInput, updatedAmount);
             }
-            else if (await this.isVisible(this.feeAmountInput, { timeout: 1000 }).catch(() => false)) {
+            else if (await this.isVisible(this.feeAmountInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.feeAmountInput, updatedAmount);
             }
 
-
-            // Update Status (e.g. Deleted / Active)
-
+            // Update Status to Deleted
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionDeleted);
             await this.click(this.statusDropdownOptionDeleted);
 
-            await this.click(this.itemTaxableCheckbox);
+            // Uncheck taxable checkbox (was checked in add)
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.itemTaxableCheckbox);
+            }
+
+            // Select last selectable package, class, location
+            await this.click(this.eligibleServiceSelection.last());
+            await this.click(this.eligibleClassesSelection.last());
+            await this.click(this.eligibleLocationsSelection.last());
+
 
             // Update Notes
             await this.fill(this.notesInput, updatedNotes);
+        });
+    }
+
+    /**
+     * Opens the Status filter dropdown, selects All status, and closes the dropdown.
+     **/
+    async filterByAllStatus() {
+        await test.step('Filter Discounts by All status', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.statusFilterDropdown);
+            await this.click(this.statusFilterDropdown);
+
+            await this.waitForVisible(this.selectAllStatusCheckbox);
+            await this.click(this.selectAllStatusCheckbox);
+
+            // Close the dropdown after selection by clicking on dropdown xpath again
+            await this.click(this.statusFilterDropdown);
+            await this.waitForLoaders();
+            await this.page.waitForTimeout(1000);
+        });
+    }
+
+    /**
+     * Verifies that the discount details in the edit form match updated values.
+     * @param {Object} data - Expected update configuration data fixture.
+     **/
+    async verifyUpdatedDiscountDetails(data = {}) {
+        await test.step('Verify discount details in edit form match updated values', async () => {
+            await this.waitForVisible(this.discountNameInput, { timeout: 5000 });
+            await expect(this.discountNameInput).toHaveValue(this.discountName || data.updatedDiscountName);
+
+            if (await this.isVisible(this.discountCodeInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.discountCodeInput).toHaveValue(this.discountCode);
+            }
+
+            if (await this.isVisible(this.discountAmountInput, { timeout: 100 }).catch(() => false)) {
+                const actualAmount = await this.discountAmountInput.inputValue();
+                expect(parseFloat(actualAmount)).toBe(parseFloat(data.updatedDiscountAmount));
+            } else if (await this.isVisible(this.feeAmountInput, { timeout: 100 }).catch(() => false)) {
+                const actualAmount = await this.feeAmountInput.inputValue();
+                expect(parseFloat(actualAmount)).toBe(parseFloat(data.updatedDiscountAmount));
+            }
+
+            await expect(this.statusDropdown).toContainText('Deleted');
+
+            if (data.updatedNotes) {
+                await expect(this.notesInput).toHaveValue(data.updatedNotes);
+            }
+
+            // Verify item taxable checkbox was unchecked
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                const taxableWrapper = this.page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
+                if (await taxableWrapper.count() > 0) {
+                    await expect(taxableWrapper).not.toHaveClass(/checked/);
+                }
+            }
+            await expect(this.selectedServicePackage).toHaveCount(2);
+            await expect(this.selectedDiscountClasses).toHaveCount(2);
+            await expect(this.selectedDiscountLocations).toHaveCount(2);
 
         });
     }

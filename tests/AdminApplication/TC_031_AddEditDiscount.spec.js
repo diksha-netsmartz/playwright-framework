@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
 import DiscountsPage from '../../pages/AdminApplication/AccountManagement/Services/DiscountsPage';
@@ -21,7 +21,7 @@ import discountData from '../../test-data/json/discountData.json';
  *   1. Discounts should be created successfully
  *   2. Discounts should be edited successfully
  **/
-test('TC_031: C-Admin >> Account Management >> Services >> Discount - To verify user able to add/edit Discount', { tag: '@accountManagement' }, async ({page}) => {
+test('TC_031: C-Admin >> Account Management >> Services >> Discount - To verify user able to add/edit Discount', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const discountsPage = new DiscountsPage(page);
@@ -59,5 +59,11 @@ test('TC_031: C-Admin >> Account Management >> Services >> Discount - To verify 
 
     await test.step('Step 7: Verify discount edited successfully', async () => {
         await discountsPage.verifyDiscountUpdatedSuccessfully();
+    });
+
+    await test.step('Step 8: Search the updated Discount, click on Edit, and verify updated details', async () => {
+        // Wait 10 seconds for updated details to reflect in UI
+        await discountsPage.searchAndEditDiscount();
+        await discountsPage.verifyUpdatedDiscountDetails(discountData);
     });
 });
