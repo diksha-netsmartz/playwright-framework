@@ -1,4 +1,12 @@
 {
     "user": "testingdata3011@gmail.com",
-    "pass": "uazx hbyz rwjf arwj"
+    "pass": "uazx hbyz rwjf arwj",
+    "testingData": {
+        "user": "testingdata3011@gmail.com",
+        "pass": "uazx hbyz rwjf arwj"
+    },
+    "rachel": {
+        "user": "rachel.greene1227@gmail.com",
+        "pass": "wtqd isgt sztf wums"
+    }
 }
