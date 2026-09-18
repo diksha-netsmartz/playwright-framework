@@ -232,6 +232,10 @@ export default class SchedulerPage extends BasePage {
                     continue;
                 }
 
+                if (cell.classList.contains('k-nonwork-hour')) {
+                    continue;
+                }
+
                 const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
                     if (apptBox.width === 0 || apptBox.height === 0) return false;
@@ -312,6 +316,7 @@ export default class SchedulerPage extends BasePage {
                 const cellBox = cell.getBoundingClientRect();
 
                 if (cellBox.width === 0 || cellBox.height === 0) continue;
+                if (cell.classList.contains('k-nonwork-hour')) continue;
 
                 if (targetCenterX !== null) {
                     const cellCenterX = (cellBox.left + cellBox.right) / 2;
@@ -351,6 +356,7 @@ export default class SchedulerPage extends BasePage {
                     const cell = cells[i];
                     const cellBox = cell.getBoundingClientRect();
                     if (cellBox.width === 0 || cellBox.height === 0) continue;
+                    if (cell.classList.contains('k-nonwork-hour')) continue;
 
                     const cellCenterX = (cellBox.left + cellBox.right) / 2;
                     const isSameCol = targetColIndex !== null
