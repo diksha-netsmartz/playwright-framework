@@ -18,7 +18,7 @@
     "btwPackage": "ABTestBTWServ"
   },
   "uat": {
-    "btwAndCrPackage": "BTW + CR Package",
+    "btwAndCrPackage": "1julytestbtwandCR",
     "crPackage": "CR Package",
     "rtPackage": "RT Package",
     "btwPackage": "ABTestBTWServ"

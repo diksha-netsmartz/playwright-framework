@@ -52,6 +52,7 @@ test('TC_039: C-Admin >> Account Management >> Vehicle >> Vehicle List - To veri
     });
 
     await test.step('Step 6: Update fields and save edited Vehicle', async () => {
+        await vehicleListPage.verifyVehicleDetails(vehicleData);
         await vehicleListPage.editVehicleDetails(vehicleData);
         await vehicleListPage.clickSave();
     });
