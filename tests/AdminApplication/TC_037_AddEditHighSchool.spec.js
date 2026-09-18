@@ -52,6 +52,7 @@ test('TC_037: C-Admin >> Account Management >> High School - To verify user able
     });
 
     await test.step('Step 6: Update fields and save edited High School', async () => {
+        await highSchoolsPage.verifyHighSchoolDetails(highSchoolData);
         await highSchoolsPage.editHighSchoolDetails(highSchoolData);
         await highSchoolsPage.clickSaveForUpdate();
     });

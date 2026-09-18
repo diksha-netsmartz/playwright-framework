@@ -2,6 +2,8 @@
   "leadNamePrefix": "Lead",
   "leadCodePrefix": "SRC",
   "notes": "Automated How Did You Hear note",
+  "address": "123 Main St",
+  "phone": "1234567890",
   "expirationDate": "11/11/2099",
   "updatedNotes": "Updated How Did You Hear note"
 }
