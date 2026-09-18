@@ -60,4 +60,9 @@ test('TC_030: C-Admin >> Account Management >> Services >> Fee - To verify user 
     await test.step('Step 7: Verify fee edited successfully', async () => {
         await feesPage.verifyFeeUpdatedSuccessfully();
     });
+
+    await test.step('Step 8: Search the updated Fee, click on Edit, and verify updated details', async () => {
+        await feesPage.searchAndEditFee();
+        await feesPage.verifyUpdatedFeeDetails(feeData);
+    });
 });
