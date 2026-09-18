@@ -36,6 +36,14 @@ export default class HowDidYouHearPage extends BasePage {
         this.searchTextbox = page.locator("input[type='search']").first()
         this.leadsTable = page.locator('#Leadslisttable');
         this.editIcon = page.getByTitle('Edit');
+
+        // Form State
+        this.uniqueId = '';
+        this.leadName = '';
+        this.leadCode = '';
+        this.expirationDate = '';
+        this.notes = '';
+        this.selectedStatus = '';
     }
 
     /**
@@ -61,32 +69,59 @@ export default class HowDidYouHearPage extends BasePage {
             this.leadName = `${data.leadNamePrefix || 'LeadSource'}_${this.uniqueId}`;
             this.leadCode = `${data.leadCodePrefix || 'SRC'}_${Math.floor(1000 + Math.random() * 9000)}`;
             this.expirationDate = data.expirationDate;
-            const notes = data.notes || 'Automated How Did You Hear note';
+            this.notes = data.notes;
 
             await this.waitForLoaders();
             await this.waitForVisible(this.leadNameInput);
             await this.fill(this.leadNameInput, this.leadName);
 
             // Select Status as Active
-            await this.waitForVisible(this.statusDropdown);
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionActive);
+            this.selectedStatus = (await this.statusDropdownOptionActive.innerText()).trim();
             await this.click(this.statusDropdownOptionActive);
 
             // Fill Lead Code
-            await this.waitForVisible(this.leadCodeInput);
             await this.fill(this.leadCodeInput, this.leadCode);
 
-            await this.fill(this.expirationDateInput, this.expirationDate)
+            await this.fill(this.expirationDateInput, this.expirationDate);
 
             // Fill Notes
-            await this.waitForVisible(this.notesInput);
-            await this.fill(this.notesInput, notes);
+            await this.fill(this.notesInput, this.notes);
 
             return {
                 leadName: this.leadName,
                 leadCode: this.leadCode
             };
+        });
+    }
+
+    /**
+     * Verifies that the How Did You Hear details in the form match the filled / expected values.
+     * @param {Object} [expectedDetails={}] - Optional expected lead details.
+     **/
+    async verifyHowDidYouHearDetails(expectedDetails = {}) {
+        await test.step('Verify How did you hear details in form', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.leadNameInput);
+
+            const expectedLeadName = expectedDetails.leadName || this.leadName;
+            const expectedLeadCode = expectedDetails.leadCode || expectedDetails.leadCodePrefix || this.leadCode;
+            const expectedExpirationDate = expectedDetails.expirationDate || this.expirationDate;
+            const expectedNotes = expectedDetails.notes || this.notes;
+
+            await expect(this.leadNameInput).toHaveValue(expectedLeadName);
+
+            const actualStatus = (await this.statusDropdown.innerText()).trim().toLowerCase();
+            const expectedStatus = (expectedDetails.status || this.selectedStatus || 'Active').trim().toLowerCase();
+            expect(actualStatus).toContain(expectedStatus);
+
+            const actualLeadCode = (await this.leadCodeInput.inputValue()).trim();
+            expect(actualLeadCode).toContain(expectedLeadCode);
+
+            await expect(this.expirationDateInput).toHaveValue(expectedExpirationDate);
+
+            await expect(this.notesInput).toHaveValue(expectedNotes);
         });
     }
 
