@@ -27,7 +27,8 @@ export default class StudentProfilePage extends BasePage {
         this.submitButton = page.getByRole('button', { name: 'Submit' });
 
         // Update email locators
-        this.emailInput = page.locator('input[name="StudentEmail"]').or(page.locator('#Email'));
+        this.emailInput = page.locator('#Email');
+        this.emailInputLable = page.locator("//lable[@id='Email']")
         this.openEmailPopupBtn = page.locator("xpath=//input[@id='Email' or @name='StudentEmail']//ancestor::div[@class='input-group']//a[@onclick='OpenPopupForSendingEmailFromField(event)']");
         this.popupStudentEmailInput = page.locator('#txt_StudentAccount_MessageTAB_StudentEmail');
         this.updateStudentEmailBtn = page.locator('#ancstudent');
@@ -84,20 +85,22 @@ export default class StudentProfilePage extends BasePage {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 20000 });
             await this.waitForVisible(this.emailInput, { timeout: 10000 });
-            await this.verifyVisible(this.emailInput);
-            const currentEmail = (await this.getInputValue(this.emailInput)).trim();
+            if (!await this.isVisible(this.emailInputLable, { timeout: 100 })) {
+                await this.verifyVisible(this.emailInput);
+                const currentEmail = (await this.getInputValue(this.emailInput)).trim();
 
-            if (currentEmail.toLowerCase() !== specifiedEmail.trim().toLowerCase()) {
-                await this.click(this.openEmailPopupBtn);
-                await this.waitForVisible(this.popupStudentEmailInput);
-                await this.clear(this.popupStudentEmailInput);
-                await this.fill(this.popupStudentEmailInput, specifiedEmail);
-                await this.click(this.updateStudentEmailBtn);
-                await this.verifyVisible(this.page.getByText('Updated successfully.', { exact: true }));
-                await this.click(this.closePopup);
-                await this.waitForHidden(this.popupStudentEmailInput);
-                await this.reload();
-                await this.waitForLoaders();
+                if (currentEmail.toLowerCase() !== specifiedEmail.trim().toLowerCase()) {
+                    await this.click(this.openEmailPopupBtn);
+                    await this.waitForVisible(this.popupStudentEmailInput);
+                    await this.clear(this.popupStudentEmailInput);
+                    await this.fill(this.popupStudentEmailInput, specifiedEmail);
+                    await this.click(this.updateStudentEmailBtn);
+                    await this.verifyVisible(this.page.getByText('Updated successfully.', { exact: true }));
+                    await this.click(this.closePopup);
+                    await this.waitForHidden(this.popupStudentEmailInput);
+                    await this.reload();
+                    await this.waitForLoaders();
+                }
             }
         });
     }
