@@ -317,6 +317,13 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.waitForVisible(this.studentInfoCaption);
             await this.verifyVisible(this.studentInfoCaption);
 
+            const captcha = this.captchaFrame.locator('#recaptcha-anchor');
+            if (await this.isVisible(captcha, { timeout: 1000 }).catch(() => false) || await this.isVisible(this.page.locator('iframe[title="reCAPTCHA"]').first(), { timeout: 1000 }).catch(() => false)) {
+                console.warn('\n⚠️ [SKIP] CAPTCHA detected on Online Enrollment form. Skipping testcase.');
+                test.skip(true, 'Online Enrollment skipped: CAPTCHA is enabled on screen.');
+                return;
+            }
+
             if (await this.isVisible(this.firstNameTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.firstNameTxt, `${data.firstName} ${this.uniqueId}`);
             }
@@ -458,11 +465,6 @@ export default class OnlineEnrollmentPage extends BasePage {
                 await this.fill(this.last6DigitsParentsDriverLicense, data.parentsDriverLicense);
             }
 
-            const captcha = this.captchaFrame.locator('#recaptcha-anchor');
-            if (await this.isVisible(captcha, { timeout: 100 }).catch(() => false)) {
-                await this.click(captcha);
-                await this.verifyAttribute(captcha, "aria-checked", "true");
-            }
             await this.page.waitForTimeout(1000);
 
         });
