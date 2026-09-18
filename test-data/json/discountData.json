@@ -3,6 +3,7 @@
   "discountAmount": "100.00",
   "feeAmount": "100.00",
   "notes": "Automated Discount Notes",
+  "updatedDiscountName": "Updated_Discount",
   "updatedDiscountAmount": "200.00",
   "updatedNotes": "Updated Automated Discount Notes"
 }

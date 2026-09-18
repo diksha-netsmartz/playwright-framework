@@ -7,6 +7,11 @@
   "zip": "06101",
   "email": "highschool@example.com",
   "notes": "Automated High School note",
+  "updatedSchoolNamePrefix": "Updated_HighSchool",
+  "updatedSchoolCodePrefix": "UHS",
+  "updatedAddress": "789 Academy Blvd",
+  "updatedCity": "Stamford",
+  "updatedZip": "06901",
   "updatedEmail": "updated_highschool@example.com",
   "updatedNotes": "Updated High School note"
 }

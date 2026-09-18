@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
 import MiscellaneousPage from '../../pages/AdminApplication/AccountManagement/Services/MiscellaneousPage';
@@ -21,7 +21,7 @@ import miscData from '../../test-data/json/miscellaneousData.json';
  *   1. Miscellaneous item should be created successfully
  *   2. Miscellaneous item should be edited successfully
  **/
-test('TC_032: C-Admin >> Account Management >> Services >> Misc - To verify user able to add /Edit Misc', { tag: '@accountManagement' }, async ({page}) => {
+test('TC_032: C-Admin >> Account Management >> Services >> Misc - To verify user able to add /Edit Misc', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const miscPage = new MiscellaneousPage(page);
@@ -59,5 +59,11 @@ test('TC_032: C-Admin >> Account Management >> Services >> Misc - To verify user
 
     await test.step('Step 7: Verify miscellaneous item edited successfully', async () => {
         await miscPage.verifyMiscUpdatedSuccessfully();
+    });
+
+    await test.step('Step 8: Search the updated Miscellaneous item, click on Edit, and verify updated details', async () => {
+
+        await miscPage.searchAndEditMisc();
+        await miscPage.verifyUpdatedMiscDetails(miscData);
     });
 });

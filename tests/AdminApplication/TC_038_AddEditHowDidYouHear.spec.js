@@ -60,4 +60,9 @@ test('TC_038: C-Admin >> Account Management >> How did you hear - To verify user
     await test.step('Step 7: Verify How did you hear edited successfully', async () => {
         await howDidYouHearPage.verifyHowDidYouHearUpdatedSuccessfully();
     });
+
+    await test.step('Step 8: Search the updated How did you hear, click on Edit, and verify updated details', async () => {
+        await howDidYouHearPage.searchAndEditHowDidYouHear();
+        await howDidYouHearPage.verifyUpdatedHowDidYouHearDetails(howDidYouHearData);
+    });
 });

@@ -60,4 +60,9 @@ test('TC_037: C-Admin >> Account Management >> High School - To verify user able
     await test.step('Step 7: Verify High School edited successfully', async () => {
         await highSchoolsPage.verifyHighSchoolUpdatedSuccessfully();
     });
+
+    await test.step('Step 8: Search the updated High School, click on Edit, and verify updated details', async () => {
+        await highSchoolsPage.searchAndEditHighSchool();
+        await highSchoolsPage.verifyUpdatedHighSchoolDetails(highSchoolData);
+    });
 });
