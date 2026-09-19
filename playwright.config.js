@@ -199,13 +199,13 @@ module.exports = defineConfig({
 
         /**
          * trace: Records detailed execution traces (DOM snapshots, network activity, console logs).
-         * Current Value: 'on'
+         * Current Value: 'retain-on-failure'
          * Possible Values:
          *   - 'off'                (never record traces).
          *   - 'on'                 (record trace for every test).
          *   - 'retain-on-failure'  (record trace, but discard if test passes; keep only on failure).
          *   - 'on-first-retry'     (record trace only when retrying a failed test).
-         * Why: Enables deep post-run debugging and time-travel inspection with `npx playwright show-trace`.
+         * Why: Retains traces only when tests fail, saving significant disk space and speeding up execution.
          */
         trace: 'retain-on-failure',
 

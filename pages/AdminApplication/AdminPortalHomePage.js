@@ -1,4 +1,4 @@
-import BasePage from "../../utils/BasePage";
+import BasePage from "@utils/BasePage";
 import { test } from "@playwright/test";
 
 /**
@@ -24,6 +24,8 @@ export default class AdminPortalHomePage extends BasePage {
         // Scheduling
         this.singleInstructorLink = page.locator("#scheduling_SingleInstructor_li").getByRole("link", { name: "Single Instructor" });
         this.multiInstructorLink = page.locator("#scheduling_MultiInstructor_li").getByRole("link", { name: "Multi Instructor" });
+        this.singleLocationLink = page.locator("#scheduling_SingleLocation_li").getByRole("link", { name: "Single Location" });
+        this.multiVehicleLink = page.locator("#scheduling_MultiVehicle_li").getByRole("link", { name: "Multi Vehicle" });
         this.manageTimeSlotsLink = page.locator('b').filter({ hasText: 'Manage Time Slots' })
         this.bulkAppointmentLink = page.locator("#li_scheduling_managetimeslots_bulkappointments");
         this.bulkProcessLink = page.locator("#li_scheduling_managetimeslots_bulkprocess");
@@ -81,6 +83,7 @@ export default class AdminPortalHomePage extends BasePage {
 
         // Configuration
         this.configurationMenu = page.locator('#ConfigurationSideMenu');
+        this.companyInfoLink = page.locator('#configuration_CompanyInfo');
         this.integratePaymentLink = page.locator('#configurationPaymentProcessing')
         this.marketplaceLink = page.locator("#configurationMarketPlace")
         this.zipCodeLink = page.getByRole('link', { name: 'Zip Code' });
@@ -93,30 +96,6 @@ export default class AdminPortalHomePage extends BasePage {
 
     }
 
-
-    /**
-     * Returns a dynamic locator for a specific report category link in the Report Center.
-     * @param {string} sectionName - The report category name.
-     * @returns {import('@playwright/test').Locator} Locator for the report category element.
-     **/
-    getReportSection(sectionName) {
-        return this.page.locator(
-            `.ReportCenter_${sectionName.replaceAll(" ", "")}`
-        );
-    }
-
-    /**
-     * Navigates to a specific section within the Report Center.
-     * @param {string} sectionName - The name of the report section to navigate to.
-     **/
-    async navigateToReportSection(sectionName) {
-        await test.step(`Navigate to Report section: "${sectionName}"`, async () => {
-            await this.click(this.reportCenter);
-            const reportSection = this.getReportSection(sectionName);
-            await this.verifyVisible(reportSection);
-            await this.click(reportSection);
-        });
-    }
 
     /**
      * Navigates to the Single Instructor scheduling page via Scheduling menu.
@@ -145,6 +124,36 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 60000 });
             await this.verifyTitle("Multi Instructor Scheduler");
+        });
+    }
+
+    /**
+* Navigates to the Single Location page via Scheduling menu.
+**/
+    async navigateToSingleLocation() {
+        await test.step('Navigate to Scheduling -> Single Location', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schedulingMenu);
+            await this.click(this.schedulingMenu);
+            await this.click(this.singleLocationLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 });
+            await this.verifyTitle("Single Location Scheduler");
+        });
+    }
+
+    /**
+* Navigates to the Multi-Vehicle scheduling page via Scheduling menu.
+**/
+    async navigateToMultiVehicle() {
+        await test.step('Navigate to Scheduling -> Multi Vehicle', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.schedulingMenu);
+            await this.click(this.schedulingMenu);
+            await this.click(this.multiVehicleLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 });
+            await this.verifyTitle("Multi Vehicle Scheduler");
         });
     }
 
@@ -639,6 +648,23 @@ export default class AdminPortalHomePage extends BasePage {
         });
     }
     /**
+     * Navigates to Configuration > Company Info via side menu.
+     **/
+    async navigateToCompanyInfo() {
+        await test.step('Click on Company Info', async () => {
+            if (!(await this.companyInfoLink.isVisible())) {
+                await this.waitForVisible(this.configurationMenu);
+                await this.click(this.configurationMenu);
+            }
+            await this.waitForVisible(this.companyInfoLink);
+            await this.click(this.companyInfoLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 60000 }).catch(() => { });
+            await this.verifyTitle(/Company Info/i);
+        });
+    }
+
+    /**
      * Clicks on Integrate Payment under Configuration and verifies Company Info title.
      **/
     async navigateToIntegratePayment() {
@@ -729,4 +755,4 @@ export default class AdminPortalHomePage extends BasePage {
         });
     }
 
-}
+}     

@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import OpenTimeSlotsPage from '../../pages/AdminApplication/Scheduling/ManageTimeSlots/OpenTimeSlotsPage';
-import login from '../../test-data/json/login.json';
-import openTimeSlotsData from '../../test-data/json/openTimeSlotsData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import OpenTimeSlotsPage from '@pages/AdminApplication/Scheduling/ManageTimeSlots/OpenTimeSlotsPage';
+import { credentials } from '@config/config';
+import openTimeSlotsData from '@test-data/json/openTimeSlotsData.json';
 
 /**
  * TC_049 / TC_050 / TC_051: C-Admin >> Scheduling >> Manage time slot >> Open time slot
@@ -34,8 +34,6 @@ test('TC_049_050_051: C-Admin >> Scheduling >> Manage time slot >> Open time slo
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const openTimeSlotsPage = new OpenTimeSlotsPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     let createdPuLocation = '';
 

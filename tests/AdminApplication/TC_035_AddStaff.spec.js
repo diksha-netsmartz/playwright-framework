@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import StaffPage from '../../pages/AdminApplication/AccountManagement/StaffPage';
-import login from '../../test-data/json/login.json';
-import staffData from '../../test-data/json/staffData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import StaffPage from '@pages/AdminApplication/AccountManagement/StaffPage';
+import { credentials } from '@config/config';
+import staffData from '@test-data/json/staffData.json';
 
 /**
  * TC_035: C-Admin >> Account Management >> Staff
@@ -26,7 +26,6 @@ test('TC_035: C-Admin >> Account Management >> Staff - To verify user is able to
     const staffPage = new StaffPage(page);
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
-        const credentials = login[process.env.ENV || 'coreServer2'];
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
     });

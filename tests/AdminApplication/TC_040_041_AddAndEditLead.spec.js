@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import LeadPage from '../../pages/AdminApplication/StudentLeads/LeadPage';
-import login from '../../test-data/json/login.json';
-import leadData from '../../test-data/json/leadData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import LeadPage from '@pages/AdminApplication/StudentLeads/LeadPage';
+import leadData from '@test-data/json/leadData.json';
+import { credentials } from '@config/config';
 
 /**
  * TC_040_041: C-Admin >> Student Leads >> Add and Edit Lead
@@ -35,7 +35,6 @@ test('TC_040_041: C-Admin >> Student Leads - Add and Edit Lead', { tag: '@studen
     const homePage = new HomePage(page);
     const leadPage = new LeadPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     /** @type {any} */
     let createdLead = {};
 

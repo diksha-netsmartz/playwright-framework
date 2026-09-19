@@ -1,7 +1,7 @@
-import BasePage from '../../utils/BasePage';
-import config from '../../config/config';
+import BasePage from '@utils/BasePage';
+import config from '@config/config';
 import { expect, test } from "@playwright/test";
-import EmailHelper from '../../utils/EmailHelper';
+import EmailHelper from '@utils/EmailHelper';
 
 /**
  * Page Object representing the Admin Portal Login Page.
@@ -199,15 +199,6 @@ export default class AdminLoginPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 30000 }).catch(() => { });
             await this.waitForLoaders().catch(() => { });
 
-        });
-    }
-
-    /**
-     * Verifies that login was successful by checking the visibility of Quick Links widget on dashboard.
-    **/
-    async verifyLoginSuccessful() {
-        await test.step('Verify Quick Links dashboard widget is displayed', async () => {
-            await this.verifyVisible(this.quickLinks);
         });
     }
 }

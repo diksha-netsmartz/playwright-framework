@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import BusinessReportsPage from '../../pages/AdminApplication/ReportCenter/BusinessReportsPage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import BusinessReportsPage from '@pages/AdminApplication/ReportCenter/BusinessReportsPage';
+import { credentials, currentEnv } from '@config/config';
 
 /**
  * TC_059: C-Admin >> Report Center >> Business Report
@@ -23,15 +23,13 @@ test('TC_059: C-Admin >> Report Center >> Business Report - To verify that Atten
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);
 
-    const env = process.env.ENV || 'coreServer2';
-    const credentials = login[env];
     const crNames = {
         uat: 'CR2026',
         staging: 'CR26',
         coreServer1: 'CR26',
         coreServer2: 'automationCR'
     };
-    const crName = crNames[env];
+    const crName = crNames[currentEnv];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

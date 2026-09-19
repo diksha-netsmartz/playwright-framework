@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import ClassroomAttendancePage from '../../pages/AdminApplication/Classroom/ClassroomAttendancePage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
+import { credentials } from '@config/config';
 
 /**
  * TC_026: C-Admin > Classroom > Attendance > Take Attendance
@@ -17,7 +17,6 @@ test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', { 
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     let pdfPage;
     let download;
 
@@ -44,5 +43,4 @@ test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', { 
         await attendancePage.verifyExcelReportDownloaded(download, 'Attendance Report');
     });
 });
-
 

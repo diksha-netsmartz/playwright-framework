@@ -1,5 +1,4 @@
-import BasePage from "../../../../utils/BasePage";
-import DateHelper from "../../../../utils/DateHelper";
+import BasePage from "@utils/BasePage";
 import { test } from "@playwright/test";
 
 /**
@@ -34,11 +33,7 @@ export default class BulkAppointmentPage extends BasePage {
         // Edit modal
         this.notesTextbox = page.locator('#txtApptNotes');
         this.cancelledTextbox = page.locator('#txtCancelApptNotes');
-        // this.statusDropdownInEditModal = page.getByRole('button', {name: 'Please Select'}).nth(4);
-        // this.confirmedOptionInEditModal = page.locator('#apptbulkedit a').filter({hasText: 'Confirmed'});
         this.updateButton = page.locator("#btnUpdateBulkAppointment");
-        // Appears after setting status to Confirmed — separate Yes button
-        // this.yesButton = page.getByRole('button', {name: 'Yes'});
 
         // Delete confirmation (uses a button, not an anchor)
         this.deleteYesButton = page.getByRole('button', { name: 'YES' });
@@ -56,8 +51,6 @@ export default class BulkAppointmentPage extends BasePage {
         this.selectDate = page.locator('#txtBulkRange');
         this.calendarPrevButton = page.locator("xpath=(//th[contains(@class,'prev')])[1]");
         this.calendarMonthHeader = page.locator("xpath=(//th[contains(@class,'month')])[1]");
-        this.currentMonthFirstDay = page.locator("xpath=(//td[contains(@class,'available') and text()='1'])[1]");
-        this.nextMonthDay = page.locator("xpath=(//td[contains(@class,'available') and text()='25'])[2]");
         this.closeSuccessMessageButton = page.locator("//div[@id='msgSuccess']//button")
         this.cancelYesButton = page.locator("xpath=//button[contains(@onclick,'cancelBulkAppointments') and text()='YES']");
     }

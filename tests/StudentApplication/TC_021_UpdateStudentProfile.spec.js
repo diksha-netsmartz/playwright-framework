@@ -1,10 +1,10 @@
 import { test } from '@playwright/test';
-import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
-import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage';
-import StudentProfilePage from '../../pages/StudentApplication/StudentProfilePage';
-import TestDataGenerator from '../../utils/TestDataGenerator';
-import DateHelper from '../../utils/DateHelper';
-import login from '../../test-data/json/login.json';
+import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
+import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage';
+import StudentProfilePage from '@pages/StudentApplication/StudentProfilePage';
+import TestDataGenerator from '@utils/TestDataGenerator';
+import DateHelper from '@utils/DateHelper';
+import { credentials } from '@config/config';
 
 /**
  * TC_021: CSP
@@ -17,7 +17,6 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
     const studentHomePage = new StudentHomePage(page);
     const studentProfilePage = new StudentProfilePage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     let dynamicParentPhone;
     let dynamicParentEmail;
     let dynamicAddress;

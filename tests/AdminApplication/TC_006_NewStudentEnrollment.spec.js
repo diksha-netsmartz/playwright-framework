@@ -1,10 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import NewStudentEnrollmentPage from '../../pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage';
-import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
-import login from "../../test-data/json/login.json";
-import studentData from "../../test-data/json/studentData.json";
-
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import NewStudentEnrollmentPage from '@pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage';
+import HomePage from "@pages/AdminApplication/AdminPortalHomePage";
+import { credentials } from "@config/config";
+import studentData from "@test-data/json/studentData.json";
 
 // Define the packages and their student information type
 const packageScenarios = [
@@ -30,14 +29,12 @@ for (const { packageName, studentType } of packageScenarios) {
     /**
      * TC_006: C-admin > New student enrollment
      * Test Case Title: Verify new student getting created and Packages are Enrolled.
-     * Expected Result: New student should get created Enrollements should be done
+     * Expected Result: New student should get created and Enrollments should be done
      **/
     test(`TC_006: C-admin > New student enrollment - Verify new student getting created and Packages are Enrolled (${packageName})`, { tag: ['@newStudentEnrollment', '@smoke'] }, async ({ page }) => {
         const loginPage = new LoginPage(page);
         const enrollmentPage = new NewStudentEnrollmentPage(page);
         const homePage = new HomePage(page);
-
-        const credentials = login[process.env.ENV || 'coreServer2'];
 
         await test.step('Step 1: Login to C-admin with valid credentials', async () => {
             await loginPage.navigateToLoginPage();

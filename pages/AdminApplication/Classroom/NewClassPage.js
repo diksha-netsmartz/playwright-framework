@@ -1,6 +1,6 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import DateHelper from '../../../utils/DateHelper';
+import DateHelper from '@utils/DateHelper';
 
 /**
  * Page Object representing the New Classroom / Add Class Page in Admin Portal.

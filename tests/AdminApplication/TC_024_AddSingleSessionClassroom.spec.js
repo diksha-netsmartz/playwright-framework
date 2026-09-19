@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import NewClassPage from '../../pages/AdminApplication/Classroom/NewClassPage';
-import login from '../../test-data/json/login.json';
-import classroomData from '../../test-data/json/classroomData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import NewClassPage from '@pages/AdminApplication/Classroom/NewClassPage';
+import { credentials } from '@config/config';
+import classroomData from '@test-data/json/classroomData.json';
 
 /**
  * TC_024: C-Admin > Classroom > New Class
@@ -15,8 +15,6 @@ test('TC_024: C-admin > Classroom > New Class - Add Single Session Class', { tag
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
   const newClassPage = new NewClassPage(page);
-
-  const credentials = login[process.env.ENV || 'coreServer2'];
 
   await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
     await loginPage.navigateToLoginPage();

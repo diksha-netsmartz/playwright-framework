@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import BulkProcessPage from '../../pages/AdminApplication/Scheduling/ManageTimeSlots/BulkProcessPage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import BulkProcessPage from '@pages/AdminApplication/Scheduling/ManageTimeSlots/BulkProcessPage';
+import { credentials } from '@config/config';
 
 /**
  * TC_052: C-Admin >> Scheduling >> Manage Time Slots >> Bulk Process
@@ -22,8 +22,6 @@ test('TC_052: C-Admin >> Scheduling >> Manage Time Slots >> Bulk Process - To Ve
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
   const bulkProcessPage = new BulkProcessPage(page);
-
-  const credentials = login[process.env.ENV || 'coreServer2'];
 
   await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
     await loginPage.navigateToLoginPage();

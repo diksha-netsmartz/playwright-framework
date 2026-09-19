@@ -1,4 +1,4 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -71,12 +71,10 @@ export default class LeadPage extends BasePage {
         this.saveNoteButton = page.locator("//button[contains(@id,'SaveNote')]");
         this.editStageSelector = page.locator('#stage').last();
         this.editSaveBtn = page.locator("//button[@data-toggle='confirmationUpdateProfile']");
-        this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.editCloseBtn = page.locator('button.close:visible')
-        this.detailsUpdatedToast = page.locator('#toast-container');
 
         this.tasktab = page.locator('#taskTab_Li');
-        this.taskSubjext = page.getByRole('textbox', { name: 'Subject' });
+        this.taskSubject = page.getByRole('textbox', { name: 'Subject' });
         this.taskStatusDropdown = page.locator("//button[contains(@data-id,'ProfileTAB_drpStatus')]");
         this.statusDropdownValueNew = page.locator("//button[contains(@data-id,'ProfileTAB_drpStatus')]//parent::div//following-sibling::div//span[text()='New']");
         this.taskNote = page.getByRole('textbox', { name: 'Note' });
@@ -343,8 +341,8 @@ export default class LeadPage extends BasePage {
     async updateTask(taskSubject, taskNote) {
         if (await this.isVisible(this.tasktab, { timeout: 100 })) {
             await this.click(this.tasktab);
-            await this.waitForVisible(this.taskSubjext);
-            await this.fill(this.taskSubjext, taskSubject);
+            await this.waitForVisible(this.taskSubject);
+            await this.fill(this.taskSubject, taskSubject);
             await this.click(this.taskStatusDropdown);
             await this.waitForVisible(this.statusDropdownValueNew);
             await this.click(this.statusDropdownValueNew);
@@ -421,7 +419,7 @@ export default class LeadPage extends BasePage {
                 await expect(this.actionLogs).toContainText(expectedData.notes);
             }
 
-            if (await this.isVisible(this.taskSubjext, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisible(this.taskSubject, { timeout: 100 }).catch(() => false)) {
                 await expect(this.actionLogs).toContainText(expectedData.taskSubject);
             }
 

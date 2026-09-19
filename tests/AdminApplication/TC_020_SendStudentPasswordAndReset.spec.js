@@ -1,12 +1,12 @@
 import { test } from '@playwright/test';
-import AdminLoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import AdminPortalHomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import StudentProfilePage from '../../pages/AdminApplication/StudentAccount/StudentProfilePage';
-import StudentResetPasswordPage from '../../pages/StudentApplication/StudentResetPasswordPage';
-import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
-import EmailHelper from '../../utils/EmailHelper';
-import TestDataGenerator from '../../utils/TestDataGenerator';
-import login from '../../test-data/json/login.json';
+import AdminLoginPage from '@pages/AdminApplication/AdminLoginPage';
+import AdminPortalHomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import StudentProfilePage from '@pages/AdminApplication/StudentAccount/StudentProfilePage';
+import StudentResetPasswordPage from '@pages/StudentApplication/StudentResetPasswordPage';
+import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
+import EmailHelper from '@utils/EmailHelper';
+import TestDataGenerator from '@utils/TestDataGenerator';
+import { credentials } from '@config/config';
 
 /**
  * TC_020: C-Admin > Student Profile
@@ -22,7 +22,6 @@ test('TC_020: C-admin > Student Profile - Verify send username/password function
     const resetPasswordPage = new StudentResetPasswordPage(page);
     const studentLoginPage = new StudentLoginPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     let resetPasswordUrl;
     let dynamicNewPassword;
 

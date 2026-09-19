@@ -1,6 +1,6 @@
-import BasePage from '../../../utils/BasePage';
-import { expect, test } from '@playwright/test';
-import DateHelper from '../../../utils/DateHelper';
+import BasePage from '@utils/BasePage';
+import { test } from '@playwright/test';
+import DateHelper from '@utils/DateHelper';
 
 /**
  * Page Object representing the Corporate Time Off page in Admin Portal (Scheduling > Corporate Time Off).

@@ -1,4 +1,4 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
 import path from 'path';
 
@@ -44,17 +44,7 @@ export default class StudentFilesPage extends BasePage {
     }
 
     /**
-     * Returns locator for a specific category option in the dropdown list.
-     * @param {string} categoryName - Category name to select.
-     * @returns {import('@playwright/test').Locator}
-     **/
-    categoryOption(categoryName) {
-        return this.page.locator('a').filter({ hasText: new RegExp(`^${categoryName}$`, 'i') }).first()
-            .or(this.page.getByRole('link', { name: categoryName, exact: true }));
-    }
-
-    /**
-     * Searches and selects a student by name in the Student Profile page.
+     * Searches and selects a student by name in the Student Files page.
      * @param {string} studentName - Student's name to search.
      **/
     async selectStudent(studentName) {
@@ -143,22 +133,8 @@ export default class StudentFilesPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 5000 }).catch(() => { });
             let count = 0;
             if (await this.isVisible(this.studentFileRows.first(), { timeout: 5000 }).catch(() => false)) {
-                // await this.waitForVisible(this.studentFileRows.first());
                 count = await this.studentFileRows.count();
             }
-
-            // console.log(`[StudentFilesPage] ${label}: ${count}`);
-
-            // try {
-            //     // await test.info().attach(label, {
-            //     //     body: `${label}: ${count}\nTotal visible file row(s): ${count}`,
-            //     //     contentType: 'text/plain'
-            //     // });
-            //     await test.step(`${label}: ${count}`, async () => { });
-
-            // } catch (e) {
-            //     console.log(`[StudentFilesPage] Error attaching count to report: ${e.message}`);
-            // }
 
             return count;
         });

@@ -1,6 +1,6 @@
-import BasePage from '../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import PdfHelper from '../../utils/PdfHelper';
+import PdfHelper from '@utils/PdfHelper';
 
 /**
  * Page Object representing the Student Enrollment and Receipt Page.

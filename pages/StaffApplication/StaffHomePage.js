@@ -1,7 +1,7 @@
-import BasePage from '../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
 import StaffLoginPage from './StaffLoginPage';
-import login from '../../test-data/json/login.json';
+import { credentials as defaultCredentials } from '@config/config';
 
 /**
  * Page Object representing the Staff Portal Home / Dashboard Page.
@@ -54,7 +54,6 @@ export default class StaffHomePage extends BasePage {
         this.fileInput = page.locator('input[type="file"][multiple]').first();
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
         this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files') or contains(text(),'file upload')]");
-        this.chooseFileBtn = page.locator("#uploadimageChoose").first();
         this.categoryDropdown = page.getByRole('button', { name: '--Select--' });
         this.categoryDropdownOption = page.locator("(//select[@name='file_Category']//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
 
@@ -387,8 +386,7 @@ export default class StaffHomePage extends BasePage {
                             expect(currentTitle.length).toBeGreaterThan(0);
                         }
                         if (await this.isVisible(this.loginBtn, { timeout: 2000 }).catch(() => false)) {
-                            const env = process.env.ENV || 'coreServer2';
-                            const creds = credentials?.staffUser || credentials || login[env]?.staffUser;
+                            const creds = credentials?.staffUser || credentials || defaultCredentials?.staffUser;
                             const username = creds?.username || creds?.staffUsername;
                             const password = creds?.password || creds?.staffPassword;
 
@@ -585,13 +583,12 @@ export default class StaffHomePage extends BasePage {
     }
 
     /**
-     * Verifies that the file upload success message is visible and the choose file button is displayed.
+     * Verifies that the file upload success message is visible.
      **/
     async verifyUploadSuccess() {
         await test.step('Verify file upload success message', async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
-            // await this.isVisible(this.chooseFileBtn);
             await this.waitForVisible(this.page.getByText('Success! Upload has been completed.', { exact: true }).first(), 60000);
             await this.verifyVisible(this.page.getByText('Success! Upload has been completed.', { exact: true }).first(), 20000);
         });

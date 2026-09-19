@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import BusinessReportsPage from '../../pages/AdminApplication/ReportCenter/BusinessReportsPage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import BusinessReportsPage from '@pages/AdminApplication/ReportCenter/BusinessReportsPage';
+import { credentials, currentEnv } from '@config/config';
 
 /**
  * TC_057: C-Admin >> Report Center >> Business Report
@@ -23,10 +23,8 @@ test('TC_057: C-Admin >> Report Center >> Business Report - To verify that Class
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);
 
-    const env = process.env.ENV || 'coreServer2';
-    const credentials = login[env];
     const studentName = credentials.studentUser.name;
-    const reportName = env === 'coreServer2' ? 'Classroom Attendance History' : 'CR Attendance History';
+    const reportName = currentEnv === 'coreServer2' ? 'Classroom Attendance History' : 'CR Attendance History';
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

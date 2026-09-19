@@ -1,5 +1,5 @@
-import BasePage from "../../../../utils/BasePage";
-import PdfHelper from "../../../../utils/PdfHelper";
+import BasePage from "@utils/BasePage";
+import PdfHelper from "@utils/PdfHelper";
 import { test, expect } from "@playwright/test";
 
 /**

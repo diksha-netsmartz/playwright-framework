@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
-import StaffLoginPage from '../../pages/StaffApplication/StaffLoginPage';
-import StaffHomePage from '../../pages/StaffApplication/StaffHomePage';
-import login from '../../test-data/json/login.json';
+import StaffLoginPage from '@pages/StaffApplication/StaffLoginPage';
+import StaffHomePage from '@pages/StaffApplication/StaffHomePage';
+import { credentials } from '@config/config';
 
 /**
  * TC_017: Centralize Staff Mobile (CSM)
@@ -13,8 +13,6 @@ test('TC_017: CSM - Verify lesson cancellation functionality', { tag: ['@CSMHome
 
     const staffLoginPage = new StaffLoginPage(page);
     const staffHomePage = new StaffHomePage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to CSM portal with valid staff credentials', async () => {
         await staffLoginPage.navigateToLoginPage();

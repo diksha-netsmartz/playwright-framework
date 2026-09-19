@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import MiscellaneousPage from '../../pages/AdminApplication/AccountManagement/Services/MiscellaneousPage';
-import login from '../../test-data/json/login.json';
-import miscData from '../../test-data/json/miscellaneousData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import MiscellaneousPage from '@pages/AdminApplication/AccountManagement/Services/MiscellaneousPage';
+import { credentials } from '@config/config';
+import miscData from '@test-data/json/miscellaneousData.json';
 
 /**
  * TC_032: C-Admin >> Account Management >> Services >> Misc
@@ -25,8 +25,6 @@ test('TC_032: C-Admin >> Account Management >> Services >> Misc - To verify user
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const miscPage = new MiscellaneousPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

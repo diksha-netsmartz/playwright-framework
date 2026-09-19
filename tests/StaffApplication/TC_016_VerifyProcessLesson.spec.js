@@ -1,10 +1,10 @@
 import { test } from '@playwright/test';
 
-import StaffLoginPage from '../../pages/StaffApplication/StaffLoginPage';
-import StaffHomePage from '../../pages/StaffApplication/StaffHomePage';
-import ProcessLessonPage from '../../pages/StaffApplication/ProcessLessonPage';
+import StaffLoginPage from '@pages/StaffApplication/StaffLoginPage';
+import StaffHomePage from '@pages/StaffApplication/StaffHomePage';
+import ProcessLessonPage from '@pages/StaffApplication/ProcessLessonPage';
 
-import login from '../../test-data/json/login.json';
+import { credentials } from '@config/config';
 
 /**
  * TC_016: Centralize Staff Mobile (CSM)
@@ -17,8 +17,6 @@ test('TC_016: CSM - Verify process lesson functionality', { tag: ['@CSMHomepage'
     const staffHomePage = new StaffHomePage(page);
     const processLessonPage = new ProcessLessonPage(page);
     let isTitleMatched = false;
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to CSM portal with valid staff credentials', async () => {
         await staffLoginPage.navigateToLoginPage();

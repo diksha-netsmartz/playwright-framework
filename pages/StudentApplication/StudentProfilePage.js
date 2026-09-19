@@ -1,4 +1,4 @@
-import BasePage from '../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { test, expect } from '@playwright/test';
 
 /**

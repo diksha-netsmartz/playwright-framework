@@ -1,7 +1,7 @@
-import BasePage from '../../utils/BasePage';
-import config from '../../config/config';
+import BasePage from '@utils/BasePage';
+import config from '@config/config';
 import { test, expect } from '@playwright/test';
-import EmailHelper from '../../utils/EmailHelper';
+import EmailHelper from '@utils/EmailHelper';
 
 /**
  * Page Object representing the Student Portal Login Page.

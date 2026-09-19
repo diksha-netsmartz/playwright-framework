@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
-import StudentEnrollPage from '../../pages/StudentApplication/StudentEnrollPage';
-import login from '../../test-data/json/login.json';
-import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage'
+import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
+import StudentEnrollPage from '@pages/StudentApplication/StudentEnrollPage';
+import { credentials } from '@config/config';
+import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage'
 
 /**
  * TC_012: CSP
@@ -15,7 +15,6 @@ test('TC_012: CSP - Verify student is able to Enroll Package', { tag: ['@CSPEnro
     const studentEnrollPage = new StudentEnrollPage(page);
     const studentHomePage = new StudentHomePage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     let receiptPage;
 
     await test.step('Step 1: Login to student portal (CSP)', async () => {

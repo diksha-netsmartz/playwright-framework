@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
-import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
-import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage';
-import login from '../../test-data/json/login.json';
+import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
+import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage';
+import { credentials } from '@config/config';
 
 /**
  * TC_013: CSP > Verify Student is able to make Payment
@@ -17,8 +17,6 @@ test('TC_013: CSP - Verify Student is able to make Payment', { tag: ['@CSPHomepa
 
     const studentLoginPage = new StudentLoginPage(page);
     const studentHomePage = new StudentHomePage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to student Portal (CSP) with valid credentials', async () => {
         await studentLoginPage.navigateToLoginPage();

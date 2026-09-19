@@ -1,6 +1,6 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import ExcelHelper from '../../../utils/ExcelHelper';
+import ExcelHelper from '@utils/ExcelHelper';
 
 /**
  * Page Object representing the OE Leads tab within Student Leads in the Admin Portal.

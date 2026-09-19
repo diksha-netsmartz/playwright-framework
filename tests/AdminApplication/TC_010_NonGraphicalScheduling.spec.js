@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
 
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import NonGraphicalPage from '../../pages/AdminApplication/Scheduling/NonGraphicalPage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import NonGraphicalPage from '@pages/AdminApplication/Scheduling/NonGraphicalPage';
+import { credentials } from '@config/config';
 
 /**
  * TC_010: C-Admin > Scheduling > Non Graphical
@@ -17,7 +17,6 @@ test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to S
     const homePage = new HomePage(page);
     const nonGraphicalPage = new NonGraphicalPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     const targetStudent = credentials.studentUser.name;
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {

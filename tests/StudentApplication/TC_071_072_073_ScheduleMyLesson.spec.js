@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
-import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage';
-import StudentScheduleLessonsPage from '../../pages/StudentApplication/StudentScheduleLessonsPage';
-import login from '../../test-data/json/login.json';
+import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
+import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage';
+import StudentScheduleLessonsPage from '@pages/StudentApplication/StudentScheduleLessonsPage';
+import { credentials } from '@config/config';
 
 /**
  * TC_071: CSP >> Scheduling >> Schedule My lesson
@@ -23,7 +23,6 @@ test('TC_071 , TC_072 and TC_073: CSP - To Verify student is able to schedule ,r
   const studentHomePage = new StudentHomePage(page);
   const studentScheduleLessonsPage = new StudentScheduleLessonsPage(page);
 
-  const credentials = login[process.env.ENV || 'coreServer2'];
   let slotText, rescheduledSlotText, cancelledSlotText;
 
   await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {

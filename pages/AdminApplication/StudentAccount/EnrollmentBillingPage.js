@@ -1,6 +1,6 @@
-import BasePage from "../../../utils/BasePage";
+import BasePage from "@utils/BasePage";
 import { expect, test } from "@playwright/test";
-import paymentData from "../../../test-data/json/paymentData.json";
+import paymentData from "@test-data/json/paymentData.json";
 
 /**
  * Page Object representing the Student Enrollment and Billing Page in Admin Portal.
@@ -23,12 +23,6 @@ export default class EnrollmentBillingPage extends BasePage {
 
         this.goButton = page.getByRole('button', { name: 'GO' });
 
-        this.selectLocationDropdown = page.getByRole('link', { name: 'Select Location' });
-
-        this.showAllCheckbox = page.getByText('Show All').first();
-
-        this.filterButton = page.getByRole('button', { name: 'Filter' });
-
         // Add New
         this.addNewButton = page.locator('#divEnrollmentGrid').getByRole('link', { name: 'Add New' });
 
@@ -41,23 +35,14 @@ export default class EnrollmentBillingPage extends BasePage {
         this.soldByDropdown = page.locator('#btnSelectSoldBy')
         this.soldByDropdownSelection = page.locator("(//div[@id='dvSoldBy']//li//a[1][not(contains(text(),'Select'))])[1]");
 
-
-
         // Location / Appointment
-        this.selectLocation = page.getByRole('link', { name: 'Select Location' });
-        this.selectButton = page.locator("xpath=//a[text()='Select' and @onclick='showAddButton(this);']").first();
         this.addButton = page.locator("xpath=//button[text()='Add' and contains(@onclick,'showSelect(this);')]").first();
-        this.addButtonForAdditionalDetails = page.locator("xpath=//td[text()='RT PRODUCT']//ancestor::tr//button[text()='Add' and contains(@onclick,'addAdditional')]").first();
-
-        this.addToCartButton = page.getByRole('button', { name: 'Add To Cart' });
 
         // Enroll
         this.enrollButton = page.getByRole('button', { name: 'Enroll' });
 
         // Edit
         this.editButton = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//ancestor::tr//a[@data-toggle='dropdown'])[1]");
-        this.getLatestPackageID = page.locator("xpath=(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[4])[1]");
-        this.getLatestPackageId2 = page.locator("(//table[@id='enrollments']//td[text()='CR Package']//parent::tr//td[text()='Package']//following-sibling::td)[1]");
         this.editIconDropdown = page.locator('.fa-edit:visible');
         this.deleteIconDropdown = page.locator('.fa-trash:visible');
 
@@ -70,10 +55,7 @@ export default class EnrollmentBillingPage extends BasePage {
         this.skipSelectionButtonForClassSelection = page.locator("xpath=//h4[text()='Class Selection']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
         this.skipSelectionButtonAddOnServices = page.locator("//h4[text()='Add On Services/Products']//ancestor::div[contains(@class,'modal-content')]//button[text()='Skip Selection']");
 
-
-
         // Billing grid
-        this.selectButton = page.getByRole('button', { name: 'Select' });
         this.addNewBilling = page.locator('#divBillingGrid').getByRole('link', { name: 'Add New' }).last();
 
         // Swiped Transaction
@@ -156,24 +138,6 @@ export default class EnrollmentBillingPage extends BasePage {
     }
 
     /**
-     * Returns locator for the edit details tab for a given enrollment database ID.
-     * @param {string|number} databaseID - Enrollment record ID.
-     * @returns {import('@playwright/test').Locator} Edit details tab locator.
-      **/
-    editDetailsTab(databaseID) {
-        return this.page.locator(`xpath=(//a[@onclick='GetEnrollmentDetail(${databaseID})'])[last()]`);
-    }
-
-    /**
-     * Returns locator for the delete enrollment button for a given enrollment database ID.
-     * @param {string|number} databaseID - Enrollment record ID.
-     * @returns {import('@playwright/test').Locator} Delete enrollment link locator.
-      **/
-    deleteLink(databaseID) {
-        return this.page.locator(`xpath=(//a[@data-toggle='confirmationDeleteEnrollment' and @data-enrollmentid='${databaseID}'])[1]`);
-    }
-
-    /**
      * Returns locator for the student autocomplete list item matching the specified name.
      * @param {string} studentName - Student name. 
      * @returns {import('@playwright/test').Locator} Student dropdown item locator.
@@ -249,22 +213,11 @@ export default class EnrollmentBillingPage extends BasePage {
             await this.click(this.addPackageButton);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 5000 });
-            // await this.page.waitForTimeout(2500);
-            // if (await this.isVisible(this.selectLocationDropdown)) {
-            //     await this.click(this.selectLocationDropdown);
-            //     await this.click(this.showAllCheckbox);
-            //     await this.click(this.filterButton);
-            //     await this.click(this.selectButton);
-            // }
-            // await this.click(this.addButtonForAdditionalDetails);
-            // await this.click(this.addToCartButton);
 
-            // await this.page.waitForTimeout(3000);
             if (await this.isVisible(this.skipSelectionButtonForClassSelection, { timeout: 10000 }).catch(() => false)) {
                 await this.click(this.skipSelectionButtonForClassSelection);
                 await this.waitForHidden(this.skipSelectionButtonForClassSelection);
             }
-            // await this.page.waitForTimeout(3000);
             if (await this.isVisible(this.skipSelectionButtonAddOnServices, { timeout: 3000 }).catch(() => false)) {
                 await this.click(this.skipSelectionButtonAddOnServices);
                 await this.waitForHidden(this.skipSelectionButtonAddOnServices);
@@ -292,17 +245,6 @@ export default class EnrollmentBillingPage extends BasePage {
     async editAndUpdateNotes() {
         await test.step('Edit package enrollment and update notes', async () => {
             await this.click(this.editButton);
-            // let packageId = "";
-            // if (await this.getLatestPackageId2.count() > 0) {
-            //     packageId = await this.getText(this.getLatestPackageId2);
-
-            // }
-            // else {
-            //     packageId = await this.getText(this.getLatestPackageID);
-            // }
-
-            // console.log("package id : " + packageId);
-            // await this.click(this.editDetailsTab(packageId));
             await this.waitForVisible(this.editIconDropdown, { timeout: 3000 });
             await this.click(this.editIconDropdown);
             await this.waitForLoaders();
@@ -314,7 +256,6 @@ export default class EnrollmentBillingPage extends BasePage {
             }
             await this.fill(this.notesTextbox, "updating package notes");
             await this.click(this.updateButton);
-            // await this.page.waitForTimeout(2000);
             if (await this.isVisible(this.yesConfirmationButton, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.yesConfirmationButton);
                 await this.waitForLoaders();
@@ -329,21 +270,6 @@ export default class EnrollmentBillingPage extends BasePage {
         await test.step('Delete package enrollment', async () => {
             await this.waitForVisible(this.editButton);
             await this.click(this.editButton);
-            // let packageId = "";
-            // if (await this.getLatestPackageId2.count() > 0) {
-            //     packageId = await this.getText(this.getLatestPackageId2);
-
-            // }
-            // else {
-            //     packageId = await this.getText(this.getLatestPackageID);
-            // }
-            // console.log("package id : " + packageId);
-            // await this.waitForVisible(this.deleteLink(packageId), { timeout: 5000 });
-            // if (!await this.isVisible(this.deleteLink(packageId))) {
-            //     await this.click(this.editButton);
-            //     await this.click(this.editButton);
-            // }
-            // await this.deleteLink(packageId).click({ force: true });
             await this.waitForVisible(this.deleteIconDropdown, { timeout: 3000 });
             await this.click(this.deleteIconDropdown);
             await this.click(this.yesConfirmationButton);

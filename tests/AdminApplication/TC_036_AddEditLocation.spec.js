@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import LocationsPage from '../../pages/AdminApplication/AccountManagement/LocationsPage';
-import login from '../../test-data/json/login.json';
-import locationData from '../../test-data/json/locationData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import LocationsPage from '@pages/AdminApplication/AccountManagement/LocationsPage';
+import { credentials } from '@config/config';
+import locationData from '@test-data/json/locationData.json';
 
 /**
  * TC_036: C-Admin >> Account Management >> Locations
@@ -18,7 +18,6 @@ test('TC_036: C-Admin >> Account Management >> Locations - To verify user able t
     const homePage = new HomePage(page);
     const locationsPage = new LocationsPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     let createdLocation;
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {

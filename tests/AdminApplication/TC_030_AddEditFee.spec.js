@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import FeesPage from '../../pages/AdminApplication/AccountManagement/Services/FeesPage';
-import login from '../../test-data/json/login.json';
-import feeData from '../../test-data/json/feeData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import FeesPage from '@pages/AdminApplication/AccountManagement/Services/FeesPage';
+import { credentials } from '@config/config';
+import feeData from '@test-data/json/feeData.json';
 
 /**
  * TC_030: C-Admin >> Account Management >> Services >> Fee
@@ -25,8 +25,6 @@ test('TC_030: C-Admin >> Account Management >> Services >> Fee - To verify user 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const feesPage = new FeesPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
