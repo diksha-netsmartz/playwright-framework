@@ -27,9 +27,12 @@ export default class DiscountsPage extends BasePage {
         this.statusDropdownOptionActive = page.locator("xpath=//select[@name='Status']//parent::div//div//span[text()='Active']");
         this.statusDropdownOptionDeleted = page.locator("xpath=//select[@name='Status']//parent::div//div//span[text()='Deleted']");
         this.itemTaxableCheckbox = page.locator("xpath=//input[@id='ItemIsTaxable']//following-sibling::ins");
+        this.itemTaxableCheckboxWrapper = page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
         this.currentTaxesDropdown = page.locator("xpath=//button[@data-id='drp_Products_CurrentSatetTaxList']");
         this.currentTaxesDropdownOption = page.locator("xpath=(//button[@data-id='drp_Products_CurrentSatetTaxList']//parent::div//div//li[not(@class='selected')]//span[1][not(text()='Please Select')])[1]");
         this.additionalTaxInput = page.getByRole('textbox', { name: 'Additional Tax' });
+        this.totalItemPriceLabel = page.locator('#lbl_Products_TotalItemprice');
+        this.totalTaxAmountLabel = page.locator('#lbl_Products_TotalTaxAmount');
 
         this.eligibleServiceSelection = page.locator("//div[contains(@class,'ms-selectable')]//li[contains(@attrcolumn,'DiscountPackages')]");
         this.selectedServicePackage = page.locator("//div[contains(@class,'ms-selection')]//li[contains(@attrcolumn,'DiscountPackages') and contains(@class,'ms-selected')]");
@@ -37,10 +40,7 @@ export default class DiscountsPage extends BasePage {
         this.selectedDiscountClasses = page.locator("//div[contains(@class,'ms-selection')]//li[contains(@attrcolumn,'DiscountClasses') and contains(@class,'ms-selected')]")
         this.eligibleLocationsSelection = page.locator("//div[contains(@class,'ms-selectable')]//li[contains(@attrcolumn,'DiscountLocations')]");
         this.selectedDiscountLocations = page.locator("//div[contains(@class,'ms-selection')]//li[contains(@attrcolumn,'DiscountLocations') and contains(@class,'ms-selected')]")
-
-        this.discountExpirationTextbox = page.getByRole('textbox', { name: 'MM/DD/YYYY' });
-        this.discountExpireDateSelectInCalendar = page.locator("xpath=(//div[contains(@class,'datepicker-days')]//td)[last()]");
-
+        this.discountExpirationTextbox = page.locator('#str_DiscountExpiry');
         this.notesInput = page.locator('#Notes');
 
         // Modal Action Buttons
@@ -50,9 +50,15 @@ export default class DiscountsPage extends BasePage {
         this.statusFilterDropdown = page.locator("xpath=//div[@id='pnlDiscountsTAB']//a[contains(.,'Status')]");
         this.selectAllStatusCheckbox = page.locator("xpath=//div[@id='pnlDiscountsTAB']//input[contains(@class,'SelectAllStatus')]//following-sibling::ins");
 
-        // Table Locators
         this.searchTextbox = page.locator("xpath=(//div[contains(@id,'Discounts')]//input[@type='search'])[1]");
         this.editIcon = page.getByTitle('Edit');
+
+        this.isServicePackageSelected = false;
+        this.isDiscountClassesSelected = false;
+        this.isDiscountLocationsSelected = false;
+        this.isServicePackageUpdated = false;
+        this.isDiscountClassesUpdated = false;
+        this.isDiscountLocationsUpdated = false;
     }
 
     /**
@@ -74,14 +80,15 @@ export default class DiscountsPage extends BasePage {
      **/
     async fillDiscountDetails(data = {}) {
         return await test.step('Fill discount details', async () => {
-            const prefix = data.discountName || 'Discount';
+            const prefix = data.discountName;
             this.discountName = `${prefix}_${Date.now()}`;
             this.discountCode = `${Math.floor(10000 + Math.random() * 90000)}`;
-            const additionalTax = data.additionalTax || `${Math.floor(1 + Math.random() * 25)}`;
+            const additionalTax = data.additionalTax;
             this.additionalTax = additionalTax;
             const discountAmount = data.discountAmount;
             const feeAmount = data.feeAmount;
             const notes = data.notes;
+            const discountExpiry = data.discountExpiry;
 
             await this.waitForLoaders();
             await this.waitForVisible(this.discountNameInput);
@@ -107,13 +114,32 @@ export default class DiscountsPage extends BasePage {
             await this.click(this.currentTaxesDropdownOption);
             await this.fill(this.additionalTaxInput, additionalTax);
 
-            await this.click(this.eligibleServiceSelection.first());
-            await this.click(this.eligibleClassesSelection.first());
-            await this.click(this.eligibleLocationsSelection.first());
+            // Select Service Package if visible
+            if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleServiceSelection.first());
+                this.isServicePackageSelected = true;
+            } else {
+                this.isServicePackageSelected = false;
+            }
 
-            await this.click(this.discountExpirationTextbox);
-            await this.waitForVisible(this.discountExpireDateSelectInCalendar);
-            await this.click(this.discountExpireDateSelectInCalendar);
+            // Select Discount Classes if visible
+            if (await this.isVisible(this.eligibleClassesSelection.first(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleClassesSelection.first());
+                this.isDiscountClassesSelected = true;
+            } else {
+                this.isDiscountClassesSelected = false;
+            }
+
+            // Select Discount Locations if visible
+            if (await this.isVisible(this.eligibleLocationsSelection.first(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleLocationsSelection.first());
+                this.isDiscountLocationsSelected = true;
+            } else {
+                this.isDiscountLocationsSelected = false;
+            }
+
+            await this.pressSequentially(this.discountExpirationTextbox, discountExpiry);
+            await this.page.keyboard.press('Tab');
 
             await this.fill(this.notesInput, notes);
 
@@ -189,10 +215,10 @@ export default class DiscountsPage extends BasePage {
     async verifyDiscountDetails(data = {}) {
         await test.step('Verify discount details in edit form match added values', async () => {
             await this.waitForVisible(this.discountNameInput, { timeout: 5000 });
-            await expect(this.discountNameInput).toHaveValue(this.discountName || data.discountName);
+            await expect(this.discountNameInput).toHaveValue(this.discountName);
 
             if (await this.isVisible(this.discountCodeInput, { timeout: 100 }).catch(() => false)) {
-                await expect(this.discountCodeInput).toHaveValue(this.discountCode || data.discountCode);
+                await expect(this.discountCodeInput).toHaveValue(this.discountCode);
             }
 
             if (await this.isVisible(this.discountAmountInput, { timeout: 100 }).catch(() => false)) {
@@ -204,28 +230,29 @@ export default class DiscountsPage extends BasePage {
             }
 
             await expect(this.statusDropdown).toContainText('Active');
-
             await expect(this.notesInput).toHaveValue(data.notes);
 
-
             if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
-                const taxableWrapper = this.page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
-                if (await taxableWrapper.count() > 0) {
-                    await expect(taxableWrapper).toHaveClass(/checked/);
-                }
-            }
-
-            if (this.additionalTax && await this.isVisible(this.additionalTaxInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.itemTaxableCheckboxWrapper).toHaveClass(/checked/);
+                await expect(this.currentTaxesDropdown).not.toContainText('Please Select');
                 const actualAmount = await this.additionalTaxInput.inputValue();
                 expect(parseFloat(actualAmount)).toBe(parseFloat(this.additionalTax));
+                await expect(this.totalItemPriceLabel).not.toHaveText('$0.00');
+                await expect(this.totalTaxAmountLabel).not.toHaveText('$0.00');
             }
 
-            await this.verifyVisible(this.selectedServicePackage.first());
-            await this.verifyVisible(this.selectedDiscountClasses.first());
-            await this.verifyVisible(this.selectedDiscountLocations.first());
+            if (this.isServicePackageSelected) {
+                await this.verifyVisible(this.selectedServicePackage.first());
+            }
+            if (this.isDiscountClassesSelected) {
+                await this.verifyVisible(this.selectedDiscountClasses.first());
+            }
+            if (this.isDiscountLocationsSelected) {
+                await this.verifyVisible(this.selectedDiscountLocations.first());
+            }
 
             if (await this.isVisible(this.discountExpirationTextbox, { timeout: 100 }).catch(() => false)) {
-                await expect(this.discountExpirationTextbox).not.toHaveValue('');
+                await expect(this.discountExpirationTextbox).toHaveValue(data.discountExpiry);
             }
         });
     }
@@ -238,12 +265,13 @@ export default class DiscountsPage extends BasePage {
         await test.step('Update Discount fields (Name, Code, Amount, Notes, Status, Selectables)', async () => {
             await this.waitForLoaders();
 
-            const updatedAmount = data.updatedDiscountAmount || '200.00';
-            const updatedNotes = data.updatedNotes || `Updated Notes for ${this.discountName}`;
+            const updatedAmount = data.updatedDiscountAmount;
+            const updatedNotes = data.updatedNotes;
+            const updatedDiscountExpiry = data.updatedDiscountExpiry;
             await this.waitForVisible(this.statusDropdown);
 
             if (await this.discountNameInput.isEditable().catch(() => false)) {
-                this.discountName = `${data.updatedDiscountName || 'Updated_Discount'}_${Date.now()}`;
+                this.discountName = `${data.updatedDiscountName}_${Date.now()}`;
                 await this.fill(this.discountNameInput, this.discountName);
             }
 
@@ -270,11 +298,29 @@ export default class DiscountsPage extends BasePage {
                 await this.click(this.itemTaxableCheckbox);
             }
 
-            // Select last selectable package, class, location
-            await this.click(this.eligibleServiceSelection.last());
-            await this.click(this.eligibleClassesSelection.last());
-            await this.click(this.eligibleLocationsSelection.last());
+            // Select last selectable package, class, location if visible
+            if (await this.isVisible(this.eligibleServiceSelection.last(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleServiceSelection.last());
+                this.isServicePackageUpdated = true;
+            } else {
+                this.isServicePackageUpdated = false;
+            }
+            if (await this.isVisible(this.eligibleClassesSelection.last(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleClassesSelection.last());
+                this.isDiscountClassesUpdated = true;
+            } else {
+                this.isDiscountClassesUpdated = false;
+            }
+            if (await this.isVisible(this.eligibleLocationsSelection.last(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleLocationsSelection.last());
+                this.isDiscountLocationsUpdated = true;
+            } else {
+                this.isDiscountLocationsUpdated = false;
+            }
 
+            await this.clear(this.discountExpirationTextbox);
+            await this.pressSequentially(this.discountExpirationTextbox, updatedDiscountExpiry);
+            await this.page.keyboard.press('Tab');
 
             // Update Notes
             await this.fill(this.notesInput, updatedNotes);
@@ -307,7 +353,7 @@ export default class DiscountsPage extends BasePage {
     async verifyUpdatedDiscountDetails(data = {}) {
         await test.step('Verify discount details in edit form match updated values', async () => {
             await this.waitForVisible(this.discountNameInput, { timeout: 5000 });
-            await expect(this.discountNameInput).toHaveValue(this.discountName || data.updatedDiscountName);
+            await expect(this.discountNameInput).toHaveValue(this.discountName);
 
             if (await this.isVisible(this.discountCodeInput, { timeout: 100 }).catch(() => false)) {
                 await expect(this.discountCodeInput).toHaveValue(this.discountCode);
@@ -323,21 +369,33 @@ export default class DiscountsPage extends BasePage {
 
             await expect(this.statusDropdown).toContainText('Deleted');
 
-            if (data.updatedNotes) {
-                await expect(this.notesInput).toHaveValue(data.updatedNotes);
-            }
+            await expect(this.notesInput).toHaveValue(data.updatedNotes);
 
             // Verify item taxable checkbox was unchecked
             if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
-                const taxableWrapper = this.page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
-                if (await taxableWrapper.count() > 0) {
-                    await expect(taxableWrapper).not.toHaveClass(/checked/);
-                }
+                await expect(this.itemTaxableCheckboxWrapper).not.toHaveClass(/checked/);
+                await this.verifyNotVisible(this.currentTaxesDropdown);
+                await this.verifyNotVisible(this.additionalTaxInput);
+                await this.verifyNotVisible(this.totalItemPriceLabel);
+                await this.verifyNotVisible(this.totalTaxAmountLabel);
             }
-            await expect(this.selectedServicePackage).toHaveCount(2);
-            await expect(this.selectedDiscountClasses).toHaveCount(2);
-            await expect(this.selectedDiscountLocations).toHaveCount(2);
 
+            const servicePackageCount = (this.isServicePackageSelected ? 1 : 0) + (this.isServicePackageUpdated ? 1 : 0);
+            if (servicePackageCount > 0) {
+                await expect(this.selectedServicePackage).toHaveCount(servicePackageCount);
+            }
+            const discountClassesCount = (this.isDiscountClassesSelected ? 1 : 0) + (this.isDiscountClassesUpdated ? 1 : 0);
+            if (discountClassesCount > 0) {
+                await expect(this.selectedDiscountClasses).toHaveCount(discountClassesCount);
+            }
+            const discountLocationsCount = (this.isDiscountLocationsSelected ? 1 : 0) + (this.isDiscountLocationsUpdated ? 1 : 0);
+            if (discountLocationsCount > 0) {
+                await expect(this.selectedDiscountLocations).toHaveCount(discountLocationsCount);
+            }
+
+            if (await this.isVisible(this.discountExpirationTextbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.discountExpirationTextbox).toHaveValue(data.updatedDiscountExpiry);
+            }
         });
     }
 

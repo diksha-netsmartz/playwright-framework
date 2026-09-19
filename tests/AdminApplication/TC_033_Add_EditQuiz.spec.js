@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
 import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
 import OnlineQuizTestsPage from '../../pages/AdminApplication/AccountManagement/Services/OnlineQuizTestsPage';
@@ -20,8 +20,9 @@ import quizData from '../../test-data/json/quizData.json';
  * Expected Result:
  *   1. "Quiz Added successfully.Now you can add questions." message should display
  *   2. The added quiz should be visible in the grid
+ *   3. Quiz should be edited successfully
  **/
-test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To verify user able to Add Quiz', { tag: '@accountManagement' }, async ({page}) => {
+test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To verify user able to Add Quiz', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const quizPage = new OnlineQuizTestsPage(page);
@@ -54,20 +55,21 @@ test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To
         await quizPage.clickBack();
     });
 
-    await test.step('Step 7: Verify the added quiz is visible in the grid', async () => {
-        await quizPage.verifyQuizVisibleInGrid();
+    await test.step('Step 7: Click Edit on the created quiz and verify details', async () => {
+        await quizPage.searchAndEditQuiz();
+        await quizPage.verifyQuizDetails(quizData);
     });
 
-    await test.step('Step 8: Click Edit on the created quiz', async () => {
-        await quizPage.editQuiz();
-    });
-
-    await test.step('Step 9: Change Quiz Status to Deleted and click Save', async () => {
-        await quizPage.updateQuizStatusToDeleted();
+    await test.step('Step 8: Edit quiz details, set status to Deleted, and click Save', async () => {
+        await quizPage.editQuizDetails(quizData);
         await quizPage.clickSave();
+        await quizPage.verifyQuizUpdatedSuccessfully();
     });
 
-    await test.step('Step 10: Verify "Quiz Updated successfully !" notification', async () => {
-        await quizPage.verifyQuizUpdatedSuccessfully();
+    await test.step('Step 9: Verify "Quiz Updated successfully !" notification', async () => {
+        await quizPage.clickBack();
+        await quizPage.searchAndEditQuiz();
+        await quizPage.verifyUpdatedQuizDetails(quizData);
+
     });
 });

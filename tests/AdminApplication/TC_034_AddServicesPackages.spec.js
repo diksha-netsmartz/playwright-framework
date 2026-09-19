@@ -7,18 +7,20 @@ import servicesData from '../../test-data/json/servicesPackagesData.json';
 
 /**
  * TC_034: C-Admin >> Account Management >> Services >> Services
- * Test Case Title: To verify user able to add Services
+ * Test Case Title: To verify user able to add and update Services (Packages)
  * Precondition: User should have valid admin login credentials
  * Steps:
  *   Step 1 - Login to Admin Portal with valid credentials
  *   Step 2 - From the side menu, navigate to Account Management > Services > Services (Packages)
- *   Step 3 - Click on "Add New" and fill all required fields (prefix + Date.now() for service name, Active status)
- *   Step 4 - Click on Save
- *   Step 5 - Verify service is created successfully and visible on the grid
+ *   Step 3 - Click on "Add New" and fill service details
+ *   Step 4 - Click on Save button and verify message
+ *   Step 5 - Search the package, click Edit, and verify details
+ *   Step 6 - Update service details and click Save
+ *   Step 7 - Search for updated package, click Edit, and verify updated details
  * Expected Result:
- *   Service should be created successfully and visible on the grid
+ *   Service (Package) should be created, verified, updated, and verified successfully
  **/
-test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify user able to add Services', { tag: '@accountManagement' }, async ({ page }) => {
+test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify user able to add and update Services', { tag: '@accountManagement' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const servicesPage = new ServicesPackagesPage(page);
@@ -43,13 +45,18 @@ test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify 
         await servicesPage.clickSaveAndVerifySuccessMessage();
     });
 
-
-    await test.step('Step 5: Verify service is created successfully and visible on the grid', async () => {
-        await servicesPage.verifyServiceVisibleInGrid();
+    await test.step('Step 5: Search the package, click Edit, and verify details', async () => {
+        await servicesPage.searchAndEditServicePackage(servicesPage.serviceName);
+        await servicesPage.verifyServiceDetails(servicesData);
     });
 
-    await test.step('Step 6: Delete the created service and verify deletion', async () => {
-        await servicesPage.deleteService();
-        await servicesPage.verifyServiceDeletedSuccessfully();
+    await test.step('Step 6: Update service details and click Save', async () => {
+        await servicesPage.updateServiceDetails(servicesData);
+        await servicesPage.clickSaveAndVerifySuccessMessage();
+    });
+
+    await test.step('Step 7: Search for updated package, click Edit, and verify updated details', async () => {
+        await servicesPage.searchAndEditServicePackage(servicesPage.updatedServiceName);
+        await servicesPage.verifyUpdatedServiceDetails(servicesData);
     });
 });

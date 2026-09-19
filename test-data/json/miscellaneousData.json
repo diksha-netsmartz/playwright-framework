@@ -2,5 +2,6 @@
   "miscellaneousName": "MiscItem",
   "updatedMiscellaneousName": "Updated_MiscItem",
   "price": "100.00",
-  "updatedPrice": "150.00"
+  "updatedPrice": "150.00",
+  "additionalTax": "15"
 }

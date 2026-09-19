@@ -31,6 +31,17 @@ export default class FeesPage extends BasePage {
         this.allowWebPurchaseNoRadioButton = page.locator("xpath=//label[contains(text(),'No')]//input[@id='AllowWebPurchase']//following-sibling::ins");
         this.allowPortalPurchaseYesRadioButton = page.locator("xpath=//label[contains(text(),'Yes')]//input[@id='AllowPortalPurchase']//following-sibling::ins");
         this.allowPortalPurchaseNoRadioButton = page.locator("xpath=//label[contains(text(),'No')]//input[@id='AllowPortalPurchase']//following-sibling::ins");
+        this.allowWebPurchaseYesRadioWrapper = page.locator("xpath=//label[contains(text(),'Yes')]//input[@id='AllowWebPurchase']//parent::div")
+        this.allowWebPurchaseNoRadioWrapper = page.locator("xpath=//label[contains(text(),'No')]//input[@id='AllowWebPurchase']//parent::div")
+        this.allowPortalPurchaseYesRadioWrapper = page.locator("xpath=//label[contains(text(),'Yes')]//input[@id='AllowPortalPurchase']//parent::div")
+        this.allowPortalPurchaseNoRadioWrapper = page.locator("xpath=//label[contains(text(),'No')]//input[@id='AllowPortalPurchase']//parent::div")
+        this.itemTaxableCheckbox = page.locator("xpath=//input[@id='ItemIsTaxable']//following-sibling::ins");
+        this.itemTaxableCheckboxWrapper = page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
+        this.currentTaxesDropdown = page.locator("xpath=//button[@data-id='drp_Products_CurrentSatetTaxList']");
+        this.currentTaxesDropdownOption = page.locator("xpath=(//button[@data-id='drp_Products_CurrentSatetTaxList']//parent::div//div//li[not(@class='selected')]//span[1][not(text()='Please Select')])[1]");
+        this.additionalTaxInput = page.getByRole('textbox', { name: 'Additional Tax' });
+        this.totalItemPriceLabel = page.locator('#lbl_Products_TotalItemprice');
+        this.totalTaxAmountLabel = page.locator('#lbl_Products_TotalTaxAmount');
 
         // Modal Action Buttons
         this.saveBtn = page.locator("xpath=//span[contains(@class,'FeesHeader')]//ancestor::div[contains(@class,'modal-content')]//button[contains(text(),'Save')]");
@@ -39,9 +50,11 @@ export default class FeesPage extends BasePage {
         this.statusFilterDropdown = page.locator("xpath=//div[@id='pnlFeesTAB']//a[contains(.,'Status')]");
         this.selectAllStatusCheckbox = page.locator("xpath=//div[@id='pnlFeesTAB']//input[contains(@class,'Fees_SelectAllStatus')]//following-sibling::ins");
 
-        // Table Locators
         this.searchTextbox = page.locator("xpath=//div[@id='tblFees_filter']//input[@type='search']");
         this.editIcon = page.getByTitle('Edit');
+
+        this.isEligibleServiceSelected = false;
+        this.isEligibleServiceUpdated = false;
     }
 
 
@@ -70,6 +83,8 @@ export default class FeesPage extends BasePage {
 
             const feeAmount = data.feeAmount;
             const notes = data.notes;
+            const additionalTax = data.additionalTax;
+            this.additionalTax = additionalTax;
 
             await this.waitForLoaders();
             await this.waitForVisible(this.feeNameInput);
@@ -84,10 +99,21 @@ export default class FeesPage extends BasePage {
             await this.fill(this.feeAmountInput, feeAmount);
 
             if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
-                await this.click(this.eligibleServiceSelection.first())
+                await this.click(this.eligibleServiceSelection.first());
+                this.isEligibleServiceSelected = true;
+            } else {
+                this.isEligibleServiceSelected = false;
             }
 
             await this.fill(this.notesInput, notes);
+
+            if (await this.isVisible(this.itemTaxableCheckboxWrapper, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.itemTaxableCheckbox);
+                await this.click(this.currentTaxesDropdown);
+                await this.waitForVisible(this.currentTaxesDropdownOption);
+                await this.click(this.currentTaxesDropdownOption);
+                await this.fill(this.additionalTaxInput, additionalTax);
+            }
 
             if (await this.isVisible(this.allowWebPurchaseYesRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.allowWebPurchaseYesRadioButton);
@@ -200,22 +226,30 @@ export default class FeesPage extends BasePage {
             if (await this.isVisible(this.statusDropdown, { timeout: 100 }).catch(() => false)) {
                 await expect(this.statusDropdown).toContainText('Active');
             }
-            if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
+            if (this.isEligibleServiceSelected) {
                 await this.verifyVisible(this.selectedDiscountPackage.first());
             }
 
             if (await this.isVisible(this.allowWebPurchaseYesRadioButton, { timeout: 100 }).catch(() => false)) {
-                const yesWrapper = this.page.locator("xpath=//input[@id='AllowWebPurchase']//parent::div");
-                if (await yesWrapper.count() > 0) {
-                    await expect(yesWrapper).toHaveClass(/checked/);
+                if (await this.allowWebPurchaseYesRadioWrapper.count() > 0) {
+                    await expect(this.allowWebPurchaseYesRadioWrapper.first()).toHaveClass(/checked/);
                 }
             }
             if (await this.isVisible(this.allowPortalPurchaseNoRadioButton, { timeout: 100 }).catch(() => false)) {
-                const noWrapper = this.page.locator("xpath=//input[@id='AllowPortalPurchase']//parent::div");
-                if (await noWrapper.count() > 0) {
-                    await expect(noWrapper).toHaveClass(/checked/);
+                if (await this.allowPortalPurchaseNoRadioWrapper.count() > 0) {
+                    await expect(this.allowPortalPurchaseNoRadioWrapper.first()).toHaveClass(/checked/);
                 }
             }
+
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.itemTaxableCheckboxWrapper).toHaveClass(/checked/);
+                await expect(this.currentTaxesDropdown).not.toContainText('Please Select');
+                const actualAmount = await this.additionalTaxInput.inputValue();
+                expect(parseFloat(actualAmount)).toBe(parseFloat(this.additionalTax));
+                await expect(this.totalItemPriceLabel).not.toHaveText('$0.00');
+                await expect(this.totalTaxAmountLabel).not.toHaveText('$0.00');
+            }
+
         });
     }
 
@@ -231,7 +265,7 @@ export default class FeesPage extends BasePage {
             const updatedNotes = data.updatedNotes;
 
             if (await this.feeNameInput.isEditable().catch(() => false)) {
-                this.feeName = `${data.updatedFeeName || 'Updated_Fee'}_${this.uniqueId}`;
+                this.feeName = `${data.updatedFeeName}_${this.uniqueId}`;
                 await this.fill(this.feeNameInput, this.feeName);
             }
 
@@ -247,6 +281,9 @@ export default class FeesPage extends BasePage {
             // Select last discount package
             if (await this.isVisible(this.eligibleServiceSelection.last(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.eligibleServiceSelection.last());
+                this.isEligibleServiceUpdated = true;
+            } else {
+                this.isEligibleServiceUpdated = false;
             }
 
             // Update Notes
@@ -258,6 +295,11 @@ export default class FeesPage extends BasePage {
             }
             if (await this.isVisible(this.allowPortalPurchaseYesRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.allowPortalPurchaseYesRadioButton);
+            }
+
+            // Uncheck taxable checkbox (was checked in add)
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.itemTaxableCheckbox);
             }
         });
     }
@@ -285,23 +327,28 @@ export default class FeesPage extends BasePage {
             }
 
             if (await this.isVisible(this.allowWebPurchaseNoRadioButton, { timeout: 100 }).catch(() => false)) {
-                const noWrapper = this.page.locator("xpath=//input[@id='AllowWebPurchase' and @value='false']//parent::div").or(
-                    this.page.locator("xpath=//label[contains(text(),'No')]//input[@id='AllowWebPurchase']//parent::div")
-                );
-                if (await noWrapper.count() > 0) {
-                    await expect(noWrapper.first()).toHaveClass(/checked/);
+                if (await this.allowWebPurchaseNoRadioWrapper.count() > 0) {
+                    await expect(this.allowWebPurchaseNoRadioWrapper.first()).toHaveClass(/checked/);
                 }
             }
             if (await this.isVisible(this.allowPortalPurchaseYesRadioButton, { timeout: 100 }).catch(() => false)) {
-                const yesWrapper = this.page.locator("xpath=//input[@id='AllowPortalPurchase' and @value='true']//parent::div").or(
-                    this.page.locator("xpath=//label[contains(text(),'Yes')]//input[@id='AllowPortalPurchase']//parent::div")
-                );
-                if (await yesWrapper.count() > 0) {
-                    await expect(yesWrapper.first()).toHaveClass(/checked/);
+                if (await this.allowPortalPurchaseYesRadioWrapper.count() > 0) {
+                    await expect(this.allowPortalPurchaseYesRadioWrapper.first()).toHaveClass(/checked/);
                 }
             }
-            if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
-                await expect(this.selectedDiscountPackage).toHaveCount(2)
+            const eligibleServiceCount = (this.isEligibleServiceSelected ? 1 : 0) + (this.isEligibleServiceUpdated ? 1 : 0);
+            if (eligibleServiceCount > 0) {
+                await expect(this.selectedDiscountPackage).toHaveCount(eligibleServiceCount);
+            }
+
+            // Verify item taxable checkbox was unchecked
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.itemTaxableCheckboxWrapper).not.toHaveClass(/checked/);
+                await this.verifyNotVisible(this.currentTaxesDropdown);
+                await this.verifyNotVisible(this.additionalTaxInput);
+                await this.verifyNotVisible(this.totalItemPriceLabel);
+                await this.verifyNotVisible(this.totalTaxAmountLabel);
+
             }
         });
     }

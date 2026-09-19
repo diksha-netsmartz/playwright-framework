@@ -6,5 +6,13 @@
   "timeToComplete": "30",
   "passFeedback": "Congratulations, you passed!",
   "failFeedback": "Please review and retake the quiz.",
-  "welcomeText": "Welcome to the online quiz."
+  "welcomeText": "Welcome to the online quiz.",
+  "updatedQuizName": "Updated_Quiz",
+  "updatedSize": "15",
+  "updatedPassingMarks": "80",
+  "updatedAssociateWithClassSessions": "2",
+  "updatedTimeToComplete": "45",
+  "updatedPassFeedback": "Outstanding effort! You have successfully met the passing criteria and satisfied this module requirement.",
+  "updatedFailFeedback": "You did not achieve the minimum passing score. Please revisit the study modules and re-attempt the quiz.",
+  "updatedWelcomeText": "Welcome to the comprehensive assessment quiz. Please read each question carefully before submitting."
 }

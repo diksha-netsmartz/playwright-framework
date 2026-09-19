@@ -28,16 +28,20 @@ export default class VehicleListPage extends BasePage {
 
         this.locationDropdown = page.locator("xpath=//select[@id='VehicleLocation']//parent::div//button");
         this.locationOption = page.locator("xpath=(//select[@id='VehicleLocation']//parent::div//div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.locationOptionLast = page.locator("xpath=(//select[@id='VehicleLocation']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.vehicleTypeDropdown = page.locator("xpath=//select[@id='VehicleType']//parent::div//button");
         this.vehicleTypeOptionBus = page.locator("xpath=//select[@id='VehicleType']//parent::div//div//span[text()='Bus']");
         this.vehicleTypeOptionMotorcycle = page.locator("xpath=//select[@id='VehicleType']//parent::div//div//span[text()='Motorcycle']");
+        this.vehicleTypeOptionLast = page.locator("xpath=(//select[@id='VehicleType']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.GPSTrackerDropdown = page.locator("xpath=//select[@id='GPSTracker']//parent::div//button");
         this.GPSTrackerOption = page.locator("xpath=(//select[@id='GPSTracker']//parent::div//div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.GPSTrackerOptionLast = page.locator("xpath=(//select[@id='GPSTracker']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.vehicleYearDropdown = page.locator("xpath=//select[@id='VehicleYear']//parent::div//button");
         this.vehicleYearOption = page.locator("xpath=(//select[@id='VehicleYear']//parent::div//div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.vehicleYearOptionLast = page.locator("xpath=(//select[@id='VehicleYear']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.vehicleNoInput = page.getByRole('textbox', { name: 'Vehicle No' });
         this.vehicleMakeInput = page.getByRole('textbox', { name: 'Vehicle Make' });
@@ -52,15 +56,21 @@ export default class VehicleListPage extends BasePage {
         this.appointmentColorCheckbox = page.locator("xpath=(//input[@id='EnableAppointmentColor']//following-sibling::ins)[1]");
         this.appointmentColorCheckboxWrapper = page.locator("xpath=(//input[@id='EnableAppointmentColor']//parent::div)[1]");
         this.appointmentColorNoRadio = page.locator("xpath=(//input[@id='EnableAppointmentColor']//following-sibling::ins)[2]");
+        this.appointmentColorButton = page.locator("//button[@class='btn default colorpick']//i");
+        this.appointmentColorSelector = page.locator('div.colorpicker-saturation:visible');
+        this.appointmentColorTextbox = page.locator('#AppointmentColor');
         this.notesInput = page.locator('#VehicleNote');
         this.odometerValueInput = page.getByRole('textbox', { name: 'Odometer Value' });
         this.initialMileageInput = page.locator("//input[@id='VehicleInitialMileage' and not(@disabled)]");
 
         // File / Picture Upload Locators
+        this.imageUploadSection = page.getByText('Vehicle Image', { exact: true });
         this.selectImageBtn = page.getByText('Select Image', { exact: true });
         this.saveImageButton = page.locator("xpath=//div[text()='Save']").or(page.locator('div').filter({ hasText: /^Save$/ }));
         this.fileInput = page.locator("input[type='file']").first();
         this.imageUploaded = page.locator('#imgCroppedImage');
+        this.removeImageButton = page.locator("//input[@data-toggle='confirmationRemoveImage']");
+        this.yesConfirmationBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
 
         // Form Action Buttons & Notifications
         this.saveBtn = page.locator("xpath=(//b[contains(text(),'VEHICLE') or contains(text(),'Vehicle')]//ancestor::div[contains(@class,'modal-content')]//a[contains(text(),'Save')])[1]");
@@ -93,6 +103,7 @@ export default class VehicleListPage extends BasePage {
         this.selectedVehicleType = '';
         this.selectedGPSTracker = '';
         this.selectedVehicleYear = '';
+        this.selectedAppointmentColor = ''
 
         this.updatedVehicleName = '';
         this.updatedVehicleNo = '';
@@ -113,6 +124,7 @@ export default class VehicleListPage extends BasePage {
         this.updatedGPSTracker = '';
         this.updatedVehicleYear = '';
         this.updatedStatus = '';
+        this.updatedAppointmentColor = '';
     }
 
     /**
@@ -162,19 +174,19 @@ export default class VehicleListPage extends BasePage {
     async fillVehicleDetails(data = {}) {
         return await test.step('Fill Vehicle details', async () => {
             this.uniqueId = `${Date.now()}`;
-            this.vehicleName = `${data.vehicleNamePrefix || 'Vehicle'}_${this.uniqueId}`;
+            this.vehicleName = `${data.vehicleNamePrefix}_${this.uniqueId}`;
             this.vehicleNo = `${Date.now()} ${Math.floor(1000 + Math.random() * 9000)}`;
-            this.vehicleMake = data.vehicleMake || 'Toyota';
-            this.vehicleModel = data.vehicleModel || 'Corolla';
-            this.licensePlate = `${data.licensePlatePrefix || 'LP'}${Math.floor(1000 + Math.random() * 9000)}`;
-            this.vin = `${data.vinPrefix || 'VIN'}${Math.floor(10000 + Math.random() * 90000)}`;
-            this.inspectionDate = data.inspectionDate || '11092027';
-            this.registrationDate = data.registrationDate || '11092027';
-            this.insuranceDate = data.insuranceDate || '11092027';
-            this.instructorBrakeDate = data.instructorBrakeDate || '11092027';
-            this.notes = data.notes || 'Automated Vehicle Note';
-            this.odometer = data.odometerValue || '1500';
-            this.initialMileage = data.initialMileage || '900';
+            this.vehicleMake = data.vehicleMake;
+            this.vehicleModel = data.vehicleModel;
+            this.licensePlate = `${data.licensePlatePrefix}${Math.floor(1000 + Math.random() * 9000)}`;
+            this.vin = `${data.vinPrefix}${Math.floor(10000 + Math.random() * 90000)}`;
+            this.inspectionDate = data.inspectionDate;
+            this.registrationDate = data.registrationDate;
+            this.insuranceDate = data.insuranceDate;
+            this.instructorBrakeDate = data.instructorBrakeDate;
+            this.notes = data.notes;
+            this.odometer = data.odometerValue;
+            this.initialMileage = data.initialMileage;
             this.description = data.description;
 
             await this.waitForLoaders();
@@ -256,8 +268,14 @@ export default class VehicleListPage extends BasePage {
             if (await this.isVisible(this.instructorBrakeInput, { timeout: 100 }).catch(() => false)) {
                 await this.pressSequentially(this.instructorBrakeInput, this.instructorBrakeDate);
             }
-            // Dual Brake Checkbox
-            if (await this.appointmentColorCheckbox.isVisible({ timeout: 100 }).catch(() => false)) {
+            if (await this.isVisible(this.appointmentColorButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.appointmentColorButton);
+                await this.waitForVisible(this.appointmentColorSelector);
+                await this.click(this.appointmentColorSelector, { position: { x: 20, y: 20 } });
+                await this.click(this.appointmentColorTextbox);
+                this.selectedAppointmentColor = await this.appointmentColorTextbox.inputValue();
+            }
+            if (await this.isVisible(this.appointmentColorCheckbox, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.appointmentColorCheckbox);
             }
 
@@ -367,6 +385,11 @@ export default class VehicleListPage extends BasePage {
                 await expect(this.instructorBrakeInput).toHaveValue(expectedInstructorBrakeDate);
             }
 
+            if (await this.isVisible(this.appointmentColorButton, { timeout: 100 }).catch(() => false)) {
+                const actualAppointmentColor = await this.appointmentColorTextbox.inputValue();
+                expect(actualAppointmentColor).toBe(this.selectedAppointmentColor);
+            }
+
             if (await this.isVisible(this.appointmentColorCheckbox, { timeout: 100 }).catch(() => false)) {
                 const checkboxWrapper = this.appointmentColorCheckboxWrapper;
                 if (await checkboxWrapper.count() > 0) {
@@ -397,9 +420,10 @@ export default class VehicleListPage extends BasePage {
                 await expect(this.odometerValueInput).toHaveValue(expectedOdometer);
             }
 
-            if (await this.isVisible(this.imageUploaded, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisible(this.imageUploadSection, { timeout: 100 }).catch(() => false)) {
                 const imageSrc = await this.imageUploaded.getAttribute('src');
                 expect(imageSrc?.length).toBeGreaterThan(0);
+                await this.verifyVisible(this.removeImageButton);
             }
 
             if (await this.isVisible(this.initialMileageInput, { timeout: 100 }).catch(() => false)) {
@@ -497,20 +521,20 @@ export default class VehicleListPage extends BasePage {
         await test.step('Update Vehicle fields', async () => {
             await this.waitForLoaders();
 
-            this.updatedVehicleName = `${data.updatedVehicleNamePrefix || 'Updated_Vehicle'}_${this.uniqueId || Date.now()}`;
+            this.updatedVehicleName = `${data.updatedVehicleNamePrefix}_${this.uniqueId}`;
             this.updatedVehicleNo = `${Date.now()} ${Math.floor(1000 + Math.random() * 9000)}`;
-            this.updatedVehicleMake = data.updatedVehicleMake || 'Honda';
-            this.updatedVehicleModel = data.updatedVehicleModel || 'Civic';
-            this.updatedLicensePlate = `${data.licensePlatePrefix || 'LP'}${Math.floor(1000 + Math.random() * 9000)}`;
-            this.updatedVin = `${data.vinPrefix || 'VIN'}${Math.floor(10000 + Math.random() * 90000)}`;
-            this.updatedInspectionDate = data.updatedInspectionDate || '12152028';
-            this.updatedRegistrationDate = data.updatedRegistrationDate || '12152028';
-            this.updatedInsuranceDate = data.updatedInsuranceDate || '12152028';
-            this.updatedInstructorBrakeDate = data.updatedInstructorBrakeDate || '12152028';
-            this.updatedNotes = data.updatedNotes || 'Updated Vehicle Note';
-            this.updatedMileage = data.updatedInitialMileage || '950';
-            this.updatedOdometer = data.updatedOdometerValue || '1550';
-            this.updatedDescription = data.updatedDescription || 'Updated Description';
+            this.updatedVehicleMake = data.updatedVehicleMake;
+            this.updatedVehicleModel = data.updatedVehicleModel;
+            this.updatedLicensePlate = `${data.licensePlatePrefix}${Math.floor(1000 + Math.random() * 9000)}`;
+            this.updatedVin = `${data.vinPrefix}${Math.floor(10000 + Math.random() * 90000)}`;
+            this.updatedInspectionDate = data.updatedInspectionDate;
+            this.updatedRegistrationDate = data.updatedRegistrationDate;
+            this.updatedInsuranceDate = data.updatedInsuranceDate;
+            this.updatedInstructorBrakeDate = data.updatedInstructorBrakeDate;
+            this.updatedNotes = data.updatedNotes;
+            this.updatedMileage = data.updatedInitialMileage;
+            this.updatedOdometer = data.updatedOdometerValue;
+            this.updatedDescription = data.updatedDescription;
 
             // 1. Vehicle Name
             if (await this.isVisible(this.vehicleNameInput, { timeout: 100 }).catch(() => false)) {
@@ -529,48 +553,38 @@ export default class VehicleListPage extends BasePage {
             await this.click(this.statusOptionInActive);
             this.updatedStatus = 'InActive';
 
-            if (await this.page.locator("xpath=//select[@id='VehicleStatus']//parent::div[contains(@class,'open')]").isVisible().catch(() => false)) {
-                await this.click(this.statusDropdown);
-            }
+
 
             // 4. Location Dropdown: select last()
             if (await this.locationDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.locationDropdown);
-                const locOptionLast = this.page.locator("xpath=(//select[@id='VehicleLocation']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                if (await locOptionLast.isVisible({ timeout: 1000 }).catch(() => false)) {
-                    this.updatedLocation = (await locOptionLast.innerText()).trim();
-                    await this.click(locOptionLast);
-                }
+                this.updatedLocation = (await this.locationOptionLast.innerText()).trim();
+                await this.waitForVisible(this.locationOptionLast);
+                await this.click(this.locationOptionLast);
             }
 
             // 5. Vehicle Type Dropdown: select last()
             if (await this.vehicleTypeDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.vehicleTypeDropdown);
-                const typeOptionLast = this.page.locator("xpath=(//select[@id='VehicleType']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                if (await typeOptionLast.isVisible({ timeout: 1000 }).catch(() => false)) {
-                    this.updatedVehicleType = (await typeOptionLast.innerText()).trim();
-                    await this.click(typeOptionLast);
-                }
+                this.updatedVehicleType = (await this.vehicleTypeOptionLast.innerText()).trim();
+                await this.waitForVisible(this.vehicleTypeOptionLast);
+                await this.click(this.vehicleTypeOptionLast);
             }
 
             // 6. GPS Tracker Dropdown: select last()
             if (await this.GPSTrackerDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.GPSTrackerDropdown);
-                const gpsOptionLast = this.page.locator("xpath=(//select[@id='GPSTracker']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                if (await gpsOptionLast.isVisible({ timeout: 1000 }).catch(() => false)) {
-                    this.updatedGPSTracker = (await gpsOptionLast.innerText()).trim();
-                    await this.click(gpsOptionLast);
-                }
+                this.updatedGPSTracker = (await this.GPSTrackerOptionLast.innerText()).trim();
+                await this.waitForVisible(this.GPSTrackerOptionLast);
+                await this.click(this.GPSTrackerOptionLast);
             }
 
             // 7. Vehicle Year Dropdown: select last()
             if (await this.vehicleYearDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.vehicleYearDropdown);
-                const yearOptionLast = this.page.locator("xpath=(//select[@id='VehicleYear']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                if (await yearOptionLast.isVisible({ timeout: 1000 }).catch(() => false)) {
-                    this.updatedVehicleYear = (await yearOptionLast.innerText()).trim();
-                    await this.click(yearOptionLast);
-                }
+                this.updatedVehicleYear = (await this.vehicleYearOptionLast.innerText()).trim();
+                await this.waitForVisible(this.vehicleYearOptionLast);
+                await this.click(this.vehicleYearOptionLast);
             }
 
             // 8. Vehicle Specs
@@ -619,6 +633,15 @@ export default class VehicleListPage extends BasePage {
             }
 
             // 9. Radio button: select alternate option ("No")
+
+            if (await this.isVisible(this.appointmentColorButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.appointmentColorButton);
+                await this.waitForVisible(this.appointmentColorSelector);
+                await this.click(this.appointmentColorSelector, { position: { x: 60, y: 60 } });
+                await this.click(this.appointmentColorTextbox);
+                this.updatedAppointmentColor = await this.appointmentColorTextbox.inputValue();
+            }
+
             if (await this.appointmentColorNoRadio.first().isVisible({ timeout: 500 }).catch(() => false)) {
                 await this.click(this.appointmentColorNoRadio.first());
             } else if (await this.appointmentColorCheckboxWrapper.isVisible({ timeout: 200 }).catch(() => false)) {
@@ -626,6 +649,11 @@ export default class VehicleListPage extends BasePage {
                 if (isChecked) {
                     await this.click(this.appointmentColorCheckbox);
                 }
+            }
+
+            if (await this.isVisible(this.imageUploadSection, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.removeImageButton);
+                await this.click(this.yesConfirmationBtn);
             }
 
             // 10. Notes
@@ -727,9 +755,21 @@ export default class VehicleListPage extends BasePage {
                 await expect(this.instructorBrakeInput).toHaveValue(expectedInstructorBrakeDate);
             }
 
+
+            if (await this.isVisible(this.imageUploadSection, { timeout: 100 }).catch(() => false)) {
+                const imageSrc = await this.imageUploaded.getAttribute('src');
+                expect(imageSrc?.length).toBe(0);
+                await this.verifyVisible(this.selectImageBtn);
+            }
+
             // appointmentColorCheckbox should be UNCHECKED
             if (await this.appointmentColorCheckboxWrapper.isVisible({ timeout: 100 }).catch(() => false)) {
                 await expect(this.appointmentColorCheckboxWrapper).not.toHaveClass(/checked/);
+            }
+
+            if (await this.isVisible(this.appointmentColorTextbox, { timeout: 100 }).catch(() => false)) {
+                const actualAppointmentColor = await this.appointmentColorTextbox.inputValue();
+                expect(actualAppointmentColor).toBe(this.updatedAppointmentColor);
             }
 
             if (this.updatedGPSTracker && await this.isVisible(this.GPSTrackerDropdown, { timeout: 100 }).catch(() => false)) {

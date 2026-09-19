@@ -39,17 +39,23 @@ test('TC_029: C-Admin >> Account Management >> Services >> Component - To verify
         await componentsPage.verifyComponentAddedSuccessfully();
     });
 
-    await test.step('Step 5: Search the created component and click on Edit', async () => {
+    await test.step('Step 5: Search the created component, click on Edit, and verify added details', async () => {
         await componentsPage.searchAndEditComponent();
+        await componentsPage.verifyComponentDetails(componentData);
     });
 
 
     await test.step('Step 6: Update fields and save edited component', async () => {
-        await componentsPage.editComponentFields();
+        await componentsPage.editComponentFields(componentData);
         await componentsPage.clickSave();
     });
 
     await test.step('Step 7: Verify component edited successfully', async () => {
         await componentsPage.verifyComponentUpdatedSuccessfully();
+    });
+
+    await test.step('Step 8: Search the updated component, click on Edit, and verify updated details', async () => {
+        await componentsPage.searchAndEditComponent(componentsPage.componentName, 5);
+        await componentsPage.verifyUpdatedComponentDetails(componentData);
     });
 });
