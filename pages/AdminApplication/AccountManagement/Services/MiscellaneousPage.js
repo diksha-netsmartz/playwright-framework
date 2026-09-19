@@ -30,10 +30,12 @@ export default class MiscellaneousPage extends BasePage {
 
         this.priceInput = page.getByRole('textbox', { name: 'Price' });
         this.itemTaxableCheckbox = page.locator("xpath=//input[@id='ItemIsTaxable']//following-sibling::ins");
+        this.itemTaxableCheckboxWrapper = page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
         this.currentTaxesDropdown = page.locator("xpath=//button[@data-id='drp_Products_CurrentSatetTaxList']");
         this.currentTaxesDropdownOption = page.locator("xpath=(//button[@data-id='drp_Products_CurrentSatetTaxList']//parent::div//div//li[not(@class='selected')]//span[1][not(text()='Please Select')])[1]");
         this.additionalTaxInput = page.locator('#txt_Products_AdditionalTax:visible');
-
+        this.totalItemPriceLabel = page.locator('#lbl_Products_TotalItemprice');
+        this.totalTaxAmountLabel = page.locator('#lbl_Products_TotalTaxAmount');
 
         // Modal Action Buttons
         this.saveBtn = page.locator("xpath=//div[contains(@id,'Miscellaneous')]//button[contains(text(),'Save')]");
@@ -80,8 +82,6 @@ export default class MiscellaneousPage extends BasePage {
             await this.click(this.typeDropdown);
             await this.waitForVisible(this.typeOptionApparel);
             await this.click(this.typeOptionApparel);
-
-
             // Select Status to Active
             await this.click(this.statusDropdown);
             await this.waitForVisible(this.statusDropdownOptionActive);
@@ -175,16 +175,14 @@ export default class MiscellaneousPage extends BasePage {
             await expect(this.statusDropdown).toContainText('Active');
             const actualPrice = await this.priceInput.inputValue();
             expect(parseFloat(actualPrice)).toBe(parseFloat(data.price));
-            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
-                const taxableWrapper = this.page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
-                if (await taxableWrapper.count() > 0) {
-                    await expect(taxableWrapper).toHaveClass(/checked/);
-                }
-            }
 
-            if (this.additionalTax && await this.isVisible(this.additionalTaxInput, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.itemTaxableCheckboxWrapper).toHaveClass(/checked/);
+                await expect(this.currentTaxesDropdown).not.toContainText('Please Select');
                 const actualAmount = await this.additionalTaxInput.inputValue();
                 expect(parseFloat(actualAmount)).toBe(parseFloat(this.additionalTax));
+                await expect(this.totalItemPriceLabel).not.toHaveText('$0.00');
+                await expect(this.totalTaxAmountLabel).not.toHaveText('$0.00');
             }
 
         });
@@ -260,10 +258,11 @@ export default class MiscellaneousPage extends BasePage {
 
             // Verify item taxable checkbox was unchecked
             if (await this.isVisible(this.itemTaxableCheckbox, { timeout: 100 }).catch(() => false)) {
-                const taxableWrapper = this.page.locator("xpath=//input[@id='ItemIsTaxable']//parent::div");
-                if (await taxableWrapper.count() > 0) {
-                    await expect(taxableWrapper).not.toHaveClass(/checked/);
-                }
+                await expect(this.itemTaxableCheckboxWrapper).not.toHaveClass(/checked/);
+                await this.verifyNotVisible(this.currentTaxesDropdown);
+                await this.verifyNotVisible(this.additionalTaxInput);
+                await this.verifyNotVisible(this.totalItemPriceLabel);
+                await this.verifyNotVisible(this.totalTaxAmountLabel);
             }
         });
     }
