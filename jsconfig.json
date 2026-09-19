@@ -16,13 +16,12 @@
     "noImplicitAny": false,
     "strictNullChecks": false,
     "useUnknownInCatchVariables": false,
-    "baseUrl": ".",
     "paths": {
-      "@pages/*": ["pages/*"],
-      "@utils/*": ["utils/*"],
-      "@config/*": ["config/*"],
-      "@test-data/*": ["test-data/*"],
-      "@scripts/*": ["scripts/*"]
+      "@pages/*": ["./pages/*"],
+      "@utils/*": ["./utils/*"],
+      "@config/*": ["./config/*"],
+      "@test-data/*": ["./test-data/*"],
+      "@scripts/*": ["./scripts/*"]
     }
   },
   "include": [

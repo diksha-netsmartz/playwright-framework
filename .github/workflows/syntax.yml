@@ -40,3 +40,6 @@ jobs:
 
       - name: Validate module tags on all spec files
         run: npm run check:tags
+
+      - name: Validate Page Object locators
+        run: npm run check:locators
