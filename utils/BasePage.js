@@ -278,6 +278,11 @@ export default class BasePage {
         await expect(locator).toBeVisible(opt);
     }
 
+    async verifyNotVisible(locator, options = {}) {
+        const opt = typeof options === 'number' ? { timeout: options } : options;
+        await expect(locator).not.toBeVisible(opt);
+    }
+
     /**
      * Asserts that an element has exact matching text.
      * @param {import('@playwright/test').Locator} locator - Target element locator.

@@ -81,14 +81,14 @@ export default class HighSchoolsPage extends BasePage {
     async fillHighSchoolDetails(data = {}) {
         return await test.step('Fill High School details', async () => {
             this.uniqueId = `${Date.now()}`;
-            this.schoolName = `${data.schoolNamePrefix || 'HighSchool'}_${this.uniqueId}`;
-            this.schoolCode = `${data.schoolCodePrefix || 'HS'}_${Math.floor(1000 + Math.random() * 9000)}`;
+            this.schoolName = `${data.schoolNamePrefix}_${this.uniqueId}`;
+            this.schoolCode = `${data.schoolCodePrefix}_${Math.floor(1000 + Math.random() * 9000)}`;
 
-            this.address = data.address || '456 Academy Way';
-            this.city = data.city || 'Hartford';
-            this.zip = data.zip || '06101';
-            this.email = data.email || `highschool_${this.uniqueId}@example.com`;
-            this.notes = data.notes || 'Automated High School note';
+            this.address = data.address;
+            this.city = data.city;
+            this.zip = data.zip;
+            this.email = data.email;
+            this.notes = data.notes;
 
             await this.waitForLoaders();
             await this.waitForVisible(this.schoolNameInput);
@@ -262,25 +262,25 @@ export default class HighSchoolsPage extends BasePage {
 
             // Update School Name
             if (await this.schoolNameInput.isEditable().catch(() => false)) {
-                this.schoolName = `${data.updatedSchoolNamePrefix || 'Updated_HighSchool'}_${this.uniqueId}`;
+                this.schoolName = `${data.updatedSchoolNamePrefix}_${this.uniqueId}`;
                 await this.fill(this.schoolNameInput, this.schoolName);
             }
 
             // Update School Code
             if (await this.schoolCodeInput.isEditable().catch(() => false)) {
-                this.schoolCode = `${data.updatedSchoolCodePrefix || 'U'}${Math.floor(1000 + Math.random() * 9000)}`.substring(0, 5);
+                this.schoolCode = `${data.updatedSchoolCodePrefix}${Math.floor(1000 + Math.random() * 9000)}`.substring(0, 5);
                 await this.fill(this.schoolCodeInput, this.schoolCode);
             }
 
             // Update Address
             if (await this.isVisible(this.schoolAddressInput, { timeout: 100 }).catch(() => false)) {
-                this.address = data.updatedAddress || '789 Academy Blvd';
+                this.address = data.updatedAddress;
                 await this.fill(this.schoolAddressInput, this.address);
             }
 
             // Update City
             if (await this.isVisible(this.cityInput, { timeout: 100 }).catch(() => false)) {
-                this.city = data.updatedCity || 'Stamford';
+                this.city = data.updatedCity;
                 await this.fill(this.cityInput, this.city);
             }
 
@@ -295,19 +295,19 @@ export default class HighSchoolsPage extends BasePage {
 
             // Update Zip
             if (await this.isVisible(this.zipCodeInput, { timeout: 100 }).catch(() => false)) {
-                this.zip = data.updatedZip || '06901';
+                this.zip = data.updatedZip;
                 await this.fill(this.zipCodeInput, this.zip);
             }
 
             // Update Email
             if (await this.isVisible(this.emailInput, { timeout: 100 }).catch(() => false)) {
-                this.email = data.updatedEmail || `updated_${this.uniqueId}@example.com`;
+                this.email = data.updatedEmail;
                 await this.fill(this.emailInput, this.email);
             }
 
             // Update Notes
             if (await this.isVisible(this.notesInput, { timeout: 100 }).catch(() => false)) {
-                this.notes = data.updatedNotes || 'Updated High School note';
+                this.notes = data.updatedNotes;
                 await this.fill(this.notesInput, this.notes);
             }
             // Update Status to Deleted

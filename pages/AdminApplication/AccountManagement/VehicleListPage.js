@@ -28,16 +28,20 @@ export default class VehicleListPage extends BasePage {
 
         this.locationDropdown = page.locator("xpath=//select[@id='VehicleLocation']//parent::div//button");
         this.locationOption = page.locator("xpath=(//select[@id='VehicleLocation']//parent::div//div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.locationOptionLast = page.locator("xpath=(//select[@id='VehicleLocation']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.vehicleTypeDropdown = page.locator("xpath=//select[@id='VehicleType']//parent::div//button");
         this.vehicleTypeOptionBus = page.locator("xpath=//select[@id='VehicleType']//parent::div//div//span[text()='Bus']");
         this.vehicleTypeOptionMotorcycle = page.locator("xpath=//select[@id='VehicleType']//parent::div//div//span[text()='Motorcycle']");
+        this.vehicleTypeOptionLast = page.locator("xpath=(//select[@id='VehicleType']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.GPSTrackerDropdown = page.locator("xpath=//select[@id='GPSTracker']//parent::div//button");
         this.GPSTrackerOption = page.locator("xpath=(//select[@id='GPSTracker']//parent::div//div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.GPSTrackerOptionLast = page.locator("xpath=(//select[@id='GPSTracker']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.vehicleYearDropdown = page.locator("xpath=//select[@id='VehicleYear']//parent::div//button");
         this.vehicleYearOption = page.locator("xpath=(//select[@id='VehicleYear']//parent::div//div//ul//li[not (contains (@class,'selected'))])[1]");
+        this.vehicleYearOptionLast = page.locator("xpath=(//select[@id='VehicleYear']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
 
         this.vehicleNoInput = page.getByRole('textbox', { name: 'Vehicle No' });
         this.vehicleMakeInput = page.getByRole('textbox', { name: 'Vehicle Make' });
@@ -170,19 +174,19 @@ export default class VehicleListPage extends BasePage {
     async fillVehicleDetails(data = {}) {
         return await test.step('Fill Vehicle details', async () => {
             this.uniqueId = `${Date.now()}`;
-            this.vehicleName = `${data.vehicleNamePrefix || 'Vehicle'}_${this.uniqueId}`;
+            this.vehicleName = `${data.vehicleNamePrefix}_${this.uniqueId}`;
             this.vehicleNo = `${Date.now()} ${Math.floor(1000 + Math.random() * 9000)}`;
-            this.vehicleMake = data.vehicleMake || 'Toyota';
-            this.vehicleModel = data.vehicleModel || 'Corolla';
-            this.licensePlate = `${data.licensePlatePrefix || 'LP'}${Math.floor(1000 + Math.random() * 9000)}`;
-            this.vin = `${data.vinPrefix || 'VIN'}${Math.floor(10000 + Math.random() * 90000)}`;
-            this.inspectionDate = data.inspectionDate || '11092027';
-            this.registrationDate = data.registrationDate || '11092027';
-            this.insuranceDate = data.insuranceDate || '11092027';
-            this.instructorBrakeDate = data.instructorBrakeDate || '11092027';
-            this.notes = data.notes || 'Automated Vehicle Note';
-            this.odometer = data.odometerValue || '1500';
-            this.initialMileage = data.initialMileage || '900';
+            this.vehicleMake = data.vehicleMake;
+            this.vehicleModel = data.vehicleModel;
+            this.licensePlate = `${data.licensePlatePrefix}${Math.floor(1000 + Math.random() * 9000)}`;
+            this.vin = `${data.vinPrefix}${Math.floor(10000 + Math.random() * 90000)}`;
+            this.inspectionDate = data.inspectionDate;
+            this.registrationDate = data.registrationDate;
+            this.insuranceDate = data.insuranceDate;
+            this.instructorBrakeDate = data.instructorBrakeDate;
+            this.notes = data.notes;
+            this.odometer = data.odometerValue;
+            this.initialMileage = data.initialMileage;
             this.description = data.description;
 
             await this.waitForLoaders();
@@ -517,20 +521,20 @@ export default class VehicleListPage extends BasePage {
         await test.step('Update Vehicle fields', async () => {
             await this.waitForLoaders();
 
-            this.updatedVehicleName = `${data.updatedVehicleNamePrefix || 'Updated_Vehicle'}_${this.uniqueId || Date.now()}`;
+            this.updatedVehicleName = `${data.updatedVehicleNamePrefix}_${this.uniqueId}`;
             this.updatedVehicleNo = `${Date.now()} ${Math.floor(1000 + Math.random() * 9000)}`;
-            this.updatedVehicleMake = data.updatedVehicleMake || 'Honda';
-            this.updatedVehicleModel = data.updatedVehicleModel || 'Civic';
-            this.updatedLicensePlate = `${data.licensePlatePrefix || 'LP'}${Math.floor(1000 + Math.random() * 9000)}`;
-            this.updatedVin = `${data.vinPrefix || 'VIN'}${Math.floor(10000 + Math.random() * 90000)}`;
-            this.updatedInspectionDate = data.updatedInspectionDate || '12152028';
-            this.updatedRegistrationDate = data.updatedRegistrationDate || '12152028';
-            this.updatedInsuranceDate = data.updatedInsuranceDate || '12152028';
-            this.updatedInstructorBrakeDate = data.updatedInstructorBrakeDate || '12152028';
-            this.updatedNotes = data.updatedNotes || 'Updated Vehicle Note';
-            this.updatedMileage = data.updatedInitialMileage || '950';
-            this.updatedOdometer = data.updatedOdometerValue || '1550';
-            this.updatedDescription = data.updatedDescription || 'Updated Description';
+            this.updatedVehicleMake = data.updatedVehicleMake;
+            this.updatedVehicleModel = data.updatedVehicleModel;
+            this.updatedLicensePlate = `${data.licensePlatePrefix}${Math.floor(1000 + Math.random() * 9000)}`;
+            this.updatedVin = `${data.vinPrefix}${Math.floor(10000 + Math.random() * 90000)}`;
+            this.updatedInspectionDate = data.updatedInspectionDate;
+            this.updatedRegistrationDate = data.updatedRegistrationDate;
+            this.updatedInsuranceDate = data.updatedInsuranceDate;
+            this.updatedInstructorBrakeDate = data.updatedInstructorBrakeDate;
+            this.updatedNotes = data.updatedNotes;
+            this.updatedMileage = data.updatedInitialMileage;
+            this.updatedOdometer = data.updatedOdometerValue;
+            this.updatedDescription = data.updatedDescription;
 
             // 1. Vehicle Name
             if (await this.isVisible(this.vehicleNameInput, { timeout: 100 }).catch(() => false)) {
@@ -549,44 +553,38 @@ export default class VehicleListPage extends BasePage {
             await this.click(this.statusOptionInActive);
             this.updatedStatus = 'InActive';
 
-            if (await this.page.locator("xpath=//select[@id='VehicleStatus']//parent::div[contains(@class,'open')]").isVisible().catch(() => false)) {
-                await this.click(this.statusDropdown);
-            }
+
 
             // 4. Location Dropdown: select last()
             if (await this.locationDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.locationDropdown);
-                const locOptionLast = this.page.locator("xpath=(//select[@id='VehicleLocation']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                this.updatedLocation = (await locOptionLast.innerText()).trim();
-                await this.waitForVisible(locOptionLast);
-                await this.click(locOptionLast);
+                this.updatedLocation = (await this.locationOptionLast.innerText()).trim();
+                await this.waitForVisible(this.locationOptionLast);
+                await this.click(this.locationOptionLast);
             }
 
             // 5. Vehicle Type Dropdown: select last()
             if (await this.vehicleTypeDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.vehicleTypeDropdown);
-                const typeOptionLast = this.page.locator("xpath=(//select[@id='VehicleType']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                this.updatedVehicleType = (await typeOptionLast.innerText()).trim();
-                await this.waitForVisible(typeOptionLast);
-                await this.click(typeOptionLast);
+                this.updatedVehicleType = (await this.vehicleTypeOptionLast.innerText()).trim();
+                await this.waitForVisible(this.vehicleTypeOptionLast);
+                await this.click(this.vehicleTypeOptionLast);
             }
 
             // 6. GPS Tracker Dropdown: select last()
             if (await this.GPSTrackerDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.GPSTrackerDropdown);
-                const gpsOptionLast = this.page.locator("xpath=(//select[@id='GPSTracker']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                this.updatedGPSTracker = (await gpsOptionLast.innerText()).trim();
-                await this.waitForVisible(gpsOptionLast);
-                await this.click(gpsOptionLast);
+                this.updatedGPSTracker = (await this.GPSTrackerOptionLast.innerText()).trim();
+                await this.waitForVisible(this.GPSTrackerOptionLast);
+                await this.click(this.GPSTrackerOptionLast);
             }
 
             // 7. Vehicle Year Dropdown: select last()
             if (await this.vehicleYearDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
                 await this.click(this.vehicleYearDropdown);
-                const yearOptionLast = this.page.locator("xpath=(//select[@id='VehicleYear']//parent::div//div//ul//li[not (contains (@class,'selected'))])[last()]");
-                this.updatedVehicleYear = (await yearOptionLast.innerText()).trim();
-                await this.waitForVisible(yearOptionLast);
-                await this.click(yearOptionLast);
+                this.updatedVehicleYear = (await this.vehicleYearOptionLast.innerText()).trim();
+                await this.waitForVisible(this.vehicleYearOptionLast);
+                await this.click(this.vehicleYearOptionLast);
             }
 
             // 8. Vehicle Specs

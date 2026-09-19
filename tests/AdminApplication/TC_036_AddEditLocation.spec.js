@@ -39,9 +39,9 @@ test('TC_036: C-Admin >> Account Management >> Locations - To verify user able t
         await locationsPage.saveLocation();
     });
 
-    await test.step('Step 5: Search the created location and click Edit', async () => {
-        await locationsPage.searchLocation(createdLocation.locationName);
-        await locationsPage.clickEdit();
+    await test.step('Step 5: Search the created location, click Edit, and verify added details', async () => {
+        await locationsPage.searchAndEditLocation(createdLocation.locationName);
+        await locationsPage.verifyLocationDetails(locationData);
     });
 
     await test.step('Step 6: Edit location details and set status to Deleted for cleanup', async () => {
@@ -50,5 +50,10 @@ test('TC_036: C-Admin >> Account Management >> Locations - To verify user able t
 
     await test.step('Step 7: Click Save and verify location updated successfully', async () => {
         await locationsPage.saveUpdatedLocation();
+    });
+
+    await test.step('Step 8: Search the updated location, click Edit, and verify updated details', async () => {
+        await locationsPage.searchAndEditLocation(locationsPage.locationName, 5);
+        await locationsPage.verifyUpdatedLocationDetails(locationData);
     });
 });

@@ -260,7 +260,7 @@ export default class FeesPage extends BasePage {
             const updatedNotes = data.updatedNotes;
 
             if (await this.feeNameInput.isEditable().catch(() => false)) {
-                this.feeName = `${data.updatedFeeName || 'Updated_Fee'}_${this.uniqueId}`;
+                this.feeName = `${data.updatedFeeName}_${this.uniqueId}`;
                 await this.fill(this.feeNameInput, this.feeName);
             }
 

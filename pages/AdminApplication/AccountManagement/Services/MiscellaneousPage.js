@@ -68,10 +68,10 @@ export default class MiscellaneousPage extends BasePage {
      **/
     async fillMiscDetails(data = {}) {
         return await test.step('Fill miscellaneous item details', async () => {
-            const prefix = data.miscellaneousName || 'MiscItem';
+            const prefix = data.miscellaneousName;
             this.miscName = `${prefix}_${Date.now()}`;
-            const price = data.price || '100.00';
-            const additionalTax = data.additionalTax || `${Math.floor(1 + Math.random() * 25)}`;
+            const price = data.price;
+            const additionalTax = data.additionalTax;
             this.additionalTax = additionalTax;
 
             await this.waitForLoaders();
@@ -196,10 +196,10 @@ export default class MiscellaneousPage extends BasePage {
         await test.step('Update Miscellaneous fields (Name, Category, Status, Price)', async () => {
             await this.waitForLoaders();
 
-            const updatedPrice = data.updatedPrice || '150.00';
+            const updatedPrice = data.updatedPrice;
 
             if (await this.miscNameInput.isEditable().catch(() => false)) {
-                this.miscName = `${data.updatedMiscellaneousName || 'Updated_MiscItem'}_${Date.now()}`;
+                this.miscName = `${data.updatedMiscellaneousName}_${Date.now()}`;
                 await this.fill(this.miscNameInput, this.miscName);
             }
 

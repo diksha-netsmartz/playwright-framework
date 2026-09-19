@@ -95,16 +95,16 @@ export default class ComponentsPage extends BasePage {
     async fillComponentDetails(data = {}) {
         await test.step('Fill component details', async () => {
             this.uniqueId = `${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
-            this.componentName = `${data.componentPrefix || 'Component'}_${this.uniqueId}`;
+            this.componentName = `${data.componentPrefix}_${this.uniqueId}`;
             this.itemCode = `${Math.floor(10000000 + Math.random() * 90000000)}`;
-            this.price = data.price || `${Math.floor(100 + Math.random() * 900)}`;
-            this.additionalTax = data.additionalTax || `${Math.floor(1 + Math.random() * 25)}`;
-            this.publicName = `${data.publicNamePrefix || 'Public'}_${this.uniqueId}`;
-            this.publicDescription = data.publicDescription || `Public description for ${this.componentName}`;
-            this.notes = data.notes || `Notes for ${this.componentName}`;
-            this.emailContent = data.emailContent || `Email content for ${this.componentName}`;
-            this.drivingHours = data.drivingHours || `${Math.floor(1 + Math.random() * 5)}`;
-            this.observationHours = data.observationHours || `${Math.floor(1 + Math.random() * 5)}`;
+            this.price = data.price;
+            this.additionalTax = data.additionalTax;
+            this.publicName = `${data.publicNamePrefix}_${this.uniqueId}`;
+            this.publicDescription = data.publicDescription;
+            this.notes = data.notes;
+            this.emailContent = data.emailContent;
+            this.drivingHours = data.drivingHours;
+            this.observationHours = data.observationHours;
 
             await this.waitForLoaders();
             await this.waitForVisible(this.componentNameInput, { timeout: 10000 }).catch(() => { });
@@ -376,7 +376,7 @@ export default class ComponentsPage extends BasePage {
 
             // 1. Component Name (if editable)
             if (await this.componentNameInput.isEditable().catch(() => false)) {
-                this.componentName = `${data.updatedComponentPrefix || 'Updated_Component'}_${this.uniqueId || Date.now()}`;
+                this.componentName = `${data.updatedComponentPrefix}_${this.uniqueId}`;
                 await this.fill(this.componentNameInput, this.componentName);
             }
 
@@ -394,13 +394,13 @@ export default class ComponentsPage extends BasePage {
             }
 
             // 4. Notes
-            this.notes = data.updatedNotes || data.editNotes || `Updated notes ${Date.now()}`;
+            this.notes = data.updatedNotes;
             if (await this.isVisible(this.notesInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.notesInput, this.notes);
             }
 
             // 5. Price
-            this.price = data.updatedPrice || data.editPrice || '250';
+            this.price = data.updatedPrice;
             if (await this.isVisible(this.priceInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.priceInput, this.price);
             }
@@ -416,19 +416,19 @@ export default class ComponentsPage extends BasePage {
             }
 
             // 8. Public Name
-            this.publicName = `${data.updatedPublicNamePrefix || 'Updated_Public'}_${this.uniqueId || Date.now()}`;
+            this.publicName = `${data.updatedPublicNamePrefix}_${this.uniqueId}`;
             if (await this.isVisible(this.publicNameInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.publicNameInput, this.publicName);
             }
 
             // 9. Public Description
-            this.publicDescription = data.updatedPublicDescription || data.editPublicDescription || `Updated public description ${Date.now()}`;
+            this.publicDescription = data.updatedPublicDescription;
             if (await this.isVisible(this.publicDescriptionInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.publicDescriptionInput, this.publicDescription);
             }
 
             // 10. Email Content
-            this.emailContent = data.updatedEmailContent || `Updated email content ${Date.now()}`;
+            this.emailContent = data.updatedEmailContent;
             if (await this.isVisible(this.emailBodyInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.emailBodyInput, this.emailContent);
             }

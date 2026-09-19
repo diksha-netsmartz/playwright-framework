@@ -72,8 +72,8 @@ export default class HowDidYouHearPage extends BasePage {
     async fillHowDidYouHearDetails(data = {}) {
         return await test.step('Fill How did you hear details', async () => {
             this.uniqueId = `${Date.now()}`;
-            this.leadName = `${data.leadNamePrefix || 'LeadSource'}_${this.uniqueId}`;
-            this.leadCode = `${data.leadCodePrefix || 'SRC'}_${Math.floor(1000 + Math.random() * 9000)}`;
+            this.leadName = `${data.leadNamePrefix}_${this.uniqueId}`;
+            this.leadCode = `${data.leadCodePrefix}_${Math.floor(1000 + Math.random() * 9000)}`;
             this.expirationDate = data.expirationDate;
             this.notes = data.notes;
             this.address = data.address;
@@ -231,37 +231,37 @@ export default class HowDidYouHearPage extends BasePage {
 
             // Update Lead Name
             if (await this.leadNameInput.isEditable().catch(() => false)) {
-                this.leadName = `${data.updatedLeadNamePrefix || 'Updated_Lead'}_${this.uniqueId}`;
+                this.leadName = `${data.updatedLeadNamePrefix}_${this.uniqueId}`;
                 await this.fill(this.leadNameInput, this.leadName);
             }
 
             // Update Lead Code
             if (await this.leadCodeInput.isEditable().catch(() => false)) {
-                this.leadCode = `${data.updatedLeadCodePrefix || 'USRC'}_${Math.floor(1000 + Math.random() * 9000)}`;
+                this.leadCode = `${data.updatedLeadCodePrefix}_${Math.floor(1000 + Math.random() * 9000)}`;
                 await this.fill(this.leadCodeInput, this.leadCode);
             }
 
             // Update Expiration Date
             if (await this.isVisible(this.expirationDateInput, { timeout: 500 }).catch(() => false)) {
-                this.expirationDate = data.updatedExpirationDate || '12/31/2099';
+                this.expirationDate = data.updatedExpirationDate;
                 await this.fill(this.expirationDateInput, this.expirationDate);
             }
 
             // Update Notes
             if (await this.isVisible(this.notesInput, { timeout: 500 }).catch(() => false)) {
-                this.notes = data.updatedNotes || 'Updated How Did You Hear note';
+                this.notes = data.updatedNotes;
                 await this.fill(this.notesInput, this.notes);
             }
 
             // Update Address
             if (await this.isVisible(this.addressInput, { timeout: 500 }).catch(() => false)) {
-                this.address = data.updatedAddress || '456 Oak Ave';
+                this.address = data.updatedAddress;
                 await this.fill(this.addressInput, this.address);
             }
 
             // Update Phone
             if (await this.isVisible(this.phoneInput, { timeout: 500 }).catch(() => false)) {
-                this.phone = data.updatedPhone || '9876543210';
+                this.phone = data.updatedPhone;
                 await this.fill(this.phoneInput, this.phone);
             }
 
