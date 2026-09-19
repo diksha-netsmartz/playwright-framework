@@ -2,8 +2,11 @@
   "discountName": "Discount",
   "discountAmount": "100.00",
   "feeAmount": "100.00",
+  "additionalTax": "15",
+  "discountExpiry": "12/11/2029",
   "notes": "Automated Discount Notes",
   "updatedDiscountName": "Updated_Discount",
   "updatedDiscountAmount": "200.00",
-  "updatedNotes": "Updated Automated Discount Notes"
+  "updatedNotes": "Updated Automated Discount Notes",
+  "updatedDiscountExpiry": "10/12/2039"
 }
