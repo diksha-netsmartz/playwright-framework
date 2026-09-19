@@ -21,12 +21,14 @@ export default class StudentPortalHomePage extends BasePage {
         this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files')]");
         this.chooseFileBtn = page.locator("#uploadimageChoose").first();
         this.enrollNavLink = page.locator('#Marketplace_li');
-        this.myAccountNavLink = page.getByRole('link', { name: ' My Account ' });
+        this.myAccountNavLink = page.locator("#MyAccount_li");
         this.profileNavLink = page.locator("xpath=//li[contains(@id,'Profile')]");
+        this.appointmentsNavLink = page.locator("#MyAccou_Appt_li");
         this.resourcesNavLink = page.locator("//strong[normalize-space()='Resources']")
         this.classesNavLink = page.locator('#Resources_Class_li:visible');
-        this.schedulingNavLink = page.locator('#Scheduling_li')
-        this.scheduleMyLessonsAdultSubLink = page.locator("//a[@class='topTab'][normalize-space()='Adult BTW']").or(page.locator("//a[@class='topTab'][normalize-space()='Schedule My Lessons adult']"))
+        this.schedulingNavLink = page.locator('#Scheduling_li');
+        this.scheduleMyLessonsSubLink = page.locator('#Schul_InCar_li').first();
+        this.myScheduleSubLink = page.locator('#Schul_MySch_li')
         this.contactUsNavLink = page.locator('#Contact_li');
         this.userProfileDropdown = page.locator('#userprofileSettings');
         this.userDropdownLogoutBtn = page.getByRole('link', { name: 'Log Out' })
@@ -87,11 +89,8 @@ export default class StudentPortalHomePage extends BasePage {
         this.stripeCvvIframe = page.locator("#card-cvc-element iframe[name^='__privateStripeFrame'], iframe[title='Secure CVC input frame']").first();
         this.stripeCvv = page.frameLocator("#card-cvc-element iframe[name^='__privateStripeFrame'], iframe[title='Secure CVC input frame']").locator("input[name='cvc'], input[data-elements-stable-field-name='cardCvc']");
 
-
         // Action Buttons
         this.payButton = page.locator('#btnAmt');
-        this.paymentCloseButton = page.getByRole('button', { name: 'Close', exact: true }).or(page.locator(".modal-dialog button:has-text('Close'), #paymentAlertError button")).first();
-        this.paymentSuccessAlert = page.getByText('Payment Approved', { exact: true }).or(page.getByText('Payment Successful', { exact: true })).or(page.getByText('Success!'));
     }
 
     /**
@@ -103,6 +102,23 @@ export default class StudentPortalHomePage extends BasePage {
                 await this.click(this.myAccountNavLink);
             }
             await this.click(this.profileNavLink);
+            await this.waitForLoaders();
+        });
+    }
+
+    /**
+     * Navigates to the Appointments page by clicking 'My Account' and then 'Appointments' in the left navigation.
+     **/
+    async navigateToAppointments() {
+        await test.step('Navigate to Appointments (My Account -> Appointments)', async () => {
+            await this.waitForLoaders();
+            if (!await this.isVisible(this.appointmentsNavLink, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.myAccountNavLink);
+            }
+            await this.waitForVisible(this.appointmentsNavLink, 5000);
+            await this.click(this.appointmentsNavLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
             await this.waitForLoaders();
         });
     }
@@ -132,15 +148,32 @@ export default class StudentPortalHomePage extends BasePage {
     }
 
     /**
-     * Navigates to Scheduling > Schedule My Lessons Adult from the left sidebar.
+     * Navigates to Scheduling > Schedule My Lessons from the left sidebar.
      **/
-    async navigateToScheduleMyLessonsAdult() {
+    async navigateToScheduleMyLessons() {
         await test.step('Navigate to Scheduling > Schedule My Lessons', async () => {
             await this.waitForLoaders();
             await this.click(this.schedulingNavLink);
             await this.waitForLoaders();
-            await this.waitForVisible(this.scheduleMyLessonsAdultSubLink, 2000);
-            await this.click(this.scheduleMyLessonsAdultSubLink);
+            await this.waitForVisible(this.scheduleMyLessonsSubLink, 2000);
+            await this.click(this.scheduleMyLessonsSubLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 15000 }).catch(() => { });
+            await this.waitForLoaders();
+            await this.verifyURLContainsText("BtwScheduling/Lessons");
+        });
+    }
+
+    /**
+     * Navigates to Scheduling > My Schedule from the left sidebar.
+     **/
+    async navigateToMySchedule() {
+        await test.step('Navigate to Scheduling > My Schedule', async () => {
+            await this.waitForLoaders();
+            await this.click(this.schedulingNavLink);
+            await this.waitForLoaders();
+            await this.waitForVisible(this.myScheduleSubLink, 2000);
+            await this.click(this.myScheduleSubLink);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 15000 }).catch(() => { });
             await this.waitForLoaders();

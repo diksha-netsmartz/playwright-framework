@@ -32,7 +32,7 @@ test('TC_071 , TC_072 and TC_073: CSP - To Verify student is able to schedule ,r
   });
 
   await test.step('Step 2: From side menu, navigate to Scheduling > Schedule My Lessons', async () => {
-    await studentHomePage.navigateToScheduleMyLessonsAdult();
+    await studentHomePage.navigateToScheduleMyLessons();
   });
 
   await test.step('Step 3: From available slots, select open slot (button with appt date and time)', async () => {
