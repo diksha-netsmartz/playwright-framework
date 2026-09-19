@@ -162,11 +162,11 @@ export default class BasePage {
     }
 
     /**
- * Retrieves the value of an element's attribute.
- * @param {import('@playwright/test').Locator} locator - Target element locator.
- * @param {string} attributeName - Attribute name.
- * @param {string} expectedValue - Exepcted attribute value.
- */
+     * Asserts that an element's attribute matches the expected value.
+     * @param {import('@playwright/test').Locator} locator - Target element locator.
+     * @param {string} attributeName - Attribute name.
+     * @param {string|RegExp} expectedValue - Expected attribute value.
+     */
     async matchAttributeValue(locator, attributeName, expectedValue) {
         await expect(locator).toHaveAttribute(attributeName, expectedValue);
     }
@@ -278,6 +278,11 @@ export default class BasePage {
         await expect(locator).toBeVisible(opt);
     }
 
+    /**
+     * Asserts that an element is not visible on the page, with optional timeout.
+     * @param {import('@playwright/test').Locator} locator - Target element locator.
+     * @param {number|Object} [options={}] - Timeout in ms or options object.
+     */
     async verifyNotVisible(locator, options = {}) {
         const opt = typeof options === 'number' ? { timeout: options } : options;
         await expect(locator).not.toBeVisible(opt);
@@ -336,11 +341,11 @@ export default class BasePage {
     }
 
     /**
- * Asserts that the page URL matches the expected URL.
- * @param {string|RegExp} text - Expected text in page URL.
- */
+     * Asserts that the current page URL contains the expected text substring.
+     * @param {string} text - Expected text in page URL.
+     */
     async verifyURLContainsText(text) {
-        await expect(this.page.url()).toContain(text)
+        await expect(this.page.url()).toContain(text);
     }
 
     /**

@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import OnlineEnrollmentPage from '../../pages/OnlineEnrollmentApplication/OnlineEnrollmentPage';
+import OnlineEnrollmentPage from '@pages/OnlineEnrollmentApplication/OnlineEnrollmentPage';
 
 /**
  * TC_014: COE TEEN/ADULT/WT

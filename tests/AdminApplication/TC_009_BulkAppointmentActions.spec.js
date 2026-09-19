@@ -1,9 +1,9 @@
 import {test} from '@playwright/test';
 
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import BulkAppointmentPage from '../../pages/AdminApplication/Scheduling/ManageTimeSlots/BulkAppointmentPage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import BulkAppointmentPage from '@pages/AdminApplication/Scheduling/ManageTimeSlots/BulkAppointmentPage';
+import { credentials } from '@config/config';
 
 /**
  * TC_009: C-Admin > Scheduling > Manage Appointment Slot > Appointment Bulk Edit
@@ -16,8 +16,6 @@ test('TC_009: C-admin > Scheduling > Manage Appointment Slot > Appointment Bulk 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const bulkAppointmentPage = new BulkAppointmentPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

@@ -47,11 +47,22 @@ const currentEnv = process.env.ENV || 'coreServer2';
 const activeEnv = environments[currentEnv] || environments.coreServer2;
 const credentials = loginData[currentEnv] || loginData.coreServer2 || {};
 
+/**
+ * Helper to retrieve credentials for a specific environment.
+ * @param {string} [env=currentEnv] - Target environment name.
+ * @returns {Object} Environment credentials object.
+ */
+export function getCredentials(env = currentEnv) {
+    return loginData[env] || loginData.coreServer2 || {};
+}
+
 const config = {
     envName: currentEnv,
     environments,
     ...activeEnv,
-    credentials
+    credentials,
+    getCredentials
 };
 
+export { currentEnv, activeEnv, environments, credentials };
 export default config;

@@ -1,5 +1,5 @@
-import BasePage from '../../../utils/BasePage';
-import { expect, test } from '@playwright/test';
+import BasePage from '@utils/BasePage';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Student Profile Page in Admin Portal.
@@ -103,14 +103,6 @@ export default class StudentProfilePage extends BasePage {
                 }
             }
         });
-    }
-
-    /**
-     * Alias for updateEmailIfDifferent.
-     * @param {string} specifiedEmail - The required email address to set.
-     **/
-    async updateEmail(specifiedEmail) {
-        await this.updateEmailIfDifferent(specifiedEmail);
     }
 }
 

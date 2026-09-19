@@ -1,6 +1,6 @@
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
-import gmailAccount from '../test-data/json/gmailAccount.json';
+import gmailAccount from '@test-data/json/gmailAccount.json';
 
 /**
  * Resolves IMAP credentials based on options and default target account.

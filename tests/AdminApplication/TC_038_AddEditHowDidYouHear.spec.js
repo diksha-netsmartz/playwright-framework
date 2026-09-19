@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import HowDidYouHearPage from '../../pages/AdminApplication/AccountManagement/HowDidYouHearPage';
-import login from '../../test-data/json/login.json';
-import howDidYouHearData from '../../test-data/json/howDidYouHearData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import HowDidYouHearPage from '@pages/AdminApplication/AccountManagement/HowDidYouHearPage';
+import { credentials } from '@config/config';
+import howDidYouHearData from '@test-data/json/howDidYouHearData.json';
 
 /**
  * TC_038: C-Admin >> Account Management >> How do you hear
@@ -25,8 +25,6 @@ test('TC_038: C-Admin >> Account Management >> How did you hear - To verify user
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const howDidYouHearPage = new HowDidYouHearPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

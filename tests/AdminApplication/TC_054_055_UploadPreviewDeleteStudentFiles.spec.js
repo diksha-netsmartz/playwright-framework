@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import StudentFilesPage from '../../pages/AdminApplication/StudentAccount/StudentFilesPage';
-import login from '../../test-data/json/login.json';
+import { test } from '@playwright/test';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import StudentFilesPage from '@pages/AdminApplication/StudentAccount/StudentFilesPage';
+import { credentials } from '@config/config';
 
 /**
  * TC_054_055: C-admin >> Student Account >> Files
@@ -27,7 +27,6 @@ test('TC_054_055: C-admin >> Student Account >> Files - Verify file upload, prev
     const homePage = new HomePage(page);
     const studentFilesPage = new StudentFilesPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     const targetStudent = credentials.studentUser.name;
     const uploadFilePath = 'test-data/uploads/uploadFile.jpg';
 

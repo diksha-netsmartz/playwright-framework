@@ -1,7 +1,7 @@
-import BasePage from "../../../utils/BasePage";
+import BasePage from "@utils/BasePage";
 import { expect, test } from "@playwright/test";
 import CombinedAppointmentPage from "./CombinedAppointmentPage";
-import DateHelper from "../../../utils/DateHelper";
+import DateHelper from "@utils/DateHelper";
 
 /**
  * Page Object representing the Scheduler View.

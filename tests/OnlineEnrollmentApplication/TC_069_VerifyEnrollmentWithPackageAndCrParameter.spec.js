@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import OnlineEnrollmentPage from '../../pages/OnlineEnrollmentApplication/OnlineEnrollmentPage';
-import oeData from '../../test-data/json/onlineEnrollmentData.json';
+import OnlineEnrollmentPage from '@pages/OnlineEnrollmentApplication/OnlineEnrollmentPage';
+import oeData from '@test-data/json/onlineEnrollmentData.json';
 
 /**
  * TC_069: C-OE

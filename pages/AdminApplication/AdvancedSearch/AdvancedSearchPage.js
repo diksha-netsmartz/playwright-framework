@@ -1,6 +1,5 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import DateHelper from '../../../utils/DateHelper';
 
 /**
  * Page Object representing the Advanced Search page in Admin Portal.
@@ -31,7 +30,6 @@ export default class AdvancedSearchPage extends BasePage {
         // Results table
         this.resultsTable = page.locator('#dtHighSchool');
         this.recordRows = page.locator("xpath=//table[@id='dtHighSchool']//tbody//tr//td[not(text()='No record exists.')]");
-        this.noRecordsCell = page.locator("xpath=//table[@id='dtHighSchool']//tbody//tr//td[text()='No record exists.']");
     }
 
     /**

@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import BusinessReportsPage from '../../pages/AdminApplication/ReportCenter/BusinessReportsPage';
-import login from '../../test-data/json/login.json';
-import TestDataGenerator from '../../utils/TestDataGenerator';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import BusinessReportsPage from '@pages/AdminApplication/ReportCenter/BusinessReportsPage';
+import { credentials, currentEnv } from '@config/config';
+import TestDataGenerator from '@utils/TestDataGenerator';
 
 /**
  * TC_061: C-Admin >> Report Center >> Business Report
@@ -33,16 +33,13 @@ test('TC_061: C-Admin >> Report Center >> Business Report - To verify that BTW D
     const businessReportsPage = new BusinessReportsPage(page);
 
     const filterName = TestDataGenerator.generateUniqueId('BTW Filter');
-    const env = process.env.ENV || 'coreServer2';
-    const credentials = login[env];
     const reportNames = {
         uat: 'BTW Openings and Schedule Report',
         staging: 'BTW Openings and Schedule Report',
         coreServer1: 'BTW Openings and Schedule Report',
         coreServer2: 'BTW Data Export'
     };
-    const reportName = reportNames[env];
-
+    const reportName = reportNames[currentEnv];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

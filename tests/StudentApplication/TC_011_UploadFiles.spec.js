@@ -1,10 +1,9 @@
 import { test } from '@playwright/test';
-import StudentLoginPage from '../../pages/StudentApplication/StudentLoginPage';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import login from '../../test-data/json/login.json';
-import StudentHomePage from '../../pages/StudentApplication/StudentPortalHomePage';
-import AdminHomePage from '../../pages/AdminApplication/AdminPortalHomePage'
-
+import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import { credentials } from '@config/config';
+import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage';
+import AdminHomePage from '@pages/AdminApplication/AdminPortalHomePage'
 
 /**
  * TC_011: CSP
@@ -17,8 +16,6 @@ test('TC_011: CSP - Verify that the file is getting uploaded', { tag: ['@CSPHome
     const studentHomePage = new StudentHomePage(page);
     const loginPage = new LoginPage(page);
     const adminHomePage = new AdminHomePage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to CSP student portal with valid credentials', async () => {
         await studentLoginPage.navigateToLoginPage();

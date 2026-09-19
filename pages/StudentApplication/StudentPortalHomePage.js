@@ -1,6 +1,6 @@
-import BasePage from '../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import paymentData from '../../test-data/json/paymentData.json';
+import paymentData from '@test-data/json/paymentData.json';
 
 /**
  * Page Object representing the Student Portal Home Page.
@@ -57,9 +57,7 @@ export default class StudentPortalHomePage extends BasePage {
         // Clover iframe locators (Card Number, Expiration Date, CVV, Zip Code)
         this.cardNumberIframe = page.locator('#CARD_NUMBER_ID, iframe[title="CARD NUMBER"]');
         this.cardNumberInIframe = page.frameLocator('#CARD_NUMBER_ID, iframe[title="CARD NUMBER"]').locator('#cardNumber');
-        this.cardDateIframe = page.locator('#CARD_DATE_ID, iframe[title="CARD DATE"]');
         this.expiryDateInIframe = page.frameLocator('#CARD_DATE_ID, iframe[title="CARD DATE"]').locator('#date');
-        this.cardCvvIframe = page.locator('#CARD_CVV_ID, iframe[title="CARD CVV"]');
         this.cvvInIframe = page.frameLocator('#CARD_CVV_ID, iframe[title="CARD CVV"]').locator('#cvv');
         this.cardPostalCodeIframe = page.locator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]');
         this.postalCodeInIframe = page.frameLocator('#CARD_POSTAL_CODE_ID, iframe[title="CARD POSTAL CODE"]').locator('#postal');
@@ -84,9 +82,7 @@ export default class StudentPortalHomePage extends BasePage {
         // Stripe iframe locators
         this.stripeCardNumberIframe = page.locator("#card-number-element iframe[title='Secure card number input frame'], #card-number-element iframe[name^='__privateStripeFrame']").first();
         this.stripeCardNumber = page.frameLocator("#card-number-element iframe[title='Secure card number input frame'], #card-number-element iframe[name^='__privateStripeFrame']").locator("input[name='cardnumber'], input[data-elements-stable-field-name='cardNumber']");
-        this.stripeExpiryDateIframe = page.locator("#card-expiry-element iframe[name^='__privateStripeFrame'], iframe[title*='expiration']").first();
         this.stripeExpiryDate = page.frameLocator("#card-expiry-element iframe[name^='__privateStripeFrame'], iframe[title*='expiration']").locator("input[name='exp-date'], input[data-elements-stable-field-name='cardExpiry']");
-        this.stripeCvvIframe = page.locator("#card-cvc-element iframe[name^='__privateStripeFrame'], iframe[title='Secure CVC input frame']").first();
         this.stripeCvv = page.frameLocator("#card-cvc-element iframe[name^='__privateStripeFrame'], iframe[title='Secure CVC input frame']").locator("input[name='cvc'], input[data-elements-stable-field-name='cardCvc']");
 
         // Action Buttons

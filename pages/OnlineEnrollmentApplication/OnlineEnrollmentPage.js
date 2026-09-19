@@ -1,8 +1,8 @@
-import BasePage from '../../utils/BasePage';
-import config from '../../config/config';
+import BasePage from '@utils/BasePage';
+import config from '@config/config';
 import { test } from '@playwright/test';
-import oeData from '../../test-data/json/onlineEnrollmentData.json';
-import PdfHelper from '../../utils/PdfHelper';
+import oeData from '@test-data/json/onlineEnrollmentData.json';
+import PdfHelper from '@utils/PdfHelper';
 
 /**
  * Unified Page Object representing the Online Enrollment Application (COE).
@@ -19,7 +19,6 @@ export default class OnlineEnrollmentPage extends BasePage {
 
         // Package selection
         this.btwPackageBtn = page.locator("xpath=(//p[contains(text(),'BTW Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
-        this.rtPackageBtn = page.locator("xpath=(//p[contains(text(),'RT Package')]//ancestor::tr//a[@data-target='#btnSelect'])[1]");
         this.btwCRPackage = page.locator("xpath=(//p[contains(text(),'BTW') and contains(text(),'CR')]//ancestor::tr//a)[1]");
         this.additionalPackageCheckbox = page.locator("(//input[@type='checkbox' and contains(@class,'AdditionalProduct')]//following-sibling::span)[1]");
         this.continueAdditionalProduct = page.locator('#btnContinueAdditionalProduct');
@@ -93,7 +92,6 @@ export default class OnlineEnrollmentPage extends BasePage {
         this.permitIssueDateSelectInCalendar = page.locator("xpath=(//div[contains(@id,'PermitIssue')]//td//a)[1]");
         this.permitExpirationDateCalendarIcon = page.locator("xpath=//input[@lblname='Permit Expiration Date']//following-sibling::span//span");
         this.permitExpireDateSelectInCalendar = page.locator("xpath=(//div[contains(@id,'ExpirePermit')]//td//a)[last()]");
-        this.studentSignature = page.locator('#StudentSignature');
         this.parentSignature = page.locator('#ParentSignature');
         this.last6DigitsParentsDriverLicense = page.locator('#Last6digitsofparentDriversLicense');
         this.parentClassDifferentSchoolDropdown = page.locator("//span[contains(@aria-owns,'ParentClassDifferentSchool')]//span[text()='Please Select']");
@@ -183,7 +181,6 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async selectRTPackage() {
         await test.step('Select RT Package and available appointment', async () => {
-            // await this.click(this.rtPackageBtn);
             await this.click(this.showAppointmentButton);
             await this.waitForVisible(this.selectButton);
             await this.click(this.selectButton);
@@ -281,6 +278,9 @@ export default class OnlineEnrollmentPage extends BasePage {
 
     }
 
+    /**
+     * Selects Date of Birth (Month, Year, Day) for package verification and proceeds.
+     **/
     async selectDOBForPackage() {
         await this.waitForLoaders();
         await this.page.waitForLoadState('load', { timeout: 5000 })

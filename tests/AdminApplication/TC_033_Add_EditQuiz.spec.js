@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import OnlineQuizTestsPage from '../../pages/AdminApplication/AccountManagement/Services/OnlineQuizTestsPage';
-import login from '../../test-data/json/login.json';
-import quizData from '../../test-data/json/quizData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import OnlineQuizTestsPage from '@pages/AdminApplication/AccountManagement/Services/OnlineQuizTestsPage';
+import { credentials } from '@config/config';
+import quizData from '@test-data/json/quizData.json';
 
 /**
  * TC_033: C-Admin >> Account Management >> Services >> Online quiz/test
@@ -26,8 +26,6 @@ test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const quizPage = new OnlineQuizTestsPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

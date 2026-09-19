@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import OELeadPage from '../../pages/AdminApplication/StudentLeads/OELeadPage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import OELeadPage from '@pages/AdminApplication/StudentLeads/OELeadPage';
+import { credentials } from '@config/config';
 
 /**
  * TC_042: C-Admin >> Student Leads >> OE Lead
@@ -23,8 +23,6 @@ test('TC_042: C-Admin >> Student Leads >> OE Lead - To verify OE lead appear', {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const oeLeadPage = new OELeadPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -48,6 +46,5 @@ test('TC_042: C-Admin >> Student Leads >> OE Lead - To verify OE lead appear', {
         await oeLeadPage.selectOELeadStatus('Active');
         await oeLeadPage.verifyOELeadsGridVisible();
     });
-
 
 });

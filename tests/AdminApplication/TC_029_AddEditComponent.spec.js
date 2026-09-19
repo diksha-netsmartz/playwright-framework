@@ -1,9 +1,9 @@
 import {test} from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import ComponentsPage from '../../pages/AdminApplication/AccountManagement/Services/ComponentsPage';
-import login from '../../test-data/json/login.json';
-import componentData from '../../test-data/json/componentData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import ComponentsPage from '@pages/AdminApplication/AccountManagement/Services/ComponentsPage';
+import { credentials } from '@config/config';
+import componentData from '@test-data/json/componentData.json';
 
 /**
  * TC_029: C-Admin >> Account Management >> Services >> Component
@@ -17,8 +17,6 @@ test('TC_029: C-Admin >> Account Management >> Services >> Component - To verify
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const componentsPage = new ComponentsPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -43,7 +41,6 @@ test('TC_029: C-Admin >> Account Management >> Services >> Component - To verify
         await componentsPage.searchAndEditComponent();
         await componentsPage.verifyComponentDetails(componentData);
     });
-
 
     await test.step('Step 6: Update fields and save edited component', async () => {
         await componentsPage.editComponentFields(componentData);

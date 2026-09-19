@@ -1,10 +1,9 @@
 import { test } from '@playwright/test';
 
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import EnrollmentBillingPage from '../../pages/AdminApplication/StudentAccount/EnrollmentBillingPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import login from "../../test-data/json/login.json";
-import studentData from "../../test-data/json/studentData.json"
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import EnrollmentBillingPage from '@pages/AdminApplication/StudentAccount/EnrollmentBillingPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import { credentials } from '@config/config';
 
 /**
  * TC_007: C-admin > Student > Enrollment
@@ -18,7 +17,6 @@ test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Del
     const homePage = new HomePage(page);
     const enrollmentBillingPage = new EnrollmentBillingPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     const targetStudent = credentials.studentUser.name;
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {

@@ -1,12 +1,12 @@
 import { test } from "@playwright/test";
-import LoginPage from "../../pages/AdminApplication/AdminLoginPage";
-import HomePage from "../../pages/AdminApplication/AdminPortalHomePage";
-import NewStudentEnrollmentPage from "../../pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage";
-import SchedulerPage from "../../pages/Common/Scheduling/SchedulerPage";
-import CombinedAppointmentPage from "../../pages/Common/Scheduling/CombinedAppointmentPage";
-import TestDataGenerator from "../../utils/TestDataGenerator";
-import createAppointmentData from "../../test-data/json/createAppointmentData.json";
-import login from "../../test-data/json/login.json";
+import LoginPage from "@pages/AdminApplication/AdminLoginPage";
+import HomePage from "@pages/AdminApplication/AdminPortalHomePage";
+import NewStudentEnrollmentPage from "@pages/AdminApplication/NewStudentEnrollment/NewStudentEnrollmentPage";
+import SchedulerPage from "@pages/Common/Scheduling/SchedulerPage";
+import CombinedAppointmentPage from "@pages/Common/Scheduling/CombinedAppointmentPage";
+import TestDataGenerator from "@utils/TestDataGenerator";
+import createAppointmentData from "@test-data/json/createAppointmentData.json";
+import { credentials } from '@config/config';
 
 /**
  * TC_002: C-admin > Scheduling
@@ -22,7 +22,6 @@ test("TC_002: C-admin > Scheduling - Verify that the appt is getting copied", { 
     const schedulerPage = new SchedulerPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
     let student1;
     let student2;
 

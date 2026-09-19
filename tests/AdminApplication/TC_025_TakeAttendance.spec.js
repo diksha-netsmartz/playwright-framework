@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import ClassListPage from '../../pages/AdminApplication/Classroom/ClassListPage';
-import ClassroomAttendancePage from '../../pages/AdminApplication/Classroom/ClassroomAttendancePage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import ClassListPage from '@pages/AdminApplication/Classroom/ClassListPage';
+import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
+import { credentials } from '@config/config';
 
 /**
  * TC_025: C-Admin > Classroom > Attendance > Take Attendance
@@ -15,8 +15,6 @@ test('TC_025: C-admin > Classroom > Attendance - Take Attendance', { tag: '@clas
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
   const attendancePage = new ClassroomAttendancePage(page);
-
-  const credentials = login[process.env.ENV || 'coreServer2'];
 
   await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
     await loginPage.navigateToLoginPage();

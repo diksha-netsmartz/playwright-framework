@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import BasePage from "../../../utils/BasePage";
-import studentData from "../../../test-data/json/studentData.json";
+import BasePage from "@utils/BasePage";
+import studentData from "@test-data/json/studentData.json";
 
 /**
  * Page Object representing the Combined Appointment Creation and Management Page in Single Instructor Scheduler.

@@ -1,7 +1,7 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import PdfHelper from '../../../utils/PdfHelper';
-import ExcelHelper from '../../../utils/ExcelHelper';
+import PdfHelper from '@utils/PdfHelper';
+import ExcelHelper from '@utils/ExcelHelper';
 
 /**
  * Page Object representing the Classroom Attendance Page in Admin Portal.
@@ -405,28 +405,12 @@ export default class ClassroomAttendancePage extends BasePage {
             await this.waitForVisible(this.emailBodyContent);
             await this.fill(this.emailBodyContent, body);
 
-            // Listen for send email API response
-            // this.sendEmailResponsePromise = this.page.waitForResponse(
-            //     response => response.url().includes('Classroom/CRAttendanceSendEmailToMultipleRecipient') && response.status() === 200
-            //     , { timeout: 30000 });
-
             await this.waitForVisible(this.sendEmailSubmitBtn);
             await this.click(this.sendEmailSubmitBtn);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 60000 });
         });
     }
-
-    // /**
-    //  * Verifies that the CRAttendanceSendEmailToMultipleRecipient API response returned IsSuccess: true.
-    //  **/
-    // async verifySendEmailResponse() {
-    //     await test.step('Verify send session email API response is successful', async () => {
-    //         const response = await this.sendEmailResponsePromise;
-    //         const responseData = await response.json();
-    //         expect(responseData.IsSuccess).toBe(true);
-    //     });
-    // }
 
     /**
      * Verifies that 'Email sent successfully.' confirmation message appears.

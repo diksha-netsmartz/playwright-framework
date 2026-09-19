@@ -1,4 +1,4 @@
-import BasePage from '../../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -69,7 +69,6 @@ export default class ComponentsPage extends BasePage {
         // Components Grid Locators
         this.searchTextbox = page.locator("xpath=//div[@id='ServiceType_filter']//input[@type='search']");
         this.editIcon = page.getByTitle('Edit');
-        this.componentsTable = page.locator('#tbl_Products_Components, table.table');
         this.tableRows = page.locator("xpath=//table[contains(@id,'ServiceType') or contains(@class,'dataTable')]//tbody//tr[not(contains(@class,'dataTables_empty'))]");
         this.componentAddedSuccessMsg = page.getByText('Component added successfully');
         this.componentUpdatedSuccessMsg = page.getByText('Component updated successfully');

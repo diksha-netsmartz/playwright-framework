@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import CorporateTimeOffPage from '../../pages/AdminApplication/Scheduling/CorporateTimeOffPage';
-import login from '../../test-data/json/login.json';
-import corporateTimeOffData from '../../test-data/json/corporateTimeOffData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import CorporateTimeOffPage from '@pages/AdminApplication/Scheduling/CorporateTimeOffPage';
+import { credentials } from '@config/config';
+import corporateTimeOffData from '@test-data/json/corporateTimeOffData.json';
 
 /**
  * TC_047: C-Admin >> Scheduling >> Corporate Time Off
@@ -26,8 +26,6 @@ test('TC_047: C-Admin >> Scheduling >> Corporate Time Off - To verify user able 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const corporateTimeOffPage = new CorporateTimeOffPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

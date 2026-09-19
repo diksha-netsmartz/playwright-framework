@@ -1,4 +1,4 @@
-import BasePage from '../../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -51,7 +51,6 @@ export default class OnlineQuizTestsPage extends BasePage {
 
         // Grid Locators
         this.searchTextbox = page.locator("input[type='search']").first();
-        this.quizzesTable = page.locator('#onlineQuizzes');
         this.editIcon = page.getByRole('link', { name: 'Edit' }).first();
 
         // Mutually Exclusive Switch Definitions

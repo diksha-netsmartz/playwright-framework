@@ -1,4 +1,4 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -22,7 +22,6 @@ export default class StaffAppointmentListPage extends BasePage {
         this.filterBtn = page.getByRole('button', { name: /filter/i });
 
         // Results table
-        this.appointmentsTable = page.locator('table.table, #staffAppointmentListtable, .table-responsive table');
         this.recordRows = page.locator("xpath=//table[@id='grid_DailyData']//tbody//td[not(text()='No record exists.')]//parent::tr");
         this.noRecordMsg = page.getByText('No record exists.', { exact: true });
     }

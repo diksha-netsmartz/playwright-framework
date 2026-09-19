@@ -3,7 +3,7 @@ import playwright from 'eslint-plugin-playwright';
 export default [
   {
     ...playwright.configs['flat/recommended'],
-    files: ['tests/**/*.js', 'pages/**/*.js'],
+    files: ['tests/**/*.js', 'pages/**/*.js', 'utils/**/*.js', 'config/**/*.js'],
     rules: {
       ...playwright.configs['flat/recommended'].rules,
       'playwright/expect-expect': 'off',
@@ -12,6 +12,13 @@ export default [
       'playwright/valid-title': 'off',
       'playwright/consistent-spacing-between-blocks': 'off',
       'playwright/no-wait-for-timeout': 'warn',
+      'playwright/prefer-web-first-assertions': 'warn',
+      'playwright/no-nested-step': 'warn',
+      'playwright/no-conditional-expect': 'warn',
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-duplicate-imports': 'error',
+      'no-unreachable': 'warn',
+      'no-constant-condition': 'warn',
     },
   },
 ];

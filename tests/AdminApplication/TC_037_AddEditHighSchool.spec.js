@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import HighSchoolsPage from '../../pages/AdminApplication/AccountManagement/HighSchoolsPage';
-import login from '../../test-data/json/login.json';
-import highSchoolData from '../../test-data/json/highSchoolData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import HighSchoolsPage from '@pages/AdminApplication/AccountManagement/HighSchoolsPage';
+import { credentials } from '@config/config';
+import highSchoolData from '@test-data/json/highSchoolData.json';
 
 /**
  * TC_037: C-Admin >> Account Management >> High School
@@ -25,8 +25,6 @@ test('TC_037: C-Admin >> Account Management >> High School - To verify user able
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const highSchoolsPage = new HighSchoolsPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

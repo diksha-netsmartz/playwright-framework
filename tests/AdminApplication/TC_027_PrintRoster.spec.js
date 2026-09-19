@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import ClassroomAttendancePage from '../../pages/AdminApplication/Classroom/ClassroomAttendancePage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
+import { credentials } from '@config/config';
 
 /**
  * TC_027: C-Admin > Classroom > Attendance > Take Attendance
@@ -17,8 +17,6 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag:
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
 
-    const env = process.env.ENV || 'coreServer2';
-    const credentials = login[env || 'coreServer2'];
     const reportName = /Roster report|Test report|CR Report|CR Roster/i;
     let pdfPage;
     let download;

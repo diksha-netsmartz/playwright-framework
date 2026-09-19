@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-import BasePage from "../../../../utils/BasePage";
-import DateHelper from "../../../../utils/DateHelper";
-import login from "../../../../test-data/json/login.json";
+import BasePage from "@utils/BasePage";
+import DateHelper from "@utils/DateHelper";
+import { credentials } from "@config/config";
 
 /**
  * Page Object representing the Open Time Slots Page in Admin Portal (Scheduling > Manage Time Slots > Open Time Slots).
@@ -31,7 +31,6 @@ export default class OpenTimeSlotsPage extends BasePage {
         this.appointmentTypeDropdown = page.locator("//select[@id='drpOSTSlotType']//parent::div//button");
         this.staffDropdown = page.locator("//select[@id='drp_AOTSInstructor']//parent::div//button");
         this.staffDropdownOption = page.locator("xpath=(//select[@id='drp_AOTSInstructor']//parent::div//div//li//span[1][not(contains(text(),'Please Select'))])[1]");
-        this.dateInput = page.locator('#OTSMultiDateSelection');
         this.availableDateCells = page.locator("xpath=(//td[@class='day'])");
 
         this.locationDropdown = page.locator("//select[@id='drpAOTSLocation']//parent::div//button");
@@ -392,7 +391,7 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.click(this.staffDropdown);
 
             const targetInstructor = (typeof options === 'string' ? options : options.instructorName)
-                || login[process.env.ENV || 'coreServer2']?.staffUser?.username
+                || credentials?.staffUser?.username
                 || data.staff;
 
             const staffOption = this.page.locator("//select[@id='drp_AOTSInstructor']//parent::div//ul//li//span")

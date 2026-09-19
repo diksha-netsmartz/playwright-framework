@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import BasePage from "../../../utils/BasePage";
-import packageData from "../../../test-data/json/packageData.json";
+import BasePage from "@utils/BasePage";
+import packageData from "@test-data/json/packageData.json";
 
 /**
  * Page Object representing the New Student Enrollment Page in Admin Portal.

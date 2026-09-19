@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import BusinessReportsPage from '../../pages/AdminApplication/ReportCenter/BusinessReportsPage';
-import login from '../../test-data/json/login.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import BusinessReportsPage from '@pages/AdminApplication/ReportCenter/BusinessReportsPage';
+import { credentials } from '@config/config';
 
 /**
  * TC_056: C-Admin >> Report Center >> Business Report
@@ -26,8 +26,6 @@ test('TC_056: C-Admin >> Report Center >> Business Report - To verify that Stude
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);
 
-    const credentials = login[process.env.ENV || 'coreServer2'];
-
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
@@ -48,7 +46,6 @@ test('TC_056: C-Admin >> Report Center >> Business Report - To verify that Stude
     await test.step('Step 5: Select Date Range', async () => {
         await businessReportsPage.selectDateRange('currentMonth');
     });
-
 
     await test.step('Step 6: Click on Filter Students button', async () => {
         await businessReportsPage.clickFilterStudents();

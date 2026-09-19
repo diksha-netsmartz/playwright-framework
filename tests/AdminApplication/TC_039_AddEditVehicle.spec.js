@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import LoginPage from '../../pages/AdminApplication/AdminLoginPage';
-import HomePage from '../../pages/AdminApplication/AdminPortalHomePage';
-import VehicleListPage from '../../pages/AdminApplication/AccountManagement/VehicleListPage';
-import login from '../../test-data/json/login.json';
-import vehicleData from '../../test-data/json/vehicleData.json';
+import LoginPage from '@pages/AdminApplication/AdminLoginPage';
+import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import VehicleListPage from '@pages/AdminApplication/AccountManagement/VehicleListPage';
+import { credentials } from '@config/config';
+import vehicleData from '@test-data/json/vehicleData.json';
 
 /**
  * TC_039: C-Admin >> Account Management >> Vehicle >> Vehicle List
@@ -25,8 +25,6 @@ test('TC_039: C-Admin >> Account Management >> Vehicle >> Vehicle List - To veri
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const vehicleListPage = new VehicleListPage(page);
-
-    const credentials = login[process.env.ENV || 'coreServer2'];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();

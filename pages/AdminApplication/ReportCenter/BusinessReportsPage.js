@@ -1,8 +1,8 @@
-import BasePage from '../../../utils/BasePage';
+import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import ExcelHelper from '../../../utils/ExcelHelper';
-import PdfHelper from '../../../utils/PdfHelper';
-import DateHelper from '../../../utils/DateHelper';
+import ExcelHelper from '@utils/ExcelHelper';
+import PdfHelper from '@utils/PdfHelper';
+import DateHelper from '@utils/DateHelper';
 
 /**
  * Page Object representing the Business Reports page in Report Center (Admin Portal).
