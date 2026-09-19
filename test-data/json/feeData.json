@@ -4,5 +4,6 @@
   "notes": "Automated Fee Notes",
   "updatedFeeName": "Updated_Fee",
   "updatedFeeAmount": "150.00",
+  "additionalTax": "15",
   "updatedNotes": "Updated Automated Fee Notes"
 }
