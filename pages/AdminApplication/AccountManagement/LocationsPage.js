@@ -358,22 +358,6 @@ export default class LocationsPage extends BasePage {
             await this.verifyVisible(this.locationAddedSuccessMsg);
         });
     }
-
-    /**
-     * Searches for a location by name in the locations grid.
-     * @param {string} locationName - Name of the location to search.
-     **/
-    async searchLocation(locationName) {
-        await test.step(`Search for location: "${locationName}"`, async () => {
-            await this.waitForLoaders();
-            await this.waitForVisible(this.searchTextbox);
-            await this.fill(this.searchTextbox, locationName);
-            await this.waitForLoaders();
-            await this.verifyContainsText(this.locationTable, locationName);
-            await expect(this.editIcon).toHaveCount(1);
-        });
-    }
-
     /**
      * Clicks the Edit (pencil) button for the filtered location.
      **/

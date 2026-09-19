@@ -240,7 +240,7 @@ export default class ServicesPackagesPage extends BasePage {
             const prefix = data.serviceName;
             this.serviceName = `${prefix}_${Date.now()}`;
             const codePrefix = data.serviceCode;
-            this.serviceCode = `${codePrefix}_${Math.floor(1000 + Math.random() * 9000)}`;
+            this.serviceCode = `${codePrefix}_${Math.floor(1000 + Math.random() * 9000)}`.substring(0, 10);
 
             this.webName = data.webName;
             this.webDescription = data.webDescription;
@@ -428,7 +428,6 @@ export default class ServicesPackagesPage extends BasePage {
             if (await this.isVisible(this.additionalInfo2Textarea, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.additionalInfo2Textarea, this.additionalInfo2);
             }
-            await this.page.pause();
             return this.serviceName;
         });
     }
@@ -561,7 +560,7 @@ export default class ServicesPackagesPage extends BasePage {
             this.updatedServiceName = `${prefix}_${Date.now()}`;
             this.serviceName = this.updatedServiceName;
             const codePrefix = data.updatedServiceCode;
-            this.updatedServiceCode = `${codePrefix}_${Math.floor(1000 + Math.random() * 9000)}`;
+            this.updatedServiceCode = `${codePrefix}_${Math.floor(1000 + Math.random() * 9000)}`.substring(0, 10);
 
             this.updatedWebName = data.updatedWebName;
             this.updatedWebDescription = data.updatedWebDescription;
@@ -697,7 +696,6 @@ export default class ServicesPackagesPage extends BasePage {
             if (await this.isVisible(this.additionalInfo2Textarea, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.additionalInfo2Textarea, this.updatedAdditionalInfo2);
             }
-            await this.page.pause();
             return this.updatedServiceName;
         });
     }
