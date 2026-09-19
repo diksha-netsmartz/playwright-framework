@@ -51,19 +51,24 @@ test('TC_035: C-Admin >> Account Management >> Staff - To verify user is able to
 
     await test.step('Step 6: Click close and verify staff is visible in the grid', async () => {
         await staffPage.clickClose();
-        await staffPage.verifyStaffVisibleInGrid();
     });
 
-    await test.step('Step 7: Click Edit on the created staff member', async () => {
-        await staffPage.editStaff();
+    await test.step('Step 7: Click Edit on the created staff member and verify details', async () => {
+        await staffPage.searchAndEditStaff();
+        await staffPage.verifyStaffDetails(staffData);
     });
 
-    await test.step('Step 8: Change staff status to Deactivated', async () => {
-        await staffPage.updateStatusToDeactivated();
+    await test.step('Step 8: Update all staff details and remove profile picture', async () => {
+        await staffPage.updateStaffDetails(staffData);
     });
 
     await test.step('Step 9: Click Save and verify "Staff information updated" confirmation message', async () => {
         await staffPage.clickSave();
         await staffPage.verifyStaffUpdatedSuccessfully();
+    });
+
+    await test.step('Step 10: Reopen staff and verify updated details', async () => {
+        await staffPage.searchAndEditStaff();
+        await staffPage.verifyUpdatedStaffDetails(staffData);
     });
 });
