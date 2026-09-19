@@ -29,6 +29,7 @@ export default class HighSchoolsPage extends BasePage {
 
         this.stateDropdown = page.locator("xpath=//select[@name='State']//parent::div//button");
         this.stateOption = page.locator("(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]");
+        this.stateOptionLast = page.locator("(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[last()]");
 
         this.zipCodeInput = page.locator('#ZipCode');
         this.emailInput = page.getByRole('textbox', { name: 'Email' });
@@ -99,7 +100,6 @@ export default class HighSchoolsPage extends BasePage {
             await this.waitForVisible(this.statusDropdownOptionActive);
             this.selectedStatus = (await this.statusDropdownOptionActive.innerText()).trim();
             await this.click(this.statusDropdownOptionActive);
-
             // Fill Code & Address
             await this.fill(this.schoolCodeInput, this.schoolCode);
 
@@ -285,15 +285,12 @@ export default class HighSchoolsPage extends BasePage {
             }
 
             // Select last State option
-            if (await this.stateDropdown.isVisible({ timeout: 100 }).catch(() => false)) {
+            if (await this.isVisible(this.stateDropdown, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.stateDropdown);
-                const stateLastOption = this.page.locator("xpath=(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[last()]");
-                if (await stateLastOption.isVisible({ timeout: 1500 }).catch(() => false)) {
-                    this.selectedState = (await stateLastOption.innerText()).trim();
-                    await this.click(stateLastOption);
-                } else {
-                    await this.click(this.stateDropdown);
-                }
+                await this.waitForVisible(this.stateOptionLast);
+                this.selectedState = (await this.stateOptionLast.innerText()).trim();
+                await this.click(this.stateOptionLast);
+
             }
 
             // Update Zip
