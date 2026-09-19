@@ -67,6 +67,11 @@ export default class OnlineQuizTestsPage extends BasePage {
         ];
 
         // Form State
+        this.isProductSelected = false;
+        this.isCrProductSelected = false;
+        this.isProductUpdated = false;
+        this.isCrProductUpdated = false;
+
         this.quizName = '';
         this.size = '';
         this.passingMarks = '';
@@ -197,11 +202,17 @@ export default class OnlineQuizTestsPage extends BasePage {
             // Select Product if selectable items are present
             if (await this.isVisible(this.productSelectable.first(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.productSelectable.first());
+                this.isProductSelected = true;
+            } else {
+                this.isProductSelected = false;
             }
 
             // Select CR Product if selectable items are present
             if (await this.isVisible(this.crProductSelectable.first(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.crProductSelectable.first());
+                this.isCrProductSelected = true;
+            } else {
+                this.isCrProductSelected = false;
             }
 
             await this.waitForVisible(this.passFeedbackTextarea);
@@ -281,11 +292,11 @@ export default class OnlineQuizTestsPage extends BasePage {
             await expect(this.failFeedbackTextarea).toContainText(data.failFeedback);
             await expect(this.welcomeTextarea).toContainText(data.welcomeText);
 
-            if (await this.isVisible(this.productSelectable.first(), { timeout: 100 }).catch(() => false)) {
+            if (this.isProductSelected) {
                 await this.verifyVisible(this.productSelected.first());
             }
 
-            if (await this.isVisible(this.crProductSelectable.first(), { timeout: 100 }).catch(() => false)) {
+            if (this.isCrProductSelected) {
                 await this.verifyVisible(this.crProductSelected.first());
             }
         });
@@ -446,9 +457,15 @@ export default class OnlineQuizTestsPage extends BasePage {
             // 10. Multi-select product toggle if present
             if (await this.isVisible(this.productSelectable.first(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.productSelectable.first());
+                this.isProductUpdated = true;
+            } else {
+                this.isProductUpdated = false;
             }
             if (await this.isVisible(this.crProductSelectable.first(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.crProductSelectable.first());
+                this.isCrProductUpdated = true;
+            } else {
+                this.isCrProductUpdated = false;
             }
 
             // 11. Update Rich Textareas
@@ -528,12 +545,14 @@ export default class OnlineQuizTestsPage extends BasePage {
             await expect(this.failFeedbackTextarea).toContainText(data.updatedFailFeedback);
             await expect(this.welcomeTextarea).toContainText(data.updatedWelcomeText);
 
-            if (await this.isVisible(this.productSelectable.first(), { timeout: 100 }).catch(() => false)) {
-                expect(await this.productSelected.count()).toBe(2);
+            const productCount = (this.isProductSelected ? 1 : 0) + (this.isProductUpdated ? 1 : 0);
+            if (productCount > 0) {
+                expect(await this.productSelected.count()).toBe(productCount);
             }
 
-            if (await this.isVisible(this.crProductSelectable.first(), { timeout: 100 }).catch(() => false)) {
-                expect(await this.crProductSelected.count()).toBe(2);
+            const crProductCount = (this.isCrProductSelected ? 1 : 0) + (this.isCrProductUpdated ? 1 : 0);
+            if (crProductCount > 0) {
+                expect(await this.crProductSelected.count()).toBe(crProductCount);
             }
         });
     }

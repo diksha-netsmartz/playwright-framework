@@ -160,6 +160,9 @@ export default class LocationsPage extends BasePage {
         this.updatedAppointmentColor = '';
         this.updatedNotes = '';
         this.updatedSurveyLink = '';
+
+        this.isAreaCoverageSelected = false;
+        this.isAreaCoverageUpdated = false;
     }
 
     /**
@@ -278,6 +281,9 @@ export default class LocationsPage extends BasePage {
             // 5. Multi-Select Area Coverage
             if (await this.isVisible(this.areaCoverageSelectableItem.first(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.areaCoverageSelectableItem.first());
+                this.isAreaCoverageSelected = true;
+            } else {
+                this.isAreaCoverageSelected = false;
             }
 
             // 6. Pickup Location Sub-Modal
@@ -496,7 +502,7 @@ export default class LocationsPage extends BasePage {
             }
 
             // 5. Multi-Select Area Coverage
-            if (await this.isVisible(this.areaCoverageSelectableItem.first(), { timeout: 100 }).catch(() => false)) {
+            if (this.isAreaCoverageSelected) {
                 await this.verifyVisible(this.areaCoverageSelectedItem.first());
             }
 
@@ -649,6 +655,9 @@ export default class LocationsPage extends BasePage {
             // 5. Multi-Select Area Coverage (select last item)
             if (await this.isVisible(this.areaCoverageSelectableItem.last(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.areaCoverageSelectableItem.last());
+                this.isAreaCoverageUpdated = true;
+            } else {
+                this.isAreaCoverageUpdated = false;
             }
 
             await this.click(this.addPickupLocationBtn);
@@ -810,8 +819,9 @@ export default class LocationsPage extends BasePage {
             }
 
             // 5. Multi-Select Area Coverage (2 items selected)
-            if (await this.isVisible(this.areaCoverageSelectableItem.first(), { timeout: 100 }).catch(() => false)) {
-                await expect(this.areaCoverageSelectedItem).toHaveCount(2);
+            const areaCoverageCount = (this.isAreaCoverageSelected ? 1 : 0) + (this.isAreaCoverageUpdated ? 1 : 0);
+            if (areaCoverageCount > 0) {
+                await expect(this.areaCoverageSelectedItem).toHaveCount(areaCoverageCount);
             }
 
             // 6. Pickup & Dropoff

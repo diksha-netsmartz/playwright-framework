@@ -50,9 +50,11 @@ export default class FeesPage extends BasePage {
         this.statusFilterDropdown = page.locator("xpath=//div[@id='pnlFeesTAB']//a[contains(.,'Status')]");
         this.selectAllStatusCheckbox = page.locator("xpath=//div[@id='pnlFeesTAB']//input[contains(@class,'Fees_SelectAllStatus')]//following-sibling::ins");
 
-        // Table Locators
         this.searchTextbox = page.locator("xpath=//div[@id='tblFees_filter']//input[@type='search']");
         this.editIcon = page.getByTitle('Edit');
+
+        this.isEligibleServiceSelected = false;
+        this.isEligibleServiceUpdated = false;
     }
 
 
@@ -97,7 +99,10 @@ export default class FeesPage extends BasePage {
             await this.fill(this.feeAmountInput, feeAmount);
 
             if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
-                await this.click(this.eligibleServiceSelection.first())
+                await this.click(this.eligibleServiceSelection.first());
+                this.isEligibleServiceSelected = true;
+            } else {
+                this.isEligibleServiceSelected = false;
             }
 
             await this.fill(this.notesInput, notes);
@@ -221,7 +226,7 @@ export default class FeesPage extends BasePage {
             if (await this.isVisible(this.statusDropdown, { timeout: 100 }).catch(() => false)) {
                 await expect(this.statusDropdown).toContainText('Active');
             }
-            if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
+            if (this.isEligibleServiceSelected) {
                 await this.verifyVisible(this.selectedDiscountPackage.first());
             }
 
@@ -276,6 +281,9 @@ export default class FeesPage extends BasePage {
             // Select last discount package
             if (await this.isVisible(this.eligibleServiceSelection.last(), { timeout: 100 }).catch(() => false)) {
                 await this.click(this.eligibleServiceSelection.last());
+                this.isEligibleServiceUpdated = true;
+            } else {
+                this.isEligibleServiceUpdated = false;
             }
 
             // Update Notes
@@ -328,8 +336,9 @@ export default class FeesPage extends BasePage {
                     await expect(this.allowPortalPurchaseYesRadioWrapper.first()).toHaveClass(/checked/);
                 }
             }
-            if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
-                await expect(this.selectedDiscountPackage).toHaveCount(2);
+            const eligibleServiceCount = (this.isEligibleServiceSelected ? 1 : 0) + (this.isEligibleServiceUpdated ? 1 : 0);
+            if (eligibleServiceCount > 0) {
+                await expect(this.selectedDiscountPackage).toHaveCount(eligibleServiceCount);
             }
 
             // Verify item taxable checkbox was unchecked

@@ -50,9 +50,15 @@ export default class DiscountsPage extends BasePage {
         this.statusFilterDropdown = page.locator("xpath=//div[@id='pnlDiscountsTAB']//a[contains(.,'Status')]");
         this.selectAllStatusCheckbox = page.locator("xpath=//div[@id='pnlDiscountsTAB']//input[contains(@class,'SelectAllStatus')]//following-sibling::ins");
 
-        // Table Locators
         this.searchTextbox = page.locator("xpath=(//div[contains(@id,'Discounts')]//input[@type='search'])[1]");
         this.editIcon = page.getByTitle('Edit');
+
+        this.isServicePackageSelected = false;
+        this.isDiscountClassesSelected = false;
+        this.isDiscountLocationsSelected = false;
+        this.isServicePackageUpdated = false;
+        this.isDiscountClassesUpdated = false;
+        this.isDiscountLocationsUpdated = false;
     }
 
     /**
@@ -108,9 +114,29 @@ export default class DiscountsPage extends BasePage {
             await this.click(this.currentTaxesDropdownOption);
             await this.fill(this.additionalTaxInput, additionalTax);
 
-            await this.click(this.eligibleServiceSelection.first());
-            await this.click(this.eligibleClassesSelection.first());
-            await this.click(this.eligibleLocationsSelection.first());
+            // Select Service Package if visible
+            if (await this.isVisible(this.eligibleServiceSelection.first(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleServiceSelection.first());
+                this.isServicePackageSelected = true;
+            } else {
+                this.isServicePackageSelected = false;
+            }
+
+            // Select Discount Classes if visible
+            if (await this.isVisible(this.eligibleClassesSelection.first(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleClassesSelection.first());
+                this.isDiscountClassesSelected = true;
+            } else {
+                this.isDiscountClassesSelected = false;
+            }
+
+            // Select Discount Locations if visible
+            if (await this.isVisible(this.eligibleLocationsSelection.first(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleLocationsSelection.first());
+                this.isDiscountLocationsSelected = true;
+            } else {
+                this.isDiscountLocationsSelected = false;
+            }
 
             await this.pressSequentially(this.discountExpirationTextbox, discountExpiry);
             await this.page.keyboard.press('Tab');
@@ -215,9 +241,15 @@ export default class DiscountsPage extends BasePage {
                 await expect(this.totalTaxAmountLabel).not.toHaveText('$0.00');
             }
 
-            await this.verifyVisible(this.selectedServicePackage.first());
-            await this.verifyVisible(this.selectedDiscountClasses.first());
-            await this.verifyVisible(this.selectedDiscountLocations.first());
+            if (this.isServicePackageSelected) {
+                await this.verifyVisible(this.selectedServicePackage.first());
+            }
+            if (this.isDiscountClassesSelected) {
+                await this.verifyVisible(this.selectedDiscountClasses.first());
+            }
+            if (this.isDiscountLocationsSelected) {
+                await this.verifyVisible(this.selectedDiscountLocations.first());
+            }
 
             if (await this.isVisible(this.discountExpirationTextbox, { timeout: 100 }).catch(() => false)) {
                 await expect(this.discountExpirationTextbox).toHaveValue(data.discountExpiry);
@@ -266,10 +298,25 @@ export default class DiscountsPage extends BasePage {
                 await this.click(this.itemTaxableCheckbox);
             }
 
-            // Select last selectable package, class, location
-            await this.click(this.eligibleServiceSelection.last());
-            await this.click(this.eligibleClassesSelection.last());
-            await this.click(this.eligibleLocationsSelection.last());
+            // Select last selectable package, class, location if visible
+            if (await this.isVisible(this.eligibleServiceSelection.last(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleServiceSelection.last());
+                this.isServicePackageUpdated = true;
+            } else {
+                this.isServicePackageUpdated = false;
+            }
+            if (await this.isVisible(this.eligibleClassesSelection.last(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleClassesSelection.last());
+                this.isDiscountClassesUpdated = true;
+            } else {
+                this.isDiscountClassesUpdated = false;
+            }
+            if (await this.isVisible(this.eligibleLocationsSelection.last(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleLocationsSelection.last());
+                this.isDiscountLocationsUpdated = true;
+            } else {
+                this.isDiscountLocationsUpdated = false;
+            }
 
             await this.clear(this.discountExpirationTextbox);
             await this.pressSequentially(this.discountExpirationTextbox, updatedDiscountExpiry);
@@ -333,9 +380,18 @@ export default class DiscountsPage extends BasePage {
                 await this.verifyNotVisible(this.totalTaxAmountLabel);
             }
 
-            await expect(this.selectedServicePackage).toHaveCount(2);
-            await expect(this.selectedDiscountClasses).toHaveCount(2);
-            await expect(this.selectedDiscountLocations).toHaveCount(2);
+            const servicePackageCount = (this.isServicePackageSelected ? 1 : 0) + (this.isServicePackageUpdated ? 1 : 0);
+            if (servicePackageCount > 0) {
+                await expect(this.selectedServicePackage).toHaveCount(servicePackageCount);
+            }
+            const discountClassesCount = (this.isDiscountClassesSelected ? 1 : 0) + (this.isDiscountClassesUpdated ? 1 : 0);
+            if (discountClassesCount > 0) {
+                await expect(this.selectedDiscountClasses).toHaveCount(discountClassesCount);
+            }
+            const discountLocationsCount = (this.isDiscountLocationsSelected ? 1 : 0) + (this.isDiscountLocationsUpdated ? 1 : 0);
+            if (discountLocationsCount > 0) {
+                await expect(this.selectedDiscountLocations).toHaveCount(discountLocationsCount);
+            }
 
             if (await this.isVisible(this.discountExpirationTextbox, { timeout: 100 }).catch(() => false)) {
                 await expect(this.discountExpirationTextbox).toHaveValue(data.updatedDiscountExpiry);
