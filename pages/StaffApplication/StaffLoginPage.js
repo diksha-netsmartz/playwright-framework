@@ -26,22 +26,17 @@ export default class StaffLoginPage extends BasePage {
     }
 
     /**
-     * Navigates to the Staff Login page using the configured CSM URL.
+     * Navigates to the Staff Login Page using the configured CSM URL.
     **/
     async navigateToLoginPage() {
         await test.step('Navigate to Staff Login Page', async () => {
-            try {
-                await this.navigate(config.csmURL);
-            } catch (error) {
-                console.warn(`\n⚠️ [SKIP] Staff Portal navigation failed: ${error.message}. Skipping testcase.`);
-                test.skip(true, `Staff Portal navigation failed (${error.message}) - testcase skipped`);
-            }
+            await this.navigate(config.csmURL);
         });
     }
 
     /**
      * Fills the staff username and password credentials and submits the login form.
-     * If login is not successful or CAPTCHA blocks authentication, the testcase is skipped.
+     * If CAPTCHA blocks authentication, the testcase is skipped. If navigation or login fails, an error is thrown.
      * @param {string} username - Staff username.
      * @param {string} password - Staff password.
     **/
@@ -53,10 +48,12 @@ export default class StaffLoginPage extends BasePage {
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
             if (!isUserVisible) {
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
-                const reason = isCaptcha ? 'CAPTCHA is enabled on screen' : 'Login page or username field not available';
-                console.warn(`\n⚠️ [SKIP] Staff Portal login not possible: ${reason}. Skipping testcase.`);
-                test.skip(true, `Staff Portal login was not successful (${reason}) - testcase skipped`);
-                return;
+                if (isCaptcha) {
+                    console.warn('\n⚠️ [SKIP] CAPTCHA is enabled on screen. Skipping testcase.');
+                    test.skip(true, 'Staff Portal login skipped: CAPTCHA is enabled on screen.');
+                    return;
+                }
+                throw new Error('Staff Portal navigation failed: Login page or username field not available.');
             }
 
             await this.fill(this.usernameTxt, username);
@@ -88,11 +85,12 @@ export default class StaffLoginPage extends BasePage {
 
             if (!isLoginSuccessful) {
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
-                const reason = isCaptcha
-                    ? 'CAPTCHA is enabled on screen'
-                    : 'Authentication failed / Staff Home did not load';
-                console.warn(`\n⚠️ [SKIP] Staff Portal login was not successful (${reason}). Skipping testcase.`);
-                test.skip(true, `Staff Portal login was not successful (${reason}) - testcase skipped`);
+                if (isCaptcha) {
+                    console.warn('\n⚠️ [SKIP] Staff Portal login blocked by CAPTCHA. Skipping testcase.');
+                    test.skip(true, 'Staff Portal login skipped: CAPTCHA is enabled on screen.');
+                    return;
+                }
+                throw new Error('Staff Portal login failed: Authentication failed / Staff Home did not load.');
             }
         });
     }

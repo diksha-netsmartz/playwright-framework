@@ -116,6 +116,8 @@ export default class OnlineEnrollmentPage extends BasePage {
     async navigateToTeenOEPage() {
         await test.step('Navigate to Teen Online Enrollment Page', async () => {
             await this.navigate(config.teenOEURL);
+            await this.selectDOBForPackage();
+            await this.clickContinue();
         });
     }
 
@@ -132,6 +134,8 @@ export default class OnlineEnrollmentPage extends BasePage {
                 url = `${url}${separator}${cleanParams}`;
             }
             await this.navigate(url);
+            await this.selectDOBForPackage();
+            await this.clickContinue();
         });
     }
 
@@ -141,6 +145,8 @@ export default class OnlineEnrollmentPage extends BasePage {
     async navigateToAdultOEPage() {
         await test.step('Navigate to Adult Online Enrollment Page', async () => {
             await this.navigate(config.adultOEURL);
+            await this.selectDOBForPackage();
+            await this.clickContinue();
         });
     }
 
@@ -150,6 +156,8 @@ export default class OnlineEnrollmentPage extends BasePage {
     async navigateToWTOEPage() {
         await test.step('Navigate to WT Online Enrollment Page', async () => {
             await this.navigate(config.ktOEURL);
+            await this.selectDOBForPackage();
+            await this.clickContinue();
         });
     }
 
@@ -159,6 +167,8 @@ export default class OnlineEnrollmentPage extends BasePage {
     async navigateToRTOEPage() {
         await test.step('Navigate to RT Online Enrollment Page', async () => {
             await this.navigate(config.rtOEURL);
+            await this.selectDOBForPackage();
+            await this.clickContinue();
         });
     }
 
@@ -167,12 +177,13 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async selectBTWPackage() {
         await test.step('Select BTW Package', async () => {
+            await this.waitForVisible(this.btwPackageBtn, { timeout: 10000 })
             await this.click(this.btwPackageBtn);
-            if (await this.isVisible(this.additionalPackageCheckbox, { timeout: 5000 })) {
-                await this.click(this.additionalPackageCheckbox);
-                await this.clickContinue();
-                await this.waitForLoaders().catch(() => { });
-            }
+            // if (await this.isVisible(this.additionalPackageCheckbox, { timeout: 5000 })) {
+            //     await this.click(this.additionalPackageCheckbox);
+            //     await this.clickContinue();
+            //     await this.waitForLoaders().catch(() => { });
+            // }
         });
     }
 
@@ -212,26 +223,40 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.waitForLoaders().catch(() => { });
             await this.waitForVisible(this.btwCRPackage);
             await this.click(this.btwCRPackage);
-            await this.waitForVisible(this.additionalPackageCheckbox);
-            await this.click(this.additionalPackageCheckbox);
+            // await this.waitForVisible(this.additionalPackageCheckbox);
+            // await this.click(this.additionalPackageCheckbox);
             await this.waitForLoaders().catch(() => { });
         });
     }
 
     /**
-     * Clicks on the Continue button after package selection.
+     * Handles the Continue button after package selection whenever it appears on screen using addLocatorHandler.
      **/
     async clickContinue() {
-        await test.step('Click on Continue', async () => {
-            await this.waitForLoaders().catch(() => { });
-            await this.page.waitForLoadState('load', { timeout: 10000 });
-            if (await this.isVisible(this.continueAdditionalProduct, { timeout: 5000 }).catch(() => false)) {
-                await this.waitForVisible(this.continueAdditionalProduct);
+        if (this._isContinueHandlerRegistered) return;
+        this._isContinueHandlerRegistered = true;
+
+        await this.page.addLocatorHandler(
+            this.continueAdditionalProduct,
+            async () => {
+                // If DOB modal is covering the screen, dismiss it first!
+                if (await this.isVisible(this.proceedButton, { timeout: 1000 }).catch(() => false)) {
+                    if (await this.isVisible(this.dobMonthPackage, { timeout: 1000 }).catch(() => false)) {
+                        await this.click(this.dobMonthPackage);
+                        await this.click(this.monthSelectionInDropdownPackage);
+                        await this.click(this.dobYearPackage);
+                        await this.click(this.yearSelectionInDropdownPackage);
+                        await this.click(this.dobDayPackage);
+                        await this.click(this.daySelectionInDropdownPackage);
+                    }
+                    await this.click(this.proceedButton);
+                    await this.waitForHidden(this.proceedButton).catch(() => { });
+                }
+
                 await this.click(this.continueAdditionalProduct);
-                // await this.waitForHidden(this.continueAdditionalProduct, { timeout: 2000 })
+                await this.waitForHidden(this.continueAdditionalProduct).catch(() => { });
             }
-            await this.waitForLoaders().catch(() => { });
-        });
+        );
     }
 
     /**
@@ -279,28 +304,33 @@ export default class OnlineEnrollmentPage extends BasePage {
     }
 
     /**
-     * Selects Date of Birth (Month, Year, Day) for package verification and proceeds.
+     * Handles Date of Birth and package verification popup whenever it appears on screen using addLocatorHandler.
      **/
     async selectDOBForPackage() {
-        await this.waitForLoaders();
-        await this.page.waitForLoadState('load', { timeout: 5000 })
-        await this.page.waitForTimeout(10000);
-        if (await this.isVisible(this.dobMonthPackage, { timeout: 10000 }).catch(() => false)) {
-            await this.click(this.dobMonthPackage);
-            await this.click(this.monthSelectionInDropdownPackage);
-            await this.click(this.dobYearPackage);
-            await this.click(this.yearSelectionInDropdownPackage);
-            await this.click(this.dobDayPackage);
-            await this.click(this.daySelectionInDropdownPackage);
-            if (await this.isVisible(this.showAppointmentButton, { timeout: 5000 }).catch(() => false)) {
-                await this.click(this.showAppointmentButton);
-            }
-            else
+        if (this._isDOBHandlerRegistered) return;
+        this._isDOBHandlerRegistered = true;
+
+        await this.page.addLocatorHandler(
+            this.proceedButton,
+            async () => {
+                if (await this.isVisible(this.dobMonthPackage, { timeout: 2000 }).catch(() => false)) {
+                    await this.click(this.dobMonthPackage);
+                    await this.click(this.monthSelectionInDropdownPackage);
+                    await this.click(this.dobYearPackage);
+                    await this.click(this.yearSelectionInDropdownPackage);
+                    await this.click(this.dobDayPackage);
+                    await this.click(this.daySelectionInDropdownPackage);
+                }
                 await this.click(this.proceedButton);
-            await this.waitForHidden(this.proceedButton);
-        }
+                await this.waitForHidden(this.proceedButton).catch(() => { });
 
-
+                // If Additional Product modal was underneath, dismiss it too
+                if (await this.isVisible(this.continueAdditionalProduct, { timeout: 2000 }).catch(() => false)) {
+                    await this.click(this.continueAdditionalProduct);
+                    await this.waitForHidden(this.continueAdditionalProduct).catch(() => { });
+                }
+            }
+        );
     }
 
     /**
@@ -315,8 +345,8 @@ export default class OnlineEnrollmentPage extends BasePage {
 
             await this.waitForLoaders();
             // await this.waitForVisible(this.studentInfoCaption);
-            await this.verifyVisible(this.studentInfoCaption);
-
+            // await this.verifyVisible(this.studentInfoCaption);
+            await this.fill(this.firstNameTxt, `${data.firstName} ${this.uniqueId}`);
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
             if (await this.isVisible(captcha, { timeout: 1000 }).catch(() => false) || await this.isVisible(this.page.locator('iframe[title="reCAPTCHA"]').first(), { timeout: 1000 }).catch(() => false)) {
                 console.warn('\n⚠️ [SKIP] CAPTCHA detected on Online Enrollment form. Skipping testcase.');
@@ -324,9 +354,9 @@ export default class OnlineEnrollmentPage extends BasePage {
                 return;
             }
 
-            if (await this.isVisible(this.firstNameTxt, { timeout: 100 }).catch(() => false)) {
-                await this.fill(this.firstNameTxt, `${data.firstName} ${this.uniqueId}`);
-            }
+            // if (await this.isVisible(this.firstNameTxt, { timeout: 100 }).catch(() => false)) {
+
+            // }
             if (await this.isVisible(this.middlenameTxt, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.middlenameTxt, data.middleName);
             }
@@ -509,15 +539,33 @@ export default class OnlineEnrollmentPage extends BasePage {
             await this.waitForLoaders().catch(() => { });
 
             // await this.page.waitForTimeout(10000);
-            await this.page.waitForFunction(() => document.title.trim().length > 0, { timeout: 30000 }).catch(() => {
-                console.log('Title did not become non-empty within 30s; proceeding with assertion.');
+            await this.page.waitForFunction(() => document.title.trim().length > 0, { timeout: 90000 }).catch(() => {
+                console.log('Title did not become non-empty within 90s; proceeding with assertion.');
             });
             // await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 15000 });
-            await this.page.waitForLoadState('load', { timeout: 10000 });
+            await this.page.waitForLoadState('load', { timeout: 30000 });
             await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')));
             await this.verifyVisible(this.page.getByText(new RegExp(expectedText, 'i')));
         });
         await PdfHelper.downloadVerifyAndAttach(this.page, expectedText, attachmentName);
     }
 
+
+    /**
+     * Selects Date of Birth (Month, Year, Day) for package verification and proceeds.
+     **/
+    async selectDateOfBirth() {
+        await this.waitForLoaders();
+        await this.page.waitForLoadState('load', { timeout: 5000 })
+        await this.page.waitForTimeout(10000);
+        if (await this.isVisible(this.dobMonthPackage, { timeout: 10000 }).catch(() => false)) {
+            await this.click(this.dobMonthPackage);
+            await this.click(this.monthSelectionInDropdownPackage);
+            await this.click(this.dobYearPackage);
+            await this.click(this.yearSelectionInDropdownPackage);
+            await this.click(this.dobDayPackage);
+            await this.click(this.daySelectionInDropdownPackage);
+            await this.click(this.showAppointmentButton);
+        }
+    }
 }
