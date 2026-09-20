@@ -24,7 +24,7 @@ test('TC_069: C-OE - To verify that enrollment is working with package and cr pa
     });
 
     await test.step('Step 2: Click on the Select button for any class', async () => {
-        await oe.selectDOBForPackage();
+        // await oe.selectDOBForPackage();
         await oe.selectClass();
     });
 
@@ -32,20 +32,20 @@ test('TC_069: C-OE - To verify that enrollment is working with package and cr pa
         await oe.selectBtwAndCrPackage();
     });
 
-    await test.step('Step 4: Click on continue', async () => {
-        await oe.clickContinue();
-    });
+    // await test.step('Step 4: Click on continue', async () => {
+    //     await oe.clickContinue();
+    // });
 
-    await test.step('Step 5: Fill data in all the fields', async () => {
+    await test.step('Step 4: Fill data in all the fields', async () => {
         await oe.fillStudentInfo();
     });
 
-    await test.step('Step 6: Click on Pay Later and handle SMS popup', async () => {
+    await test.step('Step 5: Click on Pay Later and handle SMS popup', async () => {
         await oe.clickPayLater();
         await oe.smsPopup();
     });
 
-    await test.step('Step 7: Verify Receipt Page appears and registration is completed', async () => {
+    await test.step('Step 6: Verify Receipt Page appears and registration is completed', async () => {
         await oe.verifyReceiptPage('REGISTRATION COMPLETED', 'Teen_Package_CR_Registration_Receipt.pdf');
     });
 });
