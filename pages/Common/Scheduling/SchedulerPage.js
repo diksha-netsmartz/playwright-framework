@@ -236,6 +236,12 @@ export default class SchedulerPage extends BasePage {
                     continue;
                 }
 
+                const bgColor = window.getComputedStyle(cell).backgroundColor;
+                const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
+                if (!isWhite) {
+                    continue;
+                }
+
                 const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
                     if (apptBox.width === 0 || apptBox.height === 0) return false;
@@ -317,6 +323,9 @@ export default class SchedulerPage extends BasePage {
 
                 if (cellBox.width === 0 || cellBox.height === 0) continue;
                 if (cell.classList.contains('k-nonwork-hour')) continue;
+                const bgColor = window.getComputedStyle(cell).backgroundColor;
+                const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
+                if (!isWhite) continue;
 
                 if (targetCenterX !== null) {
                     const cellCenterX = (cellBox.left + cellBox.right) / 2;
@@ -357,6 +366,9 @@ export default class SchedulerPage extends BasePage {
                     const cellBox = cell.getBoundingClientRect();
                     if (cellBox.width === 0 || cellBox.height === 0) continue;
                     if (cell.classList.contains('k-nonwork-hour')) continue;
+                    const bgColor = window.getComputedStyle(cell).backgroundColor;
+                    const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
+                    if (!isWhite) continue;
 
                     const cellCenterX = (cellBox.left + cellBox.right) / 2;
                     const isSameCol = targetColIndex !== null

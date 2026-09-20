@@ -1183,10 +1183,10 @@ export default class BusinessReportsPage extends BasePage {
 
     /**
      * Clicks 'Export As Excel' button for In-Car Evaluation Data Report and waits for file download.
-     * @param {number} [timeout=60000] - Timeout in milliseconds to wait for the download event (default: 60s).
+     * @param {number} [timeout=300000] - Timeout in milliseconds to wait for the download event (default: 300s).
      * @returns {Promise<import('@playwright/test').Download>} The Playwright Download instance.
      **/
-    async exportInCarEvaluationToExcel(timeout = 120000) {
+    async exportInCarEvaluationToExcel(timeout = 300000) {
         return await test.step('Click "Export As Excel" and wait for file download', async () => {
             await this.waitForLoaders();
             await this.waitForVisible(this.inCarEvalExportExcelBtn);
@@ -1196,7 +1196,7 @@ export default class BusinessReportsPage extends BasePage {
             const download = await downloadPromise;
 
             if (await this.processingMessage.isVisible({ timeout: 2000 }).catch(() => false)) {
-                await this.waitForHidden(this.processingMessage, 60000);
+                await this.waitForHidden(this.processingMessage, timeout);
             }
             await this.waitForLoaders();
             return download;

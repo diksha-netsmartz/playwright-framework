@@ -314,7 +314,7 @@ export default class OnlineEnrollmentPage extends BasePage {
             const phone = `(555)${random7.slice(0, 3)}-${random7.slice(3)}`;
 
             await this.waitForLoaders();
-            await this.waitForVisible(this.studentInfoCaption);
+            // await this.waitForVisible(this.studentInfoCaption);
             await this.verifyVisible(this.studentInfoCaption);
 
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');

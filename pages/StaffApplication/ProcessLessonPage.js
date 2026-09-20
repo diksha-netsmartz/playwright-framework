@@ -169,32 +169,13 @@ export default class ProcessLesson extends BasePage {
         });
         // }
     }
-
-    /**
-     * Private helper to simulate drawing a signature stroke on an HTML5 canvas element using mouse coordinates.
-     * @param {import('@playwright/test').Locator} canvas - Locator for the signature canvas element.
-     **/
-    async #drawSignature(canvas) {
-        await canvas.scrollIntoViewIfNeeded();
-        const box = await canvas.boundingBox();
-        const startX = box.x + box.width * 0.2;
-        const startY = box.y + box.height * 0.5;
-        const endX = box.x + box.width * 0.8;
-        const endY = box.y + box.height * 0.5;
-
-        await this.page.mouse.move(startX, startY);
-        await this.page.mouse.down();
-        await this.page.mouse.move(endX, endY, { steps: 10 });
-        await this.page.mouse.up();
-    }
-
     /**
      * Draws the student signature on the student signature canvas.
      **/
     async signStudentSignature() {
         if (await this.isVisible(this.studentSignatureCanvas, { timeout: 100 }).catch(() => false)) {
             await test.step('Sign student digital signature', async () => {
-                await this.#drawSignature(this.studentSignatureCanvas);
+                await this.drawSignature(this.studentSignatureCanvas);
             });
         }
     }
@@ -205,7 +186,7 @@ export default class ProcessLesson extends BasePage {
     async signInstructorSignature() {
         if (await this.isVisible(this.instructorSignatureCanvas, { timeout: 100 }).catch(() => false)) {
             await test.step('Sign instructor digital signature', async () => {
-                await this.#drawSignature(this.instructorSignatureCanvas);
+                await this.drawSignature(this.instructorSignatureCanvas);
             });
         }
     }

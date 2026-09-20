@@ -48,6 +48,11 @@ export default class StaffPage extends BasePage {
         this.employmentTypeDropdownOption = page.locator("(//select[@name='EmploymentType']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]")
         this.employmentTypeDropdownOptionLast = page.locator("(//select[@name='EmploymentType']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[last()]")
 
+        this.cashDrawerLocationDropdown = page.locator("//select[@name='SelectCashDrawerLocation']//parent::div//button//span[@class='filter-option pull-left']");
+        this.cashDrawerLocationDropdownOption = page.locator("(//select[@name='SelectCashDrawerLocation']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]");
+        this.cashDrawerLocationDropdownOptionLast = page.locator("(//select[@name='SelectCashDrawerLocation']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[last()]");
+
+
         this.staffCodeInput = page.getByRole('textbox', { name: 'Staff Code' });
         this.firstNameInput = page.getByRole('textbox', { name: 'First Name' });
         this.middleNameInput = page.getByRole('textbox', { name: 'Middle Name' });
@@ -58,7 +63,7 @@ export default class StaffPage extends BasePage {
         this.stateOption = page.locator("(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[1]");
         this.stateOptionLast = page.locator("(//select[@id='State']//parent::div//div//li//span[1][not(contains(text(),'Select'))])[last()]");
 
-        this.zipInput = page.getByRole('textbox', { name: 'Zip' });
+        this.zipInput = page.locator('#Zip');
         this.emailInput = page.getByRole('textbox', { name: 'Email' });
         this.homePhoneInput = page.getByRole('textbox', { name: 'Home Phone' });
         this.cellPhoneInput = page.getByRole('textbox', { name: 'Cell Phone' });
@@ -88,6 +93,8 @@ export default class StaffPage extends BasePage {
         this.zoomUserUrlInput = page.getByRole('textbox', { name: 'Zoom User URL' });
         this.badgeInput = page.getByRole('textbox', { name: 'Badge' });
         this.staffSurveyLinkInput = page.getByRole('textbox', { name: 'Staff Survey Link' });
+        this.staffSignatureCanvas = page.locator('#canvasInstructorSignature');
+        this.clearSignaturePad = page.locator('#btnClearSignaturePad')
 
         this.allowAccessToAdminPortalYesRadioButton = page.locator("//label[contains(text(),'Yes')]//input[@id='AllowAccessToAdminPortal']//following-sibling::ins");
         this.allowAccessToAdminPortalNoRadioButton = page.locator("//label[contains(text(),'No')]//input[@id='AllowAccessToAdminPortal']//following-sibling::ins");
@@ -95,15 +102,23 @@ export default class StaffPage extends BasePage {
         this.allowAccessToAdminPortalNoRadioWrapper = page.locator("//label[contains(text(),'No')]//input[@id='AllowAccessToAdminPortal']//parent::div");
         this.assignAppointmentColorCheckbox = page.locator("xpath=//input[@id='Bitappointmentcolor']//following-sibling::ins");
         this.assignAppointmentColorCheckboxWrapper = page.locator("//input[@id='Bitappointmentcolor']//parent::div");
-        this.requireManualEnablingOfZoomButton = page.locator("xpath=//input[contains(@id,'Zoom')]//following-sibling::ins");
-        this.requireManualEnablingOfZoomWrapper = page.locator("//input[contains(@id,'Zoom')]//parent::div");
+        this.requireManualEnablingOfZoomButton = page.locator("xpath=//input[contains(@id,'EnableZoombutton')]//following-sibling::ins");
+        this.requireManualEnablingOfZoomWrapper = page.locator("//input[contains(@id,'EnableZoombutton')]//parent::div");
+        this.allowDriveAccessCheckbox = page.locator("xpath=//input[@id='AllowDriveAccess']//following-sibling::ins");
+        this.allowDriveAccessCheckboxWrapper = page.locator("//input[@id='AllowDriveAccess']//parent::div");
+        this.cashDrawerValidationRequiredCheckbox = page.locator("xpath=//input[contains(@id,'CashDrawerValidationRequired')]//following-sibling::ins");
+        this.cashDrawerValidationRequiredCheckboxWrapper = page.locator("//input[contains(@id,'CashDrawerValidationRequired')]//parent::div");
 
         this.appointmentColorButton = page.locator("//button[@class='btn default colorpick']//i");
         this.appointmentColorSelector = page.locator('div.colorpicker-saturation:visible');
         this.appointmentColorTextbox = page.locator('#ColorPicker');
+        this.appointmentColorCodeTextbox = page.getByRole('textbox', { name: 'Appointment Color Code' })
 
         this.eligibleVehicleTypeSelection = page.locator("//div[contains(@id,'ms-VehicleType')]//li[@class='ms-elem-selectable']");
         this.selectedVehicleType = page.locator("//div[contains(@id,'ms-VehicleType')]//li[@class='ms-elem-selection ms-selected']");
+        this.eligibleMultipleLocationMatchingSelection = page.locator("//div[contains(@id,'ms-MultipleLocationMatching')]//li[@class='ms-elem-selectable']");
+        this.selectedMultipleLocationMatching = page.locator("//div[contains(@id,'ms-MultipleLocationMatching')]//li[@class='ms-elem-selection ms-selected']");
+
 
         // File / Picture Upload Locators
         this.imageUploadSection = page.getByText('Staff Profile Picture', { exact: true });
@@ -123,11 +138,15 @@ export default class StaffPage extends BasePage {
         this.selectedHighSchool = '';
         this.selectedEmploymentType = '';
         this.selectedState = '';
+        this.selectedCashDrawerLocation = '';
         this.selectedAppointmentColor = '';
         this.isAllowAccessToAdminPortalYesSelected = false;
         this.isAssignAppointmentColorSelected = false;
         this.isRequireManualEnablingOfZoomSelected = false;
         this.isVehicleTypeSelected = false;
+        this.isMultipleLocationMatchingSelected = false;
+        this.isAllowDriveAccessSelected = false;
+        this.isCashDrawerValidationRequiredSelected = false;
 
         // Updated state tracking
         this.updatedStatus = '';
@@ -137,6 +156,7 @@ export default class StaffPage extends BasePage {
         this.updatedVehicleAssigned = '';
         this.updatedHighSchool = '';
         this.updatedEmploymentType = '';
+        this.updatedCashDrawerLocation = '';
         this.updatedState = '';
         this.updatedMiddleName = '';
         this.updatedAddress = '';
@@ -164,8 +184,13 @@ export default class StaffPage extends BasePage {
         this.updatedStaffSurveyLink = '';
         this.updatedAppointmentColor = '';
         this.isVehicleTypeUpdated = false;
+        this.isMultipleLocationMatchingUpdated = false;
         this.isAllowAccessToAdminPortalNoSelected = false;
+        this.isRequireManualEnablingOfZoomUnchecked = false;
+        this.isAllowDriveAccessUnchecked = false;
+        this.isCashDrawerValidationRequiredUnchecked = false;
         this.isImageRemoved = false;
+        this.isSignatureRemoved = false;
 
         // Navigation & Action Buttons
         this.continueBtn = page.locator("xpath=//a[contains(text(),'Continue') and not(contains(@class,'hide'))]");
@@ -433,9 +458,18 @@ export default class StaffPage extends BasePage {
                 await this.click(this.assignAppointmentColorCheckbox);
                 this.isAssignAppointmentColorSelected = true;
             }
+            if (await this.isVisible(this.appointmentColorCodeTextbox, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.appointmentColorCodeTextbox, this.appointmentColorCode);
+            }
+
             if (await this.isVisible(this.requireManualEnablingOfZoomButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.requireManualEnablingOfZoomButton);
                 this.isRequireManualEnablingOfZoomSelected = true;
+            }
+
+            if (await this.isVisible(this.allowDriveAccessCheckbox, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowDriveAccessCheckbox);
+                this.isAllowDriveAccessSelected = true;
             }
 
             // 14. Radio: Allow Access To Admin Portal
@@ -460,6 +494,25 @@ export default class StaffPage extends BasePage {
                 await this.click(this.vehicleAssignedDropdownOption);
             }
 
+            if (await this.isVisible(this.eligibleMultipleLocationMatchingSelection.first(), { timeout: 100 }).catch(() => false)) {
+                await this.click(this.eligibleMultipleLocationMatchingSelection.first());
+                this.isMultipleLocationMatchingSelected = true;
+            } else {
+                this.isMultipleLocationMatchingSelected = false;
+            }
+
+            if (await this.isVisible(this.cashDrawerValidationRequiredCheckboxWrapper, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.cashDrawerValidationRequiredCheckboxWrapper);
+                this.isCashDrawerValidationRequiredSelected = true;
+            }
+            if (await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.cashDrawerLocationDropdown);
+                await this.waitForVisible(this.cashDrawerLocationDropdownOption);
+                this.selectedCashDrawerLocation = (await this.cashDrawerLocationDropdownOption.innerText()).trim();
+                await this.click(this.cashDrawerLocationDropdownOption);
+
+            }
+
             // 15. Zoom Details, Badge & Staff Survey Link
             if (await this.isVisible(this.zoomPmiInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.zoomPmiInput, this.zoomPmi);
@@ -475,6 +528,10 @@ export default class StaffPage extends BasePage {
             }
             if (await this.isVisible(this.staffSurveyLinkInput, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.staffSurveyLinkInput, this.staffSurveyLink);
+            }
+
+            if (await this.isVisible(this.staffSignatureCanvas, { timeout: 100 }).catch(() => false)) {
+                await this.drawSignature(this.staffSignatureCanvas);
             }
 
             // 16. Profile Picture Upload
@@ -659,6 +716,10 @@ export default class StaffPage extends BasePage {
                 await this.verifyVisible(this.selectedVehicleType.first());
             }
 
+            if (this.isMultipleLocationMatchingSelected) {
+                await this.verifyVisible(this.selectedMultipleLocationMatching.first());
+            }
+
             // 3. Address, City, Zip
             if (this.address && await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
                 await expect(this.addressInput).toHaveValue(this.address);
@@ -736,16 +797,31 @@ export default class StaffPage extends BasePage {
             }
             if (await this.isVisible(this.assignAppointmentColorCheckbox, { timeout: 100 }).catch(() => false)) {
                 await expect(this.assignAppointmentColorCheckboxWrapper).toHaveClass(/checked/);
-
             }
+            if (this.appointmentColorCode && await this.isVisible(this.appointmentColorCodeTextbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.appointmentColorCodeTextbox).toHaveValue(this.appointmentColorCode);
+            }
+
             if (this.isRequireManualEnablingOfZoomSelected) {
                 await expect(this.requireManualEnablingOfZoomWrapper.first()).toHaveClass(/checked/);
-
             }
             if (this.isAllowAccessToAdminPortalYesSelected) {
                 await expect(this.allowAccessToAdminPortalYesRadioWrapper.first()).toHaveClass(/checked/);
-
             }
+
+            if (this.isAllowDriveAccessSelected) {
+                await expect(this.allowDriveAccessCheckboxWrapper.first()).toHaveClass(/checked/);
+            }
+
+            if (this.isCashDrawerValidationRequiredSelected) {
+                await expect(this.cashDrawerValidationRequiredCheckboxWrapper.first()).toHaveClass(/checked/);
+            }
+
+            if (this.selectedCashDrawerLocation && await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 100 }).catch(() => false)) {
+                await expect(this.cashDrawerLocationDropdown).toContainText(this.selectedCashDrawerLocation);
+            }
+
+
 
             // 9. Zoom Details, Badge & Staff Survey Link
             if (this.zoomPmi && await this.isVisible(this.zoomPmiInput, { timeout: 100 }).catch(() => false)) {
@@ -767,6 +843,10 @@ export default class StaffPage extends BasePage {
                 const imageSrc = await this.imageUploaded.getAttribute('src');
                 expect(imageSrc?.length).toBeGreaterThan(0);
                 await this.verifyVisible(this.removeImageButton);
+            }
+
+            if (await this.isVisible(this.staffSignatureCanvas, { timeout: 100 }).catch(() => false)) {
+                await this.verifySignatureVisibility(this.staffSignatureCanvas, true);
             }
         });
     }
@@ -808,6 +888,7 @@ export default class StaffPage extends BasePage {
             this.updatedZoomUserUrl = data.updatedZoomUserUrl;
             this.updatedBadge = data.updatedBadge;
             this.updatedStaffSurveyLink = data.updatedStaffSurveyLink;
+            this.updatedAppointmentColorCode = data.updatedAppointmentColorCode;
 
             this.firstName = this.updatedFirstName;
             this.middleName = this.updatedMiddleName;
@@ -880,6 +961,23 @@ export default class StaffPage extends BasePage {
                     await this.click(this.employmentTypeDropdownOptionLast);
                 } else {
                     await this.click(this.employmentTypeDropdown);
+                }
+            }
+
+            // Multiple Location Matching Selectable -> select last option
+            if (await this.isVisible(this.eligibleMultipleLocationMatchingSelection.last(), { timeout: 200 }).catch(() => false)) {
+                await this.click(this.eligibleMultipleLocationMatchingSelection.last());
+                this.isMultipleLocationMatchingUpdated = true;
+            }
+
+            // Cash Drawer Location -> last()
+            if (await this.cashDrawerLocationDropdown.isVisible({ timeout: 200 }).catch(() => false)) {
+                await this.click(this.cashDrawerLocationDropdown);
+                if (await this.isVisible(this.cashDrawerLocationDropdownOptionLast, { timeout: 1000 }).catch(() => false)) {
+                    this.updatedCashDrawerLocation = (await this.cashDrawerLocationDropdownOptionLast.innerText()).trim();
+                    await this.click(this.cashDrawerLocationDropdownOptionLast);
+                } else {
+                    await this.click(this.cashDrawerLocationDropdown);
                 }
             }
 
@@ -977,6 +1075,37 @@ export default class StaffPage extends BasePage {
                 }
             }
 
+            if (await this.isVisible(this.appointmentColorCodeTextbox, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.appointmentColorCodeTextbox, this.updatedAppointmentColorCode);
+            }
+
+            // Require Manual Enabling of Zoom Button -> uncheck if checked
+            if (await this.requireManualEnablingOfZoomWrapper.isVisible({ timeout: 200 }).catch(() => false)) {
+                const isChecked = await this.requireManualEnablingOfZoomWrapper.first().evaluate(el => el.classList.contains('checked')).catch(() => false);
+                if (isChecked) {
+                    await this.click(this.requireManualEnablingOfZoomButton);
+                    this.isRequireManualEnablingOfZoomUnchecked = true;
+                }
+            }
+
+            // Allow Drive Access -> uncheck if checked
+            if (await this.allowDriveAccessCheckboxWrapper.isVisible({ timeout: 200 }).catch(() => false)) {
+                const isChecked = await this.allowDriveAccessCheckboxWrapper.first().evaluate(el => el.classList.contains('checked')).catch(() => false);
+                if (isChecked) {
+                    await this.click(this.allowDriveAccessCheckbox);
+                    this.isAllowDriveAccessUnchecked = true;
+                }
+            }
+
+            // Cash Drawer Validation Required -> uncheck if checked
+            if (await this.cashDrawerValidationRequiredCheckboxWrapper.isVisible({ timeout: 200 }).catch(() => false)) {
+                const isChecked = await this.cashDrawerValidationRequiredCheckboxWrapper.first().evaluate(el => el.classList.contains('checked')).catch(() => false);
+                if (isChecked) {
+                    await this.click(this.cashDrawerValidationRequiredCheckboxWrapper);
+                    this.isCashDrawerValidationRequiredUnchecked = true;
+                }
+            }
+
             // 15. Radio: Allow Access To Admin Portal -> No
             if (await this.isVisible(this.allowAccessToAdminPortalNoRadioButton, { timeout: 200 }).catch(() => false)) {
                 await this.click(this.allowAccessToAdminPortalNoRadioButton);
@@ -1000,8 +1129,14 @@ export default class StaffPage extends BasePage {
                 await this.fill(this.staffSurveyLinkInput, this.updatedStaffSurveyLink);
             }
 
-            // 17. Remove Profile Picture
-            if (await this.removeImageButton.isVisible({ timeout: 500 }).catch(() => false)) {
+            // 17. Clear Signature Pad
+            if (await this.clearSignaturePad.isVisible({ timeout: 100 }).catch(() => false)) {
+                await this.click(this.clearSignaturePad);
+                this.isSignatureRemoved = true;
+            }
+
+            // 18. Remove Profile Picture
+            if (await this.removeImageButton.isVisible({ timeout: 100 }).catch(() => false)) {
                 await this.click(this.removeImageButton);
                 await this.waitForVisible(this.yesConfirmationBtn);
                 await this.click(this.yesConfirmationBtn);
@@ -1073,8 +1208,14 @@ export default class StaffPage extends BasePage {
             if (this.isVehicleTypeUpdated) {
                 await this.verifyVisible(this.selectedVehicleType.last());
             }
+            if (this.isMultipleLocationMatchingUpdated) {
+                await this.verifyVisible(this.selectedMultipleLocationMatching.last());
+            }
             if (this.updatedVehicleAssigned && await this.isVisible(this.vehicleAssignedDropdown, { timeout: 100 }).catch(() => false)) {
                 await expect(this.vehicleAssignedDropdown).toContainText(this.updatedVehicleAssigned);
+            }
+            if (this.updatedCashDrawerLocation && await this.isVisible(this.cashDrawerLocationDropdown, { timeout: 100 }).catch(() => false)) {
+                await expect(this.cashDrawerLocationDropdown).toContainText(this.updatedCashDrawerLocation);
             }
 
             // 3. Address, City, Zip
@@ -1147,6 +1288,23 @@ export default class StaffPage extends BasePage {
                 const actualColor = await this.appointmentColorTextbox.inputValue();
                 expect(actualColor).toBe(this.updatedAppointmentColor);
             }
+
+            if (this.updatedAppointmentColorCode && await this.isVisible(this.appointmentColorCodeTextbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.appointmentColorCodeTextbox).toHaveValue(this.updatedAppointmentColorCode);
+            }
+
+            if (this.isRequireManualEnablingOfZoomUnchecked && await this.isVisible(this.requireManualEnablingOfZoomWrapper, { timeout: 100 }).catch(() => false)) {
+                await expect(this.requireManualEnablingOfZoomWrapper.first()).not.toHaveClass(/checked/);
+            }
+
+            if (this.isAllowDriveAccessUnchecked && await this.isVisible(this.allowDriveAccessCheckboxWrapper, { timeout: 100 }).catch(() => false)) {
+                await expect(this.allowDriveAccessCheckboxWrapper.first()).not.toHaveClass(/checked/);
+            }
+
+            if (this.isCashDrawerValidationRequiredUnchecked && await this.isVisible(this.cashDrawerValidationRequiredCheckboxWrapper, { timeout: 100 }).catch(() => false)) {
+                await expect(this.cashDrawerValidationRequiredCheckboxWrapper.first()).not.toHaveClass(/checked/);
+            }
+
             if (this.isAllowAccessToAdminPortalNoSelected && await this.isVisible(this.allowAccessToAdminPortalNoRadioWrapper, { timeout: 100 }).catch(() => false)) {
                 await expect(this.allowAccessToAdminPortalNoRadioWrapper.first()).toHaveClass(/checked/);
             }
@@ -1168,12 +1326,18 @@ export default class StaffPage extends BasePage {
                 await expect(this.staffSurveyLinkInput).toHaveValue(this.updatedStaffSurveyLink);
             }
 
-            // 9. Profile Picture Removed Verification
+            // 9. Signature Removed Verification
+            if (this.isSignatureRemoved && await this.isVisible(this.staffSignatureCanvas, { timeout: 100 }).catch(() => false)) {
+                await this.verifySignatureVisibility(this.staffSignatureCanvas, false);
+            }
+
+            // 10. Profile Picture Removed Verification
             if (this.isImageRemoved) {
                 const imageSrc = await this.imageUploaded.getAttribute('src');
                 expect(imageSrc ? imageSrc.length : 0).toBe(0);
                 await this.verifyVisible(this.selectImageBtn);
             }
+
         });
     }
 }

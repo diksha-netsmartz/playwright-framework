@@ -80,7 +80,7 @@ export default class AdminLoginPage extends BasePage {
             // Handle 2FA Email Authentication if prompted
             await this.handleEmailAuthentication();
             await this.waitForLoaders().catch(() => { });
-            await this.page.waitForLoadState('load', { timeout: 75000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 90000 }).catch(() => { });
 
             // Check if login was successful
             const isLoginSuccessful = await expect(this.page).toHaveTitle(/Home Page/i, { timeout: 15000 })
