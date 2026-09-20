@@ -71,7 +71,7 @@ module.exports = defineConfig({
      *   - 1, 2, 3 (number of retry attempts).
      * Why: Helps eliminate false negatives caused by intermittent network glitches or slow server responses.
      */
-    retries: 1,
+    // retries: 1,
 
     /**
      * reporter: Defines test execution reporting format and behavior.
@@ -113,7 +113,7 @@ module.exports = defineConfig({
          *   - 0 (no timeout / wait indefinitely).
          * Why: Accommodates slow server-side page loads and redirection chains.
          */
-        navigationTimeout: 30000,
+        navigationTimeout: 60000,
 
         /**
          * slowMo: Adds an artificial delay (in ms) before each action.

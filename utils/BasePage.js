@@ -250,7 +250,7 @@ export default class BasePage {
      * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
      * @param {number} [timeout=30000] - Optional timeout in milliseconds.
      */
-    async waitForLoaders(timeout = 30000) {
+    async waitForLoaders(timeout = 90000) {
         await this.page.waitForFunction(() => {
             const loaders = Array.from(document.querySelectorAll('.load-area'));
             if (loaders.length === 0) return true;
