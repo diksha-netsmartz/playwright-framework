@@ -59,8 +59,8 @@ export default class LocationsPage extends BasePage {
         this.distanceCoverageInput = page.locator('#DistanceCoverage');
 
         // Multi-Select Area Coverage
-        this.areaCoverageSelectableItem = page.locator("//div[contains(@id,'Coverage')]//div[contains(@class,'ms-selectable')]//li[contains(@attrcolumn,'Coverage')]");
-        this.areaCoverageSelectedItem = page.locator("//div[contains(@id,'Coverage')]//div[contains(@class,'ms-selection')]//li[contains(@attrcolumn,'Coverage') and contains(@class,'ms-selected')]");
+        this.areaCoverageSelectableItem = page.locator("//li[contains(@attrcolumn,'Coverage') and @class='control ms-elem-selectable']");
+        this.areaCoverageSelectedItem = page.locator("//li[contains(@attrcolumn,'Coverage') and @class='control ms-elem-selection ms-selected']");
 
         // Pickup Location Modal & Dropdown
         this.addPickupLocationBtn = page.locator("xpath=//a[contains(@onclick,'AddPickUp')]");
@@ -278,9 +278,13 @@ export default class LocationsPage extends BasePage {
                 await this.fill(this.distanceCoverageInput, this.distanceCoverage);
             }
 
-            // 5. Multi-Select Area Coverage
-            if (await this.isVisible(this.areaCoverageSelectableItem.first(), { timeout: 100 }).catch(() => false)) {
-                await this.click(this.areaCoverageSelectableItem.first());
+            // 5. Multi-Select Area Coverage (Select all available items)
+            const selectableCount = await this.areaCoverageSelectableItem.count();
+            if (selectableCount > 0) {
+                for (let i = 0; i < selectableCount; i++) {
+                    await this.waitForVisible(this.areaCoverageSelectableItem.first());
+                    await this.click(this.areaCoverageSelectableItem.first());
+                }
                 this.isAreaCoverageSelected = true;
             } else {
                 this.isAreaCoverageSelected = false;
@@ -501,9 +505,10 @@ export default class LocationsPage extends BasePage {
                 await expect(this.distanceCoverageInput).toHaveValue(this.distanceCoverage);
             }
 
-            // 5. Multi-Select Area Coverage
+            // 5. Multi-Select Area Coverage (Verify no available items remain)
             if (this.isAreaCoverageSelected) {
-                await this.verifyVisible(this.areaCoverageSelectedItem.first());
+                await expect(this.areaCoverageSelectableItem).toHaveCount(0);
+                expect(await this.areaCoverageSelectedItem.count()).toBeGreaterThan(0);
             }
 
             // 6. Pickup & Dropoff
@@ -652,9 +657,13 @@ export default class LocationsPage extends BasePage {
                 await this.fill(this.distanceCoverageInput, this.updatedDistanceCoverage);
             }
 
-            // 5. Multi-Select Area Coverage (select last item)
-            if (await this.isVisible(this.areaCoverageSelectableItem.last(), { timeout: 100 }).catch(() => false)) {
-                await this.click(this.areaCoverageSelectableItem.last());
+            // 5. Multi-Select Area Coverage (Deselect all items from selected)
+            const selectedCount = await this.areaCoverageSelectedItem.count();
+            if (selectedCount > 0) {
+                for (let i = 0; i < selectedCount; i++) {
+                    await this.waitForVisible(this.areaCoverageSelectedItem.first());
+                    await this.click(this.areaCoverageSelectedItem.first());
+                }
                 this.isAreaCoverageUpdated = true;
             } else {
                 this.isAreaCoverageUpdated = false;
@@ -818,10 +827,10 @@ export default class LocationsPage extends BasePage {
                 await expect(this.distanceCoverageInput).toHaveValue(this.updatedDistanceCoverage);
             }
 
-            // 5. Multi-Select Area Coverage (2 items selected)
-            const areaCoverageCount = (this.isAreaCoverageSelected ? 1 : 0) + (this.isAreaCoverageUpdated ? 1 : 0);
-            if (areaCoverageCount > 0) {
-                await expect(this.areaCoverageSelectedItem).toHaveCount(areaCoverageCount);
+            // 5. Multi-Select Area Coverage (Verify no selected items remain)
+            if (this.isAreaCoverageUpdated) {
+                await expect(this.areaCoverageSelectedItem).toHaveCount(0);
+                expect(await this.areaCoverageSelectableItem.count()).toBeGreaterThan(0);
             }
 
             // 6. Pickup & Dropoff
