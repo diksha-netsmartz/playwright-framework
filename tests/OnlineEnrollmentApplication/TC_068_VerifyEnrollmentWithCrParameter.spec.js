@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import OnlineEnrollmentPage from '@pages/OnlineEnrollmentApplication/OnlineEnrollmentPage';
 import oeData from '@test-data/json/onlineEnrollmentData.json';
+import { currentEnv } from '@config/config';
 
 /**
  * TC_068: C-OE
@@ -24,7 +25,10 @@ test('TC_068: C-OE - To verify that enrollment is working with cr parameter', { 
     });
 
     await test.step('Step 2: Click on the Select button for any class', async () => {
-        // await oe.selectDOBForPackage();
+        if (currentEnv?.toLowerCase() === 'coreserver1') {
+            await oe.selectDateOfBirth();
+        }
+
         await oe.selectClass();
         // await oe.selectDOBForPackage();
     });

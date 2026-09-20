@@ -550,4 +550,22 @@ export default class OnlineEnrollmentPage extends BasePage {
         await PdfHelper.downloadVerifyAndAttach(this.page, expectedText, attachmentName);
     }
 
+
+    /**
+     * Selects Date of Birth (Month, Year, Day) for package verification and proceeds.
+     **/
+    async selectDateOfBirth() {
+        await this.waitForLoaders();
+        await this.page.waitForLoadState('load', { timeout: 5000 })
+        await this.page.waitForTimeout(10000);
+        if (await this.isVisible(this.dobMonthPackage, { timeout: 10000 }).catch(() => false)) {
+            await this.click(this.dobMonthPackage);
+            await this.click(this.monthSelectionInDropdownPackage);
+            await this.click(this.dobYearPackage);
+            await this.click(this.yearSelectionInDropdownPackage);
+            await this.click(this.dobDayPackage);
+            await this.click(this.daySelectionInDropdownPackage);
+            await this.click(this.showAppointmentButton);
+        }
+    }
 }
