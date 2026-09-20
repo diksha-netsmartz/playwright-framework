@@ -374,4 +374,41 @@ export default class BasePage {
         });
     }
 
+    /**
+     * Simulates drawing a signature stroke on an HTML5 canvas element using mouse coordinates.
+     * @param {import('@playwright/test').Locator} canvas - Locator for the signature canvas element.
+     **/
+    async drawSignature(canvas) {
+        await canvas.scrollIntoViewIfNeeded();
+        const box = await canvas.boundingBox();
+        if (!box) return;
+
+        const startX = box.x + box.width * 0.2;
+        const startY = box.y + box.height * 0.5;
+        const endX = box.x + box.width * 0.8;
+        const endY = box.y + box.height * 0.5;
+
+        await this.page.mouse.move(startX, startY);
+        await this.page.mouse.down();
+        await this.page.mouse.move(endX, endY, { steps: 10 });
+        await this.page.mouse.up();
+    }
+
+    /**
+ * Verifies that an HTML5 signature canvas has a drawn signature (is not blank).
+ * @param {import('@playwright/test').Locator} canvas - Locator for the signature canvas element.
+ * @param {boolean} isVisible - Whether signature is expected to be visible.
+ **/
+    async verifySignatureVisibility(canvas, isVisible) {
+        await this.waitForVisible(canvas);
+        const isSigned = await canvas.evaluate((/** @type {HTMLCanvasElement} */ el) => {
+            const ctx = el.getContext('2d');
+            if (!ctx) return false;
+            const pixelData = ctx.getImageData(0, 0, el.width, el.height).data;
+            return pixelData.some(channel => channel !== 0);
+        });
+        expect(isSigned).toBe(isVisible);
+    }
+
+
 }

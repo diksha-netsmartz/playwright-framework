@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import OnlineEnrollmentPage from '@pages/OnlineEnrollmentApplication/OnlineEnrollmentPage';
 import oeData from '@test-data/json/onlineEnrollmentData.json';
+import { currentEnv } from '@config/config';
 
 /**
  * TC_067: C-OE
@@ -20,7 +21,12 @@ test('TC_067: C-OE - To verify that enrollment is working with package parameter
     await test.step('Step 1: Navigate to Teen OE page with package parameter and select DOB', async () => {
         await oe.navigateToTeenOEPageWithParams(packageParam);
         await oe.selectDOBForPackage();
-        await oe.clickContinue();
+        if (currentEnv?.toLowerCase() === 'uat') {
+            await oe.selectBTWPackage();
+        }
+        else {
+            await oe.clickContinue();
+        }
     });
 
     await test.step('Step 2: Add values for all Student info fields', async () => {
