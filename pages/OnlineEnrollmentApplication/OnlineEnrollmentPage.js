@@ -230,8 +230,8 @@ export default class OnlineEnrollmentPage extends BasePage {
     }
 
     /**
- * Handles the Continue button after package selection whenever it appears on screen using addLocatorHandler.
- **/
+     * Handles the Continue button after package selection whenever it appears on screen using addLocatorHandler.
+     **/
     async clickContinue() {
         if (this._isContinueHandlerRegistered) return;
         this._isContinueHandlerRegistered = true;
@@ -239,6 +239,20 @@ export default class OnlineEnrollmentPage extends BasePage {
         await this.page.addLocatorHandler(
             this.continueAdditionalProduct,
             async () => {
+                // If DOB modal is covering the screen, dismiss it first!
+                if (await this.isVisible(this.proceedButton, { timeout: 1000 }).catch(() => false)) {
+                    if (await this.isVisible(this.dobMonthPackage, { timeout: 1000 }).catch(() => false)) {
+                        await this.click(this.dobMonthPackage);
+                        await this.click(this.monthSelectionInDropdownPackage);
+                        await this.click(this.dobYearPackage);
+                        await this.click(this.yearSelectionInDropdownPackage);
+                        await this.click(this.dobDayPackage);
+                        await this.click(this.daySelectionInDropdownPackage);
+                    }
+                    await this.click(this.proceedButton);
+                    await this.waitForHidden(this.proceedButton).catch(() => { });
+                }
+
                 await this.click(this.continueAdditionalProduct);
                 await this.waitForHidden(this.continueAdditionalProduct).catch(() => { });
             }
@@ -309,6 +323,12 @@ export default class OnlineEnrollmentPage extends BasePage {
                 }
                 await this.click(this.proceedButton);
                 await this.waitForHidden(this.proceedButton).catch(() => { });
+
+                // If Additional Product modal was underneath, dismiss it too
+                if (await this.isVisible(this.continueAdditionalProduct, { timeout: 2000 }).catch(() => false)) {
+                    await this.click(this.continueAdditionalProduct);
+                    await this.waitForHidden(this.continueAdditionalProduct).catch(() => { });
+                }
             }
         );
     }
