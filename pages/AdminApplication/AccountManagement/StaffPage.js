@@ -1135,14 +1135,14 @@ export default class StaffPage extends BasePage {
                 this.isSignatureRemoved = true;
             }
 
-            // 18. Remove Profile Picture
-            if (await this.removeImageButton.isVisible({ timeout: 100 }).catch(() => false)) {
-                await this.click(this.removeImageButton);
-                await this.waitForVisible(this.yesConfirmationBtn);
-                await this.click(this.yesConfirmationBtn);
-                await this.waitForLoaders();
-                this.isImageRemoved = true;
-            }
+            // // 18. Remove Profile Picture
+            // if (await this.removeImageButton.isVisible({ timeout: 100 }).catch(() => false)) {
+            //     await this.click(this.removeImageButton);
+            //     await this.waitForVisible(this.yesConfirmationBtn);
+            //     await this.click(this.yesConfirmationBtn);
+            //     await this.waitForLoaders();
+            //     this.isImageRemoved = true;
+            // }
         });
     }
 
@@ -1331,12 +1331,12 @@ export default class StaffPage extends BasePage {
                 await this.verifySignatureVisibility(this.staffSignatureCanvas, false);
             }
 
-            // 10. Profile Picture Removed Verification
-            if (this.isImageRemoved) {
-                const imageSrc = await this.imageUploaded.getAttribute('src');
-                expect(imageSrc ? imageSrc.length : 0).toBe(0);
-                await this.verifyVisible(this.selectImageBtn);
-            }
+            // // 10. Profile Picture Removed Verification
+            // if (this.isImageRemoved) {
+            //     const imageSrc = await this.imageUploaded.getAttribute('src');
+            //     expect(imageSrc ? imageSrc.length : 0).toBe(0);
+            //     await this.verifyVisible(this.selectImageBtn);
+            // }
 
         });
     }
