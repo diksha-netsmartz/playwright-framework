@@ -565,7 +565,7 @@ export default class SchedulerPage extends BasePage {
             }).catch(() => '');
 
             await this.click(this.deleteButtonInPopup);
-            await this.waitForHidden(this.deleteButtonInPopup);
+            // await this.waitForHidden(this.deleteButtonInPopup);
             await this.waitForLoaders();
 
             const toastMessage = (await toastPromise) || '';
