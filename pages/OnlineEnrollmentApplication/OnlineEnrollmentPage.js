@@ -560,10 +560,22 @@ export default class OnlineEnrollmentPage extends BasePage {
         await this.page.waitForTimeout(10000);
         if (await this.isVisible(this.dobMonthPackage, { timeout: 10000 }).catch(() => false)) {
             await this.click(this.dobMonthPackage);
+            if (!await this.isVisible(this.monthSelectionInDropdownPackage, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.dobMonthPackage);
+            }
+            await this.waitForVisible(this.monthSelectionInDropdownPackage);
             await this.click(this.monthSelectionInDropdownPackage);
             await this.click(this.dobYearPackage);
+            if (!await this.isVisible(this.yearSelectionInDropdownPackage, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.dobYearPackage);
+            }
+            await this.waitForVisible(this.yearSelectionInDropdownPackage);
             await this.click(this.yearSelectionInDropdownPackage);
             await this.click(this.dobDayPackage);
+            if (!await this.isVisible(this.daySelectionInDropdownPackage, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.dobDayPackage);
+            }
+            await this.waitForVisible(this.daySelectionInDropdownPackage);
             await this.click(this.daySelectionInDropdownPackage);
             await this.click(this.showAppointmentButton);
         }
