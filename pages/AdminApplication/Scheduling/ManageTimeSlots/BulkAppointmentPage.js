@@ -189,13 +189,13 @@ export default class BulkAppointmentPage extends BasePage {
             await this.selectAppointment();
 
             await this.click(this.cancelAppointmentsLink);
-            if (!await this.isVisible(this.cancelledTextbox, { timeout: 3000 })) {
+            if (!await this.isVisible(this.cancelledTextbox, { timeout: 10000 })) {
                 await this.selectAppointment();
                 if (!await this.isVisible(this.cancelledTextbox, { timeout: 3000 })) {
                     await this.click(this.cancelAppointmentsLink);
                 }
             }
-
+            await this.waitForVisible(this.cancelledTextbox);
             await this.fill(this.cancelledTextbox, "cancelling appointment");
             await this.click(this.cancelYesButton);
             await this.waitForLoaders();
