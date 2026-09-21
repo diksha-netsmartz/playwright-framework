@@ -2,6 +2,7 @@ import BasePage from '@utils/BasePage';
 import config from '@config/config';
 import { test, expect } from '@playwright/test';
 import TwoFactorAuthPage from '@pages/Common/TwoFactorAuthPage';
+import StudentPortalHomePage from './StudentPortalHomePage';
 
 /**
  * Page Object representing the Student Portal Login Page.
@@ -17,6 +18,7 @@ export default class StudentLoginPage extends BasePage {
         super(page);
 
         this.twoFactorAuthPage = new TwoFactorAuthPage(page);
+        this.studentHomePage = new StudentPortalHomePage(page);
         this.usernameTxt = page.getByRole('textbox', { name: 'Username' });
         this.passwordTxt = page.getByRole('textbox', { name: 'Password' });
         this.loginBtn = page.getByRole('button', { name: 'Login' });
@@ -148,6 +150,7 @@ export default class StudentLoginPage extends BasePage {
         await test.step('Use browser Back button and verify protected CSP pages cannot be accessed without logging in again', async () => {
             await this.page.goBack();
             await this.waitForLoaders().catch(() => { });
+            await this.studentHomePage.navigateToHome();
             await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
             await this.verifyTitle("Driving School Management System");
             await this.verifyVisible(this.loginBtn, 5000);
