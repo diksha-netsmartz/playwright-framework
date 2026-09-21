@@ -451,7 +451,7 @@ export default class VehicleListPage extends BasePage {
     async verifyVehicleCreatedSuccessfully() {
         await test.step('Verify "Vehicle information added successfully." notification', async () => {
             const successMsg = this.page.getByText('Vehicle information added successfully.');
-            await this.waitForVisible(successMsg);
+            await this.waitForVisible(successMsg, { timeout: 10000 });
             await this.verifyVisible(successMsg);
         });
     }
@@ -798,7 +798,7 @@ export default class VehicleListPage extends BasePage {
     async verifyVehicleUpdatedSuccessfully() {
         await test.step('Verify "Vehicle information updated successfully." notification', async () => {
             const successMsg = this.page.getByText('Vehicle information updated successfully.');
-            await this.waitForVisible(successMsg);
+            await this.waitForVisible(successMsg, { timeout: 10000 });
             await this.verifyVisible(successMsg);
         });
     }
