@@ -103,6 +103,18 @@ export default class StudentPortalHomePage extends BasePage {
     }
 
     /**
+     * Navigates to the home page by clicking 'Home' in the left navigation.
+     **/
+    async navigateToHome() {
+        await test.step('Navigate to Home page', async () => {
+            await this.waitForVisible(this.homeNavLink);
+            await this.click(this.homeNavLink);
+            await this.waitForLoaders();
+        });
+    }
+
+
+    /**
      * Navigates to the Appointments page by clicking 'My Account' and then 'Appointments' in the left navigation.
      **/
     async navigateToAppointments() {
