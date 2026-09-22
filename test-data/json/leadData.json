@@ -7,10 +7,11 @@
   "zipCode": "90001",
   "email": "lead@gmail.com",
   "studentType": "ADULT",
-  "homePhone": "5551234567",
-  "cellPhone": "5559876543",
-  "parentPhone": "5554561234",
-  "otherPhone": "5557894560",
+  "homePhone": "(555)123-4567",
+  "cellPhone": "(555)987-6543",
+  "parentPhone": "(555)456-1234",
+  "otherPhone": "(555)789-4560",
+  "emergencyPhone": "(555)123-4568",
   "medicalConditions": "None",
   "studentNotes": "Add Lead Test",
   "preferredDateandTime": "05/09/2026",
@@ -22,6 +23,7 @@
     "medicalConditions": "Updated med conditions",
     "notes": "Notes added on edited lead",
     "taskSubject": "automated task subject",
-    "taskNote": "automated task note"
+    "taskNote": "automated task note",
+    "emergencyPhone": "(555)123-4568"
   }
 }

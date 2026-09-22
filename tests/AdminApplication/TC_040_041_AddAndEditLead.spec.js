@@ -76,7 +76,7 @@ test('TC_040_041: C-Admin >> Student Leads - Add and Edit Lead', { tag: ['@CAdmi
         await leadPage.updateLeadFields(leadData.editLead);
         await leadPage.addNotes(leadData.editLead.notes);
         await leadPage.addTask(leadData.editLead.taskSubject, leadData.editLead.taskNote);
-        await leadPage.addPhoneInCallsTab(leadData.emergencyPhone)
+        await leadPage.addPhoneInCallsTab(leadData.editLead.emergencyPhone);
         await leadPage.addFile(uploadFilePath);
     });
 
