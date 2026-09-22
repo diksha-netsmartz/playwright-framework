@@ -1,0 +1,51 @@
+name: Deploy QA Playwright Framework
+
+on:
+  # Manual trigger only - will NOT run automatically on git push
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        default: 'QA Server'
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Execute Remote Deployment via SSH
+        env:
+          TARGET_HOST: ${{ secrets.TARGET_HOST }}
+          TARGET_USER: ${{ secrets.TARGET_USER }}
+          WEB_ROOT: "/var/www/html/playwright-framework/playwright-framework"
+        run: |
+          ssh -o StrictHostKeyChecking=no ${TARGET_USER}@${TARGET_HOST} << 'EOF'
+            set -e
+            echo "Navigating to project directory..."
+            cd /var/www/html/playwright-framework/playwright-framework
+
+            echo "Ensuring clean workspace..."
+            git config --global --add safe.directory /var/www/html/playwright-framework/playwright-framework
+            git fetch origin main
+
+            echo "Pulling latest changes from main branch..."
+            git reset --hard origin/main
+            git pull origin main
+
+            # Install dependencies if needed
+            if [ -f "package.json" ]; then
+              echo "Installing dependencies..."
+              npm ci --prefer-offline || npm install
+            fi
+
+            echo "Reloading Nginx service..."
+            sudo systemctl reload nginx || sudo systemctl restart nginx
+            echo "Deployment completed successfully!"
+          EOF
+
+      - name: Verify Nginx Health
+        env:
+          TARGET_HOST: ${{ secrets.TARGET_HOST }}
+          TARGET_USER: ${{ secrets.TARGET_USER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ${TARGET_USER}@${TARGET_HOST} "systemctl is-active --quiet nginx && echo 'Nginx is running properly.'"
