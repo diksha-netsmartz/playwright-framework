@@ -43,7 +43,7 @@ test('TC_078: CSP - To Verify student is able to contact school', { tag: '@CSPCo
     await studentContactPage.contactSchool(contactData);
   });
 
-  await test.step('Step 4: Check email is received in inbox and verify subject, name, and message', async () => {
+  await test.step('Step 4: Check email is received in inbox and verify contact details', async () => {
     const receivedEmail = await EmailHelper.waitForEmail({
       subject: 'Email from student portal',
       timeoutMs: 60000
@@ -53,9 +53,26 @@ test('TC_078: CSP - To Verify student is able to contact school', { tag: '@CSPCo
     // Normalize email content (handling non-breaking spaces) and verify submitted contact fields
     const emailContent = `${receivedEmail.text || ''}\n${receivedEmail.html || ''}`.replace(/\u00a0/g, ' ');
 
-    expect(emailContent).toContain(contactData.subject);
-    expect(emailContent).toContain(contactData.name);
-    expect(emailContent).toContain(contactData.message);
+    const missingDetails = [];
+
+    if (!emailContent.includes(contactData.subject)) {
+      missingDetails.push(`Subject: "${contactData.subject}"`);
+    }
+    if (!emailContent.includes(contactData.name)) {
+      missingDetails.push(`Student Name: "${contactData.name}"`);
+    }
+    if (!emailContent.includes(contactData.email)) {
+      missingDetails.push(`Student Email: "${contactData.email}"`);
+    }
+    if (!emailContent.includes(contactData.message)) {
+      missingDetails.push(`Message Content: "${contactData.message}"`);
+    }
+
+    if (missingDetails.length > 0) {
+      const failureMsg = `Missing detail(s) in received email:\n${missingDetails.map(item => `  - ${item}`).join('\n')}`;
+      console.error(`\n❌ [VERIFICATION FAILED] ${failureMsg}\n`);
+      expect(missingDetails, failureMsg).toEqual([]);
+    }
   });
 });
 
