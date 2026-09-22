@@ -80,6 +80,7 @@ export default class OpenTimeSlotsPage extends BasePage {
 
         // Confirmation Modals
         this.successModalHeading = page.getByRole('heading', { name: 'Appointment created' });
+        this.numberOfSlotsCreated = page.locator("#spnOTSNoOfSlotsCreated");
         this.updateSuccessModalHeading = page.getByRole('heading', { name: 'Appointment updated' });
         this.closeSuccessModalBtn = page.getByRole('button', { name: 'Close' });
         this.editLink = page.getByTitle('Edit').first();
@@ -432,8 +433,10 @@ export default class OpenTimeSlotsPage extends BasePage {
             }
 
             // 7. Fill PU Location
+            await this.clear(this.puLocationInput);
             await this.fill(this.puLocationInput, this.puLocation);
             if (await this.isVisible(this.dropOffLocationInput, { timeout: 100 })) {
+                await this.clear(this.dropOffLocationInput);
                 await this.fill(this.dropOffLocationInput, "main street");
             }
 
@@ -529,6 +532,9 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.successModalHeading);
             await expect(this.successModalHeading).toBeVisible();
             await expect(this.successModalHeading).toContainText('Appointment created');
+            await expect(this.numberOfSlotsCreated).not.toHaveText('0');
+            // const slotsText = (await this.getText(this.numberOfSlotsCreated) || '').trim();
+            // expect(parseInt(slotsText, 10)).toBeGreaterThan(0);
         });
     }
 

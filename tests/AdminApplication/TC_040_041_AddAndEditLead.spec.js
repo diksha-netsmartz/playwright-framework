@@ -34,6 +34,7 @@ test('TC_040_041: C-Admin >> Student Leads - Add and Edit Lead', { tag: ['@CAdmi
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const leadPage = new LeadPage(page);
+    const uploadFilePath = 'test-data/uploads/uploadFile.jpg';
 
     /** @type {any} */
     let createdLead = {};
@@ -67,10 +68,16 @@ test('TC_040_041: C-Admin >> Student Leads - Add and Edit Lead', { tag: ['@CAdmi
         await leadPage.openLeadForEdit(createdLead.firstName);
     });
 
+    await test.step('Step 7: Verify added lead details are pre-populated in the edit modal', async () => {
+        await leadPage.verifyAddedLeadDetails(leadData, createdLead);
+    });
+
     await test.step('Step 8: Update the fields with new values', async () => {
         await leadPage.updateLeadFields(leadData.editLead);
-        await leadPage.updateNotes(leadData.editLead.notes);
-        await leadPage.updateTask(leadData.editLead.taskSubject, leadData.editLead.taskNote);
+        await leadPage.addNotes(leadData.editLead.notes);
+        await leadPage.addTask(leadData.editLead.taskSubject, leadData.editLead.taskNote);
+        await leadPage.addPhoneInCallsTab(leadData.editLead.emergencyPhone);
+        await leadPage.addFile(uploadFilePath);
     });
 
     await test.step('Step 9: Click SAVE button and confirm', async () => {
