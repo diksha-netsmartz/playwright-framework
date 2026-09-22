@@ -22,7 +22,7 @@ import quizData from '@test-data/json/quizData.json';
  *   2. The added quiz should be visible in the grid
  *   3. Quiz should be edited successfully
  **/
-test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To verify user able to Add Quiz', { tag: '@accountManagement' }, async ({ page }) => {
+test('TC_033: C-Admin >> Account Management >> Services >> Online quiz/test - To verify user able to Add Quiz', { tag: ['@CAdmin', '@accountManagement'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const quizPage = new OnlineQuizTestsPage(page);

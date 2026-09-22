@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
  * Precondition: Appointment should be Available to be Scheduled
  * Expected Result: Appointment should be scheduled to the student.
  **/
-test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to Schedule in an Appointment', { tag: ['@scheduling', '@smoke'] }, async ({ page }) => {
+test('TC_010: C-admin > Scheduling > Non Graphical - Student should be able to Schedule in an Appointment', { tag: ['@CAdmin', '@scheduling', '@smoke'] }, async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

@@ -8,7 +8,7 @@ import { credentials } from '@config/config';
  * Test Case Title: To Verify all links in left navigation are working.
  * Expected Result: Student is able to navigate through all links and submenus in the left navigation sidebar across environments
  **/
-test('TC_080: CSP - To Verify all links in left navigation are working', { tag: '@CSPHomepage' }, async ({ page }) => {
+test('TC_080: CSP - To Verify all links in left navigation are working', { tag: ['@CSP', '@CSPHomepage'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

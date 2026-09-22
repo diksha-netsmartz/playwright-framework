@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
  * Precondition: Student should be created first
  * Expected Result: Payments should be made by user
  **/
-test('TC_008: C-admin > Student > Billing - Verify user is able to make payment', { tag: ['@studentAccount', '@smoke'] }, async ({ page }) => {
+test('TC_008: C-admin > Student > Billing - Verify user is able to make payment', { tag: ['@CAdmin', '@studentAccount', '@smoke'] }, async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

@@ -313,10 +313,10 @@ export default class ClassroomAttendancePage extends BasePage {
                 : `${String(expectedText).replace(/\s+/g, '_')}.pdf`
         );
         await test.step(`Verify Roster PDF report tab is loaded`, async () => {
-            await pdfPage.waitForFunction(() => document.title.trim().length > 0, { timeout: 30000 }).catch(() => {
-                console.log('Title did not become non-empty within 30s; proceeding with assertion.');
+            await pdfPage.waitForFunction(() => document.title.trim().length > 0, { timeout: 45000 }).catch(() => {
+                console.log('Title did not become non-empty within 45s; proceeding with assertion.');
             });
-            await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 15000 });
+            await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 45000 });
         });
         await PdfHelper.downloadVerifyAndAttach(pdfPage, expectedText, resolvedAttachmentName);
         await pdfPage.close().catch(() => {

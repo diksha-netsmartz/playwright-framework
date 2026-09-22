@@ -17,7 +17,7 @@ export default class StudentEnrollPage extends BasePage {
 
         this.payLaterBtn = page.getByRole('button', { name: 'Pay Later' });
         this.printReceiptLink = page.getByRole('link', { name: 'Print Receipt' }).last();
-        this.getPackageSelectBtn = page.locator("xpath=(//button[contains(@class,'PriceTax')])[1]");
+        this.getPackageSelectBtn = page.locator("xpath=(//button[contains(@class,'PriceTax') and not(contains(text(),'$0.00'))])[1]");
         this.skipSelectionButton = page.getByRole('button', { name: 'Skip Selection' })
         this.studentSignature = page.locator('#txtStudentSignature');
         this.contractSignatureSaveButton = page.locator("(//h4[text()='Contract Signature']//ancestor::div[contains(@class,'modal-content')]//button[contains(text(),'Save')])[1]");

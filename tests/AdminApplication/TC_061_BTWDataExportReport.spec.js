@@ -27,7 +27,7 @@ import TestDataGenerator from '@utils/TestDataGenerator';
  *   - "Filter Saved Sucessfully." message should display
  *   - "Filter deleted Sucessfully" message should display
  **/
-test('TC_061: C-Admin >> Report Center >> Business Report - To verify that BTW Data Export Report report is getting downloaded and filter management works', { tag: '@reportCenter' }, async ({ page }) => {
+test('TC_061: C-Admin >> Report Center >> Business Report - To verify that BTW Data Export Report report is getting downloaded and filter management works', { tag: ['@CAdmin', '@reportCenter'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);

@@ -10,7 +10,7 @@ import { credentials } from '@config/config';
  * Test Case Title: Verify attendance can be marked
  * Expected Result: Classroom attendance marked successfully message should display
  **/
-test('TC_019: CSM - Verify attendance can be marked', { tag: ['@CSMClassroom', '@smoke'] }, async ({page}) => {
+test('TC_019: CSM - Verify attendance can be marked', { tag: ['@CSM', '@CSMClassroom', '@smoke'] }, async ({page}) => {
 
     const staffLoginPage = new StaffLoginPage(page);
     const classroomAttendancePage = new ClassroomAttendancePage(page);

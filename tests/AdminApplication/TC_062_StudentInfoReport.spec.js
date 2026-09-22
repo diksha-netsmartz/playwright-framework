@@ -18,7 +18,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   Report should get opened successfully in another tab
  **/
-test('TC_062: C-Admin >> Report Center >> Business Report - To verify that Student Info Report report is getting opened in a new tab', { tag: '@reportCenter' }, async ({ page }) => {
+test('TC_062: C-Admin >> Report Center >> Business Report - To verify that Student Info Report report is getting opened in a new tab', { tag: ['@CAdmin', '@reportCenter'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);

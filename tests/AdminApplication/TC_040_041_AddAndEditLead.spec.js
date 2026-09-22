@@ -30,7 +30,7 @@ import { credentials } from '@config/config';
  *   2. The newly created Lead should open in the edit modal with saved values intact.
  *   3. Updating fields and clicking Save should update the lead with "Details updated successfully."
  **/
-test('TC_040_041: C-Admin >> Student Leads - Add and Edit Lead', { tag: '@studentLeads' }, async ({ page }) => {
+test('TC_040_041: C-Admin >> Student Leads - Add and Edit Lead', { tag: ['@CAdmin', '@studentLeads'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const leadPage = new LeadPage(page);

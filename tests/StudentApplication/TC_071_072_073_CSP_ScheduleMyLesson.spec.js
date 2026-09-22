@@ -17,7 +17,7 @@ import { credentials } from '@config/config';
  * Test Case Title: To Verify Student is able to Cancel Appointment
  * Expected Result: Scheduled appointment is cancelled successfully
  **/
-test('TC_071 , TC_072 and TC_073: CSP - To Verify student is able to schedule ,reschedule and cancel appointment', { tag: '@CSPScheduling' }, async ({ page }) => {
+test('TC_071 , TC_072 and TC_073: CSP - To Verify student is able to schedule ,reschedule and cancel appointment', { tag: ['@CSP', '@CSPScheduling'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

@@ -269,17 +269,18 @@ export default class SchedulerPage extends BasePage {
     }
 
     /**
-     * Finds an unoccupied, visible grid slot in the for copying
+     * Finds an unoccupied, visible grid slot for copying.
+     * Prioritizes slots in the same column (below, then above), and falls back to other columns (preferably a different row/time).
      * @param {Object|string} studentName - Student object or student name string.
-     * @param {number} [skipCount=0] - Number of free slots to skip in that column.
-     * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell in the same column.
+     * @param {number} [skipCount=0] - Number of free slots to skip across candidates.
+     * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell.
      **/
     async findAvailableSlotForCopy(studentName, skipCount = 0) {
         const searchText = this.getStudentSearchText(studentName);
         const freeIndex = await this.page.evaluate(({ search, skip }) => {
             /** @type {HTMLTableCellElement[]} */
             const cells = Array.from(
-                document.querySelectorAll("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell'],#multiVehicleScheduler td[role='gridcell'],  #singleLocationScheduler td[role='gridcell']")
+                document.querySelectorAll("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell'], #multiVehicleScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']")
             );
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
@@ -297,11 +298,13 @@ export default class SchedulerPage extends BasePage {
 
             let targetCenterX = null;
             let targetColIndex = null;
+            let targetApptTop = null;
             let targetApptBottom = null;
 
             if (targetAppt) {
                 const rect = targetAppt.getBoundingClientRect();
                 targetCenterX = (rect.left + rect.right) / 2;
+                targetApptTop = rect.top;
                 targetApptBottom = rect.bottom;
 
                 // Find the column index of the cell matching targetCenterX
@@ -314,9 +317,11 @@ export default class SchedulerPage extends BasePage {
                 }
             }
 
-            let skipped = 0;
+            const tier1SameColBelow = [];
+            const tier2SameColAbove = [];
+            const tier3OtherColDiffRow = [];
+            const tier4OtherColSameRow = [];
 
-            // First pass: Find free slot in the same column AFTER (below) the existing appointment
             for (let i = 0; i < cells.length; i++) {
                 const cell = cells[i];
                 const cellBox = cell.getBoundingClientRect();
@@ -326,20 +331,6 @@ export default class SchedulerPage extends BasePage {
                 const bgColor = window.getComputedStyle(cell).backgroundColor;
                 const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
                 if (!isWhite) continue;
-
-                if (targetCenterX !== null) {
-                    const cellCenterX = (cellBox.left + cellBox.right) / 2;
-                    const isSameCol = targetColIndex !== null
-                        ? (cell.cellIndex === targetColIndex || Math.abs(cellCenterX - targetCenterX) < 20)
-                        : Math.abs(cellCenterX - targetCenterX) < 20;
-
-                    if (!isSameCol) continue;
-
-                    // Prefer slots later in time than the appointment
-                    if (targetApptBottom !== null && cellBox.top < targetApptBottom - 5) {
-                        continue;
-                    }
-                }
 
                 const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
@@ -351,55 +342,55 @@ export default class SchedulerPage extends BasePage {
                         apptBox.bottom > cellBox.top
                     );
                 });
+                if (hasApptOverlap) continue;
 
-                if (!hasApptOverlap) {
-                    if (skipped === skip) return i;
-                    skipped++;
-                }
-            }
+                let isSameCol = false;
+                let isSameRow = false;
+                let isBelow = false;
 
-            // Second pass (fallback): Find ANY free slot in the same column (if none below)
-            if (targetCenterX !== null) {
-                skipped = 0;
-                for (let i = 0; i < cells.length; i++) {
-                    const cell = cells[i];
-                    const cellBox = cell.getBoundingClientRect();
-                    if (cellBox.width === 0 || cellBox.height === 0) continue;
-                    if (cell.classList.contains('k-nonwork-hour')) continue;
-                    const bgColor = window.getComputedStyle(cell).backgroundColor;
-                    const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
-                    if (!isWhite) continue;
-
+                if (targetCenterX !== null) {
                     const cellCenterX = (cellBox.left + cellBox.right) / 2;
-                    const isSameCol = targetColIndex !== null
+                    isSameCol = targetColIndex !== null
                         ? (cell.cellIndex === targetColIndex || Math.abs(cellCenterX - targetCenterX) < 20)
                         : Math.abs(cellCenterX - targetCenterX) < 20;
 
-                    if (!isSameCol) continue;
-
-                    const hasApptOverlap = appointments.some(appt => {
-                        const apptBox = appt.getBoundingClientRect();
-                        if (apptBox.width === 0 || apptBox.height === 0) return false;
-                        return (
-                            apptBox.left < cellBox.right &&
-                            apptBox.right > cellBox.left &&
-                            apptBox.top < cellBox.bottom &&
-                            apptBox.bottom > cellBox.top
-                        );
-                    });
-
-                    if (!hasApptOverlap) {
-                        if (skipped === skip) return i;
-                        skipped++;
+                    if (targetApptTop !== null && targetApptBottom !== null) {
+                        isSameRow = cellBox.top < targetApptBottom - 5 && cellBox.bottom > targetApptTop + 5;
+                        isBelow = cellBox.top >= targetApptBottom - 5;
                     }
                 }
+
+                if (isSameCol) {
+                    if (isBelow) {
+                        tier1SameColBelow.push(i);
+                    } else {
+                        tier2SameColAbove.push(i);
+                    }
+                } else {
+                    if (!isSameRow) {
+                        tier3OtherColDiffRow.push(i);
+                    } else {
+                        tier4OtherColSameRow.push(i);
+                    }
+                }
+            }
+
+            const candidates = [
+                ...tier1SameColBelow,
+                ...tier2SameColAbove,
+                ...tier3OtherColDiffRow,
+                ...tier4OtherColSameRow
+            ];
+
+            if (skip < candidates.length) {
+                return candidates[skip];
             }
 
             return -1;
         }, { search: searchText, skip: skipCount });
 
-        if (freeIndex === -1) throw new Error(`No available slot found in the same column for student "${searchText}"`);
-        console.log(`Found available slot in same column at index ${freeIndex}`);
+        if (freeIndex === -1) throw new Error(`No available slot found for student "${searchText}"`);
+        console.log(`Found available slot for copy at index ${freeIndex}`);
         const slot = this.page.locator("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell'], #multiVehicleScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']").nth(freeIndex);
         await slot.scrollIntoViewIfNeeded();
         return slot;

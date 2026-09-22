@@ -20,7 +20,7 @@ import servicesData from '@test-data/json/servicesPackagesData.json';
  * Expected Result:
  *   Service (Package) should be created, verified, updated, and verified successfully
  **/
-test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify user able to add and update Services', { tag: '@accountManagement' }, async ({ page }) => {
+test('TC_034: C-Admin >> Account Management >> Services >> Services - To verify user able to add and update Services', { tag: ['@CAdmin', '@accountManagement'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const servicesPage = new ServicesPackagesPage(page);

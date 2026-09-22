@@ -18,7 +18,7 @@ import { credentials, currentEnv } from '@config/config';
  * Expected Result:
  *   Report should get displayed in pop-up modal with all column headers
  **/
-test('TC_063: C-Admin >> Report Center >> Business Report - To verify that Vehicle Hours Report report is getting displayed in popup', { tag: '@reportCenter' }, async ({ page }) => {
+test('TC_063: C-Admin >> Report Center >> Business Report - To verify that Vehicle Hours Report report is getting displayed in popup', { tag: ['@CAdmin', '@reportCenter'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);

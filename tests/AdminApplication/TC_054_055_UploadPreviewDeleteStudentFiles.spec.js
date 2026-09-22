@@ -21,7 +21,7 @@ import { credentials } from '@config/config';
  *   - File should get downloaded successfully
  *   - File should get deleted successfully and row count should increase and decrease accordingly
  **/
-test('TC_054_055: C-admin >> Student Account >> Files - Verify file upload, preview, download, and delete', { tag: '@studentAccount' }, async ({ page }) => {
+test('TC_054_055: C-admin >> Student Account >> Files - Verify file upload, preview, download, and delete', { tag: ['@CAdmin', '@studentAccount'] }, async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

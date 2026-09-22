@@ -14,7 +14,7 @@ import { credentials } from '@config/config';
  * Precondition: Create new appt using TC_001 (Appointment should be created for past date to verify this test case)
  * Expected Result: Appointment slot should become empty
  **/
-test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled", { tag: ['@scheduling', '@smoke'] }, async ({ page }) => {
+test("TC_004: C-admin > Scheduling - Verify that the appt is getting cancelled", { tag: ['@CAdmin', '@scheduling', '@smoke'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

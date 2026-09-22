@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
  *  Step 2: From the side menu, navigate to my schedule under scheduling
  * Expected Result: Student is able to navigate to My Schedule under Scheduling
  **/
-test('TC_075: CSP - To Verify My schedule is working', { tag: '@CSPScheduling' }, async ({ page }) => {
+test('TC_075: CSP - To Verify My schedule is working', { tag: ['@CSP', '@CSPScheduling'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

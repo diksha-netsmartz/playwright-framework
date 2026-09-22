@@ -21,7 +21,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   OE LEADS records should be Archived successfully and appear under Archived status.
  **/
-test('TC_044: C-Admin >> Student Leads >> OE Lead - To verify Archive', { tag: '@studentLeads' }, async ({ page }) => {
+test('TC_044: C-Admin >> Student Leads >> OE Lead - To verify Archive', { tag: ['@CAdmin', '@studentLeads'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const oeLeadPage = new OELeadPage(page);

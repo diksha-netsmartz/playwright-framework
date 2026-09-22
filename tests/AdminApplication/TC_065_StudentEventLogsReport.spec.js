@@ -17,7 +17,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   Report should get downloaded successfully with expected columns and sheet name
  **/
-test('TC_065: C-Admin >> Report Center >> Business Report - To verify that Student Event Logs report is getting downloaded', { tag: '@reportCenter' }, async ({ page }) => {
+test('TC_065: C-Admin >> Report Center >> Business Report - To verify that Student Event Logs report is getting downloaded', { tag: ['@CAdmin', '@reportCenter'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);

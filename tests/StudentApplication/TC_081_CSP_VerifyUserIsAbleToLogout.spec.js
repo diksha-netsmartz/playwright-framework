@@ -8,7 +8,7 @@ import { credentials } from '@config/config';
  * Test Case Title: To Verify user is able to logout.
  * Expected Result: Student user is able to log out from the student portal (CSP) and is redirected to the login page
  **/
-test('TC_081: CSP - To Verify user is able to logout', { tag: '@CSPLogout' }, async ({ page }) => {
+test('TC_081: CSP - To Verify user is able to logout', { tag: ['@CSP', '@CSPLogout'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

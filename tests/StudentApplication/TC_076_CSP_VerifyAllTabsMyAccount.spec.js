@@ -9,7 +9,7 @@ import { credentials } from '@config/config';
  * Test Case Title: To Verify all tabs are functional
  * Expected Result: All tabs under My Account (Overview, Profile, Enrollment/Billing, Appointments, Files, Quiz/Tests, Scan IN/OUT) should load and be functional
  **/
-test('TC_076: CSP - Verify all tabs under My Account are functional', { tag: ['@CSPMyAccount'] }, async ({ page }) => {
+test('TC_076: CSP - Verify all tabs under My Account are functional', { tag: ['@CSP', '@CSPMyAccount'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

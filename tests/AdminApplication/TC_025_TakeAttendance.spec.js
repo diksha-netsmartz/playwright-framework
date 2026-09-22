@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
  * Precondition: User should have valid admin login credentials and at least one classroom created
  * Expected Result: Attendance should be marked successfully for that session and student
  **/
-test('TC_025: C-admin > Classroom > Attendance - Take Attendance', { tag: '@classroom' }, async ({ page }) => {
+test('TC_025: C-admin > Classroom > Attendance - Take Attendance', { tag: ['@CAdmin', '@classroom'] }, async ({ page }) => {
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
   const attendancePage = new ClassroomAttendancePage(page);
