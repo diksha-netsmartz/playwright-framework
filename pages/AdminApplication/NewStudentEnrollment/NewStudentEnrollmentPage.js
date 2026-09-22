@@ -431,7 +431,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
             }
 
             if (await this.isVisible(this.address, { timeout: 100 }).catch(() => false) && data.address) {
-                await this.fill(this.address, data.address);
+                await this.fill(this.address, `${data.address}${Date.now()}`);
             }
 
             if (await this.isVisible(this.city, { timeout: 100 }).catch(() => false)) {
@@ -724,7 +724,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
             }
 
             if (await this.isVisible(this.address, { timeout: 100 }).catch(() => false) && data.address) {
-                await this.fill(this.address, data.address);
+                await this.fill(this.address, `${data.address}${this.uniqueId}`);
             }
 
             if (await this.isVisible(this.addressRadar, { timeout: 100 }).catch(() => false)) {
