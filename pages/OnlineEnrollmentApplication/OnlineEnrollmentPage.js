@@ -323,12 +323,6 @@ export default class OnlineEnrollmentPage extends BasePage {
                 }
                 await this.click(this.proceedButton);
                 await this.waitForHidden(this.proceedButton).catch(() => { });
-
-                // If Additional Product modal was underneath, dismiss it too
-                if (await this.isVisible(this.continueAdditionalProduct, { timeout: 2000 }).catch(() => false)) {
-                    await this.click(this.continueAdditionalProduct);
-                    await this.waitForHidden(this.continueAdditionalProduct).catch(() => { });
-                }
             }
         );
     }
