@@ -14,7 +14,7 @@ on:
           - uat
           - staging
       grep:
-        description: 'Tag or pattern to filter tests (e.g. @smoke, @reportCenter, leave empty for all)'
+        description: 'Tag or pattern to filter tests (e.g. @smoke, @CAdmin|@CSP, or comma-separated @CAdmin, @CSP, leave empty for all)'
         required: false
         default: ''
         type: string
@@ -74,7 +74,9 @@ jobs:
           CMD="HEADLESS=true VIEWPORT_WIDTH=1920 VIEWPORT_HEIGHT=1080 npx playwright test"
 
           if [ -n "$GREP" ]; then
-            CMD="$CMD --grep ${GREP}"
+            # Convert comma-separated tags (e.g. "@CAdmin, @CSP" or "@CAdmin , @CSP") to regex OR ("@CAdmin|@CSP")
+            GREP=$(echo "$GREP" | sed -E 's/[[:space:]]*,[[:space:]]*/|/g')
+            CMD="$CMD --grep \"${GREP}\""
           fi
 
           echo "Executing: $CMD"
