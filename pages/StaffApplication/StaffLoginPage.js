@@ -2,6 +2,7 @@ import BasePage from '@utils/BasePage';
 import config from '@config/config';
 import { test, expect } from '@playwright/test';
 import TwoFactorAuthPage from '@pages/Common/TwoFactorAuthPage';
+import StaffHomePage from './StaffHomePage';
 
 /**
  * Page Object representing the Staff Portal Login Page.
@@ -16,6 +17,7 @@ export default class StaffLoginPage extends BasePage {
     constructor(page) {
         super(page);
 
+        this.staffHomePage = new StaffHomePage(page);
         this.twoFactorAuthPage = new TwoFactorAuthPage(page);
         this.usernameTxt = page.getByRole('textbox', { name: 'Username' });
         this.passwordTxt = page.getByRole('textbox', { name: 'Password' });
@@ -123,6 +125,13 @@ export default class StaffLoginPage extends BasePage {
         await test.step('Verify logout redirected to Login Page', async () => {
             await this.verifyTitle("Login");
             await this.verifyVisible(this.loginBtn, 1000);
+        });
+        await test.step('Use browser Back button and verify protected CSP pages cannot be accessed without logging in again', async () => {
+            await this.page.goBack();
+            await this.waitForLoaders().catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
+            await this.verifyTitle("Login");
+            await this.verifyVisible(this.loginBtn, 5000);
         });
     }
 }
