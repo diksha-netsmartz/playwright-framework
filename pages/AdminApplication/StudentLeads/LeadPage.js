@@ -1,5 +1,6 @@
 import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
+import path from 'path';
 
 /**
  * Page Object representing the Add Lead Page in Admin Portal (Student Leads > Add Lead).
@@ -63,7 +64,7 @@ export default class LeadPage extends BasePage {
         // Yes Confirmation Button — shared XPath pattern used across Account Management pages
         this.yesConfirmationButton = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
 
-        // Edit Lead Locators (TC_041)
+        // Edit Lead Locators 
         this.staffValueDropdown = page.locator('span.valueSelected.staff-value');
         this.showAllStaffLeads = page.getByRole('link', { name: 'Show All Staff Leads' });
         this.editLeadModal = page.locator('#dealdetails');
@@ -87,6 +88,24 @@ export default class LeadPage extends BasePage {
         this.selectTime = page.getByRole('button', { name: 'Select Time' })
         this.taskTime = page.locator("(//button[contains(@data-id,'TaskTime')]//parent::div//following-sibling::div//li//a)[2]")
         this.actionLogs = page.locator('#divStaffActionLogs').first();
+
+
+        this.filesTab = page.locator("//a[@href='#tb_files']")
+        this.fileInput = page.locator('input[type="file"]').first();
+        this.browseFileButton = page.locator('#uploadimage:visible');
+        this.categoryDropdown = page.getByRole('button', { name: '--Select--' });
+        this.categoryDropdownOption = page.locator("(//select[@name='file_Category']//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
+        this.saveFilesButton = page.getByRole('button', { name: 'SAVE FILES' });
+        this.studentFileRow = page.locator('div.studentfilerow')
+
+        this.callsTab = page.locator("a[href='#tb_call']")
+        this.emergencyPhoneAddButton = page.locator("//label[contains(text(),'Emergency Phone')]//parent::b//button");
+        this.enterPhoneNumber = page.getByRole('textbox', { name: 'Enter Phone Number' })
+        this.addButton = page.locator('#btn_AddMissingNumber_LeadPage:visible')
+        this.addedSuccessMsg = page.getByText('Number added successfully.');
+        this.closeCallModal = page.locator("//button[@onclick='CloseMissingNumberModal()'][normalize-space()='Close']");
+        this.emergencyPhoneNumberText = page.locator("//label[contains(text(),'Emergency Phone')]//parent::b//a")
+
 
     }
     /**
@@ -293,6 +312,88 @@ export default class LeadPage extends BasePage {
     }
 
     /**
+     * Verifies the originally added lead details are correctly pre-populated in the edit modal.
+     * All field checks are guarded with isVisible so they skip gracefully on envs where fields are hidden.
+     * @param {Object} data - Lead test data fixture (same object passed to fillLeadDetails).
+     * @param {Object} createdLead - The returned object from fillLeadDetails with generated firstName/email.
+     **/
+    async verifyAddedLeadDetails(data, createdLead) {
+        await test.step('Step 7: Verify originally added lead details are pre-populated', async () => {
+            await this.waitForVisible(this.editSaveBtn);
+
+            // First Name (dynamically generated — use createdLead.firstName)
+            if (await this.isVisible(this.firstNameInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.firstNameInput).toHaveValue(createdLead.firstName);
+            }
+
+            // Middle Name
+            if (await this.isVisible(this.middleNameInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.middleNameInput).toHaveValue(data.middleName);
+            }
+
+            // Last Name
+            if (await this.isVisible(this.lastNameInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.lastNameInput).toHaveValue(data.lastName);
+            }
+
+            // Address
+            if (await this.isVisible(this.addressInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.addressInput).toHaveValue(data.address);
+            }
+
+            // City
+            if (await this.isVisible(this.cityInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.cityInput).toHaveValue(data.city);
+            }
+
+            // Zip Code
+            if (await this.isVisible(this.zipCodeInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.zipCodeInput).toHaveValue(data.zipCode);
+            }
+
+            // Email (from fillLeadDetails return — same as what was typed)
+            if (await this.isVisible(this.emailInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.emailInput).toHaveValue(createdLead.email);
+            }
+
+            // Home Phone
+            if (await this.isVisible(this.homePhoneInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.homePhoneInput).toHaveValue(data.homePhone);
+            }
+
+            // Cell Phone
+            if (await this.isVisible(this.cellPhoneInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.cellPhoneInput).toHaveValue(data.cellPhone);
+            }
+
+            // Parent Phone
+            if (await this.isVisible(this.parentPhoneInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.parentPhoneInput).toHaveValue(data.parentPhone);
+            }
+
+            // Other Phone
+            if (await this.isVisible(this.otherPhoneInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.otherPhoneInput).toHaveValue(data.otherPhone);
+            }
+
+            // Medical Conditions
+            if (await this.isVisible(this.medicalConditionsInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.medicalConditionsInput).toHaveValue(data.medicalConditions);
+            }
+
+            // Student Notes
+            if (await this.isVisible(this.studentNotesInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.studentNotesInput).toHaveValue(data.studentNotes);
+            }
+
+            // Preferred Date and Time
+            if (await this.isVisible(this.preferredDateandTimeInput, { timeout: 100 }).catch(() => false)) {
+                await expect(this.preferredDateandTimeInput).toHaveValue(data.preferredDateandTime);
+            }
+        });
+    }
+
+    /**
      * Updates the Lead fields with new values.
      * @param {Object} updatedData - New field values to populate.
      **/
@@ -323,46 +424,100 @@ export default class LeadPage extends BasePage {
     /**
  * Add and save notes while updating lead
  **/
-    async updateNotes(notes) {
+    async addNotes(notes) {
         if (await this.isVisible(this.notesTextarea, { timeout: 100 })) {
-            await this.fill(this.notesTextarea, notes);
-            await this.click(this.saveNoteButton);
-            await this.waitForVisible(this.yesConfirmationButton);
-            await this.click(this.yesConfirmationButton);
-            const successMsg = this.page.getByText('Note added successfully.');
-            await this.waitForVisible(successMsg);
-            await this.verifyVisible(successMsg);
+            await test.step('Add and save note', async () => {
+                await this.fill(this.notesTextarea, notes);
+                await this.click(this.saveNoteButton);
+                await this.waitForVisible(this.yesConfirmationButton);
+                await this.click(this.yesConfirmationButton);
+                const successMsg = this.page.getByText('Note added successfully.');
+                await this.waitForVisible(successMsg);
+                await this.verifyVisible(successMsg);
+            });
         }
     }
 
     /**
+* Add and save files while updating lead
+**/
+    async addFile(filePath) {
+        if (await this.isVisible(this.filesTab, { timeout: 100 })) {
+            await test.step('Upload file in Files tab', async () => {
+                await this.click(this.filesTab);
+                const fileChooserPromise = this.page.waitForEvent('filechooser');
+                await this.click(this.browseFileButton);
+                const fileChooser = await fileChooserPromise;
+                await fileChooser.setFiles(filePath);
+                await this.waitForLoaders();
+                await this.page.waitForTimeout(1000);
+                await this.waitForVisible(this.categoryDropdown);
+                await this.click(this.categoryDropdown);
+                await this.waitForVisible(this.categoryDropdownOption);
+                await this.click(this.categoryDropdownOption);
+                await this.click(this.saveFilesButton);
+                await this.waitForLoaders();
+                await this.page.waitForLoadState('load', { timeout: 30000 }).catch(() => { });
+                await this.waitForVisible(this.page.getByText('File(s) uploaded successfully.', { exact: true }));
+                await this.verifyVisible(this.page.getByText('File(s) uploaded successfully.', { exact: true }));
+            });
+        }
+    }
+
+    /**
+* Add and save phone number while updating lead
+**/
+    async addPhoneInCallsTab(phoneNumber) {
+        if (await this.isVisible(this.callsTab, { timeout: 100 })) {
+            await test.step('Add emergency phone number in Calls tab', async () => {
+                await this.click(this.callsTab);
+                await this.click(this.emergencyPhoneAddButton);
+                await this.waitForVisible(this.enterPhoneNumber);
+                await this.fill(this.enterPhoneNumber, phoneNumber);
+                await this.click(this.addButton);
+                await this.click(this.yesConfirmationButton);
+                await this.waitForLoaders();
+                await this.page.waitForLoadState('load', { timeout: 30000 }).catch(() => { });
+                await this.waitForVisible(this.addedSuccessMsg);
+                await this.verifyVisible(this.addedSuccessMsg);
+                await this.click(this.closeCallModal);
+                await this.waitForHidden(this.closeCallModal);
+            });
+        }
+    }
+
+
+
+    /**
 * Add and save task while updating lead
 **/
-    async updateTask(taskSubject, taskNote) {
+    async addTask(taskSubject, taskNote) {
         if (await this.isVisible(this.tasktab, { timeout: 100 })) {
-            await this.click(this.tasktab);
-            await this.waitForVisible(this.taskSubject);
-            await this.fill(this.taskSubject, taskSubject);
-            await this.click(this.taskStatusDropdown);
-            await this.waitForVisible(this.statusDropdownValueNew);
-            await this.click(this.statusDropdownValueNew);
-            await this.click(this.dueDateCalendar);
-            await this.waitForVisible(this.lastday);
-            await this.click(this.lastday);
-            await this.click(this.selectTime);
-            await this.waitForVisible(this.taskTime);
-            await this.click(this.taskTime);
-            await this.click(this.taskAssignToMeDropdown)
-            await this.waitForVisible(this.taskAssignToMeDropdownValue);
-            await this.click(this.taskAssignToMeDropdownValue);
-            await this.click(this.priorityButton);
-            await this.fill(this.taskNote, taskNote);
-            await this.click(this.saveTaskButton);
-            await this.waitForVisible(this.yesConfirmationButton);
-            await this.click(this.yesConfirmationButton);
-            const successMsg = this.page.getByText('Task added successfully.').first();
-            await this.waitForVisible(successMsg);
-            await this.verifyVisible(successMsg);
+            await test.step('Add and save task in Tasks tab', async () => {
+                await this.click(this.tasktab);
+                await this.waitForVisible(this.taskSubject);
+                await this.fill(this.taskSubject, taskSubject);
+                await this.click(this.taskStatusDropdown);
+                await this.waitForVisible(this.statusDropdownValueNew);
+                await this.click(this.statusDropdownValueNew);
+                await this.click(this.dueDateCalendar);
+                await this.waitForVisible(this.lastday);
+                await this.click(this.lastday);
+                await this.click(this.selectTime);
+                await this.waitForVisible(this.taskTime);
+                await this.click(this.taskTime);
+                await this.click(this.taskAssignToMeDropdown);
+                await this.waitForVisible(this.taskAssignToMeDropdownValue);
+                await this.click(this.taskAssignToMeDropdownValue);
+                await this.click(this.priorityButton);
+                await this.fill(this.taskNote, taskNote);
+                await this.click(this.saveTaskButton);
+                await this.waitForVisible(this.yesConfirmationButton);
+                await this.click(this.yesConfirmationButton);
+                const successMsg = this.page.getByText('Task added successfully.').first();
+                await this.waitForVisible(successMsg);
+                await this.verifyVisible(successMsg);
+            });
         }
     }
 
@@ -421,6 +576,16 @@ export default class LeadPage extends BasePage {
 
             if (await this.isVisible(this.taskSubject, { timeout: 100 }).catch(() => false)) {
                 await expect(this.actionLogs).toContainText(expectedData.taskSubject);
+            }
+            if (await this.isVisible(this.filesTab, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.filesTab);
+                await this.verifyVisible(this.studentFileRow);
+            }
+
+            if (await this.isVisible(this.callsTab, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.callsTab);
+                await this.verifyVisible(this.emergencyPhoneNumberText);
+                await expect(this.emergencyPhoneNumberText).toContainText(expectedData.emergencyPhone);
             }
 
         });
