@@ -101,6 +101,17 @@ jobs:
           EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME || 'testingdata3011@gmail.com' }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj' }}
           EMAIL_TO: ${{ github.event.inputs.recipients || 'diksha.gupta@netsmartz.com' }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: node scripts/send-email.js
+
+      - name: Upload Lightweight Allure Report (for quick download)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report-zip
+          path: Allure-Report.zip
+          retention-days: 14
+          if-no-files-found: warn
 
 

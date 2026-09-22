@@ -122,6 +122,11 @@ async function sendEmail() {
     console.warn('[Email] Warning: Could not generate Allure single-file report zip:', err.message);
   }
 
+  // Export zip path for GitHub Actions artifact upload step
+  if (zipExists) {
+    console.log(`[Email] ALLURE_ZIP_PATH=${zipPath}`);
+  }
+
   const emailUser = process.env.EMAIL_USERNAME || 'testingdata3011@gmail.com';
   const emailPass = process.env.EMAIL_PASSWORD || 'uazx hbyz rwjf arwj';
   const defaultRecipients = 'diksha.gupta@netsmartz.com, abhishek.gautam@netsmartz.net, manpreet.lamba@netsmartz.com, jitesh.bhardwaj@netsmartz.com, manjit.kumar@netsmartz.com';
@@ -133,6 +138,12 @@ async function sendEmail() {
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
+    pool: true,              // Use connection pooling for reliability
+    maxConnections: 3,
+    maxMessages: 10,
+    connectionTimeout: 30000,  // 30s to establish connection
+    greetingTimeout: 15000,    // 15s for SMTP greeting
+    socketTimeout: 60000,      // 60s socket inactivity timeout
     auth: {
       user: emailUser,
       pass: emailPass
@@ -223,28 +234,53 @@ async function sendEmail() {
   }
 
   const recipientList = emailTo.split(',').map((e) => e.trim()).filter(Boolean);
-  console.log(`[Email] Sending execution notification to ${recipientList.length} recipient(s)...`);
+  const toField = recipientList.join(', ');
+  console.log(`[Email] Sending execution notification to ${recipientList.length} recipient(s): ${toField}`);
 
-  let successCount = 0;
-  for (const recipient of recipientList) {
+  // Verify SMTP connection before attempting to send
+  try {
+    await transporter.verify();
+    console.log('[Email] SMTP connection verified successfully.');
+  } catch (verifyErr) {
+    console.error(`[Email] SMTP connection verification failed: ${verifyErr.message}`);
+    throw verifyErr;
+  }
+
+  const MAX_RETRIES = 3;
+  let lastError;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
+      // Send ONE email with all recipients in the 'to' field.
+      // This avoids Gmail rate-limiting that occurs when sending
+      // multiple separate SMTP transactions in quick succession.
       const info = await transporter.sendMail({
         from: `"Playwright Automation" <${emailUser}>`,
-        to: recipient,
+        to: toField,
         subject: `DSS Playwright Test Run [${statusText}]: ${envName}`,
         html: htmlBody,
         attachments: attachments
       });
-      console.log(`[Email] Successfully delivered to: ${recipient} (Message ID: ${info.messageId})`);
-      successCount++;
-    } catch (recipientErr) {
-      console.error(`[Email] Failed to deliver to: ${recipient} - ${recipientErr.message}`);
+      console.log(`[Email] Successfully delivered to all ${recipientList.length} recipient(s). (Message ID: ${info.messageId})`);
+      recipientList.forEach((r) => console.log(`  ✓ ${r}`));
+      break; // success — exit retry loop
+    } catch (err) {
+      lastError = err;
+      const waitMs = Math.pow(2, attempt - 1) * 5000; // 5s, 10s, 20s
+      console.warn(`[Email] Attempt ${attempt}/${MAX_RETRIES} failed: ${err.message}`);
+      if (attempt < MAX_RETRIES) {
+        console.log(`[Email] Retrying in ${waitMs / 1000}s...`);
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      } else {
+        console.error(`[Email] All ${MAX_RETRIES} attempts failed.`);
+        throw new Error(`Failed to deliver email after ${MAX_RETRIES} attempts: ${lastError.message}`);
+      }
     }
   }
 
-  if (successCount === 0 && recipientList.length > 0) {
-    throw new Error('Failed to deliver email to any of the specified recipients.');
-  }
+  // Close connection pool gracefully
+  transporter.close();
+
 }
 
 if (require.main === module) {
