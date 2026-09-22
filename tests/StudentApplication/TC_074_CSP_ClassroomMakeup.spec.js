@@ -17,7 +17,7 @@ import { credentials } from '@config/config';
  *  Step 6: Click on select to choose available makeup slot and verify enrollment success
  * Expected Result: Student is able to book makeup class and is enrolled successfully
  **/
-test('TC_074: CSP - To Verify student is able to perform makeup', { tag: ['@CSPScheduling'] }, async ({ page }) => {
+test('TC_074: CSP - To Verify student is able to perform makeup', { tag: ['@CSP', '@CSPScheduling'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

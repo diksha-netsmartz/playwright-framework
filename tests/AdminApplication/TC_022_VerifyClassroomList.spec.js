@@ -10,7 +10,7 @@ import { credentials } from '@config/config';
  * Precondition: User should have valid admin login credentials
  * Expected Result: The class list should appear successfully
  **/
-test('TC_022: C-admin > Classroom > Classroom List - To verify CR List showing', { tag: '@classroom' }, async ({ page }) => {
+test('TC_022: C-admin > Classroom > Classroom List - To verify CR List showing', { tag: ['@CAdmin', '@classroom'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const classListPage = new ClassListPage(page);

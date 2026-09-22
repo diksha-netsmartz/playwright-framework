@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
  * Precondition: Student should be created first
  * Expected Result: Enrollment is Added, Edit and Deleted.
  **/
-test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Delete Package', { tag: ['@studentAccount', '@smoke'] }, async ({ page }) => {
+test('TC_007: C-admin > Student > Enrollment - Verify User can Add, Edit and Delete Package', { tag: ['@CAdmin', '@studentAccount', '@smoke'] }, async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

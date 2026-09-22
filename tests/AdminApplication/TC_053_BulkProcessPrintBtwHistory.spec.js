@@ -19,7 +19,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   The BTW History PDF should download successfully and contain expected table columns
  **/
-test('TC_053: C-Admin >> Scheduling >> Manage Time Slots >> Bulk Process - To verify user able to print BTW history', { tag: '@scheduling' }, async ({ page }) => {
+test('TC_053: C-Admin >> Scheduling >> Manage Time Slots >> Bulk Process - To verify user able to print BTW history', { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const bulkProcessPage = new BulkProcessPage(page);

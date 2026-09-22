@@ -18,7 +18,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   Appointment status should change to completed ("Appointments status updated successfully!!")
  **/
-test('TC_052: C-Admin >> Scheduling >> Manage Time Slots >> Bulk Process - To Verify user able to complete appointment', { tag: '@scheduling' }, async ({ page }) => {
+test('TC_052: C-Admin >> Scheduling >> Manage Time Slots >> Bulk Process - To Verify user able to complete appointment', { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
   const loginPage = new LoginPage(page);
   const homePage = new HomePage(page);
   const bulkProcessPage = new BulkProcessPage(page);

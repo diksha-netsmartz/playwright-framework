@@ -14,7 +14,7 @@ import { credentials } from '@config/config';
  * Precondition: TC_001 should be executed
  * Expected Result: Appointment should get deleted successfully and removed from the graphical scheduler
  **/
-test("TC_003: C-admin > Scheduling - Verify that the appt is getting deleted", { tag: ['@scheduling', '@smoke'] }, async ({ page }) => {
+test("TC_003: C-admin > Scheduling - Verify that the appt is getting deleted", { tag: ['@CAdmin', '@scheduling', '@smoke'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

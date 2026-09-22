@@ -8,7 +8,7 @@ import { credentials } from '@config/config';
  * Test Case Title: To Verify Quick links are working
  * Expected Result: Student is able to navigate and verify all Quick Links on the student portal homepage across environments
  **/
-test('TC_079: CSP - To Verify Quick links are working', { tag: '@CSPHomepage' }, async ({ page }) => {
+test('TC_079: CSP - To Verify Quick links are working', { tag: ['@CSP', '@CSPHomepage'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

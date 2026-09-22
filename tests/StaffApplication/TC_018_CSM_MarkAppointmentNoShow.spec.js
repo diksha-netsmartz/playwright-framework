@@ -9,7 +9,7 @@ import { credentials } from '@config/config';
  * Precondition: There should be a Past Appointment or should be created using TC-001 with staff - test, instructor6
  * Expected Result: Appointment Marked No show successfully message should display
  **/
-test('TC_018: CSM - Verify no show functionality', { tag: ['@CSMHomepage', '@smoke'] }, async ({ page }) => {
+test('TC_018: CSM - Verify no show functionality', { tag: ['@CSM', '@CSMHomepage', '@smoke'] }, async ({ page }) => {
 
     const staffLoginPage = new StaffLoginPage(page);
     const staffHomePage = new StaffHomePage(page);

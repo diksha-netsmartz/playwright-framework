@@ -19,7 +19,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   OE LEADS records should be Deleted successfully ("OE Lead Deleted successfully.")
  **/
-test('TC_043: C-Admin >> Student Leads >> OE Lead - To verify Delete', { tag: '@studentLeads' }, async ({ page }) => {
+test('TC_043: C-Admin >> Student Leads >> OE Lead - To verify Delete', { tag: ['@CAdmin', '@studentLeads'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const oeLeadPage = new OELeadPage(page);

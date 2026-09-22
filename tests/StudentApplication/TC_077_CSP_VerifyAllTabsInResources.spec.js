@@ -9,7 +9,7 @@ import StudentResourcesPage from '@pages/StudentApplication/StudentResourcesPage
  * Test Case Title: To Verify all tabs are functional
  * Expected Result: All tabs under Resources should load and be functional
  **/
-test('TC_077: CSP - Verify all tabs under Resources are functional', { tag: '@CSPResources' }, async ({ page }) => {
+test('TC_077: CSP - Verify all tabs under Resources are functional', { tag: ['@CSP', '@CSPResources'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

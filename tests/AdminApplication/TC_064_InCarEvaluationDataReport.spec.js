@@ -17,7 +17,7 @@ import { credentials, currentEnv } from '@config/config';
  * Expected Result:
  *   Report should get downloaded successfully
  **/
-test('TC_064: C-Admin >> Report Center >> Business Report - To verify that In-Car Evaluation Data Report is getting downloaded', { tag: '@reportCenter' }, async ({ page }) => {
+test('TC_064: C-Admin >> Report Center >> Business Report - To verify that In-Car Evaluation Data Report is getting downloaded', { tag: ['@CAdmin', '@reportCenter'] }, async ({ page }) => {
     test.setTimeout(360000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

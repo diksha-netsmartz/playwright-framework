@@ -18,7 +18,7 @@ import { credentials, currentEnv } from '@config/config';
  * Expected Result:
  *   Report should get downloaded successfully and attached to the test report
  **/
-test('TC_059: C-Admin >> Report Center >> Business Report - To verify that Attendance Sheet Report report is getting downloaded', { tag: '@reportCenter' }, async ({ page }) => {
+test('TC_059: C-Admin >> Report Center >> Business Report - To verify that Attendance Sheet Report report is getting downloaded', { tag: ['@CAdmin', '@reportCenter'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);

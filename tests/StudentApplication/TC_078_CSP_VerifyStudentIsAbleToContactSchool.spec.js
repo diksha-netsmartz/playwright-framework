@@ -10,7 +10,7 @@ import { credentials } from '@config/config';
  * Test Case Title: To Verify student is able to contact school
  * Expected Result: Student is able to navigate to Contact page, open the Email Us form, submit the message, verify mail is sent successfully, and verify email is received in inbox
  **/
-test('TC_078: CSP - To Verify student is able to contact school', { tag: '@CSPContact' }, async ({ page }) => {
+test('TC_078: CSP - To Verify student is able to contact school', { tag: ['@CSP', '@CSPContact'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
   const studentHomePage = new StudentHomePage(page);

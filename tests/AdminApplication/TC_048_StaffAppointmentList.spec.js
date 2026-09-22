@@ -16,7 +16,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   Staff appointment records should be displayed
  **/
-test('TC_048: C-Admin >> Scheduling >> Staff Appointment List - To verify staff appointment list working', { tag: '@scheduling' }, async ({ page }) => {
+test('TC_048: C-Admin >> Scheduling >> Staff Appointment List - To verify staff appointment list working', { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const staffAppointmentListPage = new StaffAppointmentListPage(page);

@@ -12,7 +12,7 @@ import { credentials } from '@config/config';
  * - CR attendance Roster report should be exported successfully in PDF format
  * - CR attendance Roster report should be exported successfully in EXCEL format
  **/
-test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag: '@classroom' }, async ({ page }) => {
+test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag: ['@CAdmin', '@classroom'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);

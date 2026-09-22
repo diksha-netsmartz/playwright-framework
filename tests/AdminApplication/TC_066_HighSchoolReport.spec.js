@@ -20,7 +20,7 @@ import { credentials } from '@config/config';
  * Expected Result:
  *   Report should get displayed in pop-up modal with High School and # of Students
  **/
-test('TC_066: C-Admin >> Report Center >> Business Report - To verify that High School Report is getting displayed in popup', { tag: '@reportCenter' }, async ({ page }) => {
+test('TC_066: C-Admin >> Report Center >> Business Report - To verify that High School Report is getting displayed in popup', { tag: ['@CAdmin', '@reportCenter'] }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const businessReportsPage = new BusinessReportsPage(page);
