@@ -13,6 +13,11 @@ test('TC_085: CSM - Verify that the file is getting uploaded', { tag: ['@CSM', '
     const staffLoginPage = new StaffLoginPage(page);
     const staffHomePage = new StaffHomePage(page);
     const studentName = credentials.studentUser.name;
+    const uploadFilePaths = [
+        'test-data/uploads/uploadFile.jpg',
+        'test-data/uploads/vehicle.png',
+        'test-data/uploads/sample.pdf'
+    ];
 
     await test.step('Step 1: Login to staff portal (CSM) with valid credentials', async () => {
         await staffLoginPage.navigateToLoginPage();
@@ -20,7 +25,7 @@ test('TC_085: CSM - Verify that the file is getting uploaded', { tag: ['@CSM', '
     });
 
     await test.step('Step 2-4: Upload file in "Upload Files" widget and verify success', async () => {
-        await staffHomePage.uploadFile('test-data/uploads/uploadFile.jpg', studentName);
+        await staffHomePage.uploadFiles(uploadFilePaths, studentName);
         await staffHomePage.verifyUploadSuccess();
     });
 
