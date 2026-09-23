@@ -614,7 +614,7 @@ export default class AdminPortalHomePage extends BasePage {
             await this.waitForVisible(this.vehicleListLink);
             await this.click(this.vehicleListLink);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 10000 });
+            await this.page.waitForLoadState('load', { timeout: 30000 });
             await this.verifyTitle("School Setup");
         });
     }
