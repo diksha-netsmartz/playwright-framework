@@ -4,6 +4,33 @@
 export default class DateHelper {
 
     /**
+     * Converts a GMT date string into EST text in the format used on the admin portal.
+     * @param {string} gmtDateString - GMT date string.
+     * @returns {string}
+     */
+    static convertGMTToEST(gmtDateString) {
+        const parsedDate = new Date(gmtDateString);
+        if (Number.isNaN(parsedDate.getTime())) {
+            throw new Error(`Invalid GMT date: ${gmtDateString}`);
+        }
+
+        const formattedParts = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/New_York',
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        }).formatToParts(parsedDate);
+
+        const getPart = (type) => formattedParts.find((part) => part.type === type)?.value || '';
+
+        return `${getPart('weekday')}, ${getPart('month')} ${getPart('day')}, ${getPart('year')} at ${getPart('hour')}:${getPart('minute')} ${getPart('dayPeriod')} EST`;
+    }
+
+    /**
      * Formats a JavaScript Date object into MM/DD/YYYY string format.
      * @param {Date} date - Date object.
      * @returns {string} Formatted date string (e.g. "08/31/2026").
@@ -714,7 +741,6 @@ export default class DateHelper {
         };
     }
 }
-
 
 
 

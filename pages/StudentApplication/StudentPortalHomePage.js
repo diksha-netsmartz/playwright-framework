@@ -1,4 +1,6 @@
+import path from 'path';
 import BasePage from '@utils/BasePage';
+import DateHelper from '@utils/DateHelper';
 import { expect, test } from '@playwright/test';
 import paymentData from '@test-data/json/paymentData.json';
 
@@ -19,6 +21,7 @@ export default class StudentPortalHomePage extends BasePage {
         this.fileInput = page.locator('input[type="file"][multiple]').first();
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
         this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files')]");
+        this.lastUploadedOnValues = [];
         this.chooseFileBtn = page.locator("#uploadimageChoose").first();
         this.enrollNavLink = page.locator('#Marketplace_li');
         this.myAccountNavLink = page.locator("#MyAccount_li");
@@ -46,8 +49,8 @@ export default class StudentPortalHomePage extends BasePage {
         this.quickLinkItems = page.locator("ul.page-sidebar-menu > li:not(.sidebar-toggler-wrapper):not(.sidebar-search-wrapper)");
         this.quickLinks = page.locator("ul.page-sidebar-menu > li:not(.sidebar-toggler-wrapper):not(.sidebar-search-wrapper) > a");
 
-        this.categoryDropdown = page.getByRole('button', { name: '--Select--' });
-        this.categoryDropdownOption = page.locator("(//select[@name='file_Category']//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
+        this.categoryDropdowns = page.getByRole('button', { name: '--Select--' }).first();
+        this.categoryDropdownOption = (/** @type {number} */ index) => this.page.locator(`((//select[@name='file_Category'])[${index + 1}]//parent::div//li//span[1][not(contains(text(),'Select'))])[1]`);
 
         // Pay Balance / Payment Modal Locators
         this.payNowLink = page.locator("//a[normalize-space()='Pay Now']")
@@ -126,7 +129,8 @@ export default class StudentPortalHomePage extends BasePage {
             await this.waitForVisible(this.appointmentsNavLink, 5000);
             await this.click(this.appointmentsNavLink);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+            });
             await this.waitForLoaders();
         });
     }
@@ -144,8 +148,8 @@ export default class StudentPortalHomePage extends BasePage {
     }
 
     /**
- * Navigates to the classes page by clicking 'Resources' and then 'Classes' in the left navigation.
- **/
+     * Navigates to the classes page by clicking 'Resources' and then 'Classes' in the left navigation.
+     **/
     async navigateToClassInResources() {
         await test.step('Navigate to Classes (Resources -> Classes)', async () => {
             await this.click(this.resourcesNavLink);
@@ -166,7 +170,8 @@ export default class StudentPortalHomePage extends BasePage {
             await this.waitForVisible(this.scheduleMyLessonsSubLink, 2000);
             await this.click(this.scheduleMyLessonsSubLink);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 15000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 15000 }).catch(() => {
+            });
             await this.waitForLoaders();
             await this.verifyURLContainsText("BtwScheduling/Lessons");
         });
@@ -183,7 +188,8 @@ export default class StudentPortalHomePage extends BasePage {
             await this.waitForVisible(this.myScheduleSubLink, 2000);
             await this.click(this.myScheduleSubLink);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 15000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 15000 }).catch(() => {
+            });
             await this.waitForLoaders();
             await this.verifyURLContainsText("BtwScheduling/Lessons");
         });
@@ -199,7 +205,8 @@ export default class StudentPortalHomePage extends BasePage {
             await this.waitForVisible(this.userDropdownLogoutBtn, 1000);
             await this.click(this.userDropdownLogoutBtn);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+            });
             await this.waitForLoaders();
         });
     }
@@ -254,7 +261,8 @@ export default class StudentPortalHomePage extends BasePage {
             await this.waitForVisible(this.homeNavLink, 500);
             await this.click(this.homeNavLink);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 1000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 1000 }).catch(() => {
+            });
             await this.waitForLoaders();
             await this.waitForVisible(this.quickLinksWidget, 5000);
         }
@@ -304,14 +312,17 @@ export default class StudentPortalHomePage extends BasePage {
                         }
 
                         if (popupPage) {
-                            await popupPage.waitForLoadState('domcontentloaded').catch(() => { });
-                            await popupPage.close().catch(() => { });
+                            await popupPage.waitForLoadState('domcontentloaded').catch(() => {
+                            });
+                            await popupPage.close().catch(() => {
+                            });
                         }
                     } else {
                         // Internal navigation within the same tab
                         await this.click(linkToClick);
                         await this.waitForLoaders();
-                        await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => { });
+                        await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
+                        });
                         await this.waitForLoaders();
 
                         const currentTitle = await this.getPageTitle();
@@ -326,7 +337,8 @@ export default class StudentPortalHomePage extends BasePage {
                             await this.page.goBack();
                             // await this.click(this.loginBtn);
                             await this.waitForLoaders();
-                            await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => { });
+                            await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
+                            });
                             await this.waitForLoaders();
                         }
                     }
@@ -363,7 +375,8 @@ export default class StudentPortalHomePage extends BasePage {
                     await test.step(`Navigate Quick Link: "${topText}"`, async () => {
                         await this.click(topA);
                         await this.waitForLoaders();
-                        await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => { });
+                        await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
+                        });
                         await this.waitForLoaders();
                         await this.verifyLinkTitle(topText);
                         totalNavigated++;
@@ -391,12 +404,12 @@ export default class StudentPortalHomePage extends BasePage {
                             await test.step(`Click Sub-Link [${j + 1}/${subCount}]: "${subText}" under "${topText}"`, async () => {
                                 await this.click(targetSubLink);
                                 await this.waitForLoaders();
-                                await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => { });
+                                await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
+                                });
                                 await this.waitForLoaders();
                                 if ((await this.getPageTitle()).length > 0) {
                                     await this.verifyLinkTitle(subText);
-                                }
-                                else if (await this.isVisible(this.pageTitle, { timeout: 2000 })) {
+                                } else if (await this.isVisible(this.pageTitle, { timeout: 2000 })) {
                                     await expect(await this.pageTitle.textContent()).toContain(subText);
                                 }
                                 totalNavigated++;
@@ -411,23 +424,62 @@ export default class StudentPortalHomePage extends BasePage {
     }
 
     /**
-     * Uploads a document/file by setting the file input, clicking upload, and waiting for loaders to disappear.
-     * @param {string} filePath - Absolute or relative path to the file to upload.
+     * Uploads one or more documents/files and selects a category for each staged file.
+     * @param {string|string[]} filePaths - Absolute or relative path(s) to the file(s) to upload.
      **/
-    async uploadFile(filePath) {
-        await test.step(`Upload student file: ${filePath}`, async () => {
+    async uploadFiles(filePaths) {
+        const filesToUpload = Array.isArray(filePaths) ? filePaths : [filePaths];
+        const resolvedPaths = filesToUpload.map((filePath) => path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath));
+
+        await test.step(`Upload ${filesToUpload.length} student file(s)`, async () => {
             await this.waitForVisible(this.uploadFilesWidget);
             await this.verifyVisible(this.uploadFilesWidget, 5000);
             await this.uploadFilesWidget.scrollIntoViewIfNeeded();
-            await this.setInputFiles(this.fileInput, filePath);
-            await this.waitForVisible(this.categoryDropdown);
-            await this.click(this.categoryDropdown);
-            await this.waitForVisible(this.categoryDropdownOption);
-            await this.click(this.categoryDropdownOption);
+            await this.setInputFiles(this.fileInput, resolvedPaths);
+
+            for (let i = 0; i < resolvedPaths.length; i++) {
+                await this.waitForVisible(this.categoryDropdowns);
+                await this.click(this.categoryDropdowns);
+                await this.waitForVisible(this.categoryDropdownOption(i));
+                await this.click(this.categoryDropdownOption(i));
+            }
+
+            const uploadResponsePromise = this.page.waitForResponse((response) =>
+                response.url().includes('StudentCenterUploadCategory')
+                && response.request().method() === 'POST'
+                && response.status() === 200
+                , { timeout: 12000 });
+
             await this.click(this.uploadBtn);
+            const uploadResponse = await uploadResponsePromise;
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+            });
+
+            this.lastUploadedOnValues = this.getUploadedOnValuesFromResponse(uploadResponse, filesToUpload.length);
         });
+    }
+
+    /**
+     * Returns the last uploaded-on values captured from the upload API response.
+     * @returns {string[]}
+     **/
+    getLastUploadedOnValues() {
+        return [...this.lastUploadedOnValues];
+    }
+
+    /**
+     * Returns one admin-portal-formatted uploaded-on value per uploaded file using the upload API response Date header.
+     * @param {import('@playwright/test').Response} response - Upload API response.
+     * @param {number} fileCount - Number of uploaded files.
+     * @returns {string[]}
+     **/
+    getUploadedOnValuesFromResponse(response, fileCount) {
+        const responseDateHeader = response.headers()['date'];
+        expect(responseDateHeader, 'Expected upload response to include a Date header.').toBeTruthy();
+
+        const uploadedOnValue = DateHelper.convertGMTToEST(responseDateHeader);
+        return Array.from({ length: fileCount }, () => uploadedOnValue);
     }
 
     /**
@@ -436,7 +488,8 @@ export default class StudentPortalHomePage extends BasePage {
     async verifyUploadSuccess() {
         await test.step('Verify file upload success message', async () => {
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+            });
             // await this.isVisible(this.chooseFileBtn);
             await this.waitForVisible(this.page.getByText('Success! Upload has been completed.', { exact: true }).first(), 60000);
             await this.verifyVisible(this.page.getByText('Success! Upload has been completed.', { exact: true }).first(), 20000);
@@ -491,7 +544,8 @@ export default class StudentPortalHomePage extends BasePage {
                 .or(this.paymentFormCardNumber)
                 .or(this.cardNumber);
 
-            await cardGateway.first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => { });
+            await cardGateway.first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {
+            });
 
             // Fill card details for the active gateway only
             if (await this.stripeCardNumberIframe.isVisible().catch(() => false)) {
