@@ -41,6 +41,64 @@ export default class BasePage {
     }
 
     /**
+     * Clicks on an element, awaits the document navigation response, verifies the HTTP status code,
+     * and waits for page loaders and load state to complete.
+     * @param {import('@playwright/test').Locator} locator - Target element locator.
+     * @param {Object} [options] - Navigation options.
+     * @param {number} [options.expectedStatus=200] - Expected HTTP status code.
+     * @param {number} [options.responseTimeout=5000] - Timeout waiting for navigation response in ms.
+     * @param {number} [options.loadTimeout=3000] - Timeout waiting for load state in ms.
+     * @returns {Promise<import('@playwright/test').Response|null>} The navigation response or null.
+     */
+    async clickAndVerifyNavigation(locator, options = {}) {
+        const expectedStatus = options.expectedStatus ?? 200;
+        const responseTimeout = options.responseTimeout ?? 5000;
+        const loadTimeout = options.loadTimeout ?? 3000;
+
+        const responsePromise = this.page.waitForResponse(
+            (resp) => resp.request().isNavigationRequest() && !resp.status().toString().startsWith('3'),
+            { timeout: responseTimeout }
+        ).catch(() => null);
+
+        await this.click(locator);
+        const response = await responsePromise;
+
+        if (response) {
+            expect(response.status()).toBe(expectedStatus);
+        }
+
+        await this.waitForLoaders();
+        await this.page.waitForLoadState('load', { timeout: loadTimeout }).catch(() => {});
+        await this.waitForLoaders();
+
+        return response;
+    }
+
+    /**
+     * Verifies the document navigation response status of a popup/newly-opened page.
+     * @param {import('@playwright/test').Page} popupPage - The newly opened page/tab.
+     * @param {Object} [options] - Options.
+     * @param {number} [options.expectedStatus=200] - Expected HTTP status code.
+     * @param {number} [options.responseTimeout=5000] - Timeout waiting for navigation response in ms.
+     * @returns {Promise<import('@playwright/test').Response|null>}
+     */
+    async verifyPopupNavigation(popupPage, options = {}) {
+        const expectedStatus = options.expectedStatus ?? 200;
+        const responseTimeout = options.responseTimeout ?? 5000;
+
+        const response = await popupPage.waitForResponse(
+            (resp) => resp.request().isNavigationRequest() && !resp.status().toString().startsWith('3'),
+            { timeout: responseTimeout }
+        ).catch(() => null);
+
+        if (response) {
+            expect(response.status()).toBe(expectedStatus);
+        }
+
+        return response;
+    }
+
+    /**
      * Performs a JavaScript DOM click directly on an element in browser context.
      * @param {import('@playwright/test').Locator} locator - Target element locator.
      */

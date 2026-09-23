@@ -312,6 +312,7 @@ export default class StudentPortalHomePage extends BasePage {
                         }
 
                         if (popupPage) {
+                            await this.verifyPopupNavigation(popupPage);
                             await popupPage.waitForLoadState('domcontentloaded').catch(() => {
                             });
                             await popupPage.close().catch(() => {
@@ -319,11 +320,7 @@ export default class StudentPortalHomePage extends BasePage {
                         }
                     } else {
                         // Internal navigation within the same tab
-                        await this.click(linkToClick);
-                        await this.waitForLoaders();
-                        await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
-                        });
-                        await this.waitForLoaders();
+                        await this.clickAndVerifyNavigation(linkToClick);
 
                         const currentTitle = await this.getPageTitle();
                         const currentUrl = this.page.url();
@@ -373,11 +370,7 @@ export default class StudentPortalHomePage extends BasePage {
                 if (subCount === 0) {
                     // Direct top-level link (e.g., Home, Enroll, Contact, Logout)
                     await test.step(`Navigate Quick Link: "${topText}"`, async () => {
-                        await this.click(topA);
-                        await this.waitForLoaders();
-                        await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
-                        });
-                        await this.waitForLoaders();
+                        await this.clickAndVerifyNavigation(topA);
                         await this.verifyLinkTitle(topText);
                         totalNavigated++;
                     });
@@ -402,11 +395,7 @@ export default class StudentPortalHomePage extends BasePage {
 
                             const subText = (await targetSubLink.textContent() || '').trim().replace(/\s+/g, ' ');
                             await test.step(`Click Sub-Link [${j + 1}/${subCount}]: "${subText}" under "${topText}"`, async () => {
-                                await this.click(targetSubLink);
-                                await this.waitForLoaders();
-                                await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
-                                });
-                                await this.waitForLoaders();
+                                await this.clickAndVerifyNavigation(targetSubLink);
                                 if ((await this.getPageTitle()).length > 0) {
                                     await this.verifyLinkTitle(subText);
                                 } else if (await this.isVisible(this.pageTitle, { timeout: 2000 })) {
