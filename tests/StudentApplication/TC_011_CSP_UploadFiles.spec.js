@@ -11,6 +11,13 @@ import AdminHomePage from '@pages/AdminApplication/AdminPortalHomePage'
  * Expected Result: File should be uploaded successfully and should be visible under C-Admin > Home Page > Uploaded Files widget
  **/
 test('TC_011: CSP - Verify that the file is getting uploaded', { tag: ['@CSP', '@CSPHomepage', '@smoke'] }, async ({ page }) => {
+    const uploadFilePaths = [
+        'test-data/uploads/uploadFile.jpg',
+        'test-data/uploads/vehicle.png',
+        'test-data/uploads/sample.pdf'
+    ];
+    /** @type {string[]} */
+    let uploadedOnValues = [];
 
     const studentLoginPage = new StudentLoginPage(page);
     const studentHomePage = new StudentHomePage(page);
@@ -22,15 +29,15 @@ test('TC_011: CSP - Verify that the file is getting uploaded', { tag: ['@CSP', '
         await studentLoginPage.login(credentials.studentUser.username, credentials.studentUser.password);
     });
 
-    await test.step('Step 2-4: Upload file in "Upload Files" widget and verify success', async () => {
-        await studentHomePage.uploadFile('test-data/uploads/uploadFile.jpg');
+    await test.step('Step 2-4: Upload files in "Upload Files" widget and verify success', async () => {
+        await studentHomePage.uploadFiles(uploadFilePaths);
+        uploadedOnValues = studentHomePage.getLastUploadedOnValues();
         await studentHomePage.verifyUploadSuccess();
     });
 
     await test.step('Step 5: Verify uploaded file under C-Admin -> Uploaded Files widget', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
-        await adminHomePage.clickShowFilesToConfirm(credentials.studentUser.name);
+        await adminHomePage.clickShowFilesToConfirm(credentials.studentUser.name, uploadedOnValues);
     });
 });
-

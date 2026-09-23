@@ -18,6 +18,17 @@ export default class TestDataGenerator {
     static generateUniqueId(prefix) {
         return `${prefix} ${Date.now()}`;
     }
+
+    /**
+     * Generates a random zip code.
+     * @param {number} [length=5] - Number of digits (default: 5).
+     * @returns {string} e.g. "90210"
+     */
+    static generateRandomZipCode(length = 5) {
+        const min = Math.pow(10, length - 1);
+        const max = Math.pow(10, length) - 1;
+        return `${Math.floor(min + Math.random() * (max - min + 1))}`;
+    }
     /**
      * Generates a random full name.
      * @param {string} prefix - Optional prefix.
@@ -62,4 +73,13 @@ export default class TestDataGenerator {
             permitNumber: baseData.permitNumber || permitNumber,
         };
     }
+
+    /**
+     * Generates a random 3-digit number (between 100 and 999) as a string.
+     * @returns {string} e.g. "582"
+     */
+    static generateRandomThreeDigitNumber() {
+        return `${Math.floor(100 + Math.random() * 900)}`;
+    }
 }
+
