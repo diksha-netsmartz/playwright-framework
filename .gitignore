@@ -7,3 +7,4 @@ allure-results/
 allure-report/
 allure-reports/
 playwright/.auth/
+.DS_Store

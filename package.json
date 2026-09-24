@@ -30,7 +30,7 @@
     "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.61.1",
     "@types/mailparser": "^3.4.6",
-    "@types/node": "^26.3.0",
+    "@types/node": "^26.6.2",
     "allure-commandline": "^2.43.0",
     "allure-playwright": "^3.10.2",
     "cross-env": "^10.1.0",
