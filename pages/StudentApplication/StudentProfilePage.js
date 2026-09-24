@@ -29,6 +29,9 @@ export default class StudentProfilePage extends BasePage {
         this.permitExpireDate = page.locator('#dt_Date_ExpirePermit');
         this.coursePassword = page.getByRole('textbox', { name: 'Course Password' });
         this.courseStartDate = page.locator('#dt_CourseStartDate');
+        this.studentNotesTextbox = page.locator('#StudentNotes');
+        this.medicalConditionsTextbox = page.locator('#MedicalConditions');
+        this.preferredPronouns = page.getByRole('textbox', { name: 'Preferred Pronouns' });
         // Action buttons
         this.updateBtn = page.getByRole('button', { name: 'Update' });
         this.yesConfirmationBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
@@ -47,6 +50,9 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [details.permit] - Permit / DL number.
      * @param {string} [details.coursePassword] - Course password.
      * @param {string} [details.courseStartDate] - Course start date.
+     * @param {string} [details.studentNotes] - Student notes.
+     * @param {string} [details.medicalConditions] - Medical conditions.
+     * @param {string} [details.preferredPronouns] - Preferred pronouns.
      **/
     async updateProfileDetails(details = {}) {
         await test.step('Fill updated student profile details', async () => {
@@ -73,15 +79,33 @@ export default class StudentProfilePage extends BasePage {
                 await this.fill(this.dlPermit, details.permit);
             }
 
-            if (await this.isVisible(this.coursePassword, { timeout: 100 }).catch(() => false) ) {
+            if (await this.isVisible(this.coursePassword, { timeout: 100 }).catch(() => false)) {
                 await this.clear(this.coursePassword);
                 await this.fill(this.coursePassword, details.coursePassword);
             }
 
-            if (await this.isVisible(this.courseStartDate, { timeout: 100 }).catch(() => false) ) {
+            if (await this.isVisible(this.courseStartDate, { timeout: 100 }).catch(() => false)) {
                 await this.clear(this.courseStartDate);
                 await this.pressSequentially(this.courseStartDate, details.courseStartDate);
                 await this.page.keyboard.press('Tab');
+            }
+
+            if (await this.isVisible(this.studentNotesTextbox, { timeout: 100 }).catch(() => false)) {
+                await this.clear(this.studentNotesTextbox);
+                await this.fill(this.studentNotesTextbox, details.studentNotes);
+
+            }
+
+            if (await this.isVisible(this.medicalConditionsTextbox, { timeout: 100 }).catch(() => false)) {
+                await this.clear(this.medicalConditionsTextbox);
+                await this.fill(this.medicalConditionsTextbox, details.medicalConditions);
+
+            }
+
+            if (await this.isVisible(this.preferredPronouns, { timeout: 100 }).catch(() => false)) {
+                await this.clear(this.preferredPronouns);
+                await this.fill(this.preferredPronouns, details.preferredPronouns);
+
             }
 
             if (await this.isVisible(this.wearGlassDropdown, { timeout: 100 }).catch(() => false)) {
@@ -123,7 +147,7 @@ export default class StudentProfilePage extends BasePage {
      **/
     async verifyProfileUpdateSuccess() {
         await test.step('Verify "Details updated successfully." message', async () => {
-            await this.verifyVisible(this.successAlert);
+            await this.waitForVisible(this.successAlert, 20000);
             await this.verifyContainsText(this.successAlert, 'Details updated successfully.');
         });
     }
@@ -138,6 +162,9 @@ export default class StudentProfilePage extends BasePage {
      * @param {string} [expectedDetails.permit] - Expected permit / DL number.
      * @param {string} [expectedDetails.coursePassword] - Expected course password.
      * @param {string} [expectedDetails.courseStartDate] - Expected course start date.
+     * @param {string} [expectedDetails.studentNotes] - Expected student notes.
+     * @param {string} [expectedDetails.medicalConditions] - Expected medical conditions.
+     * @param {string} [expectedDetails.preferredPronouns] - Expected preferred pronouns.
      **/
     async verifyProfileDetails(expectedDetails = {}) {
         await test.step('Verify profile field values match expected', async () => {
@@ -164,6 +191,21 @@ export default class StudentProfilePage extends BasePage {
 
             if (await this.isVisible(this.courseStartDate, { timeout: 100 }).catch(() => false)) {
                 await expect(this.courseStartDate).toHaveValue(expectedDetails.courseStartDate);
+            }
+
+            if (await this.isVisible(this.studentNotesTextbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.studentNotesTextbox).toHaveValue(expectedDetails.studentNotes);
+
+            }
+
+            if (await this.isVisible(this.medicalConditionsTextbox, { timeout: 100 }).catch(() => false)) {
+                await expect(this.medicalConditionsTextbox).toHaveValue(expectedDetails.medicalConditions);
+
+            }
+
+            if (await this.isVisible(this.preferredPronouns, { timeout: 100 }).catch(() => false)) {
+                await expect(this.preferredPronouns).toHaveValue(expectedDetails.preferredPronouns);
+
             }
         });
     }

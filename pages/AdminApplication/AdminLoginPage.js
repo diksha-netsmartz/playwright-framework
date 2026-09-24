@@ -51,7 +51,7 @@ export default class AdminLoginPage extends BasePage {
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
                 if (isCaptcha) {
                     console.warn('\n⚠️ [SKIP] CAPTCHA is enabled on screen. Skipping testcase.');
-                    test.skip(true, 'Admin Portal login skipped: CAPTCHA is enabled on screen.');
+                    await this.skipWithScreenshot('Admin Portal login skipped: CAPTCHA is enabled on screen.');
                     return;
                 }
                 throw new Error('Admin Portal navigation failed: Login page or username field not available.');
@@ -67,7 +67,7 @@ export default class AdminLoginPage extends BasePage {
                     .catch(() => false);
                 if (!isChecked) {
                     console.warn('\n⚠️ [SKIP] CAPTCHA detected on Admin Portal and unresolved. Skipping testcase.');
-                    test.skip(true, 'Admin Portal login skipped: CAPTCHA is enabled on screen.');
+                    await this.skipWithScreenshot('Admin Portal login skipped: CAPTCHA is enabled on screen.');
                     return;
                 }
             }
@@ -90,7 +90,7 @@ export default class AdminLoginPage extends BasePage {
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
                 if (isCaptcha) {
                     console.warn('\n⚠️ [SKIP] Admin Portal login blocked by CAPTCHA. Skipping testcase.');
-                    test.skip(true, 'Admin Portal login skipped: CAPTCHA is enabled on screen.');
+                    await this.skipWithScreenshot('Admin Portal login skipped: CAPTCHA is enabled on screen.');
                     return;
                 }
                 throw new Error('Admin Portal login failed: Authentication failed / Home Page did not load.');

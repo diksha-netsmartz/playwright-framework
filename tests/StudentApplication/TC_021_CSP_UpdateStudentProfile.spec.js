@@ -24,6 +24,9 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
     let dynamicPermitNumber;
     let dynamicCoursePassword;
     let dynamicCourseStartDate;
+    let dynamicStudentNotes;
+    let dynamicMedicalConditions;
+    let dynamicPreferredPronouns;
 
     await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
         await studentLoginPage.navigateToLoginPage();
@@ -42,6 +45,9 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
         dynamicPermitNumber = `PM${Math.floor(10000 + Math.random() * 90000)}`;
         dynamicCoursePassword = TestDataGenerator.generateRandomPassword();
         dynamicCourseStartDate = DateHelper.formatDate(new Date());
+        dynamicStudentNotes = `Student note ${Date.now()}`;
+        dynamicMedicalConditions = `Medical condition ${Date.now()}`;
+        dynamicPreferredPronouns = 'They/Them';
 
         await studentProfilePage.updateProfileDetails({
             parentPhone: dynamicParentPhone,
@@ -50,6 +56,9 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
             permit: dynamicPermitNumber,
             coursePassword: dynamicCoursePassword,
             courseStartDate: dynamicCourseStartDate,
+            studentNotes: dynamicStudentNotes,
+            medicalConditions: dynamicMedicalConditions,
+            preferredPronouns: dynamicPreferredPronouns,
         });
     });
 
@@ -67,6 +76,9 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
             permit: dynamicPermitNumber,
             coursePassword: dynamicCoursePassword,
             courseStartDate: dynamicCourseStartDate,
+            studentNotes: dynamicStudentNotes,
+            medicalConditions: dynamicMedicalConditions,
+            preferredPronouns: dynamicPreferredPronouns,
         });
     });
 });

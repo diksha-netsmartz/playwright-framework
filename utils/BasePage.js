@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Base Page Object Model class providing common reusable browser actions,
@@ -68,7 +68,7 @@ export default class BasePage {
         }
 
         await this.waitForLoaders();
-        await this.page.waitForLoadState('load', { timeout: loadTimeout }).catch(() => {});
+        await this.page.waitForLoadState('load', { timeout: loadTimeout }).catch(() => { });
         await this.waitForLoaders();
 
         return response;
@@ -305,25 +305,34 @@ export default class BasePage {
     }
 
     /**
-     * Waits for all background loader overlay elements (`.load-area`) on the page to hide.
-     * @param {number} [timeout=30000] - Optional timeout in milliseconds.
-     */
+   * Waits for all background loader overlay elements on the page to hide.
+   * @param {number} [timeout=90000] - Optional timeout in milliseconds.
+   */
     async waitForLoaders(timeout = 90000) {
-        await this.page.waitForFunction(() => {
-            const loaders = Array.from(document.querySelectorAll('.load-area'));
+        // Brief settling delay to allow newly triggered loaders to attach to the DOM
+        await this.page.waitForTimeout(150);
+
+        const loaderSelector = '.load-area, #loading, .blockUI, .blockOverlay, .k-loading-mask, .loading-message';
+
+        await this.page.waitForFunction((selector) => {
+            const loaders = Array.from(document.querySelectorAll(selector));
             if (loaders.length === 0) return true;
+
             return loaders.every(node => {
                 const el = /** @type {HTMLElement} */ (node);
                 const style = window.getComputedStyle(el);
-                return (
-                    style.display === 'none' ||
-                    style.visibility === 'hidden' ||
-                    el.offsetParent === null ||
-                    (el.style && el.style.display === 'none')
-                );
+
+                if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+                    return true;
+                }
+
+                // Check geometry: if element has no dimensions, it's not visible
+                const rect = el.getBoundingClientRect();
+                return rect.width === 0 && rect.height === 0;
             });
-        }, { timeout }).catch(() => { });
+        }, loaderSelector, { timeout }).catch(() => { });
     }
+
 
     /**
      * Asserts that an element is visible on the page, with optional timeout.
@@ -468,5 +477,22 @@ export default class BasePage {
         expect(isSigned).toBe(isVisible);
     }
 
+    /**
+     * Captures a screenshot, attaches it to the test report, and skips the remaining test execution.
+     * @param {string} reason - The reason for skipping the test.
+     * @param {string} [attachmentName='Skipped_Test_Screenshot'] - Attachment name for the test report.
+     */
+    async skipWithScreenshot(reason, attachmentName = 'Skipped_Test_Screenshot') {
+        try {
+            const screenshot = await this.page.screenshot();
+            await test.info().attach(attachmentName, {
+                body: screenshot,
+                contentType: 'image/png'
+            });
+        } catch (error) {
+            console.warn(`[BasePage] Failed to capture/attach screenshot before skipping: ${error.message}`);
+        }
+        test.skip(true, reason);
+    }
 
 }
