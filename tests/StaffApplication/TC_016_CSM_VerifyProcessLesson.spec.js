@@ -27,7 +27,7 @@ test('TC_016: CSM - Verify process lesson functionality', { tag: ['@CSM', '@CSMH
         isTitleMatched = await staffHomePage.clickProcess('Process Lesson');
     });
     if (!isTitleMatched) {
-        test.skip(true, 'Page title did not match "Process Lesson". Please turn off process yard skills settings in staff portal and try again. Skipping remaining steps.');
+        await staffHomePage.skipWithScreenshot('Page title did not match "Process Lesson". Please turn off process yard skills settings in staff portal and try again. Skipping remaining steps.');
     }
     await test.step('Step 5 & 6: Click Process and select evaluation', async () => {
         await processLessonPage.clickProcess();

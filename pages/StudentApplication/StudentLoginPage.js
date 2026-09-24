@@ -55,7 +55,7 @@ export default class StudentLoginPage extends BasePage {
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
                 if (isCaptcha) {
                     console.warn('\n⚠️ [SKIP] CAPTCHA is enabled on screen. Skipping testcase.');
-                    test.skip(true, 'Student Portal login skipped: CAPTCHA is enabled on screen.');
+                    await this.skipWithScreenshot('Student Portal login skipped: CAPTCHA is enabled on screen.');
                     return;
                 }
                 throw new Error('Student Portal navigation failed: Login page or username field not available.');
@@ -71,7 +71,7 @@ export default class StudentLoginPage extends BasePage {
                     .catch(() => false);
                 if (!isChecked) {
                     console.warn('\n⚠️ [SKIP] CAPTCHA detected on Student Portal and unresolved. Skipping testcase.');
-                    test.skip(true, 'Student Portal login skipped: CAPTCHA is enabled on screen.');
+                    await this.skipWithScreenshot('Student Portal login skipped: CAPTCHA is enabled on screen.');
                     return;
                 }
             }
@@ -94,7 +94,7 @@ export default class StudentLoginPage extends BasePage {
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
                 if (isCaptcha) {
                     console.warn('\n⚠️ [SKIP] Student Portal login blocked by CAPTCHA. Skipping testcase.');
-                    test.skip(true, 'Student Portal login skipped: CAPTCHA is enabled on screen.');
+                    await this.skipWithScreenshot('Student Portal login skipped: CAPTCHA is enabled on screen.');
                     return;
                 }
                 throw new Error('Student Portal login failed: Authentication failed / Student Home did not load.');

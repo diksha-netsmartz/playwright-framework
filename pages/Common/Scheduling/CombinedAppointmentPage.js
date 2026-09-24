@@ -468,10 +468,7 @@ export default class CombinedAppointmentPage extends BasePage {
     listMenuOfCreatedAppointment(studentName) {
         const student = studentName || this.student1 || this.expectedValues?.student1;
         const text = this.getStudentSearchText(student);
-        if (text) {
-            return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
-        }
-        return this.page.locator("xpath=//div[contains(@class,'k-event') or @data-types='Appointment']//img[contains(@src,'list')]");
+        return this.page.locator(`xpath=//div[contains(@data-formattedstudentname,'${text}') or contains(@data-formattedstudentname2,'${text}')]//img[contains(@src,'list')]`);
     }
 
     /**

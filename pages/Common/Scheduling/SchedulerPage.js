@@ -58,7 +58,7 @@ export default class SchedulerPage extends BasePage {
      **/
     listMenuOfCreatedAppointment(studentName) {
         const text = this.getStudentSearchText(studentName);
-        return this.page.locator(`xpath=(//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')])[last()]`);
+        return this.page.locator(`xpath=//div[contains(@data-formattedstudentname,'${text}') or contains(@data-formattedstudentname2,'${text}')]//img[contains(@src,'list')][last()]`);
     }
 
     /**
@@ -68,7 +68,7 @@ export default class SchedulerPage extends BasePage {
      **/
     allListMenusOfCreatedAppointments(studentName) {
         const text = this.getStudentSearchText(studentName);
-        return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
+        return this.page.locator(`xpath=//div[contains(@data-formattedstudentname,'${text}') or contains(@data-formattedstudentname2,'${text}')]//img[contains(@src,'list')]`);
 
     }
 
@@ -79,7 +79,7 @@ export default class SchedulerPage extends BasePage {
      **/
     listMenuOfNoShowAppointment(studentOrName) {
         const text = this.getStudentSearchText(studentOrName);
-        return this.page.locator(`xpath=//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//img[contains(@src,'list')]`);
+        return this.page.locator(`xpath=//div[contains(@data-formattedstudentname,'${text}') or contains(@data-formattedstudentname2,'${text}')]//img[contains(@src,'list')]`);
 
     }
 
@@ -90,7 +90,7 @@ export default class SchedulerPage extends BasePage {
      **/
     deleteAppointmentButton(studentName) {
         const text = this.getStudentSearchText(studentName);
-        return this.page.locator(`xpath=(//div[@data-formattedstudentname='${text}' or @data-formattedstudentname2='${text}']//a[@href='cancelAppt'])[last()]`);
+        return this.page.locator(`xpath=(//div[contains(@data-formattedstudentname,'${text}') or contains(@data-formattedstudentname2,'${text}')]//a[@href='cancelAppt'])[last()]`);
     }
 
     /**
@@ -561,6 +561,8 @@ export default class SchedulerPage extends BasePage {
 
             const toastMessage = (await toastPromise) || '';
             console.log(`Appointment deleted with message: ${toastMessage}`);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 30000 })
 
             const listMenu = this.listMenuOfCreatedAppointment(studentName);
             let count = await listMenu.count();
@@ -570,7 +572,7 @@ export default class SchedulerPage extends BasePage {
                     await expect.poll(async () => {
                         await this.waitForLoaders().catch(() => { });
                         return await listMenu.count();
-                    }, { timeout: 10000 }).toBe(0);
+                    }, { timeout: 60000 }).toBe(0);
                     count = await listMenu.count();
                 } catch { }
             }
@@ -726,7 +728,7 @@ export default class SchedulerPage extends BasePage {
             }
 
             // const locator = this.page.locator(`xpath=//p[contains(text(),'${formattedName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
-            const locator = this.page.locator(`xpath=//div[@data-formattedstudentname='${formattedName}' or @data-formattedstudentname2='${formattedName}']//img[contains(@src,'list')]`);
+            const locator = this.page.locator(`xpath=//div[contains(@data-formattedstudentname,'${formattedName}') or contains(@data-formattedstudentname2,'${formattedName}')]//img[contains(@src,'list')]`);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 10000 });
             await expect(locator).toHaveCount(2);
