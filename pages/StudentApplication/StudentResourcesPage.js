@@ -36,7 +36,7 @@ export default class StudentResourcesPage extends BasePage {
     }
 
     /**
-     * Clicks on a resources tab by its 0-based index and verifies its content container is visible.
+     * Clicks on a resources tab by its 0-based index and verifies that the tab returns HTTP status 200.
      * @param {number} index - Index of the tab to click.
      * @returns {Promise<string>} The text name of the clicked tab.
      **/
@@ -44,33 +44,17 @@ export default class StudentResourcesPage extends BasePage {
         const tab = this.tabs.nth(index);
         await this.waitForVisible(tab, 5000);
         const tabName = (await tab.textContent() || '').trim();
-        const href = await tab.getAttribute('href');
 
-        await test.step(`Click Resources tab: "${tabName}" and verify content`, async () => {
+        await test.step(`Click Resources tab: "${tabName}" and verify response 200`, async () => {
+            const responsePromise = this.page.waitForResponse(
+                (response) => response.url().toLowerCase().includes('/resources/'),
+                { timeout: 10000 }
+            );
+
             await this.click(tab);
+            const response = await responsePromise;
+            expect(response.status()).toBe(200);
             await this.waitForLoaders();
-
-            // Determine expected content container by href or tab name
-            let container = null;
-            if (href && href.startsWith('#') && href.length > 1) {
-                container = this.page.locator(href);
-            } else if (tabName.toLowerCase().includes('in-car')) {
-                container = this.inCarResourceContent;
-            } else if (tabName.toLowerCase().includes('parent')) {
-                container = this.parentResourceContent;
-            } else if (tabName.toLowerCase().includes('road')) {
-                container = this.roadTestResourceContent;
-            } else if (tabName.toLowerCase().includes('class')) {
-                container = this.classResourceContent;
-            }
-            else if (tabName.toLowerCase().includes('sadd')) {
-                container = this.saddResourceContent;
-            }
-
-            if (container) {
-                await this.waitForVisible(container, 5000);
-                await this.verifyVisible(container);
-            }
         });
 
         return tabName;
@@ -78,11 +62,11 @@ export default class StudentResourcesPage extends BasePage {
 
     /**
      * Iterates through each tab in resources, clicks it,
-     * and verifies that its corresponding content container is displayed.
+     * and verifies that each tab responds with HTTP status 200.
      * @returns {Promise<number>} Total count of tabs clicked and verified.
      **/
     async openEachTab() {
-        return await test.step('Open each Resources tab and verify content container', async () => {
+        return await test.step('Open each Resources tab and verify response 200', async () => {
             const count = await this.getResourcesTabsCount();
             for (let i = 0; i < count; i++) {
                 await this.clickResourcesTabByIndex(i);
