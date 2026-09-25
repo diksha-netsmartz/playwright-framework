@@ -16,10 +16,32 @@ export default class StaffProfilePage extends BasePage {
         this.staffProfileHeading = page.locator("//h3[contains(text(),'Staff Profile')]");
 
         // Profile input fields
-        this.homePhoneTxt = page.getByRole('textbox', { name: 'Home Phone' });
-        this.emergencyContactNameTxt = page.getByRole('textbox', { name: 'Emergency Contact Name' });
-        this.emergencyContactPhoneTxt = page.getByRole('textbox', { name: 'Emergency Contact Phone' });
-        this.licenseNumberTxt = page.getByRole('textbox', { name: 'Instructor/Staff License#' });
+        this.homePhoneTxt = page.locator('#HomePhone')
+        this.cellPhoneTxt = page.locator('#CellPhone')
+        this.otherPhoneTxt = page.locator('#OtherPhone');
+        this.emergencyContactNameTxt = page.locator('#EmergencyContactName')
+        this.emergencyContactPhoneTxt = page.locator('#EmergencyContactPhone')
+        this.emergencyContactRelation = page.locator('#EmergencyContactRelation')
+        this.licenseNumberTxt = page.getByRole('textbox', { name: 'Instructor/Staff License#' })
+        this.instructorPermitNumberTxt = page.locator('#InstructorPermitNumber')
+        this.cityTxt = page.locator('#City')
+        this.zipTxt = page.locator('#Zip')
+        this.zoomHostUrl = page.locator('#ZoomHostURL');
+        this.zoomUserUrl = page.locator('#ZoomUserURL')
+        this.staffCodeTxt = page.locator('#StaffCode')
+        this.certExpDate = page.locator('#date_CertExp')
+        this.inCarPermitIssueDate = page.locator('#date_InCarPermitIssue')
+        this.certificateNumber = page.locator('#CertificateNumber')
+        this.emailTxt = page.locator('#Email');
+        this.stateDropdown = page.locator("//button[@data-id='State']")
+        this.stateDropdownValue = page.locator("(//button[@data-id='State']//parent::div//ul//li//span[1][not(contains(text(),'Select'))])[1]");
+        this.locationDropdown = page.locator("//button[@data-id='Location']")
+        this.locationDropdownValue = page.locator("(//button[@data-id='Location']//parent::div//ul//li//span[1][not(contains(text(),'Select'))])[1]");
+        this.notesTextboxArea = page.locator('div.note-editable:visible');
+        this.notesAddedTextarea = page.locator("div[role='textbox'] p")
+
+        this.selectedState = '';
+        this.selectedLocation = '';
 
         // Action buttons
         this.updateBtn = page.getByRole('button', { name: 'Update' });
@@ -45,9 +67,23 @@ export default class StaffProfilePage extends BasePage {
      * Updates staff profile fields with dynamic runtime details.
      * @param {Object} details - Profile fields to update.
      * @param {string} [details.homePhone] - Home phone number.
+     * @param {string} [details.cellPhone] - Cell phone number.
+     * @param {string} [details.otherPhone] - Other phone number.
      * @param {string} [details.emergencyContactName] - Emergency contact name.
      * @param {string} [details.emergencyContactPhone] - Emergency contact phone.
+     * @param {string} [details.emergencyContactRelation] - Emergency contact relation.
      * @param {string} [details.licenseNumber] - Instructor/Staff license number.
+     * @param {string} [details.instructorPermitNumber] - Instructor permit number.
+     * @param {string} [details.city] - City.
+     * @param {string} [details.zip] - Zip code.
+     * @param {string} [details.zoomHostUrl] - Zoom host URL.
+     * @param {string} [details.zoomUserUrl] - Zoom user URL.
+     * @param {string} [details.staffCode] - Staff code.
+     * @param {string} [details.certExpDate] - Certificate expiration date.
+     * @param {string} [details.inCarPermitIssueDate] - In-car permit issue date.
+     * @param {string} [details.certificateNumber] - Certificate number.
+     * @param {string} [details.email] - Email.
+     * @param {string} [details.notes] - Notes.
      **/
     async updateProfileDetails(details = {}) {
         await test.step('Fill updated staff profile details', async () => {
@@ -55,28 +91,108 @@ export default class StaffProfilePage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
             await this.verifyVisible(this.staffProfileHeading);
 
-            if (details.homePhone !== undefined) {
-                await this.waitForVisible(this.homePhoneTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.homePhoneTxt)) {
                 await this.clear(this.homePhoneTxt);
                 await this.fill(this.homePhoneTxt, details.homePhone);
             }
 
-            if (details.emergencyContactName !== undefined) {
-                await this.waitForVisible(this.emergencyContactNameTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.cellPhoneTxt)) {
+                await this.clear(this.cellPhoneTxt);
+                await this.fill(this.cellPhoneTxt, details.cellPhone);
+            }
+
+            if (await this.isVisibleAndEnabled(this.otherPhoneTxt)) {
+                await this.clear(this.otherPhoneTxt);
+                await this.fill(this.otherPhoneTxt, details.otherPhone);
+            }
+
+            if (await this.isVisibleAndEnabled(this.emergencyContactNameTxt)) {
                 await this.clear(this.emergencyContactNameTxt);
                 await this.fill(this.emergencyContactNameTxt, details.emergencyContactName);
             }
 
-            if (details.emergencyContactPhone !== undefined) {
-                await this.waitForVisible(this.emergencyContactPhoneTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.emergencyContactPhoneTxt)) {
                 await this.clear(this.emergencyContactPhoneTxt);
                 await this.fill(this.emergencyContactPhoneTxt, details.emergencyContactPhone);
             }
 
-            if (details.licenseNumber !== undefined) {
-                await this.waitForVisible(this.licenseNumberTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.emergencyContactRelation)) {
+                await this.clear(this.emergencyContactRelation);
+                await this.fill(this.emergencyContactRelation, details.emergencyContactRelation);
+            }
+
+            if (await this.isVisibleAndEnabled(this.licenseNumberTxt)) {
                 await this.clear(this.licenseNumberTxt);
                 await this.fill(this.licenseNumberTxt, details.licenseNumber);
+            }
+
+            if (await this.isVisibleAndEnabled(this.instructorPermitNumberTxt)) {
+                await this.clear(this.instructorPermitNumberTxt);
+                await this.fill(this.instructorPermitNumberTxt, details.instructorPermitNumber);
+            }
+
+            if (await this.isVisibleAndEnabled(this.cityTxt)) {
+                await this.clear(this.cityTxt);
+                await this.fill(this.cityTxt, details.city);
+            }
+
+            if (await this.isVisibleAndEnabled(this.zipTxt)) {
+                await this.clear(this.zipTxt);
+                await this.fill(this.zipTxt, details.zip);
+            }
+
+            if (await this.isVisibleAndEnabled(this.zoomHostUrl)) {
+                await this.clear(this.zoomHostUrl);
+                await this.fill(this.zoomHostUrl, details.zoomHostUrl);
+            }
+
+            if (await this.isVisibleAndEnabled(this.zoomUserUrl)) {
+                await this.clear(this.zoomUserUrl);
+                await this.fill(this.zoomUserUrl, details.zoomUserUrl);
+            }
+
+            if (await this.isVisibleAndEnabled(this.staffCodeTxt)) {
+                await this.clear(this.staffCodeTxt);
+                await this.fill(this.staffCodeTxt, details.staffCode);
+            }
+
+            if (await this.isVisibleAndEnabled(this.certExpDate)) {
+                await this.clear(this.certExpDate);
+                await this.pressSequentially(this.certExpDate, this.formatDateWithSlashes(details.certExpDate));
+            }
+
+            if (await this.isVisibleAndEnabled(this.inCarPermitIssueDate)) {
+                await this.clear(this.inCarPermitIssueDate);
+                await this.pressSequentially(this.inCarPermitIssueDate, this.formatDateWithSlashes(details.inCarPermitIssueDate));
+            }
+
+            if (await this.isVisibleAndEnabled(this.certificateNumber)) {
+                await this.clear(this.certificateNumber);
+                await this.pressSequentially(this.certificateNumber, details.certificateNumber);
+            }
+
+            if (await this.isVisibleAndEnabled(this.emailTxt)) {
+                await this.clear(this.emailTxt);
+                await this.fill(this.emailTxt, details.email);
+            }
+
+            if (await this.isVisibleAndEnabled(this.stateDropdown)) {
+                await this.click(this.stateDropdown);
+                await this.waitForVisible(this.stateDropdownValue);
+                this.selectedState = (await this.stateDropdownValue.innerText()).trim();
+                await this.click(this.stateDropdownValue);
+            }
+
+            if (await this.isVisibleAndEnabled(this.locationDropdown)) {
+                await this.click(this.locationDropdown);
+                await this.waitForVisible(this.locationDropdownValue);
+                this.selectedLocation = (await this.locationDropdownValue.innerText()).trim();
+                await this.click(this.locationDropdownValue);
+            }
+
+            if (await this.isVisibleAndEnabled(this.notesTextboxArea)) {
+                await this.clear(this.notesTextboxArea);
+                await this.fill(this.notesTextboxArea, details.notes);
             }
         });
     }
@@ -110,33 +226,107 @@ export default class StaffProfilePage extends BasePage {
      * Verifies profile field values after saving by validating value attribute / property.
      * @param {Object} expectedDetails - Expected profile field values.
      * @param {string} [expectedDetails.homePhone] - Expected home phone.
+     * @param {string} [expectedDetails.cellPhone] - Expected cell phone.
+     * @param {string} [expectedDetails.otherPhone] - Expected other phone.
      * @param {string} [expectedDetails.emergencyContactName] - Expected emergency contact name.
      * @param {string} [expectedDetails.emergencyContactPhone] - Expected emergency contact phone.
+     * @param {string} [expectedDetails.emergencyContactRelation] - Expected emergency contact relation.
      * @param {string} [expectedDetails.licenseNumber] - Expected instructor/staff license number.
+     * @param {string} [expectedDetails.instructorPermitNumber] - Expected instructor permit number.
+     * @param {string} [expectedDetails.city] - Expected city.
+     * @param {string} [expectedDetails.zip] - Expected zip code.
+     * @param {string} [expectedDetails.zoomHostUrl] - Expected zoom host URL.
+     * @param {string} [expectedDetails.zoomUserUrl] - Expected zoom user URL.
+     * @param {string} [expectedDetails.staffCode] - Expected staff code.
+     * @param {string} [expectedDetails.certExpDate] - Expected certificate expiration date.
+     * @param {string} [expectedDetails.inCarPermitIssueDate] - Expected in-car permit issue date.
+     * @param {string} [expectedDetails.certificateNumber] - Expected certificate number.
+     * @param {string} [expectedDetails.email] - Expected email.
+     * @param {string} [expectedDetails.notes] - Expected notes.
      **/
     async verifyProfileDetails(expectedDetails = {}) {
         await test.step('Verify profile details after save by validating value attribute', async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
+            await this.verifyVisible(this.staffProfileHeading);
 
-            if (expectedDetails.homePhone !== undefined) {
-                await this.waitForVisible(this.homePhoneTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.homePhoneTxt) && !await this.isMasked(this.homePhoneTxt)) {
                 await expect(this.homePhoneTxt).toHaveValue(expectedDetails.homePhone);
             }
 
-            if (expectedDetails.emergencyContactName !== undefined) {
-                await this.waitForVisible(this.emergencyContactNameTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.cellPhoneTxt) && !await this.isMasked(this.cellPhoneTxt)) {
+                await expect(this.cellPhoneTxt).toHaveValue(expectedDetails.cellPhone);
+            }
+
+            if (await this.isVisibleAndEnabled(this.otherPhoneTxt) && !await this.isMasked(this.otherPhoneTxt)) {
+                await expect(this.otherPhoneTxt).toHaveValue(expectedDetails.otherPhone);
+            }
+
+            if (await this.isVisibleAndEnabled(this.emergencyContactNameTxt)) {
                 await expect(this.emergencyContactNameTxt).toHaveValue(expectedDetails.emergencyContactName);
             }
 
-            if (expectedDetails.emergencyContactPhone !== undefined) {
-                await this.waitForVisible(this.emergencyContactPhoneTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.emergencyContactPhoneTxt) && !await this.isMasked(this.emergencyContactPhoneTxt)) {
                 await expect(this.emergencyContactPhoneTxt).toHaveValue(expectedDetails.emergencyContactPhone);
             }
 
-            if (expectedDetails.licenseNumber !== undefined) {
-                await this.waitForVisible(this.licenseNumberTxt, 1000);
+            if (await this.isVisibleAndEnabled(this.emergencyContactRelation)) {
+                await expect(this.emergencyContactRelation).toHaveValue(expectedDetails.emergencyContactRelation);
+            }
+
+            if (await this.isVisibleAndEnabled(this.licenseNumberTxt)) {
                 await expect(this.licenseNumberTxt).toHaveValue(expectedDetails.licenseNumber);
+            }
+
+            if (await this.isVisibleAndEnabled(this.instructorPermitNumberTxt)) {
+                await expect(this.instructorPermitNumberTxt).toHaveValue(expectedDetails.instructorPermitNumber);
+            }
+
+            if (await this.isVisibleAndEnabled(this.cityTxt)) {
+                await expect(this.cityTxt).toHaveValue(expectedDetails.city);
+            }
+
+            if (await this.isVisibleAndEnabled(this.zipTxt)) {
+                await expect(this.zipTxt).toHaveValue(expectedDetails.zip);
+            }
+
+            if (await this.isVisibleAndEnabled(this.zoomHostUrl)) {
+                await expect(this.zoomHostUrl).toHaveValue(expectedDetails.zoomHostUrl);
+            }
+
+            if (await this.isVisibleAndEnabled(this.zoomUserUrl)) {
+                await expect(this.zoomUserUrl).toHaveValue(expectedDetails.zoomUserUrl);
+            }
+
+            if (await this.isVisibleAndEnabled(this.staffCodeTxt)) {
+                await expect(this.staffCodeTxt).toHaveValue(expectedDetails.staffCode);
+            }
+
+            if (await this.isVisibleAndEnabled(this.certExpDate)) {
+                await expect(this.certExpDate).toHaveValue(this.formatDateWithSlashes(expectedDetails.certExpDate));
+            }
+
+            if (await this.isVisibleAndEnabled(this.inCarPermitIssueDate)) {
+                await expect(this.inCarPermitIssueDate).toHaveValue(this.formatDateWithSlashes(expectedDetails.inCarPermitIssueDate));
+            }
+            if (await this.isVisibleAndEnabled(this.certificateNumber)) {
+                await expect(this.certificateNumber).toHaveValue(expectedDetails.certificateNumber);
+            }
+
+            if (this.selectedState && await this.isVisibleAndEnabled(this.stateDropdown)) {
+                await expect(this.stateDropdown).toContainText(this.selectedState);
+            }
+
+            if (this.selectedLocation && await this.isVisibleAndEnabled(this.locationDropdown)) {
+                await expect(this.locationDropdown).toContainText(this.selectedLocation);
+            }
+
+            if (await this.isVisibleAndEnabled(this.notesAddedTextarea)) {
+                await expect(this.notesAddedTextarea).toContainText(expectedDetails.notes);
+            }
+
+            if (await this.isVisibleAndEnabled(this.emailTxt) && !await this.isMasked(this.emailTxt)) {
+                await expect(this.emailTxt).toHaveValue(expectedDetails.email);
             }
         });
     }
