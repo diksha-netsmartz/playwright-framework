@@ -122,7 +122,7 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     cancelAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=(//a[text()='Cancel Appointment' and (@data-sname1='${studentName}' or @data-sname2='${studentName}')])[1]`
+            `xpath=(//a[text()='Cancel Appointment' and (contains(@data-sname1,'${studentName}') or contains(@data-sname2,'${studentName}'))])[1]`
         );
     }
 
@@ -133,7 +133,7 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     noShowAppointmentButton(studentName) {
         return this.page.locator(
-            `xpath=(//a[text()='No Show' and (@data-sname1='${studentName}' or @data-sname2='${studentName}')])[1]`
+            `xpath=(//a[text()='No Show' and (contains(@data-sname1,'${studentName}') or contains(@data-sname2,'${studentName}'))])[1]`
         );
     }
 

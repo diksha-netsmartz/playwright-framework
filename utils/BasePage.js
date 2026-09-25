@@ -304,6 +304,35 @@ export default class BasePage {
         return await locator.isVisible();
     }
 
+
+    /**
+     * Checks if a field element is visible and not disabled / frozen.
+     * @param {import('@playwright/test').Locator} locator - Target element locator.
+     * @returns {Promise<boolean>} True if visible and enabled, false otherwise.
+     **/
+    async isVisibleAndEnabled(locator) {
+        if (!await this.isVisible(locator).catch(() => false)) return false;
+        if (await locator.isDisabled().catch(() => false)) return false;
+        const disabled = await locator.getAttribute('disabled').catch(() => null);
+        if (disabled !== null && disabled !== 'false') return false;
+        const attrEnabled = await locator.getAttribute('attrenabled').catch(() => null);
+        if (attrEnabled && attrEnabled.toLowerCase() === 'false') return false;
+        const classAttr = await locator.getAttribute('class').catch(() => '') || '';
+        if (classAttr.includes('disabled') || classAttr.includes('freezeClass')) return false;
+        return true;
+    }
+
+    /**
+     * Checks if a field element has an input mask applied (e.g. contains 'mask' in class or data-mask).
+     * @param {import('@playwright/test').Locator} locator - Target element locator.
+     * @returns {Promise<boolean>} True if masked, false otherwise.
+     **/
+    async isMasked(locator) {
+        const classAttr = await locator.getAttribute('class').catch(() => '') || '';
+        const dataMask = await locator.getAttribute('data-mask').catch(() => null);
+        return /mask/i.test(classAttr) || dataMask !== null;
+    }
+
     /**
    * Waits for all background loader overlay elements on the page to hide.
    * @param {number} [timeout=90000] - Optional timeout in milliseconds.

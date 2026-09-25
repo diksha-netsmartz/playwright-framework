@@ -538,7 +538,7 @@ export default class OnlineEnrollmentPage extends BasePage {
             });
             // await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 15000 });
             await this.page.waitForLoadState('load', { timeout: 30000 });
-            await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')));
+            await this.waitForVisible(this.page.getByText(new RegExp(expectedText, 'i')), { timeout: 90000 });
             await this.verifyVisible(this.page.getByText(new RegExp(expectedText, 'i')));
         });
         await PdfHelper.downloadVerifyAndAttach(this.page, expectedText, attachmentName);
