@@ -1,6 +1,5 @@
 import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
-import path from 'path';
 
 /**
  * Page Object representing the Add Lead Page in Admin Portal (Student Leads > Add Lead).
@@ -445,6 +444,8 @@ export default class LeadPage extends BasePage {
         if (await this.isVisible(this.filesTab, { timeout: 100 })) {
             await test.step('Upload file in Files tab', async () => {
                 await this.click(this.filesTab);
+                await this.waitForLoaders();
+                await this.waitForVisible(this.browseFileButton, { timeout: 10000 });
                 const fileChooserPromise = this.page.waitForEvent('filechooser');
                 await this.click(this.browseFileButton);
                 const fileChooser = await fileChooserPromise;
@@ -579,6 +580,8 @@ export default class LeadPage extends BasePage {
             }
             if (await this.isVisible(this.filesTab, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.filesTab);
+                await this.waitForLoaders();
+                await this.waitForVisible(this.studentFileRow, { timeout: 10000 })
                 await this.verifyVisible(this.studentFileRow);
             }
 
