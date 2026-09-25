@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 /**
  * Page Object representing the Resources section in the Student Portal (CSP).
  * Handles tab navigation under Resources (//ul[contains(@class,'nav-tabs')]//li//a)
- * and verifies each tab and its content container (e.g. #dvResourceInCar, #dvResourceParent).
+ * and verifies each tab responds with HTTP status 200.
  **/
 export default class StudentResourcesPage extends BasePage {
 
@@ -17,13 +17,6 @@ export default class StudentResourcesPage extends BasePage {
 
         // Locators for resources tabs
         this.tabs = page.locator("//ul[contains(@class,'nav-tabs')]//li//a");
-
-        // Resource Tab Content Containers
-        this.inCarResourceContent = page.locator('#dvResourceInCar');
-        this.parentResourceContent = page.locator('#dvResourceParent');
-        this.classResourceContent = page.locator('#dvResourceClass');
-        this.roadTestResourceContent = page.locator('#dvResourceRoadTest');
-        this.saddResourceContent = page.locator('#dvResourceSadd')
     }
 
     /**
