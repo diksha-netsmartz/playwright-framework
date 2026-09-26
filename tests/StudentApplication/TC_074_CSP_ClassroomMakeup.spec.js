@@ -32,16 +32,7 @@ test('TC_074: CSP - To Verify student is able to perform makeup', { tag: ['@CSP'
     await studentHomePage.navigateToAppointments();
   });
 
-  await test.step('Step 3 & 4: Select appointment type "Class" and apply filter', async () => {
-    await studentAppointmentsPage.filterByAppointmentType();
-  });
-
-  await test.step('Step 5: Click on BOOK MAKEUP', async () => {
-    await studentAppointmentsPage.clickBookMakeup();
-  });
-
-  await test.step('Step 6: Select makeup slot and verify enrollment success', async () => {
-    await studentAppointmentsPage.selectMakeupSlot();
-    await studentAppointmentsPage.verifyEnrollmentSuccess();
+  await test.step('Step 3 to 6: Select and enroll available makeup slot', async () => {
+    await studentAppointmentsPage.selectAndEnrollAvailableMakeupSlot();
   });
 });
