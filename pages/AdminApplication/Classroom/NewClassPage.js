@@ -49,7 +49,7 @@ export default class NewClassPage extends BasePage {
 
         // Instructor & Availability
         this.instructorDropdownBtn = page.locator('#panel_Teacher').getByRole('button', { name: 'Select' });
-        this.instructorOption = page.locator("xpath=(//button[@data-id='drp_Teacher']//parent::div//following-sibling::div//li)[2]");
+        this.instructorOption = page.locator("xpath=(//button[@data-id='drp_Teacher']//parent::div//following-sibling::div//li//span[1][not(contains(text(),'Select'))])[1]");
         this.checkAvailabilityBtn = page.getByRole('button', { name: 'Click Here to Check' });
         this.addButton = page.locator("xpath=(//a[text()='Add'])[1]");
         this.weekdayDropdown = page.locator("xpath=//button[@data-id='drp_WorkTiming_WeekDay']");
@@ -73,6 +73,8 @@ export default class NewClassPage extends BasePage {
         this.teacherAvailableMessage = page.getByText('Teacher is available.', { exact: true });
         this.closeTeacherAvailableModal = page.locator("xpath=//b[text()='Teacher is available.']//ancestor::div[@class='modal-content']//button[text()='Close']");
         this.removeButton = page.locator("xpath=//button[contains(text(),'Remove')]");
+        this.deleteButton = page.locator("xpath=//button[contains(text(),'Delete')]");
+        this.closeDeleteModal = page.locator("//h4[contains(text(),'Teacher is not available')]//ancestor::div[@class='modal-content']//button[text()='Close']");
         this.teacherRemovedMessage = page.getByText('Teacher removed successfully from conflicting session.', { exact: true });
 
         // Notes
@@ -136,7 +138,7 @@ export default class NewClassPage extends BasePage {
      * Enters the Classroom ID Number. If no ID is provided, generates a random numeric ID.
      * @returns {Promise<string>} The classroom ID that was entered.
      **/
-    async enterClassroomId(classroomId) {
+    async enterClassroomId() {
         const idToEnter = String(Math.floor(1000 + Math.random() * 90000));
         console.log(`Classroom ID entered: ${idToEnter}`);
         return await test.step(`Enter Classroom ID: "${idToEnter}"`, async () => {
@@ -230,14 +232,14 @@ export default class NewClassPage extends BasePage {
     /**
      * Selects instructor from the instructor dropdown. If no instructorName is provided, selects the first available option in the list.
      **/
-    async selectInstructor(instructorName) {
+    async selectInstructor() {
         await test.step('Select Classroom Instructor', async () => {
             await this.click(this.instructorDropdownBtn);
-            // await this.waitForVisible(this.instructorOption);
-            // await this.click(this.instructorOption);
-            const instructorOption = this.page.locator(`xpath=(//li//span[contains(text(),'${instructorName}')])[1]`);
-            await this.waitForVisible(instructorOption);
-            await this.click(instructorOption);
+            await this.waitForVisible(this.instructorOption);
+            await this.click(this.instructorOption);
+            // const instructorOption = this.page.locator(`xpath=(//li//span[contains(text(),'${instructorName}')])[1]`);
+            // await this.waitForVisible(instructorOption);
+            // await this.click(instructorOption);
         });
     }
 
@@ -309,6 +311,11 @@ export default class NewClassPage extends BasePage {
                 }
                 await this.waitForLoaders();
             }
+            else if (await this.isVisible(this.deleteButton, { timeout: 5000 }).catch(() => false)) {
+                await this.click(this.closeDeleteModal);
+                await this.waitForHidden(this.closeDeleteModal);
+            }
+
             else if (await this.isVisible(this.teacherAvailableMessage, { timeout: 5000 }).catch(() => false)) {
                 await this.verifyVisible(this.teacherAvailableMessage);
                 await this.click(this.closeTeacherAvailableModal);
@@ -360,7 +367,7 @@ export default class NewClassPage extends BasePage {
      * Classroom ID is randomly generated automatically if not provided.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createMultiSessionClassroom(classData = {}, instructorName = '') {
+    async createMultiSessionClassroom(classData = {}) {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Multi Session Class');
         await this.selectClassroomService();
@@ -372,7 +379,7 @@ export default class NewClassPage extends BasePage {
         await this.enterTotalSessions(classData.totalSessions);
         await this.selectWeekdays(classData.weekdays);
         await this.setSessionTimes(classData.startTime, classData.duration);
-        await this.selectInstructor(instructorName);
+        await this.selectInstructor();
         await this.checkScheduleAvailability();
         await this.enterClassroomNotes(classData.webSignupNotes, classData.crNotes, classData.internalCrNotes);
         await this.clickCreateClassroom();
@@ -384,7 +391,7 @@ export default class NewClassPage extends BasePage {
      * Classroom ID is randomly generated automatically if not provided.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createSingleSessionClassroom(classData = {}, instructorName = '') {
+    async createSingleSessionClassroom(classData = {}) {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Single Session Class');
         await this.selectClassroomService();
@@ -394,7 +401,7 @@ export default class NewClassPage extends BasePage {
         await this.selectLocation();
         await this.selectStartDate();
         await this.setSessionTimes(classData.startTime, classData.duration);
-        await this.selectInstructor(instructorName);
+        await this.selectInstructor();
         await this.checkScheduleAvailability();
         await this.enterClassroomNotes(classData.webSignupNotes, classData.crNotes, classData.internalCrNotes);
         await this.clickCreateClassroom();
