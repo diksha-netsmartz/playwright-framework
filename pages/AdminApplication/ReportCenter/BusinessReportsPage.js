@@ -1219,12 +1219,12 @@ export default class BusinessReportsPage extends BasePage {
 
             const env = process.env.ENV || 'coreServer2';
             const isServer1 = env === 'coreServer1' || env === 'server1';
-            const locationColumns = {
-                uat: [],
-                staging: ['Appointment Location'],
-                coreServer1: ['Appointment Location'],
-                coreServer2: ['Appointment Location']
-            };
+            // const locationColumns = {
+            //     uat: [],
+            //     staging: ['Appointment Location'],
+            //     coreServer1: ['Appointment Location'],
+            //     coreServer2: ['Appointment Location']
+            // };
 
             const expectedColumns = [
                 'Student Name',
@@ -1234,7 +1234,8 @@ export default class BusinessReportsPage extends BasePage {
                 'Answer',
                 'Appt Date',
                 'Appt Start Time',
-                ...(locationColumns[env] ?? []),
+                'Appointment Location',
+                // ...(locationColumns[env] ?? []),
                 'Appt End Time',
                 'Staff Name',
                 isServer1 ? 'Public Notes' : 'Private Lesson Notes'

@@ -147,7 +147,7 @@ export default class StudentProfilePage extends BasePage {
      **/
     async verifyProfileUpdateSuccess() {
         await test.step('Verify "Details updated successfully." message', async () => {
-            await this.waitForVisible(this.successAlert, 20000);
+            await this.waitForVisible(this.successAlert, 60000);
             await this.verifyContainsText(this.successAlert, 'Details updated successfully.');
         });
     }

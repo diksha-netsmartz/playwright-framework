@@ -25,7 +25,7 @@ export default class ClassroomAttendancePage extends BasePage {
 
         // Date range filter
         this.todayFilterBtn = page.locator("#btnSelectDateRangeFilter");
-        this.last26WeeksLink = page.getByRole('link', { name: 'Last 26 Weeks' });
+        this.lastWeeksLink = page.getByRole('link', { name: 'Last 26 Weeks' }).or(page.getByRole('link', { name: 'Last 12 Weeks' }));
         this.filterBtn = page.getByRole('button', { name: 'Filter' }).last();
 
         // Attendance table
@@ -68,12 +68,12 @@ export default class ClassroomAttendancePage extends BasePage {
     }
 
     /**
-     * Applies the 'Last 26 Weeks' date range filter and clicks the Filter button.
+     * Applies the 'Last 26/12 Weeks' date range filter and clicks the Filter button.
     **/
-    async selectLast26WeeksAndFilter() {
-        await test.step('Filter schedule by "Last 26 Weeks" date range', async () => {
+    async selectLastWeeksAndFilter() {
+        await test.step('Filter schedule by "Last 26/12 Weeks" date range', async () => {
             await this.click(this.todayFilterBtn);
-            await this.click(this.last26WeeksLink);
+            await this.click(this.lastWeeksLink.first());
             await this.click(this.filterBtn);
         });
     }

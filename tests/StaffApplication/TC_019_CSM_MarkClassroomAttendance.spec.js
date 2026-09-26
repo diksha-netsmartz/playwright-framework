@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import { test } from '@playwright/test';
 
 import StaffLoginPage from '@pages/StaffApplication/StaffLoginPage';
 import ClassroomAttendancePage from '@pages/StaffApplication/ClassroomAttendancePage';
@@ -10,7 +10,7 @@ import { credentials } from '@config/config';
  * Test Case Title: Verify attendance can be marked
  * Expected Result: Classroom attendance marked successfully message should display
  **/
-test('TC_019: CSM - Verify attendance can be marked', { tag: ['@CSM', '@CSMClassroom', '@smoke'] }, async ({page}) => {
+test('TC_019: CSM - Verify attendance can be marked', { tag: ['@CSM', '@CSMClassroom', '@smoke'] }, async ({ page }) => {
 
     const staffLoginPage = new StaffLoginPage(page);
     const classroomAttendancePage = new ClassroomAttendancePage(page);
@@ -25,9 +25,9 @@ test('TC_019: CSM - Verify attendance can be marked', { tag: ['@CSM', '@CSMClass
         await classroomAttendancePage.clickViewAll();
     });
 
-    await test.step('Step 4 & 5: Filter by Class and Last 26 Weeks', async () => {
+    await test.step('Step 4 & 5: Filter by Class and Last Weeks', async () => {
         await classroomAttendancePage.selectClassFilter();
-        await classroomAttendancePage.selectLast26WeeksAndFilter();
+        await classroomAttendancePage.selectLastWeeksAndFilter();
     });
 
     await test.step('Step 6: Click Take Attendance', async () => {
