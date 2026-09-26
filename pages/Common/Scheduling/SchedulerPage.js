@@ -232,9 +232,9 @@ export default class SchedulerPage extends BasePage {
                     continue;
                 }
 
-                if (cell.classList.contains('k-nonwork-hour')) {
-                    continue;
-                }
+                // if (cell.classList.contains('k-nonwork-hour')) {
+                //     continue;
+                // }
 
                 const bgColor = window.getComputedStyle(cell).backgroundColor;
                 const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
@@ -327,7 +327,7 @@ export default class SchedulerPage extends BasePage {
                 const cellBox = cell.getBoundingClientRect();
 
                 if (cellBox.width === 0 || cellBox.height === 0) continue;
-                if (cell.classList.contains('k-nonwork-hour')) continue;
+                // if (cell.classList.contains('k-nonwork-hour')) continue;
                 const bgColor = window.getComputedStyle(cell).backgroundColor;
                 const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
                 if (!isWhite) continue;
