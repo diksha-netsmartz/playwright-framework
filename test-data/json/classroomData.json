@@ -1,9 +1,9 @@
 {
   "sessionType": "Single Session Class",
   "status": "Open",
-  "enrollment": "1000",
-  "makeup": "70",
-  "totalSessions": "50",
+  "enrollment": "100",
+  "makeup": "7",
+  "totalSessions": "5",
   "weekdays": [
     "MON",
     "TUE",
