@@ -17,6 +17,9 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
     const studentHomePage = new StudentHomePage(page);
     const studentProfilePage = new StudentProfilePage(page);
 
+    let dynamicMiddleName;
+    let dynamicCellPhone;
+    let dynamicCity;
     let dynamicParentPhone;
     let dynamicParentEmail;
     let dynamicAddress;
@@ -38,6 +41,9 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
     });
 
     await test.step('Step 3: Update profile fields with dynamic runtime values', async () => {
+        dynamicMiddleName = `Mid${Math.floor(10 + Math.random() * 90)}`;
+        dynamicCellPhone = TestDataGenerator.generateRandomPhoneNumber();
+        dynamicCity = 'Springfield';
         dynamicParentPhone = TestDataGenerator.generateRandomPhoneNumber();
         dynamicParentEmail = `parent_${Date.now()}@test.com`;
         dynamicAddress = `${Math.floor(100 + Math.random() * 900)} Main Street`;
@@ -50,6 +56,10 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
         dynamicPreferredPronouns = 'They/Them';
 
         await studentProfilePage.updateProfileDetails({
+            middleName: dynamicMiddleName,
+            cellPhone: dynamicCellPhone,
+            city: dynamicCity,
+            zipcode: dynamicZipcode,
             parentPhone: dynamicParentPhone,
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
@@ -70,6 +80,10 @@ test('TC_021: CSP - Verify student is able to update the profile', { tag: ['@CSP
     await test.step('Step 6: Navigate back to Profile and verify updated values', async () => {
         await studentHomePage.navigateToProfile();
         await studentProfilePage.verifyProfileDetails({
+            middleName: dynamicMiddleName,
+            cellPhone: dynamicCellPhone,
+            city: dynamicCity,
+            zipcode: dynamicZipcode,
             parentPhone: dynamicParentPhone,
             parentGuardianEmail: dynamicParentEmail,
             address: dynamicAddress,
