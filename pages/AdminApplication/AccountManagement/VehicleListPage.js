@@ -501,14 +501,15 @@ export default class VehicleListPage extends BasePage {
     async filterByAllStatus() {
         await test.step('Filter Vehicles by All status', async () => {
             await this.waitForLoaders();
-            if (await this.statusFilterDropdown.isVisible({ timeout: 2000 }).catch(() => false)) {
+            if (await this.isVisible(this.statusFilterDropdown, { timeout: 2000 }).catch(() => false)) {
                 await this.click(this.statusFilterDropdown);
                 await this.waitForVisible(this.selectAllStatusCheckbox);
                 await this.click(this.selectAllStatusCheckbox, { force: true });
-                // Close dropdown after selection
-                await this.click(this.statusFilterDropdown);
                 await this.waitForLoaders();
-                await this.page.waitForTimeout(1000);
+                // Close dropdown after selection
+                // await this.jsClick(this.statusFilterDropdown);
+                // await this.waitForLoaders();
+                // await this.page.waitForTimeout(1000);
             }
         });
     }

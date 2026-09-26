@@ -52,7 +52,7 @@
   "uat": {
     "cadmin": {
       "username": "testautomation",
-      "password": "Staffing@*123321"
+      "password": "123456Aa#"
     },
     "studentUser": {
       "name": "testautomation_donotuse",
@@ -78,7 +78,7 @@
   "coreServer1": {
     "cadmin": {
       "username": "testautomation",
-      "password": "Staffing@*123321"
+      "password": "123456Aa#"
     },
     "studentUser": {
       "name": "testautomation_donotuse",

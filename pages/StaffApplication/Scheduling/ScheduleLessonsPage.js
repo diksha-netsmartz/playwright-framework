@@ -1,5 +1,5 @@
 import BasePage from '@utils/BasePage';
-import {expect, test} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Page Object representing the Schedule Lessons Page in Staff Portal (CSM).
@@ -16,16 +16,17 @@ export default class ScheduleLessonsPage extends BasePage {
         super(page);
 
         this.studentNameInput = page.locator('#txt_studentLessons_StudentName');
-        this.studentNameOption = (name) => page.getByRole('option', {name: new RegExp(name, 'i')});
+        this.studentNameOption = (name) => page.getByRole('option', { name: new RegExp(name, 'i') });
         this.selectStudentBtn = page.locator("#btn_btwScheduling_SelectStudent")
 
         // Open slots: buttons with date/time or green buttons
         this.openSlotButtons = page.locator('#btnSelectAppt');
         this.pickupLocation = page.locator('#txtPickuplocation');
         this.pickupLocationRadioButton = page.locator("//ul[@id='divPickupLocation']//input//following-sibling::ins").first();
-        this.dropoffLocationRadioButton = page.locator("//ul[@id='divDropOffLocation'//input//following-sibling::Ins").first();
+        this.dropoffLocationRadioButton = page.locator("//ul[@id='divDropOffLocation']//input//following-sibling::ins").first();
         this.dropoffLocation = page.locator('#txtdropOfflocation');
-        this.scheduleLessonBtn = page.getByRole('button', {name: 'Schedule Lesson'});
+        this.openSlotsCurrentPage = page.locator('.table-pager a.currentPage').first();
+        this.scheduleLessonBtn = page.getByRole('button', { name: 'Schedule Lesson' });
 
         // Confirmation popup
         this.successCheckIcon = page.locator('.icon-check, .alert-success, i.fa-check').first();
@@ -36,7 +37,7 @@ export default class ScheduleLessonsPage extends BasePage {
 
 
         //scheduled lesson
-        this.clickHereToViewScheduledLesson = page.getByRole('link', {name: 'Click Here to View Scheduled Lessons'})
+        this.clickHereToViewScheduledLesson = page.getByRole('link', { name: 'Click Here to View Scheduled Lessons' })
         this.scheduledLessonsTable = page.locator('#TableAlreadyScheduled');
         this.scheduledLessonsTableLastRow = page.locator("(//table[@id='TableAlreadyScheduled']//tr)[last()]");
 
@@ -65,51 +66,100 @@ export default class ScheduleLessonsPage extends BasePage {
             });
 
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', {timeout: 10000}).catch(() => {
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
             });
             await this.waitForLoaders();
         });
     }
 
     /**
-     * Selects any available open slot (green button with appointment date and time).
-     * If the selected slot displays an error message, it closes the modal and clicks the next slot green button.
+     * Selects any available open slot from last button to first.
+     * If the selected slot displays an error message modal, closes the modal and tries the previous slot button.
      * @returns {Promise<string>} The selected slot text.
      **/
     async selectAnyOpenSlot() {
         return await test.step('Select an open appointment slot', async () => {
-            await this.page.waitForLoadState('load', {timeout: 10000}).catch(() => {
-            });
-            await this.waitForLoaders();
-            await this.waitForVisible(this.openSlotButtons.first(), 8000);
-            const slotCount = await this.openSlotButtons.count();
+            let pageNum = 1;
 
-            for (let i = 0; i < slotCount; i++) {
-                const slotToSelect = this.openSlotButtons.nth(i);
-                const slotText = (await slotToSelect.textContent() || '').trim().replace(/\s+/g, ' ');
-
-                await this.click(slotToSelect);
+            while (true) {
+                await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+                });
                 await this.waitForLoaders();
-                await this.waitForVisible(this.modal, 20000);
+                await this.waitForVisible(this.openSlotButtons.first(), 10000);
+                const slotCount = await this.openSlotButtons.count();
 
-                // If error message modal is displayed, close modal and try the next slot button
-                const hasError = await this.isVisible(this.errorMessage, {timeout: 1500}).catch(() => false);
-                if (hasError) {
-
-                    await this.click(this.closeModalBtn);
-                    await this.waitForLoaders();
-                    await this.waitForHidden(this.closeModalBtn, 3000).catch(() => {
-                    });
-                    await this.waitForLoaders();
-                    continue;
+                if (slotCount === 0) {
+                    throw new Error('No open appointment slots found on the page.');
                 }
 
-                return slotText;
+                for (let i = slotCount - 1; i >= 0; i--) {
+                    const slotToSelect = this.openSlotButtons.nth(i);
+                    const slotText = (await slotToSelect.textContent() || '').trim().replace(/\s+/g, ' ');
+
+                    await this.click(slotToSelect);
+                    await this.waitForLoaders();
+                    await this.waitForVisible(this.modal, 20000);
+
+                    // If error message modal is displayed, close modal and try the next slot button
+                    const hasError = await this.isVisible(this.errorMessage, { timeout: 1500 }).catch(() => false);
+                    if (hasError) {
+                        await this.click(this.closeModalBtn);
+                        await this.waitForLoaders();
+                        await this.waitForHidden(this.closeModalBtn, 3000).catch(() => {
+                        });
+                        await this.waitForLoaders();
+                        continue;
+                    }
+
+                    return slotText;
+                }
+
+                const navigatedToNextPage = await this.goToNextOpenSlotsPage(pageNum);
+                if (!navigatedToNextPage) {
+                    break;
+                }
+
+                pageNum++;
             }
 
-            throw new Error('No open slot could be selected without an error.');
+            throw new Error('No open slot could be selected without an error across all pages.');
         });
     }
+
+    /**
+    * Navigates to the next available open-slots page in the table pager.
+    * @param {number} currentPageNum - Current pager page number.
+    * @returns {Promise<boolean>} True when navigation succeeded, otherwise false.
+    **/
+    async goToNextOpenSlotsPage(currentPageNum) {
+        const nextPageLink = this.page.locator(`.table-pager a[href*="page=${currentPageNum + 1}"]`).first();
+        const isNextAvailable = await this.isVisible(nextPageLink, { timeout: 1500 }).catch(() => false);
+
+        if (!isNextAvailable) {
+            return false;
+        }
+
+        const currentActiveText = await this.openSlotsCurrentPage.textContent().catch(() => String(currentPageNum));
+
+        try {
+            await this.click(nextPageLink);
+        } catch {
+            await this.jsClick(nextPageLink);
+        }
+
+        await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+        });
+        await this.waitForLoaders();
+
+        if (currentActiveText) {
+            await expect(this.openSlotsCurrentPage).not.toHaveText(currentActiveText.trim(), { timeout: 7000 }).catch(() => {
+            });
+        }
+
+        await this.waitForLoaders();
+        return true;
+    }
+
 
     /**
      * Clicks the 'Schedule Lesson' button to schedule the selected slot.
@@ -120,13 +170,13 @@ export default class ScheduleLessonsPage extends BasePage {
             await this.waitForVisible(this.scheduleLessonBtn, 500);
             if (await this.isVisible(this.pickupLocation)) {
                 await this.fill(this.pickupLocation, "Pick Up location")
-            } else if (await this.isVisible(this.pickupLocationRadioButton, {timeout: 100}).catch(() => false)) {
+            } else if (await this.isVisible(this.pickupLocationRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.pickupLocationRadioButton);
             }
 
             if (await this.isVisible(this.dropoffLocation)) {
                 await this.fill(this.dropoffLocation, "Drop Off location")
-            } else if (await this.isVisible(this.dropoffLocationRadioButton, {timeout: 100}).catch(() => false)) {
+            } else if (await this.isVisible(this.dropoffLocationRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.dropoffLocationRadioButton);
             }
             await this.click(this.scheduleLessonBtn);
@@ -163,7 +213,7 @@ export default class ScheduleLessonsPage extends BasePage {
             await this.waitForVisible(this.clickHereToViewScheduledLesson, 5000);
             await this.click(this.clickHereToViewScheduledLesson);
             await this.waitForVisible(this.scheduledLessonsTable);
-            const expectedHeaders = ['Date/Time', 'Starts in', 'Instructor Name', 'Location', 'Pickup Location'];
+            const expectedHeaders = ['Date/Time', 'Starts in', 'Location', 'Cancel', 'Reschedule'];
             for (const header of expectedHeaders) {
                 await expect(this.scheduledLessonsTable).toContainText(header);
             }

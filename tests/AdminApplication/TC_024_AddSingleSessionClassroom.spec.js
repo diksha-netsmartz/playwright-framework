@@ -26,7 +26,7 @@ test('TC_024: C-admin > Classroom > New Class - Add Single Session Class', { tag
   });
 
   await test.step('Step 3: Fill all Single-Session Classroom fields and submit', async () => {
-    await newClassPage.createSingleSessionClassroom(classroomData, credentials.staffUser.username);
+    await newClassPage.createSingleSessionClassroom(credentials.staffUser.username, classroomData);
   });
 });
 

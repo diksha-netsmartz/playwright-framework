@@ -21,14 +21,16 @@ export default class StudentAppointmentsPage extends BasePage {
         this.filterButton = page.getByRole('button', { name: 'Filter' }).first();
 
         // Appointment table & action links
-        this.bookMakeupLink = page.getByRole('link', { name: 'BOOK MAKEUP' }).first();
+        this.bookMakeupLink = page.getByRole('link', { name: 'BOOK MAKEUP' });
         this.makeupModalHeading = page.getByRole('heading', { name: 'MAKEUP' });
 
         // Makeup selection modal / table
-        this.firstAvailableMakeupSlotButton = page.locator('#partialMakeupTable').getByRole('button', { name: 'SELECT' }).first();
+        this.makeupSlotButton = page.locator('#partialMakeupTable').getByRole('button', { name: 'SELECT' });
 
         // Confirmation / alert message
         this.makeupSuccessModalMessage = page.getByText('Enrolled sucessfully.');
+        this.modal = page.locator('div.modal-content:visible')
+        this.closeModalButton = page.getByRole('button', { name: 'Close' }).filter({ visible: true });
     }
 
     /**
@@ -49,11 +51,13 @@ export default class StudentAppointmentsPage extends BasePage {
 
     /**
      * Clicks on the 'BOOK MAKEUP' link for an appointment row.
+     * @param {number} [index=0] - The index of the BOOK MAKEUP link to click.
      **/
-    async clickBookMakeup() {
-        await test.step('Click on BOOK MAKEUP', async () => {
-            await this.waitForVisible(this.bookMakeupLink, 5000);
-            await this.click(this.bookMakeupLink);
+    async clickBookMakeup(index = 0) {
+        await test.step(`Click on BOOK MAKEUP (row ${index + 1})`, async () => {
+            const link = this.bookMakeupLink.nth(index);
+            await this.waitForVisible(link, 5000);
+            await this.click(link);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
             await this.waitForLoaders();
@@ -64,13 +68,43 @@ export default class StudentAppointmentsPage extends BasePage {
     }
 
     /**
-     * Selects the first available makeup slot in the modal/table.
+     * Iterates through available 'BOOK MAKEUP' appointments and their available makeup slots
+     * to select and enroll in one successfully.
      **/
-    async selectMakeupSlot() {
+    async selectAndEnrollAvailableMakeupSlot() {
         await test.step('Select available makeup slot and confirm', async () => {
-            await this.waitForVisible(this.firstAvailableMakeupSlotButton, 5000);
-            await this.click(this.firstAvailableMakeupSlotButton);
-            await this.waitForLoaders();
+            await this.filterByAppointmentType();
+            const bookMakeupCount = await this.bookMakeupLink.count();
+
+            for (let j = 0; j < bookMakeupCount; j++) {
+                if (j > 0) {
+                    await this.filterByAppointmentType();
+                }
+                await this.clickBookMakeup(j);
+                await this.waitForVisible(this.makeupSlotButton.first(), 5000);
+                const slotCount = await this.makeupSlotButton.count();
+
+                for (let i = 0; i < slotCount; i++) {
+                    if (i > 0) {
+                        await this.filterByAppointmentType();
+                        await this.clickBookMakeup(j);
+                    }
+
+                    await this.click(this.makeupSlotButton.nth(i));
+                    await this.waitForLoaders();
+                    await this.waitForVisible(this.modal, { timeout: 10000 });
+
+                    if (await this.isVisible(this.makeupSuccessModalMessage, { timeout: 1500 }).catch(() => false)) {
+                        await this.verifyEnrollmentSuccess();
+                        return;
+                    }
+
+                    await this.click(this.closeModalButton);
+                    await this.waitForLoaders();
+                }
+            }
+
+            throw new Error('No available makeup slot could be enrolled successfully across all appointments.');
         });
     }
 

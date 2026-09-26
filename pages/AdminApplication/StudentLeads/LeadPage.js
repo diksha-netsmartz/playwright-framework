@@ -459,7 +459,7 @@ export default class LeadPage extends BasePage {
                 await this.click(this.saveFilesButton);
                 await this.waitForLoaders();
                 await this.page.waitForLoadState('load', { timeout: 30000 }).catch(() => { });
-                await this.waitForVisible(this.page.getByText('File(s) uploaded successfully.', { exact: true }));
+                await this.waitForVisible(this.page.getByText('File(s) uploaded successfully.', { exact: true }), { timeout: 30000 });
                 await this.verifyVisible(this.page.getByText('File(s) uploaded successfully.', { exact: true }));
             });
         }
