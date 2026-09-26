@@ -232,14 +232,14 @@ export default class NewClassPage extends BasePage {
     /**
      * Selects instructor from the instructor dropdown. If no instructorName is provided, selects the first available option in the list.
      **/
-    async selectInstructor() {
+    async selectInstructor(instructorName) {
         await test.step('Select Classroom Instructor', async () => {
             await this.click(this.instructorDropdownBtn);
-            await this.waitForVisible(this.instructorOption);
-            await this.click(this.instructorOption);
-            // const instructorOption = this.page.locator(`xpath=(//li//span[contains(text(),'${instructorName}')])[1]`);
-            // await this.waitForVisible(instructorOption);
-            // await this.click(instructorOption);
+            // await this.waitForVisible(this.instructorOption);
+            // await this.click(this.instructorOption);
+            const instructorOption = this.page.locator(`xpath=(//li//span[contains(text(),'${instructorName}')])[1]`);
+            await this.waitForVisible(instructorOption);
+            await this.click(instructorOption);
         });
     }
 
@@ -365,9 +365,10 @@ export default class NewClassPage extends BasePage {
     /**
      * High-level method to fill all fields and create a new Multi-Session Classroom.
      * Classroom ID is randomly generated automatically if not provided.
+     * @param {string} instructorName - Username of the staff member.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createMultiSessionClassroom(classData = {}) {
+    async createMultiSessionClassroom(instructorName, classData = {}) {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Multi Session Class');
         await this.selectClassroomService();
@@ -379,7 +380,7 @@ export default class NewClassPage extends BasePage {
         await this.enterTotalSessions(classData.totalSessions);
         await this.selectWeekdays(classData.weekdays);
         await this.setSessionTimes(classData.startTime, classData.duration);
-        await this.selectInstructor();
+        await this.selectInstructor(instructorName);
         await this.checkScheduleAvailability();
         await this.enterClassroomNotes(classData.webSignupNotes, classData.crNotes, classData.internalCrNotes);
         await this.clickCreateClassroom();
@@ -389,9 +390,10 @@ export default class NewClassPage extends BasePage {
     /**
      * High-level method to fill all fields and create a new Single-Session Classroom.
      * Classroom ID is randomly generated automatically if not provided.
+     * @param {string} instructorName - Username of the staff member.
      * @param {Object} [classData={}] - Classroom configuration object.
      **/
-    async createSingleSessionClassroom(classData = {}) {
+    async createSingleSessionClassroom(instructorName, classData = {}) {
         await this.verifyNewClassroomPageIsDisplayed();
         await this.selectClassSessionType('Single Session Class');
         await this.selectClassroomService();
@@ -401,7 +403,7 @@ export default class NewClassPage extends BasePage {
         await this.selectLocation();
         await this.selectStartDate();
         await this.setSessionTimes(classData.startTime, classData.duration);
-        await this.selectInstructor();
+        await this.selectInstructor(instructorName);
         await this.checkScheduleAvailability();
         await this.enterClassroomNotes(classData.webSignupNotes, classData.crNotes, classData.internalCrNotes);
         await this.clickCreateClassroom();
