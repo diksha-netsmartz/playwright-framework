@@ -71,84 +71,84 @@ export default class StudentProfilePage extends BasePage {
             await this.clear(this.addressTextbox);
             await this.fill(this.addressTextbox, details.address);
 
-            if (details.middleName && await this.isVisible(this.middleName, { timeout: 100 }).catch(() => false)) {
+            if (details.middleName && await this.isVisibleAndEnabled(this.middleName)) {
                 await this.clear(this.middleName);
                 await this.fill(this.middleName, details.middleName);
             }
 
-            if (details.cellPhone && await this.isVisible(this.cellPhone, { timeout: 100 }).catch(() => false)) {
+            if (details.cellPhone && await this.isVisibleAndEnabled(this.cellPhone)) {
                 await this.clear(this.cellPhone);
                 await this.fill(this.cellPhone, details.cellPhone);
             }
 
-            if (details.city && await this.isVisible(this.cityTextbox, { timeout: 100 }).catch(() => false)) {
+            if (details.city && await this.isVisibleAndEnabled(this.cityTextbox)) {
                 await this.clear(this.cityTextbox);
                 await this.fill(this.cityTextbox, details.city);
             }
 
-            if (details.zipcode && await this.isVisible(this.zipcodeTextbox, { timeout: 100 }).catch(() => false)) {
+            if (details.zipcode && await this.isVisibleAndEnabled(this.zipcodeTextbox)) {
                 await this.clear(this.zipcodeTextbox);
                 await this.fill(this.zipcodeTextbox, details.zipcode);
             }
 
-            if (await this.isVisible(this.parentPhoneTxt, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.parentPhoneTxt)) {
                 await this.clear(this.parentPhoneTxt);
                 await this.fill(this.parentPhoneTxt, details.parentPhone);
             }
 
-            if (await this.isVisible(this.parentGuardianEmail, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.parentGuardianEmail)) {
                 await this.clear(this.parentGuardianEmail);
                 await this.fill(this.parentGuardianEmail, details.parentGuardianEmail);
             }
 
-            if (await this.isVisible(this.dlPermit.first(), { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.dlPermit.first())) {
                 await this.fill(this.dlPermit.first(), details.permit);
             }
 
-            if (await this.isVisible(this.coursePassword, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.coursePassword)) {
                 await this.clear(this.coursePassword);
                 await this.fill(this.coursePassword, details.coursePassword);
             }
 
-            if (await this.isVisible(this.courseStartDate, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.courseStartDate)) {
                 await this.clear(this.courseStartDate);
                 await this.pressSequentially(this.courseStartDate, details.courseStartDate);
                 await this.page.keyboard.press('Tab');
             }
 
-            if (await this.isVisible(this.studentNotesTextbox, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.studentNotesTextbox)) {
                 await this.clear(this.studentNotesTextbox);
                 await this.fill(this.studentNotesTextbox, details.studentNotes);
             }
 
-            if (await this.isVisible(this.medicalConditionsTextbox, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.medicalConditionsTextbox)) {
                 await this.clear(this.medicalConditionsTextbox);
                 await this.fill(this.medicalConditionsTextbox, details.medicalConditions);
             }
 
-            if (await this.isVisible(this.preferredPronouns, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.preferredPronouns)) {
                 await this.clear(this.preferredPronouns);
                 await this.fill(this.preferredPronouns, details.preferredPronouns);
             }
 
-            if (await this.isVisible(this.assignToLocation, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.assignToLocation)) {
                 await this.click(this.assignToLocation);
                 this.selectedLocation = (await this.assignToLocationValue.textContent() || '').trim();
                 await this.click(this.assignToLocationValue);
             }
 
-            if (await this.isVisible(this.wearGlassDropdown, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.wearGlassDropdown)) {
                 await this.click(this.wearGlassDropdown);
                 await this.click(this.wearGlassDropdownValue);
             }
 
-            if (await this.isVisible(this.permitIssuedDate, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.permitIssuedDate)) {
                 await this.clear(this.permitIssuedDate);
                 await this.waitForVisible(this.monthFirstDay);
                 await this.click(this.monthFirstDay);
             }
 
-            if (await this.isVisible(this.permitExpireDate, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.permitExpireDate)) {
                 await this.clear(this.permitExpireDate);
                 await this.waitForVisible(this.monthLastDay);
                 await this.click(this.monthLastDay);
@@ -202,60 +202,60 @@ export default class StudentProfilePage extends BasePage {
         await test.step('Verify profile field values match expected', async () => {
             await this.waitForVisible(this.updateBtn);
 
-            if (expectedDetails.middleName && await this.isVisible(this.middleName, { timeout: 100 }).catch(() => false)) {
+            if (expectedDetails.middleName && await this.isVisibleAndEnabled(this.middleName)) {
                 await expect(this.middleName).toHaveValue(expectedDetails.middleName);
             }
 
-            if (expectedDetails.cellPhone && await this.isVisible(this.cellPhone, { timeout: 100 }).catch(() => false)) {
+            if (expectedDetails.cellPhone && await this.isVisibleAndEnabled(this.cellPhone)) {
                 await expect(this.cellPhone).toHaveValue(expectedDetails.cellPhone);
             }
 
-            if (expectedDetails.city && await this.isVisible(this.cityTextbox, { timeout: 100 }).catch(() => false)) {
+            if (expectedDetails.city && await this.isVisibleAndEnabled(this.cityTextbox)) {
                 await expect(this.cityTextbox).toHaveValue(expectedDetails.city);
             }
 
-            if (expectedDetails.zipcode && await this.isVisible(this.zipcodeTextbox, { timeout: 100 }).catch(() => false)) {
+            if (expectedDetails.zipcode && await this.isVisibleAndEnabled(this.zipcodeTextbox)) {
                 await expect(this.zipcodeTextbox).toHaveValue(expectedDetails.zipcode);
             }
 
-            if (await this.isVisible(this.parentPhoneTxt, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.parentPhoneTxt)) {
                 await expect(this.parentPhoneTxt).toHaveValue(expectedDetails.parentPhone);
             }
 
-            if (await this.isVisible(this.parentGuardianEmail, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.parentGuardianEmail)) {
                 await expect(this.parentGuardianEmail).toHaveValue(expectedDetails.parentGuardianEmail);
             }
 
-            if (await this.isVisible(this.addressTextbox, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.addressTextbox)) {
                 await expect(this.addressTextbox).toHaveValue(expectedDetails.address);
             }
 
-            if (await this.isVisible(this.dlPermit.first(), { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.dlPermit.first())) {
                 await expect(this.dlPermit.first()).toHaveValue(expectedDetails.permit);
             }
 
-            if (await this.isVisible(this.coursePassword, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.coursePassword)) {
                 await expect(this.coursePassword).toHaveValue(expectedDetails.coursePassword);
             }
 
-            if (await this.isVisible(this.courseStartDate, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.courseStartDate)) {
                 await expect(this.courseStartDate).toHaveValue(expectedDetails.courseStartDate);
             }
 
-            if (await this.isVisible(this.studentNotesTextbox, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.studentNotesTextbox)) {
                 await expect(this.studentNotesTextbox).toHaveValue(expectedDetails.studentNotes);
             }
 
-            if (await this.isVisible(this.medicalConditionsTextbox, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.medicalConditionsTextbox)) {
                 await expect(this.medicalConditionsTextbox).toHaveValue(expectedDetails.medicalConditions);
             }
 
-            if (await this.isVisible(this.preferredPronouns, { timeout: 100 }).catch(() => false)) {
+            if (await this.isVisibleAndEnabled(this.preferredPronouns)) {
                 await expect(this.preferredPronouns).toHaveValue(expectedDetails.preferredPronouns);
             }
 
             const expectedLocation = this.selectedLocation;
-            if (expectedLocation && await this.isVisible(this.assignToLocation, { timeout: 100 }).catch(() => false)) {
+            if (expectedLocation && await this.isVisibleAndEnabled(this.assignToLocation)) {
                 expect(await this.getAttribute(this.assignToLocation, 'title')).toContain(expectedLocation);
             }
         });
