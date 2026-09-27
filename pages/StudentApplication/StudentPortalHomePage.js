@@ -20,7 +20,7 @@ export default class StudentPortalHomePage extends BasePage {
         // Upload Files widget
         this.fileInput = page.locator('input[type="file"][multiple]').first();
         this.uploadBtn = page.locator("xpath=//button[text()='UPLOAD' and @id='uploadimage']");
-        this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files')]");
+        this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files') or contains(text(),'file upload')]");
         this.lastUploadedOnValues = [];
         this.chooseFileBtn = page.locator("#uploadimageChoose").first();
         this.enrollNavLink = page.locator('#Marketplace_li');
