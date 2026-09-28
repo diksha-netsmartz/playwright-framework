@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import LoginPage from '@pages/AdminApplication/AdminLoginPage';
 import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
 import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
-import { credentials } from '@config/config';
+import { credentials, currentEnv } from '@config/config';
 
 /**
  * TC_028: C-Admin > Classroom > Attendance > Take Attendance
@@ -14,6 +14,13 @@ test('TC_028: C-admin > Classroom > Attendance - To verify send Session Email', 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
+    const crNames = {
+        uat: '15dsss11',
+        staging: 'CR26',
+        coreServer1: 'dsstest',
+        coreServer2: 'automationCR'
+    };
+    const crName = crNames[currentEnv];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -25,7 +32,7 @@ test('TC_028: C-admin > Classroom > Attendance - To verify send Session Email', 
     });
 
     await test.step('Step 3: Select a Classroom session with student records', async () => {
-        await attendancePage.selectSession();
+        await attendancePage.selectSession(crName);
     });
 
     await test.step('Step 4: Click on SEND SESSION EMAIL button', async () => {

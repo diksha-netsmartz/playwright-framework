@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import LoginPage from '@pages/AdminApplication/AdminLoginPage';
 import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
 import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
-import { credentials } from '@config/config';
+import { credentials, currentEnv } from '@config/config';
 
 /**
  * TC_026: C-Admin > Classroom > Attendance > Take Attendance
@@ -16,7 +16,13 @@ test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', { 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
-
+    const crNames = {
+        uat: '15dsss11',
+        staging: 'CR26',
+        coreServer1: 'dsstest',
+        coreServer2: 'automationCR'
+    };
+    const crName = crNames[currentEnv];
     let pdfPage;
     let download;
 
@@ -30,7 +36,7 @@ test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', { 
     });
 
     await test.step('Step 3: Select a Classroom session with student records', async () => {
-        await attendancePage.selectSession();
+        await attendancePage.selectSession(crName);
     });
 
     await test.step('Step 4 & 5: Export Attendance report to PDF and verify content in new tab', async () => {

@@ -1,5 +1,5 @@
 import BasePage from '@utils/BasePage';
-import {expect, test} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import PdfHelper from '@utils/PdfHelper';
 import ExcelHelper from '@utils/ExcelHelper';
 
@@ -22,15 +22,16 @@ export default class ClassroomAttendancePage extends BasePage {
         // Session selection & Pagination
         this.sessionRadioBtn = page.locator('.radioinner').first();
         this.sessionRadioBtns = page.locator('.radioinner');
+        this.searchTextbox = page.locator("div[id='attendanceTakenDta_filter'] input[placeholder='Search']")
         this.sessionsPageLengthSelect = page.locator('select[name="attendanceTakenDta_length"]').first();
-        this.noRecordMessage = page.getByText('No record exists.', {exact: true});
+        this.noRecordMessage = page.getByText('No record exists.', { exact: true });
         this.sessionsPagination = page.locator("#attendanceTakenDta_wrapper ul.pagination").first();
         this.sessionsNextPageBtn = page.locator("//div[@id='attendanceTakenDta_wrapper']//ul[contains(@class,'pagination')]//li[contains(@class,'next') and not(contains(@class,'disabled'))]//a").first();
         this.sessionsActivePage = page.locator("//div[@id='attendanceTakenDta_wrapper']//ul[contains(@class,'pagination')]//li[contains(@class,'active')]//a").first();
 
         // Student search & addition
         // this.searchStudentInput = page.getByRole('textbox', { name: 'Search Student' });
-        this.addStudentBtn = page.getByRole('button', {name: 'ADD'});
+        this.addStudentBtn = page.getByRole('button', { name: 'ADD' });
         this.confirmYesBtn = page.locator("xpath=//div[contains(@id,'confirmation')]//a[text()='Yes']");
 
         // Attendance radio options
@@ -38,7 +39,7 @@ export default class ClassroomAttendancePage extends BasePage {
         this.absentRadioBtn = page.locator("xpath=(//label[not(contains(@class,'checkedTrueAbsent'))]//span[@class='checkstudenta1'])[last()]");
 
         // Save & Feedback
-        this.saveAttendanceBtn = page.getByRole('link', {name: 'SAVE'});
+        this.saveAttendanceBtn = page.getByRole('link', { name: 'SAVE' });
         this.alertNoButton = page.locator("xpath=//button[text()='No']");
         this.noFileUploadBtn = page.locator("xpath=//a[text()='No' and @data-apply='confirmation'] | //div[contains(@id,'confirmation')]//a[text()='No'] | //button[text()='No']");
 
@@ -60,7 +61,7 @@ export default class ClassroomAttendancePage extends BasePage {
         this.emailBodyContent = page.locator('.note-editable');
         this.additionalEmail = page.locator('#CRAttendanceAdditionalEmail');
         this.sendEmailSubmitBtn = page.locator("xpath=(//button[text()='Send'])[1]");
-        this.emailSentSuccessMessage = page.getByText('Email sent successfully.', {exact: true});
+        this.emailSentSuccessMessage = page.getByText('Email sent successfully.', { exact: true });
 
         // Tracked locators
         this.presentLabelLocator = null;
@@ -71,8 +72,9 @@ export default class ClassroomAttendancePage extends BasePage {
     /**
      * Selects a session radio button. If 'No record exists.' appears, checks all sessions
      * on the current page and navigates through all pagination pages until records are found.
-     **/
-    async selectSession() {
+     * @param {string} [crName]
+     */
+    async selectSession(crName) {
         return await test.step('Select a classroom session with student records', async () => {
             await this.waitForLoaders();
             await this.page.waitForLoadState('load');
@@ -86,6 +88,7 @@ export default class ClassroomAttendancePage extends BasePage {
             }
             await this.waitForLoaders();
             await this.page.waitForLoadState('load');
+            await this.pressSequentially(this.searchTextbox, crName)
             await this.waitForVisible(this.sessionRadioBtns.first());
             const studentRowOrNoRecord = this.page.locator("//span[@class='checkstudentp1'] | //span[@class='checkstudenta1'] | //*[text()='No record exists.']");
 
@@ -103,7 +106,7 @@ export default class ClassroomAttendancePage extends BasePage {
                     await this.waitForLoaders();
 
                     // Wait for student rows or 'No record exists.' message to appear
-                    await this.waitForVisible(studentRowOrNoRecord.first(), {timeout: 5000}).catch(() => false);
+                    await this.waitForVisible(studentRowOrNoRecord.first(), { timeout: 5000 }).catch(() => false);
 
                     const isNoRecord = await this.noRecordMessage.isVisible().catch(() => false);
                     if (!isNoRecord) {
@@ -130,7 +133,7 @@ export default class ClassroomAttendancePage extends BasePage {
                     }
                     await this.waitForLoaders();
                     if (currentActiveText) {
-                        await expect(this.sessionsActivePage).not.toHaveText(currentActiveText, {timeout: 7000}).catch(() => {
+                        await expect(this.sessionsActivePage).not.toHaveText(currentActiveText, { timeout: 7000 }).catch(() => {
                         });
                     }
                     await this.waitForLoaders();
@@ -152,7 +155,7 @@ export default class ClassroomAttendancePage extends BasePage {
 
         await this.waitForLoaders();
 
-        if (await this.isVisible(this.presentRadioBtn, {timeout: 5000}).catch(() => false)) {
+        if (await this.isVisible(this.presentRadioBtn, { timeout: 500 }).catch(() => false)) {
             await test.step(`Randomly mark student attendance as Present`, async () => {
                 this.selectedAttendanceAction = 'Present';
                 await this.waitForVisible(this.presentRadioBtn);
@@ -171,7 +174,7 @@ export default class ClassroomAttendancePage extends BasePage {
         }
 
         await this.waitForLoaders();
-        return {action: this.selectedAttendanceAction, beforeCount: this.beforeCheckedCount};
+        return { action: this.selectedAttendanceAction, beforeCount: this.beforeCheckedCount };
 
     }
 
@@ -195,8 +198,8 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async verifyAttendanceMarkedSuccessfully() {
         await test.step('Verify "Classroom attendance marked successfully." confirmation message', async () => {
-            await this.waitForVisible(this.page.getByText('Classroom attendance marked successfully.', {exact: true}));
-            await this.verifyVisible(this.page.getByText('Classroom attendance marked successfully.', {exact: true}));
+            await this.waitForVisible(this.page.getByText('Classroom attendance marked successfully.', { exact: true }));
+            await this.verifyVisible(this.page.getByText('Classroom attendance marked successfully.', { exact: true }));
             await this.waitForLoaders();
         });
     }
@@ -254,7 +257,7 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async exportToExcel() {
         return await test.step('Click "Export to Excel" and wait for file download', async () => {
-            const downloadPromise = this.page.waitForEvent('download', {timeout: 60000});
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
             if (!await this.isVisible(this.exportToExcelOption)) {
                 await this.clickPrintAttendance();
             }
@@ -315,10 +318,10 @@ export default class ClassroomAttendancePage extends BasePage {
                 : `${String(expectedText).replace(/\s+/g, '_')}.pdf`
         );
         await test.step(`Verify Roster PDF report tab is loaded`, async () => {
-            await pdfPage.waitForFunction(() => document.title.trim().length > 0, {timeout: 45000}).catch(() => {
+            await pdfPage.waitForFunction(() => document.title.trim().length > 0, { timeout: 45000 }).catch(() => {
                 console.log('Title did not become non-empty within 45s; proceeding with assertion.');
             });
-            await expect(pdfPage).toHaveTitle(/Report/i, {timeout: 45000});
+            await expect(pdfPage).toHaveTitle(/Report/i, { timeout: 45000 });
         });
         await PdfHelper.downloadVerifyAndAttach(pdfPage, expectedText, resolvedAttachmentName);
         await pdfPage.close().catch(() => {
@@ -358,7 +361,7 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async exportRosterToExcel() {
         return await test.step('Click "Export to Excel" under Print Roster and wait for download', async () => {
-            const downloadPromise = this.page.waitForEvent('download', {timeout: 60000});
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
             if (!await this.isVisible(this.exportRosterToExcelOption)) {
                 await this.clickPrintRoster();
             }
@@ -411,7 +414,7 @@ export default class ClassroomAttendancePage extends BasePage {
             await this.waitForVisible(this.sendEmailSubmitBtn);
             await this.click(this.sendEmailSubmitBtn);
             await this.waitForLoaders();
-            await this.page.waitForLoadState('load', {timeout: 60000});
+            await this.page.waitForLoadState('load', { timeout: 60000 });
         });
     }
 
@@ -420,8 +423,8 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async verifyEmailSentSuccessfully() {
         await test.step('Verify "Email sent successfully." message is displayed', async () => {
-            await this.waitForVisible(this.emailSentSuccessMessage, {timeout: 30000});
-            await this.verifyVisible(this.emailSentSuccessMessage, {timeout: 30000});
+            await this.waitForVisible(this.emailSentSuccessMessage, { timeout: 30000 });
+            await this.verifyVisible(this.emailSentSuccessMessage, { timeout: 30000 });
             await this.waitForLoaders();
         });
     }
