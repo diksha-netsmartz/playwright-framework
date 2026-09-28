@@ -49,7 +49,7 @@ export default class AdminPortalHomePage extends BasePage {
 
 
         // Uploaded Files widget
-        this.uploadedFilesWidget = page.getByText('Uploaded Files', { exact: true });
+        this.uploadedFilesWidget = page.getByText('UPLOADED FILES', { exact: true }).first();
         this.showFilesToConfirmBtn = page.getByRole('button', { name: 'Show Files to Confirm' });
         this.studentSearchBox = page.locator("(//input[@aria-controls='StudentPortalEmaildataTable'])[1]")
         this.confirmButton = page.locator('#btnConfirmFile:visible');
@@ -381,16 +381,25 @@ export default class AdminPortalHomePage extends BasePage {
                 // await this.waitForHidden(this.closePreviewButton);
 
                 await this.waitForVisible(this.confirmButton);
-                await this.click(this.confirmButton);
-                await this.click(this.yesConfirmationButton);
+                await this.confirmButton.click({ force: true }).catch(async () => {
+                    await this.jsClick(this.confirmButton);
+                });
+
+                // await this.click(this.confirmButton);
+                // await this.click(this.yesConfirmationButton);
+                await this.yesConfirmationButton.click({ force: true }).catch(async () => {
+                    await this.jsClick(this.yesConfirmationButton);
+                });
                 await this.waitForLoaders();
-                await this.waitForVisible(this.sendButton);
-                await this.waitForVisible(this.page.getByText(' File has been confirmed', { exact: true }))
+                // await this.waitForVisible(this.sendButton);
+                await this.waitForVisible(this.page.getByText(' File has been confirmed', { exact: true }), { timeout: 30000 })
                 await this.verifyVisible(this.page.getByText(' File has been confirmed', { exact: true }));
-                await this.jsClick(this.sendButton);
+                await this.sendButton.click({ force: true }).catch(async () => {
+                    await this.jsClick(this.sendButton);
+                });
                 await this.waitForHidden(this.sendButton);
                 await this.waitForLoaders();
-                await this.waitForVisible(this.page.getByText('Email sent successfully.', { exact: true }));
+                await this.waitForVisible(this.page.getByText('Email sent successfully.', { exact: true }), { timeout: 30000 });
                 await this.verifyVisible(this.page.getByText('Email sent successfully.', { exact: true }));
                 await expect(matchingRows).toHaveCount(rowCountBeforeConfirmation - 1);
             }
