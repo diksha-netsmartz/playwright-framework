@@ -21,7 +21,7 @@ export default class StudentAppointmentsPage extends BasePage {
         this.filterButton = page.getByRole('button', { name: 'Filter' }).first();
 
         // Appointment table & action links
-        this.bookMakeupLink = page.getByRole('link', { name: 'BOOK MAKEUP' });
+        this.bookMakeupLink = page.locator('a:not([disabled]):has-text("BOOK MAKEUP")');
         this.makeupModalHeading = page.getByRole('heading', { name: 'MAKEUP' });
 
         // Makeup selection modal / table
@@ -38,7 +38,7 @@ export default class StudentAppointmentsPage extends BasePage {
      **/
     async filterByAppointmentType() {
         await test.step(`Filter appointments by type: Class"`, async () => {
-            await this.waitForVisible(this.selectAppointmentTypeDropdown, 5000);
+            // await this.waitForVisible(this.selectAppointmentTypeDropdown, 5000);
             await this.click(this.selectAppointmentTypeDropdown);
             await this.waitForVisible(this.classCheckbox);
             await this.click(this.classCheckbox);

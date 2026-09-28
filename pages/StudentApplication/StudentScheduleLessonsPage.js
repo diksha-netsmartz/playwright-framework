@@ -27,7 +27,7 @@ export default class StudentScheduleLessonsPage extends BasePage {
 
         // Confirmation popup
         this.successCheckIcon = page.locator('.icon-check, .alert-success, i.fa-check').first();
-        this.modal = page.locator('div.modal-body:visible')
+        this.modal = page.locator('div.modal-body:visible').first();
         this.successMessage = page.locator('#SuccessMessage');
         this.errorMessage = page.locator('#errorMessage').or(page.getByText('Student is scheduled for class at this time.'));
         this.closeModalBtn = page.locator("//div[@id='divScheduleMessage']//button[text()='Close']");
