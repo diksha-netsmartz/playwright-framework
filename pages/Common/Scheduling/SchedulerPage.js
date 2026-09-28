@@ -43,10 +43,7 @@ export default class SchedulerPage extends BasePage {
     getStudentSearchText(studentOrIdentifier) {
         if (!studentOrIdentifier) return '';
         if (typeof studentOrIdentifier === 'object') {
-            if (studentOrIdentifier.firstName && studentOrIdentifier.lastName) {
-                return `${studentOrIdentifier.lastName}, ${studentOrIdentifier.firstName}`;
-            }
-            return studentOrIdentifier.name || String(studentOrIdentifier);
+            return studentOrIdentifier.lastName || studentOrIdentifier.name || String(studentOrIdentifier);
         }
         return String(studentOrIdentifier);
     }
@@ -69,7 +66,6 @@ export default class SchedulerPage extends BasePage {
     allListMenusOfCreatedAppointments(studentName) {
         const text = this.getStudentSearchText(studentName);
         return this.page.locator(`xpath=//div[contains(@data-formattedstudentname,'${text}') or contains(@data-formattedstudentname2,'${text}')]//img[contains(@src,'list')]`);
-
     }
 
     /**
@@ -718,14 +714,7 @@ export default class SchedulerPage extends BasePage {
      **/
     async verifyAppointmentIsCopied(studentName) {
         await test.step(`Verify appointment is duplicated in scheduler for: "${this.getStudentSearchText(studentName)}"`, async () => {
-            let formattedName = '';
-            if (studentName && typeof studentName === 'object') {
-                formattedName = (studentName.firstName && studentName.lastName)
-                    ? `${studentName.lastName}, ${studentName.firstName}`
-                    : (studentName.name || String(studentName));
-            } else {
-                formattedName = String(studentName);
-            }
+            const formattedName = this.getStudentSearchText(studentName);
 
             // const locator = this.page.locator(`xpath=//p[contains(text(),'${formattedName}')]//ancestor::div[@data-types='Appointment']//span[@data-types='Appointment']//img`);
             const locator = this.page.locator(`xpath=//div[contains(@data-formattedstudentname,'${formattedName}') or contains(@data-formattedstudentname2,'${formattedName}')]//img[contains(@src,'list')]`);
@@ -741,9 +730,7 @@ export default class SchedulerPage extends BasePage {
      * @param {Object|string} studentOrName - Student object or student name string.
      **/
     async editNoShowAppointment(studentOrName) {
-        const studentName = typeof studentOrName === 'object'
-            ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
-            : studentOrName;
+        const studentName = this.getStudentSearchText(studentOrName);
 
         await test.step(`Open Edit modal for No Show appointment: "${studentName}"`, async () => {
             const listMenu = this.listMenuOfNoShowAppointment(studentName);
