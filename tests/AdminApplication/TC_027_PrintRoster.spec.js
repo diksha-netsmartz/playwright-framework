@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import LoginPage from '@pages/AdminApplication/AdminLoginPage';
 import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
 import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
-import { credentials } from '@config/config';
+import { credentials, currentEnv } from '@config/config';
 
 /**
  * TC_027: C-Admin > Classroom > Attendance > Take Attendance
@@ -20,6 +20,13 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag:
     const reportName = /Roster report|Test report|CR Report|CR Roster/i;
     let pdfPage;
     let download;
+    const crNames = {
+        uat: '15dsss11',
+        staging: 'CR26',
+        coreServer1: 'dsstest',
+        coreServer2: 'automationCR'
+    };
+    const crName = crNames[currentEnv];
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -31,7 +38,7 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag:
     });
 
     await test.step('Step 3: Select a Classroom session with student records', async () => {
-        await attendancePage.selectSession();
+        await attendancePage.selectSession(crName);
     });
 
     await test.step('Step 4 & 5: Export Roster report to PDF and verify content in new tab', async () => {

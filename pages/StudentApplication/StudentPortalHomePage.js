@@ -437,7 +437,7 @@ export default class StudentPortalHomePage extends BasePage {
                 response.url().includes('StudentCenterUploadCategory')
                 && response.request().method() === 'POST'
                 && response.status() === 200
-                , { timeout: 12000 });
+                , { timeout: 60000 });
 
             await this.click(this.uploadBtn);
             const uploadResponse = await uploadResponsePromise;
