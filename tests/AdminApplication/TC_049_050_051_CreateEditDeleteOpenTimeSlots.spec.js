@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import LoginPage from '@pages/AdminApplication/AdminLoginPage';
 import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
 import OpenTimeSlotsPage from '@pages/AdminApplication/Scheduling/ManageTimeSlots/OpenTimeSlotsPage';
-import { credentials } from '@config/config';
+import { credentials, currentEnv } from '@config/config';
 import openTimeSlotsData from '@test-data/json/openTimeSlotsData.json';
 
 /**
@@ -35,6 +35,13 @@ test('TC_049_050_051: C-Admin >> Scheduling >> Manage time slot >> Open time slo
     const homePage = new HomePage(page);
     const openTimeSlotsPage = new OpenTimeSlotsPage(page);
 
+    const instructorNamesByEnv = {
+        coreServer2: 'Instructor2',
+        coreServer1: 'DSSTEST_5292026',
+        uat: 'DSS Test'
+    };
+    const instructorName = instructorNamesByEnv[currentEnv];
+
     let createdPuLocation = '';
 
     await test.step('Step 1: Login to Admin Portal with valid credentials', async () => {
@@ -48,7 +55,7 @@ test('TC_049_050_051: C-Admin >> Scheduling >> Manage time slot >> Open time slo
 
     await test.step('Step 2.1: Filter by current month, instructor, and appointment type to check occupied dates', async () => {
         await openTimeSlotsPage.applyFilterWithCurrentMonth({
-            instructorName: credentials.staffUser.username,
+            instructorName,
             appointmentType: openTimeSlotsData.appointmentType
         });
     });
@@ -59,7 +66,7 @@ test('TC_049_050_051: C-Admin >> Scheduling >> Manage time slot >> Open time slo
 
     await test.step('Step 4: Fill all required fields in popup', async () => {
         createdPuLocation = await openTimeSlotsPage.fillOpenTimeSlotDetails(openTimeSlotsData, {
-            instructorName: credentials.staffUser.username
+            instructorName
         });
     });
 
@@ -74,7 +81,7 @@ test('TC_049_050_051: C-Admin >> Scheduling >> Manage time slot >> Open time slo
 
     await test.step('Step 7: Apply filter with current month, instructor, and appointment type', async () => {
         await openTimeSlotsPage.applyFilterWithCurrentMonth({
-            instructorName: credentials.staffUser.username,
+            instructorName,
             appointmentType: openTimeSlotsData.appointmentType
         });
     });
