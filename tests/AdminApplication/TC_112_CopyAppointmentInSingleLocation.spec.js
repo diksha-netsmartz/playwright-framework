@@ -9,12 +9,12 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC0112: C-Admin >> Single Location
+ * TC_112: C-Admin >> Single Location
  * Test Case Title: To Verify staff is able to copy/paste appointment
  * Precondition: Valid staff login credentials are available and an existing appointment is available under Single Location.
  * Expected Result: The appointment should be copied and pasted successfully, and the newly created appointment should display the same relevant details as the original appointment.
  **/
-test("TC0112: C-Admin >> Single Location - To Verify staff is able to copy/paste appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_112: C-Admin >> Single Location - To Verify staff is able to copy/paste appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

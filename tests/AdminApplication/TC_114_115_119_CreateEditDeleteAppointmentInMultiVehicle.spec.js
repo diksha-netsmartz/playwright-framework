@@ -9,7 +9,7 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC0114 / TC0115 / TC0119: C-Admin >> Multi Vehicle
+ * TC_114 / TC_115 / TC_119: C-Admin >> Multi Vehicle
  * Test Case Title: To Verify staff is able to Create, Edit, and Delete appointment
  * Precondition: User should have valid admin login credentials
  * Expected Result:

@@ -9,12 +9,12 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC0117: C-Admin >> Multi Vehicle
+ * TC_117: C-Admin >> Multi Vehicle
  * Test Case Title: To Verify staff is able to No show appointment
  * Precondition: Valid staff login credentials are available and an existing appointment is available under Multi Vehicle.
  * Expected Result: The appointment should be successfully marked as No Show, and the updated status should be displayed under Multi Vehicle.
  **/
-test("TC0117: C-Admin >> Multi Vehicle - To Verify staff is able to No show appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_117: C-Admin >> Multi Vehicle - To Verify staff is able to No show appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

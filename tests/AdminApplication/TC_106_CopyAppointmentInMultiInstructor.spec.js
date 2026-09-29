@@ -9,12 +9,12 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC0106: C-Admin >> Multi Instructor
+ * TC_106: C-Admin >> Multi Instructor
  * Test Case Title: To Verify staff is able to copy/paste appointment
  * Precondition: Valid staff login credentials are available and an existing appointment is available under Multi Instructor.
  * Expected Result: The appointment should be copied and pasted successfully, and the newly created appointment should display the same relevant details as the original appointment.
  **/
-test("TC0106: C-Admin >> Multi Instructor - To Verify staff is able to copy/paste appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_106: C-Admin >> Multi Instructor - To Verify staff is able to copy/paste appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

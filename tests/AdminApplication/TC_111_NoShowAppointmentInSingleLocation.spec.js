@@ -14,7 +14,7 @@ import { credentials } from '@config/config';
  * Precondition: Valid staff login credentials are available and an existing appointment is available under Single Location.
  * Expected Result: The appointment should be successfully marked as No Show, and the updated status should be displayed under Single Location.
  **/
-test("TC0111: C-Admin >> Single Location - To Verify staff is able to No show appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_111: C-Admin >> Single Location - To Verify staff is able to No show appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

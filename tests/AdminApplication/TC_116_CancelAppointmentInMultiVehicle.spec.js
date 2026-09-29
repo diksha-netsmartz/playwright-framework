@@ -9,12 +9,12 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC0116: C-Admin >> Multi Vehicle
+ * TC_116: C-Admin >> Multi Vehicle
  * Test Case Title: To verify staff is able to cancel appointment
  * Precondition: Valid staff login credentials are available and an existing appointment is available under Multi Vehicle.
  * Expected Result: The appointment should be cancelled successfully, and its status should be updated to Cancelled under Multi Vehicle.
  **/
-test("TC0116: C-Admin >> Multi Vehicle - To verify staff is able to cancel appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_116: C-Admin >> Multi Vehicle - To verify staff is able to cancel appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
