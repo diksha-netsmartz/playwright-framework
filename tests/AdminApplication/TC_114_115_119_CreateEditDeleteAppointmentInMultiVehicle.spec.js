@@ -9,12 +9,15 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC_104: C-Admin >> Multi Instructor
- * Test Case Title: To verify staff is able to cancel appointment
- * Precondition: Valid staff login credentials are available and an existing appointment is available under Multi Instructor.
- * Expected Result: The appointment should be cancelled successfully, and its status should be updated to Cancelled under Multi Instructor.
+ * TC_114 / TC_115 / TC_119: C-Admin >> Multi Vehicle
+ * Test Case Title: To Verify staff is able to Create, Edit, and Delete appointment
+ * Precondition: User should have valid admin login credentials
+ * Expected Result:
+ *   1. The appointment should be created successfully and values match runtime students.
+ *   2. The appointment details should get updated and modified details should be displayed correctly.
+ *   3. The appointment should be deleted successfully.
  **/
-test("TC_104: C-Admin >> Multi Instructor - To verify staff is able to cancel appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_114_115_119: C-Admin >> Multi Vehicle - To Verify staff is able to Create, Edit, and Delete appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -22,7 +25,9 @@ test("TC_104: C-Admin >> Multi Instructor - To verify staff is able to cancel ap
     const schedulerPage = new SchedulerPage(page);
     const combinedAppointmentPage = new CombinedAppointmentPage(page);
 
+    /** @type {any} */
     let student1;
+    /** @type {any} */
     let student2;
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
@@ -57,33 +62,70 @@ test("TC_104: C-Admin >> Multi Instructor - To verify staff is able to cancel ap
         await enrollmentPage.closeEnrollmentConfirmationPopup();
     });
 
-    await test.step('Step 5: Navigate to Scheduling > Multi Instructor', async () => {
-        await homePage.navigateToMultiInstructor();
+    await test.step('Step 5: Navigate to Scheduling > Multi Vehicle', async () => {
+        await homePage.navigateToMultiVehicle();
         await schedulerPage.selectAllFromDropdown();
     });
 
-    await test.step('Precondition / Setup: Create initial Combined Appointment under Multi Instructor', async () => {
+    await test.step('Step 6: Directly select calendar date and open Create Combined Appointment form', async () => {
         await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
+    });
+
+    await test.step('Step 7: Select fields (Instructor, Location, Vehicle, Students, Duration)', async () => {
         await combinedAppointmentPage.verifyPopup();
         await combinedAppointmentPage.selectMidTimeDropdown();
         await combinedAppointmentPage.selectEndTimeDropdown();
+        await combinedAppointmentPage.selectDropdown("InstID");
         await combinedAppointmentPage.selectDropdown("Location");
-        await combinedAppointmentPage.selectDropdown("Vehicle");
         await combinedAppointmentPage.selectDropdown("Language");
+        await combinedAppointmentPage.selectDropdown("Vehicle");
         await combinedAppointmentPage.fillStudentDetails(1, student1);
         await combinedAppointmentPage.fillStudentDetails(2, student2);
         await combinedAppointmentPage.selectDuration();
+    });
+
+    await test.step('Step 8: Store values and submit appointment', async () => {
         await combinedAppointmentPage.storeAppointmentValues();
         await combinedAppointmentPage.submitAppointment();
     });
 
-    await test.step('Step 6: Cancel appointment for Student 1 and verify cancellation', async () => {
+    await test.step('Step 9: Verify appointment is created successfully and values match runtime students', async () => {
         await schedulerPage.editAppointment(student1);
-        await combinedAppointmentPage.cancelAppointment(student1);
+        await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues(student1, student2);
     });
 
-    await test.step('Step 7: Cancel appointment for Student 2 and verify cancellation', async () => {
-        await schedulerPage.editAppointment(student2);
-        await combinedAppointmentPage.cancelAppointment(student2);
+    const updatedStudent1 = {
+        ...student1,
+        pickup: "updated pickup location one",
+        dropoff: "updated dropoff location one",
+        notes: "updated note student1"
+    };
+    const updatedStudent2 = {
+        ...student2,
+        pickup: "updated pickup location two",
+        dropoff: "updated dropoff location two",
+        notes: "updated note student2"
+    };
+
+    await test.step('Step 10: Select existing appointment and click Edit option', async () => {
+        await schedulerPage.editAppointment(student1);
+    });
+
+    await test.step('Step 11: Update appointment details for Student 1 and Student 2', async () => {
+        await combinedAppointmentPage.updateStudentDetails(1, updatedStudent1);
+        await combinedAppointmentPage.updateStudentDetails(2, updatedStudent2);
+    });
+
+    await test.step('Step 12: Submit updated appointment', async () => {
+        await combinedAppointmentPage.updateAppointment();
+    });
+
+    await test.step('Step 13: Verify modified details are displayed correctly under Multi Vehicle', async () => {
+        await schedulerPage.editAppointment(student1);
+        await combinedAppointmentPage.verifyCombinedAppointmentCreatedValues(updatedStudent1, updatedStudent2);
+    });
+
+    await test.step('Step 14: Select existing appointment, click Delete, and confirm deletion', async () => {
+        await schedulerPage.deleteAppointment(student1);
     });
 });

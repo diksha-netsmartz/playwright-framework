@@ -14,7 +14,7 @@ import { credentials } from '@config/config';
  * Precondition: Valid staff login credentials are available and an existing appointment is available under Single Location.
  * Expected Result: The appointment should be cancelled successfully, and its status should be updated to Cancelled under Single Location.
  **/
-test("TC0110: C-Admin >> Single Location - To verify staff is able to cancel appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_110: C-Admin >> Single Location - To verify staff is able to cancel appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

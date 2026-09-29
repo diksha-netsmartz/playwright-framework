@@ -9,12 +9,12 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC0105: C-Admin >> Multi Instructor
+ * TC_105: C-Admin >> Multi Instructor
  * Test Case Title: To Verify staff is able to No show appointment
  * Precondition: Valid staff login credentials are available and an existing appointment is available under Multi Instructor.
  * Expected Result: The appointment should be successfully marked as No Show, and the updated status should be displayed under Multi Instructor.
  **/
-test("TC0105: C-Admin >> Multi Instructor - To Verify staff is able to No show appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_105: C-Admin >> Multi Instructor - To Verify staff is able to No show appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);

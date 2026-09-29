@@ -9,12 +9,12 @@ import createAppointmentData from "@test-data/json/createAppointmentData.json";
 import { credentials } from '@config/config';
 
 /**
- * TC_104: C-Admin >> Multi Instructor
+ * TC_116: C-Admin >> Multi Vehicle
  * Test Case Title: To verify staff is able to cancel appointment
- * Precondition: Valid staff login credentials are available and an existing appointment is available under Multi Instructor.
- * Expected Result: The appointment should be cancelled successfully, and its status should be updated to Cancelled under Multi Instructor.
+ * Precondition: Valid staff login credentials are available and an existing appointment is available under Multi Vehicle.
+ * Expected Result: The appointment should be cancelled successfully, and its status should be updated to Cancelled under Multi Vehicle.
  **/
-test("TC_104: C-Admin >> Multi Instructor - To verify staff is able to cancel appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
+test("TC_116: C-Admin >> Multi Vehicle - To verify staff is able to cancel appointment", { tag: ['@CAdmin', '@scheduling'] }, async ({ page }) => {
     test.setTimeout(600000);
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
@@ -57,18 +57,19 @@ test("TC_104: C-Admin >> Multi Instructor - To verify staff is able to cancel ap
         await enrollmentPage.closeEnrollmentConfirmationPopup();
     });
 
-    await test.step('Step 5: Navigate to Scheduling > Multi Instructor', async () => {
-        await homePage.navigateToMultiInstructor();
+    await test.step('Step 5: Navigate to Scheduling > Multi Vehicle', async () => {
+        await homePage.navigateToMultiVehicle();
         await schedulerPage.selectAllFromDropdown();
     });
 
-    await test.step('Precondition / Setup: Create initial Combined Appointment under Multi Instructor', async () => {
+    await test.step('Precondition / Setup: Create initial Combined Appointment under Multi Vehicle', async () => {
         await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
         await combinedAppointmentPage.verifyPopup();
         await combinedAppointmentPage.selectMidTimeDropdown();
         await combinedAppointmentPage.selectEndTimeDropdown();
-        await combinedAppointmentPage.selectDropdown("Location");
+        await combinedAppointmentPage.selectDropdown("InstID");
         await combinedAppointmentPage.selectDropdown("Vehicle");
+        await combinedAppointmentPage.selectDropdown("Location");
         await combinedAppointmentPage.selectDropdown("Language");
         await combinedAppointmentPage.fillStudentDetails(1, student1);
         await combinedAppointmentPage.fillStudentDetails(2, student2);
