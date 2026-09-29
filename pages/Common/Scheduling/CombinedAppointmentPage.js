@@ -452,10 +452,7 @@ export default class CombinedAppointmentPage extends BasePage {
             return studentOrIdentifier;
         }
         if (typeof studentOrIdentifier === 'object') {
-            if (studentOrIdentifier.firstName && studentOrIdentifier.lastName) {
-                return `${studentOrIdentifier.lastName}, ${studentOrIdentifier.firstName}`;
-            }
-            return studentOrIdentifier.name || String(studentOrIdentifier);
+            return studentOrIdentifier.lastName || studentOrIdentifier.firstName || studentOrIdentifier.name || String(studentOrIdentifier);
         }
         return String(studentOrIdentifier);
     }
@@ -631,9 +628,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {Object|string} studentOrName - Student object or student's name string.
      **/
     async cancelAppointment(studentOrName) {
-        const studentName = typeof studentOrName === 'object'
-            ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
-            : studentOrName;
+        const studentName = this.getStudentSearchText(studentOrName);
 
         await test.step(`Cancel appointment for: "${studentName}"`, async () => {
             await this.isVisible(this.cancelAppointmentButton(studentName), { timeout: 5000 }).catch(() => false);
@@ -699,9 +694,7 @@ export default class CombinedAppointmentPage extends BasePage {
      * @param {Object|string} studentOrName - Student object or student's name string.
      **/
     async markAppointmentAsNoShow(studentOrName) {
-        const studentName = typeof studentOrName === 'object'
-            ? ((studentOrName.firstName && studentOrName.lastName) ? `${studentOrName.lastName}, ${studentOrName.firstName}` : studentOrName.name.replace(" ", ", "))
-            : studentOrName;
+        const studentName = this.getStudentSearchText(studentOrName);
 
         await test.step(`Mark appointment as No Show for: "${studentName}"`, async () => {
             await this.waitForVisible(this.noShowAppointmentButton(studentName));
