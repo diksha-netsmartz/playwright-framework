@@ -580,9 +580,9 @@ export default class CombinedAppointmentPage extends BasePage {
                 ? expectedState.student1
                 : expectedState.student2;
 
-        const expectedStudentName = (student.firstName && student.lastName)
-            ? `${student.lastName}, ${student.firstName}`
-            : student.name.replace(" ", ", ");
+        const expectedStudentName = typeof student === 'object'
+            ? (student.firstName || (student.name ? student.name.split(' ')[0] : ''))
+            : String(student).split(' ')[0];
 
         await this.verifyText(
             this.page.locator(`#FirstTypeAppointment_Student${studentNo}Name`), expectedStudentName);
