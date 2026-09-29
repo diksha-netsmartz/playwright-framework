@@ -391,19 +391,17 @@ export default class OpenTimeSlotsPage extends BasePage {
             await this.waitForVisible(this.staffDropdown);
             await this.click(this.staffDropdown);
 
-            const targetInstructor = (typeof options === 'string' ? options : options.instructorName)
-                || credentials?.staffUser?.username
-                || data.staff;
+            const targetInstructor = (typeof options === 'string' ? options : options.instructorName);
 
             const staffOption = this.page.locator("//select[@id='drp_AOTSInstructor']//parent::div//ul//li//span")
                 .filter({ hasText: new RegExp(targetInstructor, 'i') }).first();
 
-            if (await this.isVisible(staffOption, { timeout: 2000 }).catch(() => false)) {
-                await this.click(staffOption);
-                console.log(`[OpenTimeSlotsPage] Selected staff in popup: "${targetInstructor}"`);
-            } else {
-                await this.click(this.staffDropdownOption);
-            }
+            // if (await this.isVisible(staffOption, { timeout: 2000 }).catch(() => false)) {
+            await this.click(staffOption);
+            console.log(`[OpenTimeSlotsPage] Selected staff in popup: "${targetInstructor}"`);
+            // } else {
+            //     await this.click(this.staffDropdownOption);
+            // }
             await this.waitForLoaders();
 
             // 4. Select 2 consecutive unoccupied dates in DatePicker
