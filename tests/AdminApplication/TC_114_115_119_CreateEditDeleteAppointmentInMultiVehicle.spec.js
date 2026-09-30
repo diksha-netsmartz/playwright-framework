@@ -29,6 +29,8 @@ test("TC_114_115_119: C-Admin >> Multi Vehicle - To Verify staff is able to Crea
     let student1;
     /** @type {any} */
     let student2;
+    /** @type {any} */
+    let selectedVehicle;
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -68,7 +70,7 @@ test("TC_114_115_119: C-Admin >> Multi Vehicle - To Verify staff is able to Crea
     });
 
     await test.step('Step 6: Directly select calendar date and open Create Combined Appointment form', async () => {
-        await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
+        selectedVehicle = await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
     });
 
     await test.step('Step 7: Select fields (Instructor, Location, Vehicle, Students, Duration)', async () => {
@@ -78,7 +80,7 @@ test("TC_114_115_119: C-Admin >> Multi Vehicle - To Verify staff is able to Crea
         await combinedAppointmentPage.selectDropdown("InstID");
         await combinedAppointmentPage.selectDropdown("Location");
         await combinedAppointmentPage.selectDropdown("Language");
-        await combinedAppointmentPage.selectDropdown("Vehicle");
+        await combinedAppointmentPage.selectDropdownOption("Vehicle", selectedVehicle);
         await combinedAppointmentPage.fillStudentDetails(1, student1);
         await combinedAppointmentPage.fillStudentDetails(2, student2);
         await combinedAppointmentPage.selectDuration();

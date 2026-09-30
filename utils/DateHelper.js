@@ -119,6 +119,35 @@ export default class DateHelper {
     }
 
     /**
+     * Computes the current year's start (01/01) and end (12/31) dates formatted as MM/DD/YYYY.
+     * @param {Date} [baseDate=new Date()] - Reference date.
+     * @returns {{ startDate: string, endDate: string, formattedRange: string }}
+     */
+    static getCurrentYearDateRange(baseDate = new Date()) {
+        const year = baseDate.getFullYear();
+        const firstDay = new Date(year, 0, 1);
+        const lastDay = new Date(year, 11, 31);
+
+        const startDate = this.formatDate(firstDay);
+        const endDate = this.formatDate(lastDay);
+
+        return {
+            startDate,
+            endDate,
+            formattedRange: `${startDate} - ${endDate}`
+        };
+    }
+
+    /**
+     * Returns current year formatted date range string e.g. "01/01/2026 - 12/31/2026".
+     * @param {Date} [baseDate=new Date()] - Reference date.
+     * @returns {string}
+     */
+    static getCurrentYearFormattedRange(baseDate = new Date()) {
+        return this.getCurrentYearDateRange(baseDate).formattedRange;
+    }
+
+    /**
      * Generates a random integer between min and max (inclusive).
      * @param {number} min - Minimum number.
      * @param {number} max - Maximum number.

@@ -24,6 +24,8 @@ test("TC_116: C-Admin >> Multi Vehicle - To verify staff is able to cancel appoi
 
     let student1;
     let student2;
+    /** @type {any} */
+    let selectedVehicle;
 
     await test.step('Step 1: Login to C-admin with valid credentials', async () => {
         await loginPage.navigateToLoginPage();
@@ -63,12 +65,12 @@ test("TC_116: C-Admin >> Multi Vehicle - To verify staff is able to cancel appoi
     });
 
     await test.step('Precondition / Setup: Create initial Combined Appointment under Multi Vehicle', async () => {
-        await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
+        selectedVehicle = await schedulerPage.selectCreateAppointment(createAppointmentData.appointmentDetails.appointmentType);
         await combinedAppointmentPage.verifyPopup();
         await combinedAppointmentPage.selectMidTimeDropdown();
         await combinedAppointmentPage.selectEndTimeDropdown();
         await combinedAppointmentPage.selectDropdown("InstID");
-        await combinedAppointmentPage.selectDropdown("Vehicle");
+        await combinedAppointmentPage.selectDropdownOption("Vehicle", selectedVehicle);
         await combinedAppointmentPage.selectDropdown("Location");
         await combinedAppointmentPage.selectDropdown("Language");
         await combinedAppointmentPage.fillStudentDetails(1, student1);

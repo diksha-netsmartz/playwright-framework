@@ -362,9 +362,7 @@ export default class ClassroomAttendancePage extends BasePage {
     async exportRosterToExcel() {
         return await test.step('Click "Export to Excel" under Print Roster and wait for download', async () => {
             const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
-            if (!await this.isVisible(this.exportRosterToExcelOption)) {
-                await this.clickPrintRoster();
-            }
+            await this.clickPrintRoster();
             await this.waitForVisible(this.exportRosterToExcelOption);
             await this.click(this.exportRosterToExcelOption);
             return await downloadPromise;

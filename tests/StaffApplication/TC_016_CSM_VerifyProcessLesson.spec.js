@@ -40,14 +40,16 @@ test('TC_016: CSM - Verify process lesson functionality', { tag: ['@CSM', '@CSMH
 
     await test.step('Step 8-10: Enter details', async () => {
         await processLessonPage.selectTravelTime();
+        await processLessonPage.FillObservationMinutes();
         await processLessonPage.SelectActualStartAndEndTime();
         await processLessonPage.FillOdometerStartAndEndValue();
         await processLessonPage.enterPublicNotes();
         await processLessonPage.enterPrivateNotes();
     });
 
-    await test.step('Step 11 & 12: Sign student and instructor signatures', async () => {
+    await test.step('Step 11 & 12: Sign student, observer and instructor signatures', async () => {
         await processLessonPage.signStudentSignature();
+        await processLessonPage.signObserverSignature();
         await processLessonPage.signInstructorSignature();
     });
 
