@@ -21,13 +21,13 @@ export default class StaffHomePage extends BasePage {
         this.actionDropdownBtn = page.locator("xpath=(//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')])[1]");
         this.actionDropdownBtn2 = page.locator("xpath=(//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')])[2]");
         this.actionDropdownButtonsList = page.locator("//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')]");
-        this.processLink = page.locator("xpath=(//a//strong[text()='Process'])[last()]");
-        this.noShowLink = page.locator("xpath=(//a//strong[text()='No Show'])[last()]");
+        this.processLink = page.locator('.fa-tire:visible')
+        this.noShowLink = page.locator('.fa-eye-slash:visible')
         this.noShowTextbox = page.locator("#txtnoShowNotes");
         this.noShowButton = page.locator("#btnNoShowLesson").last();
         this.yesConfirmationButton = page.locator("#btnDeleteConfirmation");
         this.fullAppointmentYesButton = page.locator('#btnDeleteMakeFullAppointment:visible')
-        this.cancelLink = page.locator("xpath=(//a//strong[text()='Cancel'])[last()]");
+        this.cancelLink = page.locator('.fa-times-circle:visible')
         this.cancelTextbox = page.locator("#txtArea_CancelLesson");
         this.cancelButton = page.locator("#btnCancelLesson").first();
 

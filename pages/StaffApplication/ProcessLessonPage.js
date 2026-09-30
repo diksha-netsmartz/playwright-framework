@@ -21,18 +21,24 @@ export default class ProcessLesson extends BasePage {
         this.travelTime = page.locator("xpath=//input[@name='travel' and @value='15']//following-sibling::ins");
         this.publicNotesTxt = page.locator('#txtAreaLessonNotes')
         this.privateNotesTxt = page.locator('#txtAreaPrivateLesson')
-        this.studentSignatureCanvas = page.locator('#canvasStudentSignature , #canvasObserverSignature')
+        this.studentSignatureCanvas = page.locator('#canvasStudentSignature');
+        this.observerSignatureCanvas = page.locator('#canvasObserverSignature')
         this.instructorSignatureCanvas = page.locator('#canvasInstructorSignature')
         this.completeLessonSendEmailBtn = page.getByRole('button', { name: 'Complete Lesson (Send Email)' });
         this.confirmYesBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
         this.questionsDropdowns = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//button[@title='Select']");
         this.questionsOptionSelect = page.locator("(//div[contains(@id,'divEvalQuestionNumber')]//button[@title='Select']//following-sibling::div//ul//li[not(@class='selected')])[1]");
+        this.questionsTextboxes = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//input[@type='text']");
+        this.questionsRadioFalse = page.locator("//div[contains(@id,'divEvalQuestionNumber')]//input[@type='radio' and @value='False']//following-sibling::span");
         this.actualStartTimeDropdown = page.locator("//button[@data-id='txt_odometer_starttime' and @title='SELECT']");
         this.actualStartTimeValue = page.locator("(//button[@data-id='txt_odometer_starttime']//parent::div//ul//li//a//span[1][not(contains(text(),'SELECT'))])[1]");
         this.actualEndTimeDropdown = page.locator("//button[@data-id='txt_odometer_endtime' and @title='SELECT']");
         this.actualEndTimeValue = page.locator("(//button[@data-id='txt_odometer_endtime']//parent::div//ul//li//a//span[1][not(contains(text(),'SELECT'))])[1]");
         this.odometerStartValue = page.locator('#txt_odometer_startNumber')
         this.odometerEndValue = page.locator('#txt_odometer_endNumber')
+        this.observationMinutes = page.locator("button[data-id='ddlObservationMinutes']")
+        this.observationMinutesValue = page.locator("(//button[@data-id='ddlObservationMinutes']//parent::div//ul//li//a//span[1][not(contains(text(),'Select'))])[1]");
+
 
     }
 
@@ -89,6 +95,19 @@ export default class ProcessLesson extends BasePage {
     }
 
     /**
+* Fill observation minutes dropdown value
+**/
+    async FillObservationMinutes() {
+        if (await this.isVisible(this.observationMinutes, { timeout: 2000 }).catch(() => false)) {
+            await test.step('Fill observation minutes from dropdown', async () => {
+                await this.click(this.observationMinutes);
+                await this.click(this.observationMinutesValue);
+            });
+        }
+
+    }
+
+    /**
 * Fill odometer start and end value
 **/
     async FillOdometerStartAndEndValue() {
@@ -109,27 +128,50 @@ export default class ProcessLesson extends BasePage {
 
 
     /**
-     * Fills out answers for all evaluation questions dynamically by finding all dropdowns
-     * with title 'Select' and selecting a valid option (other than 'Select' / 'Please Select').
+     * Fills out answers for all evaluation questions dynamically by checking for
+     * dropdowns, textboxes, and radio buttons.
      **/
     async answerAllEvaluationQuestions() {
         await test.step('Answer all evaluation questions', async () => {
             await this.waitForLoaders();
 
-            await this.waitForVisible(this.questionsDropdowns.first(), { timeout: 5000 }).catch(() => false)
-            const totalCount = await this.questionsDropdowns.count();
+            // 1. Dropdown questions
+            await this.waitForVisible(this.questionsDropdowns.first(), { timeout: 3000 }).catch(() => false);
+            const totalDropdowns = await this.questionsDropdowns.count();
+            if (totalDropdowns > 0) {
+                for (let i = 0; i < totalDropdowns; i++) {
+                    const remainingCount = await this.questionsDropdowns.count();
+                    if (remainingCount === 0) break;
 
-            for (let i = 0; i < totalCount; i++) {
-                const remainingCount = await this.questionsDropdowns.count();
-                if (remainingCount === 0) break;
+                    const dropdown = this.questionsDropdowns.first();
+                    // await dropdown.scrollIntoViewIfNeeded();
+                    await this.click(dropdown);
+                    await this.waitForVisible(this.questionsOptionSelect, { timeout: 3000 });
+                    await this.click(this.questionsOptionSelect);
+                    await this.waitForLoaders();
+                    await this.page.waitForTimeout(300);
+                }
+            }
 
-                const dropdown = this.questionsDropdowns.first();
-                // await dropdown.scrollIntoViewIfNeeded();
-                await this.click(dropdown);
-                await this.waitForVisible(this.questionsOptionSelect, { timeout: 3000 })
-                await this.click(this.questionsOptionSelect);
-                await this.waitForLoaders();
-                await this.page.waitForTimeout(300);
+            // 2. Textbox questions
+            await this.waitForVisible(this.questionsTextboxes.first(), { timeout: 3000 }).catch(() => false);
+            const totalTextboxes = await this.questionsTextboxes.count();
+            if (totalTextboxes > 0) {
+                for (let i = 0; i < totalTextboxes; i++) {
+                    const textbox = this.questionsTextboxes.nth(i);
+                    await this.fill(textbox, 'test');
+                    await this.page.waitForTimeout(300);
+                }
+            }
+
+            // 3. Radio button questions
+            await this.waitForVisible(this.questionsRadioFalse.first(), { timeout: 3000 }).catch(() => false);
+            const totalRadios = await this.questionsRadioFalse.count();
+            if (totalRadios > 0) {
+                for (let i = 0; i < totalRadios; i++) {
+                    await this.click(this.questionsRadioFalse.nth(i));
+                    await this.page.waitForTimeout(300);
+                }
             }
         });
     }
@@ -187,6 +229,17 @@ export default class ProcessLesson extends BasePage {
         if (await this.isVisible(this.instructorSignatureCanvas, { timeout: 100 }).catch(() => false)) {
             await test.step('Sign instructor digital signature', async () => {
                 await this.drawSignature(this.instructorSignatureCanvas);
+            });
+        }
+    }
+
+    /**
+     * Draws the observer signature on the observer signature canvas.
+     **/
+    async signObserverSignature() {
+        if (await this.isVisible(this.observerSignatureCanvas, { timeout: 100 }).catch(() => false)) {
+            await test.step('Sign observer digital signature', async () => {
+                await this.drawSignature(this.observerSignatureCanvas);
             });
         }
     }
