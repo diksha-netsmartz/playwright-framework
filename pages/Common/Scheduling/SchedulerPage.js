@@ -33,6 +33,7 @@ export default class SchedulerPage extends BasePage {
         this.locationDropdownValueSelect = page.locator("(//button[contains(@data-id,'SingleLoc')]//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
         this.calendarPrevBtn = page.getByRole('group').filter({ hasText: /Instructor View:/ }).getByLabel('Previous').first();
+        this.selectedColumnName = null;
     }
 
     /**
@@ -46,6 +47,14 @@ export default class SchedulerPage extends BasePage {
             return studentOrIdentifier.lastName || studentOrIdentifier.name || String(studentOrIdentifier);
         }
         return String(studentOrIdentifier);
+    }
+
+    /**
+     * Returns locator for the column headers in the scheduler.
+     * @returns {import('@playwright/test').Locator}
+     **/
+    columnHeaders() {
+        return this.page.locator(".k-scheduler-header th.k-scheduler-group-cell");
     }
 
     /**
@@ -394,10 +403,11 @@ export default class SchedulerPage extends BasePage {
 
 
     /**
-     * Selects date in calendar, right clicks an unoccupied slot, and selects the given appointment creation option.
-     * @param {string} appointmentType - Context menu label for appointment type.
-     **/
+   * Selects date in calendar, right clicks an unoccupied slot, and selects the given appointment creation option.
+   * @param {string} appointmentType - Context menu label for appointment type.
+   **/
     async selectCreateAppointment(appointmentType) {
+        let selectedCol = '';
         await test.step(`Right-click free slot and select: "${appointmentType}"`, async () => {
             await this.selectDateInCalendar();
             await this.waitForLoaders().catch(() => { });
@@ -405,6 +415,11 @@ export default class SchedulerPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 20000 });
 
             const slot = await this.findAvailableSlot(0);
+            const colIndex = await slot.evaluate(td => td instanceof HTMLTableCellElement ? td.cellIndex : 0);
+            selectedCol = (await this.columnHeaders().nth(colIndex).innerText().catch(() => '')).trim();
+            this.selectedColumnName = selectedCol;
+            CombinedAppointmentPage.selectedVehicle = selectedCol;
+            console.log(`Clicked slot is in column: "${selectedCol}"`);
             await this.page.waitForLoadState('load', { timeout: 20000 });
             if (this.page.url().includes("StaffMobile")) {
                 await slot.click();
@@ -427,6 +442,7 @@ export default class SchedulerPage extends BasePage {
             }
             await this.click(this.createAppointmentOnRightClick(appointmentType));
         });
+        return selectedCol;
     }
     /**
      * Opens the action menu on an appointment matching student name and clicks 'Edit Appointment'.

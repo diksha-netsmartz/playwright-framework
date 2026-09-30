@@ -8,6 +8,7 @@ import studentData from "@test-data/json/studentData.json";
  * verifying appointment values, cancelling, and marking appointments as No Show.
  **/
 export default class CombinedAppointmentPage extends BasePage {
+    static selectedVehicle = null;
     static storedState = {
         uniqueId: null,
         expectedValues: {}
@@ -91,6 +92,18 @@ export default class CombinedAppointmentPage extends BasePage {
         return this.page.locator(
             `xpath=(//button[contains(@data-id,'${dropdownName}')]//parent::div//li[@data-original-index='1'])[1]`
         );
+    }
+
+    /**
+     * Returns locator for a dropdown option item matching text/name in the specified dropdown.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     * @param {string} optionText - Option text or name to match.
+     * @returns {import('@playwright/test').Locator} Matching dropdown list item locator.
+     **/
+    getDropdownOptionByName(dropdownName, optionText) {
+        return this.page.locator(
+            `xpath=//button[contains(@data-id,'${dropdownName}')]//parent::div//li[.//span[contains(normalize-space(),'${optionText}')] or .//a[contains(normalize-space(),'${optionText}')]]`
+        ).first();
     }
 
     /**
@@ -312,6 +325,24 @@ export default class CombinedAppointmentPage extends BasePage {
                 }
                 await this.click(this.getDropdownButton(dropdownName));
                 await this.click(this.getFirstDropdownOption(dropdownName));
+
+            });
+        }
+    }
+
+    /**
+     * Returns the option locator for the specified dropdown.
+     * @param {string} dropdownName - Dropdown data-id identifier.
+     * @param {string} dropdownOption - Option to be selected
+     */
+    async selectDropdownOption(dropdownName, dropdownOption) {
+        if (await this.isVisible(this.getDropdownButton(dropdownName), { timeout: 1000 })) {
+            await test.step(`Select dropdown option for: "${dropdownName}"`, async () => {
+                if (dropdownName == 'Vehicle' && await this.isVisible(this.showAllVehiclesCheckbox, { timeout: 100 })) {
+                    await this.click(this.showAllVehiclesCheckbox);
+                }
+                await this.click(this.getDropdownButton(dropdownName));
+                await this.click(this.getDropdownOptionByName(dropdownName, dropdownOption));
 
             });
         }
