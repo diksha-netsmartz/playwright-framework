@@ -135,28 +135,6 @@ export default class StudentLoginPage extends BasePage {
     async handleEmailAuthentication() {
         await this.twoFactorAuthPage.handleEmailAuthentication();
     }
-
-    /**
-     * Verifies that the student has successfully logged out and is redirected to the Login page.
-     * Also verifies that the user session is terminated and protected CSP pages cannot be accessed
-     * using the browser Back button without logging in again.
-     **/
-    async verifyLogoutSuccessful() {
-        await test.step('Verify logout redirected to Login Page', async () => {
-            await this.verifyTitle("Driving School Management System");
-            await this.verifyVisible(this.loginBtn, 1000);
-        });
-
-        await test.step('Use browser Back button and verify protected CSP pages cannot be accessed without logging in again', async () => {
-            await this.page.goBack();
-            await this.waitForLoaders().catch(() => { });
-            await this.studentHomePage.navigateToHome();
-            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
-            await this.verifyTitle("Driving School Management System");
-            await this.verifyVisible(this.loginBtn, 5000);
-            await expect(this.profileDropdownOnHomepage).toBeHidden();
-        });
-    }
 }
 
 

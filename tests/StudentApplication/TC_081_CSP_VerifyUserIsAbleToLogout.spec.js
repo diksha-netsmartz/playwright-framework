@@ -23,6 +23,6 @@ test('TC_081: CSP - To Verify user is able to logout', { tag: ['@CSP', '@CSPLogo
   });
 
   await test.step('Step 3: Verify user is successfully logged out', async () => {
-    await studentLoginPage.verifyLogoutSuccessful();
+    await header.verifyLogoutSuccessful();
   });
 });

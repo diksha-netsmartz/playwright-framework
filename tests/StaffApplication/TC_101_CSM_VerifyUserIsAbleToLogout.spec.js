@@ -23,6 +23,6 @@ test('TC_101: CSM - To Verify user is able to logout', { tag: ['@CSM', '@CSMLogo
   });
 
   await test.step('Step 3: Verify user is successfully logged out', async () => {
-    await staffLoginPage.verifyLogoutSuccessful();
+    await header.verifyLogoutSuccessful();
   });
 });

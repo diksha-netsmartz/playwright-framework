@@ -56,9 +56,12 @@ export default class BasePage {
         const loadTimeout = options.loadTimeout ?? 3000;
 
         const responsePromise = this.page.waitForResponse(
-            (resp) => resp.request().isNavigationRequest() && !resp.status().toString().startsWith('3'),
+            (resp) => resp.request().isNavigationRequest() &&
+                      resp.request().frame() === this.page.mainFrame() &&
+                      !resp.status().toString().startsWith('3'),
             { timeout: responseTimeout }
         ).catch(() => null);
+
 
         await this.click(locator);
         const response = await responsePromise;
@@ -68,6 +71,7 @@ export default class BasePage {
         }
 
         await this.waitForLoaders();
+
         await this.page.waitForLoadState('load', { timeout: loadTimeout }).catch(() => { });
         await this.waitForLoaders();
 
@@ -87,9 +91,13 @@ export default class BasePage {
         const responseTimeout = options.responseTimeout ?? 5000;
 
         const response = await popupPage.waitForResponse(
-            (resp) => resp.request().isNavigationRequest() && !resp.status().toString().startsWith('3'),
+            (resp) => resp.request().isNavigationRequest() &&
+                      resp.request().frame() === popupPage.mainFrame() &&
+                      !resp.status().toString().startsWith('3'),
             { timeout: responseTimeout }
         ).catch(() => null);
+
+        await this.waitForLoaders();
 
         if (response) {
             expect(response.status()).toBe(expectedStatus);

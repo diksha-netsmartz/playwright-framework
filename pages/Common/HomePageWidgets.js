@@ -1,6 +1,9 @@
 import BasePage from '@utils/BasePage';
 import { expect, test } from '@playwright/test';
 import { credentials as defaultCredentials } from '@config/config';
+import AdminLoginPage from '@pages/AdminApplication/AdminLoginPage';
+import StaffLoginPage from '@pages/StaffApplication/StaffLoginPage';
+import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
 
 /**
  * Shared Page Object representing Homepage / Dashboard Widgets
@@ -37,33 +40,6 @@ export default class HomePageWidgets extends BasePage {
         this.loginBtn = page.getByRole('button', { name: 'Login' }).first();
     }
 
-    /**
-     * Navigates back to the portal Home page if currently on another page.
-     */
-    async ensureOnHomePage() {
-        await this.waitForLoaders();
-        const currentUrl = this.page.url().toLowerCase();
-
-        const isOnHome = typeof this.homeUrlPattern === 'string'
-            ? currentUrl.includes(this.homeUrlPattern.toLowerCase())
-            : this.homeUrlPattern.test(currentUrl);
-
-        if (!isOnHome) {
-            if (await this.isVisible(this.homeNavLink, { timeout: 3000 }).catch(() => false)) {
-                await this.waitForLoaders();
-                await this.jsClick(this.homeNavLink).catch(async () => {
-                    await this.click(this.homeNavLink);
-                });
-            } else if (this.homeUrl) {
-                await this.navigate(this.homeUrl);
-            } else {
-                await this.page.goBack().catch(() => { });
-            }
-            await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 5000 }).catch(() => { });
-            await this.waitForLoaders();
-        }
-    }
 
     /**
      * Re-authenticates if a quick link causes a logout action.
@@ -77,17 +53,14 @@ export default class HomePageWidgets extends BasePage {
             }
 
             if (this.portalType === 'admin') {
-                const { default: AdminLoginPage } = await import('@pages/AdminApplication/AdminLoginPage');
                 const adminLoginPage = new AdminLoginPage(this.page);
                 const creds = credentials?.cadmin || credentials || defaultCredentials?.cadmin;
                 await adminLoginPage.login(creds?.username, creds?.password);
             } else if (this.portalType === 'staff') {
-                const { default: StaffLoginPage } = await import('@pages/StaffApplication/StaffLoginPage');
                 const staffLoginPage = new StaffLoginPage(this.page);
                 const creds = credentials?.staffUser || credentials || defaultCredentials?.staffUser;
                 await staffLoginPage.login(creds?.username, creds?.password);
             } else if (this.portalType === 'student') {
-                const { default: StudentLoginPage } = await import('@pages/StudentApplication/StudentLoginPage');
                 const studentLoginPage = new StudentLoginPage(this.page);
                 const creds = credentials?.studentUser || credentials || defaultCredentials?.studentUser;
                 await studentLoginPage.login(creds?.username, creds?.password);
@@ -115,8 +88,6 @@ export default class HomePageWidgets extends BasePage {
      */
     async openEachQuickLink(credentials = null) {
         return await test.step('Open each Quick Link in widget and verify navigation', async () => {
-            this.homeUrl = this.page.url();
-            await this.ensureOnHomePage();
 
             const count = await this.quickLinkButtons.count();
             if (count === 0) {
@@ -142,7 +113,10 @@ export default class HomePageWidgets extends BasePage {
                 const isLogoutLink = /log\s*out|logout/i.test(item.text);
 
                 await test.step(`Click Quick Link [${i + 1}/${linksData.length}]: "${item.text}"`, async () => {
-                    await this.ensureOnHomePage();
+                    if (await this.isVisible(this.homeNavLink, 2000)) {
+                        await this.click(this.homeNavLink);
+                        await this.waitForLoaders();
+                    }
                     const linkToClick = this.quickLinkButtons.nth(item.index);
                     await linkToClick.scrollIntoViewIfNeeded();
 
@@ -185,7 +159,10 @@ export default class HomePageWidgets extends BasePage {
                             // If there are more quick links left to test, re-login and return to home
                             if (i < linksData.length - 1) {
                                 await this.relogin(credentials);
-                                await this.ensureOnHomePage();
+                                if (await this.isVisible(this.homeNavLink, 2000)) {
+                                    await this.click(this.homeNavLink);
+                                    await this.waitForLoaders();
+                                }
                             }
                         } else {
                             if (currentTitle && currentTitle.length > 0) {
