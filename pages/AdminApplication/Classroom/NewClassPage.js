@@ -237,7 +237,7 @@ export default class NewClassPage extends BasePage {
             await this.click(this.instructorDropdownBtn);
             // await this.waitForVisible(this.instructorOption);
             // await this.click(this.instructorOption);
-            const instructorOption = this.page.locator(`xpath=(//li//span[contains(text(),'${instructorName}')])[1]`);
+            const instructorOption = this.page.locator('li span').filter({ hasText: new RegExp(instructorName, 'i') }).first();
             await this.waitForVisible(instructorOption);
             await this.click(instructorOption);
         });
