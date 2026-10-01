@@ -32,7 +32,7 @@ export default class SchedulerPage extends BasePage {
         this.multiSelectDropdownAfterSelection = page.locator("//div[@id='divInstructors']//span[contains(text(),'All selected')]");
         this.locationDropdownValueSelect = page.locator("(//button[contains(@data-id,'SingleLoc')]//parent::div//li//span[1][not(contains(text(),'Select'))])[1]");
         this.deleteButtonInPopup = page.locator("#btnDeleteAppointment");
-        this.calendarPrevBtn = page.getByRole('group').filter({ hasText: /Instructor View:/ }).getByLabel('Previous').first();
+        this.calendarPrevBtn = page.locator('a.k-nav-prev:visible').first();
         this.selectedColumnName = null;
     }
 
