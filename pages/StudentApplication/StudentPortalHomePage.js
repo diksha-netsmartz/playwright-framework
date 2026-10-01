@@ -90,6 +90,9 @@ export default class StudentPortalHomePage extends BasePage {
 
         // Action Buttons
         this.payButton = page.locator('#btnAmt');
+
+        this.previewModal = page.getByRole('heading', { name: 'Preview' });
+        this.studentMsgAttachment = (/** @type {string | RegExp} */ messageName) => page.locator(`//div[contains(text(),'${messageName}')]//parent::div//a[contains(@class,'preview')]`).first();
     }
 
     /**
@@ -524,7 +527,7 @@ export default class StudentPortalHomePage extends BasePage {
                 await this.click(this.openBalanceEnrollmentsCheckbox);
             } else {
                 await this.clear(this.creditCardAmount);
-                await this.fill(this.creditCardAmount, data.amount);
+                await this.pressSequentially(this.creditCardAmount, data.amount);
             }
 
             // Wait for whichever card gateway renders first (Clover, Stripe, Payment Form, or Standard)
@@ -598,6 +601,24 @@ export default class StudentPortalHomePage extends BasePage {
             await this.waitForVisible(this.page.getByText('Your payment has been processed successfully.', { exact: true }).first(), { timeout: 10000 });
             await this.verifyVisible(this.page.getByText('Your payment has been processed successfully.', { exact: true }).first());
 
+        });
+    }
+
+    /**
+     * Verifies student message visibility on homepage and validates attachment preview.
+     * @param {string} message - Message text.
+     * @param {boolean} isVisible - Expected visibility state.
+     **/
+    async verifyStudentMessageVisibilityOnHompegae(message, isVisible) {
+        await test.step(`Verify student message visibility: "${message}" is ${isVisible ? 'visible' : 'not visible'}`, async () => {
+            if (isVisible) {
+                await this.verifyVisible(this.page.getByText(message, { exact: false }).first());
+                await this.click(this.studentMsgAttachment(message));
+                await this.verifyVisible(this.previewModal);
+
+            } else {
+                await this.verifyNotVisible(this.page.getByText(message, { exact: false }).first());
+            }
         });
     }
 }
