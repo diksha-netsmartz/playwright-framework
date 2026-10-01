@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import StaffLoginPage from '@pages/StaffApplication/StaffLoginPage';
-import StaffHomePage from '@pages/StaffApplication/StaffHomePage';
+import HomePageWidgets from '@pages/Common/HomePageWidgets';
 import { credentials } from '@config/config';
 
 /**
@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
 test('TC_083: CSM - To Verify quick links are working', { tag: ['@CSM', '@CSMQuickLinks'] }, async ({ page }) => {
 
   const staffLoginPage = new StaffLoginPage(page);
-  const staffHomePage = new StaffHomePage(page);
+  const homePageWidgets = new HomePageWidgets(page, { portalType: 'staff' });
 
   await test.step('Step 1: Login to staff portal (CSM) with valid credentials', async () => {
     await staffLoginPage.navigateToLoginPage();
@@ -19,10 +19,10 @@ test('TC_083: CSM - To Verify quick links are working', { tag: ['@CSM', '@CSMQui
   });
 
   await test.step('Step 2: Verify Quick Links widget is visible on Staff Home page', async () => {
-    await staffHomePage.verifyQuickLinksWidgetVisible();
+    await homePageWidgets.verifyQuickLinksWidgetVisible();
   });
 
   await test.step('Step 3: Open each Quick Link and verify navigation', async () => {
-    await staffHomePage.openEachQuickLink(credentials);
+    await homePageWidgets.openEachQuickLink(credentials);
   });
 });

@@ -118,21 +118,5 @@ export default class StaffLoginPage extends BasePage {
         await this.twoFactorAuthPage.handleEmailAuthentication();
     }
 
-    /**
-* Verifies that the users has successfully logged out and is redirected to the Login page.
-**/
-    async verifyLogoutSuccessful() {
-        await test.step('Verify logout redirected to Login Page', async () => {
-            await this.verifyTitle("Login");
-            await this.verifyVisible(this.loginBtn, 1000);
-        });
-        await test.step('Use browser Back button and verify protected CSP pages cannot be accessed without logging in again', async () => {
-            await this.page.goBack();
-            await this.waitForLoaders().catch(() => { });
-            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => { });
-            await this.verifyTitle("Login");
-            await this.verifyVisible(this.loginBtn, 5000);
-        });
-    }
 }
 

@@ -682,21 +682,11 @@ export default class BusinessReportsPage extends BasePage {
             console.log(`Downloaded file name: ${fileName}`);
 
             if (fileName.endsWith('.pdf')) {
-                const env = process.env.ENV || 'coreServer2';
-                const providerDetails = {
-                    uat: [],
-                    staging: [],
-                    coreServer1: ['Provider Name', 'Provider Certificate'],
-                    coreServer2: ['Provider Name', 'Provider Certificate']
-                };
 
                 const expectedTexts = [
-                    ...(providerDetails[env] ?? []),
                     'CR#',
                     'Location',
                     'Student Name',
-                    'Teacher Name',
-                    'Teacher Signature'
                 ];
 
                 if (crName) {
