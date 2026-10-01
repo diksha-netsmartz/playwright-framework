@@ -70,9 +70,9 @@
       "password": "Session@123"
     },
     "classroomInstructor": {
-      "name": "automation_instructor_donotuse",
-      "username": "automation_instructor_donotuse",
-      "password": "Session@123"
+      "name": "2",
+      "username": "2",
+      "password": "Staffing@*123321"
     }
   },
   "coreServer1": {
