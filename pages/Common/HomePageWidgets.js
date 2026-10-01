@@ -36,7 +36,7 @@ export default class HomePageWidgets extends BasePage {
         this.quickLinkButtons = page.locator('#div_QuickLinks a');
 
         // Navigation & Authentication helpers
-        this.homeNavLink = page.locator('#home_li , .newHomePage').first();
+        this.homeNavLink = page.locator('#home_li, .newHomePage, ul.page-sidebar-menu .icon-home');
         this.loginBtn = page.getByRole('button', { name: 'Login' }).first();
     }
 
@@ -113,8 +113,8 @@ export default class HomePageWidgets extends BasePage {
                 const isLogoutLink = /log\s*out|logout/i.test(item.text);
 
                 await test.step(`Click Quick Link [${i + 1}/${linksData.length}]: "${item.text}"`, async () => {
-                    if (await this.isVisible(this.homeNavLink, 2000)) {
-                        await this.click(this.homeNavLink);
+                    if (await this.isVisible(this.homeNavLink.first(), 2000)) {
+                        await this.click(this.homeNavLink.first());
                         await this.waitForLoaders();
                     }
                     const linkToClick = this.quickLinkButtons.nth(item.index);
@@ -159,8 +159,8 @@ export default class HomePageWidgets extends BasePage {
                             // If there are more quick links left to test, re-login and return to home
                             if (i < linksData.length - 1) {
                                 await this.relogin(credentials);
-                                if (await this.isVisible(this.homeNavLink, 2000)) {
-                                    await this.click(this.homeNavLink);
+                                if (await this.isVisible(this.homeNavLink.first(), 2000)) {
+                                    await this.click(this.homeNavLink.first());
                                     await this.waitForLoaders();
                                 }
                             }
