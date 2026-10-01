@@ -3,6 +3,9 @@ import BasePage from '@utils/BasePage';
 import DateHelper from '@utils/DateHelper';
 import { expect, test } from '@playwright/test';
 import paymentData from '@test-data/json/paymentData.json';
+import StudentLoginPage from './StudentLoginPage';
+import { credentials as defaultCredentials } from '@config/config';
+
 
 /**
  * Page Object representing the Student Portal Home Page.
@@ -277,7 +280,7 @@ export default class StudentPortalHomePage extends BasePage {
      * and finally verifies Logout if present.
      * @returns {Promise<number>} Total count of quick links tested.
      **/
-    async openEachQuickLink() {
+    async openEachQuickLink(credentials = null) {
         return await test.step('Open each Quick Link in #div_QuickLinks and verify navigation', async () => {
             await this.ensureOnStudentHomePage();
             const count = await this.quickLinkButtons.count();
@@ -334,7 +337,15 @@ export default class StudentPortalHomePage extends BasePage {
 
                         if (await this.isVisible(this.loginBtn, { timeout: 2000 }).catch(() => false)) {
                             await this.verifyTitle(/Driving School|Login/i);
-                            await this.page.goBack();
+                            const creds = credentials?.studentUser || credentials || defaultCredentials?.studentUser;
+                            const username = creds?.username || creds?.studentUsername;
+                            const password = creds?.password || creds?.studentPassword;
+
+                            if (username && password) {
+                                const studentLoginPage = new StudentLoginPage(this.page);
+                                await studentLoginPage.login(username, password);
+                            }
+
                             // await this.click(this.loginBtn);
                             await this.waitForLoaders();
                             await this.page.waitForLoadState('load', { timeout: 3000 }).catch(() => {
