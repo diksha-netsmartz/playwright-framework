@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
-import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage';
+import SidebarNavigationComponent from '@pages/Common/SidebarNavigationComponent';
 import { credentials } from '@config/config';
 
 /**
@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
 test('TC_080: CSP - To Verify all links in left navigation are working', { tag: ['@CSP', '@CSPHomepage'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
-  const studentHomePage = new StudentHomePage(page);
+  const sidebarNav = new SidebarNavigationComponent(page, { portalType: 'student' });
 
   await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
     await studentLoginPage.navigateToLoginPage();
@@ -19,6 +19,6 @@ test('TC_080: CSP - To Verify all links in left navigation are working', { tag: 
   });
 
   await test.step('Step 2: Navigate and verify each link and submenu in the left navigation', async () => {
-    await studentHomePage.openEachLinkInLeftSidebar();
+    await sidebarNav.openEachLinkInLeftSidebar(credentials);
   });
 });

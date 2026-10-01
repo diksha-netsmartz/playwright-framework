@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
-import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage';
+import HomePageWidgets from '@pages/Common/HomePageWidgets';
 import { credentials } from '@config/config';
 
 /**
@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
 test('TC_079: CSP - To Verify Quick links are working', { tag: ['@CSP', '@CSPHomepage'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
-  const studentHomePage = new StudentHomePage(page);
+  const homePageWidgets = new HomePageWidgets(page, { portalType: 'student' });
 
   await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
     await studentLoginPage.navigateToLoginPage();
@@ -19,10 +19,10 @@ test('TC_079: CSP - To Verify Quick links are working', { tag: ['@CSP', '@CSPHom
   });
 
   await test.step('Step 2: Verify Quick Links widget is visible on Student Home page', async () => {
-    await studentHomePage.verifyQuickLinksWidgetVisible();
+    await homePageWidgets.verifyQuickLinksWidgetVisible();
   });
 
   await test.step('Step 3: Open each Quick Link and verify navigation', async () => {
-    await studentHomePage.openEachQuickLink();
+    await homePageWidgets.openEachQuickLink(credentials);
   });
 });

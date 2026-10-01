@@ -31,17 +31,6 @@ export default class StaffHomePage extends BasePage {
         this.cancelTextbox = page.locator("#txtArea_CancelLesson");
         this.cancelButton = page.locator("#btnCancelLesson").first();
 
-        // Sidebar Menu locators (Left Navigation)
-        this.sidebarMenu = page.locator('ul.page-sidebar-menu');
-        this.sidebarItems = page.locator("ul.page-sidebar-menu > li:not(.sidebar-toggler-wrapper):not(.sidebar-search-wrapper)");
-        this.homeNavLink = page.locator('#home_li');
-
-        // Quick Links widget locators (on Staff Home page)
-        this.quickLinksWidget = page.locator('#div_QuickLinks, .quicklinksbody');
-        this.quickLinksHeading = page.locator('.portlet-heading:has-text("QUICK LINKS"), :text-is("QUICK LINKS")');
-        this.quickLinkButtons = page.locator('#div_QuickLinks a, .quicklinksbody a');
-        this.loginBtn = page.getByRole('button', { name: 'Login' }).first();
-
         // Student Details Widget Locators
         this.studentNameInput = page.getByRole('textbox', { name: 'Student Name' });
         this.studentNameOption = (name) => page.getByRole('option', { name: new RegExp(name, 'i') }).or(page.locator('.ui-autocomplete li, .typeahead li, [role="option"], ul.ui-menu li').filter({ hasText: name })).first();
@@ -57,6 +46,9 @@ export default class StaffHomePage extends BasePage {
         this.uploadFilesWidget = page.locator("//div[contains(text(),'Upload Files') or contains(text(),'file upload')]");
         this.categoryDropdown = page.getByRole('button', { name: '--Select--' }).first();
         this.categoryDropdownOption = (/** @type {number} */ index) => this.page.locator(`((//select[@name='file_Category'])[${index + 1}]//parent::div//li//span[1][not(contains(text(),'Select'))])[1]`);
+
+        this.previewModal = page.getByRole('heading', { name: 'Preview' });
+        this.staffMsgAttachment = (/** @type {string | RegExp} */ messageName) => page.locator(`//div[contains(text(),'${messageName}')]//parent::div//a[contains(@class,'preview')]`).first();
 
         this.schedulingMenu = page.locator('#Scheduling_li');
         this.scheduleLessonsSubLink = page.locator('#Schul_btwschedulingLessons_li');
@@ -84,10 +76,6 @@ export default class StaffHomePage extends BasePage {
         this.deleteTaskIcon = page.locator("(//a[@data-toggle='confirmationDeleteTask'])[1]")
         this.taskDeleteNotification = page.getByText('Task deleted successfully.');
         this.taskOldNotes = page.locator("(//div[@id='divOldNotes']//p[contains(@class,'PNote')])[last()]");
-
-        //user profile dropdown locators
-        this.userProfileDropdown = page.locator('li.dropdown.dropdown-user')
-        this.userDropdownLogoutBtn = page.getByRole('link', { name: 'Log Out' })
     }
 
     /**
@@ -230,247 +218,6 @@ export default class StaffHomePage extends BasePage {
                 });
             }
 
-        });
-    }
-
-    /**
-     * Verifies that the Quick Links widget (#div_QuickLinks / .quicklinksbody) is displayed on the Staff Home page.
-     **/
-    async verifyQuickLinksWidgetVisible() {
-        await test.step('Verify Quick Links widget is displayed', async () => {
-            await this.waitForVisible(this.quickLinksWidget.first(), 1000);
-            await this.verifyVisible(this.quickLinksWidget.first(), 1000);
-        });
-    }
-
-    /**
-     * Navigates back to the Staff Home page if currently on another page.
-     **/
-    async ensureOnStaffHomePage() {
-        await this.waitForLoaders();
-        const isStaffHome = this.page.url().toLowerCase().includes('staffhome');
-        if (!isStaffHome) {
-            const homeLink = this.page.locator('#home_li > a, a:has-text("Home")').first();
-            if (await this.isVisible(homeLink, { timeout: 3000 }).catch(() => false)) {
-                await this.waitForLoaders();
-                await this.jsClick(homeLink).catch(async () => {
-                    await this.click(homeLink);
-                });
-            } else if (this.staffHomeUrl) {
-                await this.navigate(this.staffHomeUrl);
-            } else {
-                await this.page.goBack().catch(() => {
-                });
-            }
-            await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 5000 }).catch(() => {
-            });
-            await this.waitForLoaders();
-        }
-    }
-
-    /**
-     * Verifies page navigation and title after navigating via a quick link or sidebar link.
-     * @param {string} linkText - The text/label of the clicked link.
-     **/
-    async verifyLinkTitle(linkText) {
-        await test.step(`Verify page navigation and title for "${linkText}"`, async () => {
-            const normalized = linkText.toLowerCase();
-            const currentTitle = await this.getPageTitle();
-            const currentUrl = this.page.url();
-
-            expect(currentUrl).not.toContain('about:blank');
-
-            if (normalized.includes('home')) {
-                await this.verifyTitle(/Staff Home/i);
-            } else if (normalized.includes('logout')) {
-                await this.verifyTitle(/Login/i);
-            } else if (normalized.includes('schedule') || normalized.includes('calendar') || normalized.includes('appointment')) {
-                if (currentTitle && currentTitle.length > 0) {
-                    expect(currentTitle.length).toBeGreaterThan(0);
-                } else {
-                    expect(currentUrl).toMatch(/Scheduler|BTWScheduling|DailyStaffSchedule/i);
-                }
-            } else if (normalized.includes('classroom') || normalized.includes('attendance') || normalized.includes('roster')) {
-                if (currentTitle && currentTitle.length > 0) {
-                    expect(currentTitle.length).toBeGreaterThan(0);
-                } else {
-                    expect(currentUrl).toMatch(/Classroom/i);
-                }
-            } else if (normalized.includes('profile')) {
-                if (currentTitle && currentTitle.length > 0) {
-                    expect(currentTitle.length).toBeGreaterThan(0);
-                } else {
-                    expect(currentUrl).toMatch(/StaffProfile/i);
-                }
-            } else if (normalized.includes('payroll')) {
-                if (currentTitle && currentTitle.length > 0) {
-                    expect(currentTitle.length).toBeGreaterThan(0);
-                } else {
-                    expect(currentUrl).toMatch(/PayrollReport/i);
-                }
-            } else if (normalized.includes('yard skills')) {
-                if (currentTitle && currentTitle.length > 0) {
-                    expect(currentTitle.length).toBeGreaterThan(0);
-                } else {
-                    expect(currentUrl).toMatch(/ProcessYardSkills/i);
-                }
-            } else {
-                expect(currentTitle.length).toBeGreaterThan(0);
-            }
-        });
-    }
-
-    /**
-     * Iterates through each Quick Link in the Quick Links widget on the Staff Home page,
-     * clicks it dynamically, verifies navigation/title, returns to Home,
-     * and re-authenticates if any link triggers logout.
-     * If no quick links are present, prints "No quick links found on page".
-     * @param {Object} [credentials] - Optional staff login credentials object.
-     * @returns {Promise<number>} Total count of quick links tested.
-     **/
-    async openEachQuickLink(credentials = null) {
-        return await test.step('Open each Quick Link in #div_QuickLinks and verify navigation', async () => {
-            this.staffHomeUrl = this.page.url();
-            await this.ensureOnStaffHomePage();
-            const count = await this.quickLinkButtons.count();
-
-            if (count === 0) {
-                console.log('No quick links found on page');
-                await test.step('No quick links found on page', async () => {
-                });
-                return 0;
-            }
-
-            // Collect link details in advance to avoid stale element references during navigations
-            const linksData = [];
-            for (let i = 0; i < count; i++) {
-                const btn = this.quickLinkButtons.nth(i);
-                const text = (await btn.textContent() || '').trim().replace(/\s+/g, ' ');
-                const href = await btn.getAttribute('href') || '';
-                const target = await btn.getAttribute('target') || '';
-                linksData.push({ index: i, text, href, target });
-            }
-
-            let totalTested = 0;
-
-            for (let i = 0; i < linksData.length; i++) {
-                const item = linksData[i];
-                await test.step(`Click Quick Link [${i + 1}/${linksData.length}]: "${item.text}"`, async () => {
-                    await this.ensureOnStaffHomePage();
-                    const linkToClick = this.quickLinkButtons.nth(item.index);
-                    await linkToClick.scrollIntoViewIfNeeded();
-
-                    if (item.target === '_blank') {
-                        // Handle links that open in a new tab/window
-                        let popupPage = null;
-                        try {
-                            const [newPage] = await Promise.all([
-                                this.page.context().waitForEvent('page', { timeout: 3000 }),
-                                linkToClick.click()
-                            ]);
-                            popupPage = newPage;
-                        } catch {
-                            // Link did not trigger a new page event (e.g. invalid href), handled gracefully
-                        }
-
-                        if (popupPage) {
-                            await this.verifyPopupNavigation(popupPage);
-                            await popupPage.waitForLoadState('domcontentloaded').catch(() => {
-                            });
-                            await popupPage.close().catch(() => {
-                            });
-                        }
-                    } else {
-                        // Internal navigation within the same tab
-                        await this.clickAndVerifyNavigation(linkToClick);
-
-                        const currentTitle = await this.getPageTitle();
-                        const currentUrl = this.page.url();
-                        expect(currentUrl).not.toContain('about:blank');
-                        if (currentTitle && currentTitle.length > 0) {
-                            expect(currentTitle.length).toBeGreaterThan(0);
-                        }
-                        if (await this.isVisible(this.loginBtn, { timeout: 2000 }).catch(() => false)) {
-                            const creds = credentials?.staffUser || credentials || defaultCredentials?.staffUser;
-                            const username = creds?.username || creds?.staffUsername;
-                            const password = creds?.password || creds?.staffPassword;
-
-                            if (username && password) {
-                                const staffLoginPage = new StaffLoginPage(this.page);
-                                await staffLoginPage.login(username, password);
-                            }
-                        }
-
-                    }
-                    totalTested++;
-                });
-            }
-
-            return totalTested;
-        });
-    }
-
-    /**
-     * Iterates through all Links in the sidebar menu, including accordion submenus
-     * (e.g. under Scheduling, Classroom), navigates each link and sub-link,
-     * and verifies successful navigation and page title.
-     * @returns {Promise<number>} Total count of links and sub-links navigated.
-     **/
-    async openEachLinkInLeftSidebar() {
-        return await test.step('Open each link in left sidebar menu including submenus and verify titles', async () => {
-            this.staffHomeUrl = this.page.url();
-            await this.waitForVisible(this.sidebarMenu, 3000);
-            const topCount = await this.sidebarItems.count();
-            let totalNavigated = 0;
-
-            for (let i = 0; i < topCount; i++) {
-                const currentItem = this.sidebarItems.nth(i);
-                const topA = currentItem.locator('> a');
-                const topText = (await topA.textContent() || '').trim().replace(/\s+/g, ' ');
-
-                // Only consider non-hidden submenus
-                const subLinks = currentItem.locator('ul.sub-menu > li:not(.hide) > a');
-                const subCount = await subLinks.count();
-
-                if (subCount === 0) {
-                    // Direct top-level link (e.g., Home, My Profile, Payroll Report, Process Yard Skills, Logout)
-                    await test.step(`Navigate Sidebar Link: "${topText}"`, async () => {
-                        await this.clickAndVerifyNavigation(topA, { loadTimeout: 5000 });
-                        await this.verifyLinkTitle(topText);
-                        totalNavigated++;
-                    });
-
-                    if (topText.toLowerCase().includes('logout')) {
-                        break;
-                    }
-                } else {
-                    // Accordion menu with submenus (e.g., Scheduling, Classroom)
-                    await test.step(`Navigate Submenus under "${topText}" (${subCount} links)`, async () => {
-                        for (let j = 0; j < subCount; j++) {
-                            const itemNow = this.sidebarItems.nth(i);
-                            const topANow = itemNow.locator('> a');
-                            const targetSubLink = itemNow.locator('ul.sub-menu > li:not(.hide) > a').nth(j);
-
-                            // Expand accordion parent if submenu is not visible
-                            const isVisible = await targetSubLink.isVisible().catch(() => false);
-                            if (!isVisible) {
-                                await this.click(topANow);
-                                await this.page.waitForTimeout(500);
-                            }
-
-                            const subText = (await targetSubLink.textContent() || '').trim().replace(/\s+/g, ' ');
-                            await test.step(`Click Sub-Link [${j + 1}/${subCount}]: "${subText}" under "${topText}"`, async () => {
-                                await this.clickAndVerifyNavigation(targetSubLink);
-                                await this.verifyLinkTitle(subText);
-                                totalNavigated++;
-                            });
-                        }
-                    });
-                }
-            }
-
-            return totalNavigated;
         });
     }
 
@@ -860,20 +607,22 @@ export default class StaffHomePage extends BasePage {
         });
     }
 
-
     /**
-     * Logs out of the Student Portal by clicking 'Log Out' from the top header user profile dropdown.
+     * Verifies that staff message is visible or not visible on homepage, and validates attachment preview.
+     * @param {string} message - Message name/text.
+     * @param {boolean} isVisible - Expected visibility state.
      **/
-    async logout() {
-        await test.step('Log out from Student Portal via top header user profile dropdown', async () => {
-            await this.waitForVisible(this.userProfileDropdown, 1000);
-            await this.hover(this.userProfileDropdown);
-            await this.waitForVisible(this.userDropdownLogoutBtn, 1000);
-            await this.click(this.userDropdownLogoutBtn);
-            await this.waitForLoaders();
-            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
-            });
-            await this.waitForLoaders();
+    async verifyStaffMessageVisibilityOnHomepage(message, isVisible) {
+        await test.step(`Verify staff message visibility: "${message}" is ${isVisible ? 'visible' : 'not visible'}`, async () => {
+            if (isVisible) {
+                await this.verifyVisible(this.page.getByText(message, { exact: false }).first());
+
+                await this.click(this.staffMsgAttachment(message));
+                await this.verifyVisible(this.previewModal);
+
+            } else {
+                await this.verifyNotVisible(this.page.getByText(message, { exact: false }).first());
+            }
         });
     }
 }

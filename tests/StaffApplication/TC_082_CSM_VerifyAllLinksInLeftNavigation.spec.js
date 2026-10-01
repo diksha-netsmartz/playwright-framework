@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import StaffLoginPage from '@pages/StaffApplication/StaffLoginPage';
-import StaffHomePage from '@pages/StaffApplication/StaffHomePage';
+import SidebarNavigationComponent from '@pages/Common/SidebarNavigationComponent';
 import { credentials } from '@config/config';
 
 /**
@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
 test('TC_082: CSM - To Verify all links in left navigation are working', { tag: ['@CSM', '@CSMHomepage'] }, async ({ page }) => {
 
   const staffLoginPage = new StaffLoginPage(page);
-  const staffHomePage = new StaffHomePage(page);
+  const sidebarNav = new SidebarNavigationComponent(page, { portalType: 'staff' });
 
   await test.step('Step 1: Login to staff portal (CSM) with valid credentials', async () => {
     await staffLoginPage.navigateToLoginPage();
@@ -19,6 +19,6 @@ test('TC_082: CSM - To Verify all links in left navigation are working', { tag: 
   });
 
   await test.step('Step 2: Navigate and verify each link and submenu in the left navigation', async () => {
-    await staffHomePage.openEachLinkInLeftSidebar();
+    await sidebarNav.openEachLinkInLeftSidebar(credentials);
   });
 });

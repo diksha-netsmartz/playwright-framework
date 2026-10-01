@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import StudentLoginPage from '@pages/StudentApplication/StudentLoginPage';
-import StudentHomePage from '@pages/StudentApplication/StudentPortalHomePage';
+import HeaderComponent from '@pages/Common/HeaderComponent';
 import { credentials } from '@config/config';
 
 /**
@@ -11,7 +11,7 @@ import { credentials } from '@config/config';
 test('TC_081: CSP - To Verify user is able to logout', { tag: ['@CSP', '@CSPLogout'] }, async ({ page }) => {
 
   const studentLoginPage = new StudentLoginPage(page);
-  const studentHomePage = new StudentHomePage(page);
+  const header = new HeaderComponent(page, { portalType: 'student' });
 
   await test.step('Step 1: Login to student portal (CSP) with valid credentials', async () => {
     await studentLoginPage.navigateToLoginPage();
@@ -19,7 +19,7 @@ test('TC_081: CSP - To Verify user is able to logout', { tag: ['@CSP', '@CSPLogo
   });
 
   await test.step('Step 2: Logout from student portal', async () => {
-    await studentHomePage.logout();
+    await header.logout();
   });
 
   await test.step('Step 3: Verify user is successfully logged out', async () => {
