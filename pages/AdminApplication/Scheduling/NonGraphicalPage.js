@@ -27,6 +27,8 @@ export default class NonGraphicalPage extends BasePage {
         this.appointmentTypeDropdown = page.locator('#drp_OpenSlotBookAppointment_product_0');
         this.statusTypeDropdown = page.locator('#drp_OpenSlotBookAppointment_AppointmentStatus_0');
         this.highlightedDates = page.locator('td.ui-highlight a');
+        this.prevMonthButton = page.locator('a.ui-datepicker-prev.ui-corner-all, a.ui-datepicker-prev');
+        this.nextMonthButton = page.locator('a.ui-datepicker-next.ui-corner-all, a.ui-datepicker-next');
         this.currentDateIndex = null;
 
         // Schedule action
@@ -99,7 +101,8 @@ export default class NonGraphicalPage extends BasePage {
             const count = await this.highlightedDates.count();
 
             if (count === 0) {
-                throw new Error('No highlighted dates found in the calendar.');
+                console.log('No highlighted dates found in the calendar for the current month.');
+                return { found: false, dateIndex: -1, totalDates: 0 };
             }
 
             for (let i = startIndex; i < count; i++) {
@@ -120,9 +123,6 @@ export default class NonGraphicalPage extends BasePage {
             }
 
             console.log(`No open slots found for any highlighted dates starting from index ${startIndex}.`);
-            if (startIndex === 0) {
-                throw new Error('No open slots found for any of the highlighted dates in the calendar.');
-            }
             return { found: false, dateIndex: -1, totalDates: count };
         });
     }
@@ -312,104 +312,172 @@ export default class NonGraphicalPage extends BasePage {
     }
 
     /**
+     * Navigates to the previous month in the calendar datepicker.
+     * @returns {Promise<boolean>} True if navigation succeeded, false if button is unavailable or disabled.
+     **/
+    async navigateToPrevMonth() {
+        return await test.step('Navigate to previous month in calendar', async () => {
+            const isVisible = await this.prevMonthButton.first().isVisible().catch(() => false);
+            const isDisabled = await this.prevMonthButton.first().evaluate(el => el.classList.contains('ui-state-disabled')).catch(() => false);
+
+            if (isVisible && !isDisabled) {
+                console.log('Navigating to previous month in calendar...');
+                await this.click(this.prevMonthButton.first());
+                await this.waitForLoaders().catch(() => { });
+                await this.page.waitForTimeout(500);
+                this.currentDateIndex = null;
+                return true;
+            }
+
+            console.log('Previous month button is not available or is disabled.');
+            return false;
+        });
+    }
+
+    /**
+     * Navigates to the next month in the calendar datepicker.
+     * @returns {Promise<boolean>} True if navigation succeeded, false if button is unavailable or disabled.
+     **/
+    async navigateToNextMonth() {
+        return await test.step('Navigate to next month in calendar', async () => {
+            const isVisible = await this.nextMonthButton.first().isVisible().catch(() => false);
+            const isDisabled = await this.nextMonthButton.first().evaluate(el => el.classList.contains('ui-state-disabled')).catch(() => false);
+
+            if (isVisible && !isDisabled) {
+                console.log('Navigating to next month in calendar...');
+                await this.click(this.nextMonthButton.first());
+                await this.waitForLoaders().catch(() => { });
+                await this.page.waitForTimeout(500);
+                this.currentDateIndex = null;
+                return true;
+            }
+
+            console.log('Next month button is not available or is disabled.');
+            return false;
+        });
+    }
+
+    /**
      * Schedules the student into an available slot.
      * Iterates through available dates and slots on each date.
      * Selects slot, appointment type, status, and confirms scheduling.
      * If an error occurs (e.g. 'Student is not available'), deselects that slot and tries next slot.
      * If all slots on a date fail, automatically calls selectFirstAvailableDate() to iterate to the
      * next available date with slots until scheduling succeeds.
+     * If all dates in the current month fail/have no slots and fallbackToPrevMonth is true,
+     * navigates to the previous month and attempts scheduling there.
+     * @param {boolean} [fallbackToPrevMonth=true] - Whether to fall back to the previous month if current month has no available slots.
      **/
-    async scheduleIntoSlot() {
+    async scheduleIntoSlot(fallbackToPrevMonth = true) {
         await test.step('Schedule student into slot with retry across slots and dates', async () => {
-            const hasSlotsInitially = await this.isVisible(this.firstSlotCheckbox, { timeout: 3000 }).catch(() => false);
+            const attemptMonthScheduling = async () => {
+                const hasSlotsInitially = await this.isVisible(this.firstSlotCheckbox, { timeout: 3000 }).catch(() => false);
 
-            if (!hasSlotsInitially) {
-                const dateResult = await this.selectFirstAvailableDate(0);
-                if (!dateResult || !dateResult.found) {
-                    throw new Error('No open slots found for any of the highlighted dates in the calendar.');
+                if (!hasSlotsInitially) {
+                    const dateResult = await this.selectFirstAvailableDate(0);
+                    if (!dateResult || !dateResult.found) {
+                        console.log('No open slots found for any of the highlighted dates in the currently displayed month.');
+                        return false;
+                    }
                 }
-            }
 
-            const totalDates = await this.highlightedDates.count();
+                const totalDates = await this.highlightedDates.count();
 
-            if (this.currentDateIndex === undefined || this.currentDateIndex === null) {
-                const activeHighlight = this.page.locator('td.ui-highlight.ui-datepicker-current-day a');
-                if (await activeHighlight.count() > 0) {
-                    const activeText = (await activeHighlight.first().textContent() || '').trim();
-                    for (let d = 0; d < totalDates; d++) {
-                        const text = (await this.highlightedDates.nth(d).textContent() || '').trim();
-                        if (text === activeText) {
-                            this.currentDateIndex = d;
-                            break;
+                if (this.currentDateIndex === undefined || this.currentDateIndex === null) {
+                    const activeHighlight = this.page.locator('td.ui-highlight.ui-datepicker-current-day a');
+                    if (await activeHighlight.count() > 0) {
+                        const activeText = (await activeHighlight.first().textContent() || '').trim();
+                        for (let d = 0; d < totalDates; d++) {
+                            const text = (await this.highlightedDates.nth(d).textContent() || '').trim();
+                            if (text === activeText) {
+                                this.currentDateIndex = d;
+                                break;
+                            }
                         }
                     }
-                }
-                if (this.currentDateIndex === undefined || this.currentDateIndex === null) {
-                    this.currentDateIndex = 0;
-                }
-            }
-
-            while (this.currentDateIndex < totalDates) {
-                console.log(`=== Processing date #${this.currentDateIndex + 1} of ${totalDates} ===`);
-
-                await this.waitForVisible(this.slotSpans.first(), 10000).catch(() => { });
-                const totalSlots = await this.slotSpans.count();
-
-                if (totalSlots === 0) {
-                    console.log(`No slots available on date #${this.currentDateIndex + 1}. Trying next available date...`);
-                    const nextDateResult = await this.selectFirstAvailableDate(this.currentDateIndex + 1);
-                    if (!nextDateResult || !nextDateResult.found) {
-                        break;
+                    if (this.currentDateIndex === undefined || this.currentDateIndex === null) {
+                        this.currentDateIndex = 0;
                     }
-                    continue;
                 }
 
-                console.log(`Found ${totalSlots} available slot(s) on date #${this.currentDateIndex + 1} to attempt scheduling.`);
+                while (this.currentDateIndex < totalDates) {
+                    console.log(`=== Processing date #${this.currentDateIndex + 1} of ${totalDates} ===`);
 
-                for (let slotIndex = 0; slotIndex < totalSlots; slotIndex++) {
-                    console.log(`--- Attempting slot row ${slotIndex + 1} of ${totalSlots} (Date #${this.currentDateIndex + 1}) ---`);
+                    await this.waitForVisible(this.slotSpans.first(), 10000).catch(() => { });
+                    const totalSlots = await this.slotSpans.count();
 
-                    // 1. Clear old toast notifications
-                    await this.clearToasts();
-
-                    // 2. Select slot checkbox
-                    await this.selectSlot(slotIndex);
-
-                    // 3. Select available appointment product type
-                    const selectedType = await this.selectAppointmentType(slotIndex);
-                    if (!selectedType) {
-                        console.log(`No valid appointment product type found for slot row ${slotIndex + 1}. Trying next slot...`);
-                        await this.deselectSlot(slotIndex);
+                    if (totalSlots === 0) {
+                        console.log(`No slots available on date #${this.currentDateIndex + 1}. Trying next available date...`);
+                        const nextDateResult = await this.selectFirstAvailableDate(this.currentDateIndex + 1);
+                        if (!nextDateResult || !nextDateResult.found) {
+                            break;
+                        }
                         continue;
                     }
 
-                    // 4. Select appointment status
-                    await this.selectStatusType(slotIndex, 'Confirmed');
+                    console.log(`Found ${totalSlots} available slot(s) on date #${this.currentDateIndex + 1} to attempt scheduling.`);
 
-                    // 5. Confirm scheduling and observe outcome
-                    const result = await this.confirmSchedule();
-                    console.log(`Slot row ${slotIndex + 1} scheduling outcome:`, result);
+                    for (let slotIndex = 0; slotIndex < totalSlots; slotIndex++) {
+                        console.log(`--- Attempting slot row ${slotIndex + 1} of ${totalSlots} (Date #${this.currentDateIndex + 1}) ---`);
 
-                    if (result.success) {
-                        console.log(`Appointment(s) scheduled successfully on date #${this.currentDateIndex + 1}, slot row ${slotIndex + 1}.`);
-                        await test.step('Toast message "Appointment(s) scheduled successfully." appeared', async () => { });
-                        return;
+                        // 1. Clear old toast notifications
+                        await this.clearToasts();
+
+                        // 2. Select slot checkbox
+                        await this.selectSlot(slotIndex);
+
+                        // 3. Select available appointment product type
+                        const selectedType = await this.selectAppointmentType(slotIndex);
+                        if (!selectedType) {
+                            console.log(`No valid appointment product type found for slot row ${slotIndex + 1}. Trying next slot...`);
+                            await this.deselectSlot(slotIndex);
+                            continue;
+                        }
+
+                        // 4. Select appointment status
+                        await this.selectStatusType(slotIndex, 'Confirmed');
+
+                        // 5. Confirm scheduling and observe outcome
+                        const result = await this.confirmSchedule();
+                        console.log(`Slot row ${slotIndex + 1} scheduling outcome:`, result);
+
+                        if (result.success) {
+                            console.log(`Appointment(s) scheduled successfully on date #${this.currentDateIndex + 1}, slot row ${slotIndex + 1}.`);
+                            await test.step('Toast message "Appointment(s) scheduled successfully." appeared', async () => { });
+                            return true;
+                        }
+
+                        // 6. Handle failure and deselect slot
+                        await this.handleSlotError(slotIndex, result.message);
                     }
 
-                    // 6. Handle failure and deselect slot
-                    await this.handleSlotError(slotIndex, result.message);
+                    // If all slots on this date failed, move to next available date with slots
+                    console.log(`All ${totalSlots} slot(s) on date #${this.currentDateIndex + 1} failed. Trying next available date...`);
+                    const nextDateResult = await this.selectFirstAvailableDate(this.currentDateIndex + 1);
+                    if (!nextDateResult || !nextDateResult.found) {
+                        console.log('No more dates with available slots remaining in the currently displayed month.');
+                        break;
+                    }
                 }
 
-                // If all slots on this date failed, move to next available date with slots
-                console.log(`All ${totalSlots} slot(s) on date #${this.currentDateIndex + 1} failed. Trying next available date...`);
-                const nextDateResult = await this.selectFirstAvailableDate(this.currentDateIndex + 1);
-                if (!nextDateResult || !nextDateResult.found) {
-                    console.log('No more dates with available slots remaining in the calendar.');
-                    break;
+                return false;
+            };
+
+            // 1. Attempt scheduling in the currently displayed month
+            let scheduled = await attemptMonthScheduling();
+
+            // 2. If current month had no slots or all failed, fall back to previous month
+            if (!scheduled && fallbackToPrevMonth) {
+                console.log('No available slots scheduled in current month. Attempting fallback to previous month...');
+                const navigated = await this.navigateToPrevMonth();
+                if (navigated) {
+                    scheduled = await attemptMonthScheduling();
                 }
             }
 
-            throw new Error('Unable to schedule appointment on any available date. All slots failed.');
+            if (!scheduled) {
+                throw new Error('Unable to schedule appointment on any available date/month. All slots failed.');
+            }
         });
     }
 
