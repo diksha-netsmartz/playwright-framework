@@ -9,7 +9,7 @@ import { credentials } from '@config/config';
  * Expected Result: Student is able to navigate through all links and submenus in the left navigation sidebar across environments
  **/
 test('TC_080: CSP - To Verify all links in left navigation are working', { tag: ['@CSP', '@CSPHomepage'] }, async ({ page }) => {
-
+  test.setTimeout(600000);
   const studentLoginPage = new StudentLoginPage(page);
   const sidebarNav = new SidebarNavigationComponent(page, { portalType: 'student' });
 

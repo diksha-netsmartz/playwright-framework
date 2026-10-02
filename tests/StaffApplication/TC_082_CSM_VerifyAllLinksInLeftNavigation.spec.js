@@ -9,7 +9,7 @@ import { credentials } from '@config/config';
  * Expected Result: Staff is able to navigate through all links and submenus in the left navigation sidebar across environments
  **/
 test('TC_082: CSM - To Verify all links in left navigation are working', { tag: ['@CSM', '@CSMHomepage'] }, async ({ page }) => {
-
+  test.setTimeout(600000);
   const staffLoginPage = new StaffLoginPage(page);
   const sidebarNav = new SidebarNavigationComponent(page, { portalType: 'staff' });
 

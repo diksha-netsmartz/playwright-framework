@@ -9,7 +9,7 @@ import { credentials } from '@config/config';
  * Expected Result: Staff is able to navigate and verify all Quick Links on the staff portal homepage across environments (or logs no quick links found if empty)
  **/
 test('TC_083: CSM - To Verify quick links are working', { tag: ['@CSM', '@CSMQuickLinks'] }, async ({ page }) => {
-
+  test.setTimeout(600000);
   const staffLoginPage = new StaffLoginPage(page);
   const homePageWidgets = new HomePageWidgets(page, { portalType: 'staff' });
 

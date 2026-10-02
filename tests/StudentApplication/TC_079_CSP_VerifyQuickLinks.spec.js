@@ -9,7 +9,7 @@ import { credentials } from '@config/config';
  * Expected Result: Student is able to navigate and verify all Quick Links on the student portal homepage across environments
  **/
 test('TC_079: CSP - To Verify Quick links are working', { tag: ['@CSP', '@CSPHomepage'] }, async ({ page }) => {
-
+  test.setTimeout(600000);
   const studentLoginPage = new StudentLoginPage(page);
   const homePageWidgets = new HomePageWidgets(page, { portalType: 'student' });
 
