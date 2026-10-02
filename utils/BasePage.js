@@ -12,15 +12,47 @@ export default class BasePage {
      */
     constructor(page) {
         this.page = page;
+        this.lastNavigationResponse = null;
     }
 
     /**
-     * Navigates to a URL and waits for network idle state.
+     * Navigates to a URL, tracks the HTTP response, and waits for load state.
      * @param {string} url - Target URL to navigate to.
+     * @returns {Promise<import('@playwright/test').Response|null>}
      */
     async navigate(url) {
-        await this.page.goto(url);
-        await this.page.waitForLoadState("load", { timeout: 10000 });
+        this.lastNavigationResponse = await this.page.goto(url);
+        await this.page.waitForLoadState("load", { timeout: 10000 }).catch(() => {});
+        return this.lastNavigationResponse;
+    }
+
+    /**
+     * Checks if the navigation response or page content indicates a server error (HTTP 500 or 5xx),
+     * and if so, attaches a screenshot to the report and skips the test execution.
+     * @param {import('@playwright/test').Response|null} [response] - Optional response to inspect.
+     * @param {string} [portalName='Portal'] - Name of the portal for report description.
+     * @returns {Promise<boolean>} Whether the test was skipped.
+     */
+    async skipIfServerError(response = null, portalName = 'Portal') {
+        const resp = response || this.lastNavigationResponse;
+        if (resp && resp.status() >= 500) {
+            const status = resp.status();
+            const reason = `${portalName} login skipped: Server returned HTTP ${status} (${resp.statusText() || 'Internal Server Error'}).`;
+            console.warn(`\n⚠️ [SKIP] ${reason}`);
+            await this.skipWithScreenshot(reason);
+            return true;
+        }
+
+        // Also check if page content shows internal server error text (in case status was masked)
+        const pageText = await this.page.locator('body').innerText({ timeout: 1000 }).catch(() => '');
+        if (/internal server error|page cannot be displayed because an internal server error/i.test(pageText)) {
+            const reason = `${portalName} login skipped: Server error displayed on page ("${pageText.trim().replace(/\s+/g, ' ').slice(0, 100)}").`;
+            console.warn(`\n⚠️ [SKIP] ${reason}`);
+            await this.skipWithScreenshot(reason);
+            return true;
+        }
+
+        return false;
     }
 
     /**

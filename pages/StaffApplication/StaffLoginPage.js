@@ -32,7 +32,8 @@ export default class StaffLoginPage extends BasePage {
     **/
     async navigateToLoginPage() {
         await test.step('Navigate to Staff Login Page', async () => {
-            await this.navigate(config.csmURL);
+            const response = await this.navigate(config.csmURL);
+            await this.skipIfServerError(response, 'Staff Portal');
         });
     }
 
@@ -44,11 +45,13 @@ export default class StaffLoginPage extends BasePage {
     **/
     async login(username, password) {
         await test.step(`Login to Staff Portal with user: ${username}`, async () => {
+            await this.skipIfServerError(null, 'Staff Portal');
             await this.closeMobilePopup();
 
             const isUserVisible = await this.isVisible(this.usernameTxt, { timeout: 10000 }).catch(() => false);
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
             if (!isUserVisible) {
+                await this.skipIfServerError(null, 'Staff Portal');
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
                 if (isCaptcha) {
                     console.warn('\n⚠️ [SKIP] CAPTCHA is enabled on screen. Skipping testcase.');

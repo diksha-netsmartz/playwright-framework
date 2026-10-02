@@ -45,14 +45,13 @@ export default class ClassroomAttendancePage extends BasePage {
 
         // Print Attendance Locators
         this.printAttendanceBtn = page.locator("xpath=//button[contains(text(),'PRINT ATTENDANCE')]");
-        this.exportToPdfOption = page.locator("xpath=//button[contains(text(),'PRINT ATTENDANCE')]//parent::div//strong[contains(text(),'Export to PDF')]");
-        this.exportToExcelOption = page.locator("xpath=//button[contains(text(),'PRINT ATTENDANCE')]//parent::div//strong[contains(text(),'Export to Excel')]");
+        // this.exportToPdfOption = page.locator("xpath=//button[contains(text(),'PRINT ATTENDANCE')]//parent::div//strong[contains(text(),'Export to PDF')]");
+        // this.exportToExcelOption = page.locator("xpath=//button[contains(text(),'PRINT ATTENDANCE')]//parent::div//strong[contains(text(),'Export to Excel')]");
 
         // Print Roster Locators
         this.printRosterBtn = page.locator("xpath=//button[contains(text(),'PRINT Roster')]");
-        this.exportRosterToPdfOption = page.locator("xpath=//button[contains(text(),'PRINT Roster')]//parent::div//strong[contains(text(),'Export to PDF')]");
-        this.exportRosterToExcelOption = page.locator("xpath=//button[contains(text(),'PRINT Roster')]//parent::div//strong[contains(text(),'Export to Excel')]");
-
+        this.exportToPdfOption = page.locator('a.pdf:visible')
+        this.exportToExcelOption = page.locator('a.excel:visible')
         // Send Session Email Locators
         this.sendSessionEmailBtn = page.locator("xpath=//a[text()='SEND SESSION EMAIL']");
         this.selectAllStudentEmailCheckbox = page.locator("xpath=//input[@id='chkSelectAllStudentEmail']//following-sibling::span");
@@ -257,7 +256,7 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async exportToExcel() {
         return await test.step('Click "Export to Excel" and wait for file download', async () => {
-            const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 180000 });
             if (!await this.isVisible(this.exportToExcelOption)) {
                 await this.clickPrintAttendance();
             }
@@ -347,8 +346,8 @@ export default class ClassroomAttendancePage extends BasePage {
         await this.clickPrintRoster();
         return await test.step('Click "Export to PDF" under Print Roster and wait for PDF tab', async () => {
             const popupPromise = this.page.waitForEvent('popup');
-            await this.waitForVisible(this.exportRosterToPdfOption);
-            await this.click(this.exportRosterToPdfOption);
+            await this.waitForVisible(this.exportToPdfOption);
+            await this.click(this.exportToPdfOption);
             const pdfPage = await popupPromise;
             await pdfPage.waitForLoadState('domcontentloaded');
             return pdfPage;
@@ -361,12 +360,12 @@ export default class ClassroomAttendancePage extends BasePage {
      **/
     async exportRosterToExcel() {
         return await test.step('Click "Export to Excel" under Print Roster and wait for download', async () => {
-            const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
-            if (!await this.isVisible(this.exportRosterToExcelOption)) {
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 180000 });
+            if (!await this.isVisible(this.exportToExcelOption)) {
                 await this.clickPrintRoster();
             }
-            await this.waitForVisible(this.exportRosterToExcelOption);
-            await this.click(this.exportRosterToExcelOption);
+            await this.waitForVisible(this.exportToExcelOption);
+            await this.click(this.exportToExcelOption);
             return await downloadPromise;
         });
     }

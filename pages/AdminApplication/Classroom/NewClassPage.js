@@ -63,7 +63,7 @@ export default class NewClassPage extends BasePage {
         this.closeTeacherModal = page.locator("xpath=//h4[contains(@id,'Teacher')]//ancestor::div[@class='modal-content']//button[text()='Close']")
 
         // Reassign / Edit Instructor Availability Locators
-        this.editButton = page.locator("xpath=//button[text()='Edit']");
+        this.editButton = page.locator("xpath=(//button[text()='Edit'])[1]");
         this.selectBTWInstructorDropdown = page.locator("xpath=//button[@data-id='drpSelectBTWAppointmentInstructor']");
         this.selectBTWInstructorOption = page.locator("xpath=(//button[@data-id='drpSelectBTWAppointmentInstructor']//parent::div//li)[2]");
         this.saveBTWInstructorBtn = page.locator("xpath=//button[contains(@data-toggle,'Update') and text()='Save']");
@@ -72,8 +72,8 @@ export default class NewClassPage extends BasePage {
         this.closeChangeInstructorModal = page.locator("xpath=//strong[text()='Change Instructor']//ancestor::div[@class='modal-content']//button[text()='Close']");
         this.teacherAvailableMessage = page.getByText('Teacher is available.', { exact: true });
         this.closeTeacherAvailableModal = page.locator("xpath=//b[text()='Teacher is available.']//ancestor::div[@class='modal-content']//button[text()='Close']");
-        this.removeButton = page.locator("xpath=//button[contains(text(),'Remove')]");
-        this.deleteButton = page.locator("xpath=//button[contains(text(),'Delete')]");
+        this.removeButton = page.locator("xpath=(//button[contains(text(),'Remove')])[1]");
+        this.deleteButton = page.locator("xpath=(//button[contains(text(),'Delete')])[1]");
         this.closeDeleteModal = page.locator("//h4[contains(text(),'Teacher is not available')]//ancestor::div[@class='modal-content']//button[text()='Close']");
         this.teacherRemovedMessage = page.getByText('Teacher removed successfully from conflicting session.', { exact: true });
 
@@ -215,10 +215,10 @@ export default class NewClassPage extends BasePage {
 
     /**
      * Opens Set Session Times popup, sets start time and duration, and saves.
-     * @param {string} [startTime='0800'] - Start time option value.
-     * @param {string} [duration='3'] - Duration option value.
+     * @param {string} [startTime] - Start time option value.
+     * @param {string} [duration] - Duration option value.
      **/
-    async setSessionTimes(startTime = '0800', duration = '3') {
+    async setSessionTimes(startTime, duration) {
         await test.step(`Set session times (Start Time: ${startTime}, Duration: ${duration})`, async () => {
             await this.click(this.setSessionTimesLink);
             await this.selectOption(this.startTimeSelect, startTime);
@@ -253,7 +253,7 @@ export default class NewClassPage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.closeTeacherModal);
 
-            if (await this.addButton.isVisible({ timeout: 5000 }).catch(() => false)) {
+            if (await this.isVisible(this.addButton, 10000).catch(() => false)) {
                 await this.click(this.addButton);
                 await this.waitForVisible(this.weekdayDropdown);
                 await this.click(this.weekdayDropdown);
@@ -271,7 +271,7 @@ export default class NewClassPage extends BasePage {
                 await this.click(this.closeTeacherModal);
                 await this.waitForHidden(this.closeTeacherModal);
                 await this.waitForLoaders();
-            } else if (await this.editButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+            } else if (await this.isVisible(this.editButton, 10000).catch(() => false)) {
                 await this.click(this.editButton);
                 await this.waitForLoaders();
                 await this.waitForVisible(this.selectBTWInstructorDropdown);
@@ -292,11 +292,13 @@ export default class NewClassPage extends BasePage {
                 await this.verifyVisible(this.teacherAvailableMessage);
                 await this.click(this.closeTeacherAvailableModal);
                 await this.waitForLoaders();
-            } else if (await this.removeButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+            } else if (await this.isVisible(this.removeButton, 10000).catch(() => false)) {
                 await this.click(this.removeButton);
                 await this.waitForLoaders();
                 await this.waitForVisible(this.confirmYesBtn);
                 await this.click(this.confirmYesBtn);
+                await this.click(this.closeDeleteModal);
+                await this.waitForHidden(this.closeDeleteModal);
                 // await this.waitForLoaders();
                 // await this.page.waitForTimeout(2000);
                 // if (await this.isVisible(this.teacherRemovedMessage, { timeout: 2000 }).catch(() => false)) {
@@ -311,12 +313,12 @@ export default class NewClassPage extends BasePage {
                 }
                 await this.waitForLoaders();
             }
-            else if (await this.isVisible(this.deleteButton, { timeout: 5000 }).catch(() => false)) {
+            else if (await this.isVisible(this.deleteButton, 10000).catch(() => false)) {
                 await this.click(this.closeDeleteModal);
                 await this.waitForHidden(this.closeDeleteModal);
             }
 
-            else if (await this.isVisible(this.teacherAvailableMessage, { timeout: 5000 }).catch(() => false)) {
+            else if (await this.isVisible(this.teacherAvailableMessage, 10000).catch(() => false)) {
                 await this.verifyVisible(this.teacherAvailableMessage);
                 await this.click(this.closeTeacherAvailableModal);
                 await this.waitForHidden(this.closeTeacherAvailableModal);
@@ -379,7 +381,7 @@ export default class NewClassPage extends BasePage {
         await this.selectStartDate();
         await this.enterTotalSessions(classData.totalSessions);
         await this.selectWeekdays(classData.weekdays);
-        await this.setSessionTimes(classData.startTime, classData.duration);
+        await this.setSessionTimes(classData.startTime2, classData.duration);
         await this.selectInstructor(instructorName);
         await this.checkScheduleAvailability();
         await this.enterClassroomNotes(classData.webSignupNotes, classData.crNotes, classData.internalCrNotes);

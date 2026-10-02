@@ -55,14 +55,23 @@ export default class HomePageWidgets extends BasePage {
             if (this.portalType === 'admin') {
                 const adminLoginPage = new AdminLoginPage(this.page);
                 const creds = credentials?.cadmin || credentials || defaultCredentials?.cadmin;
+                if (!await adminLoginPage.isVisible(adminLoginPage.usernameTxt, { timeout: 2000 }).catch(() => false)) {
+                    await adminLoginPage.navigateToLoginPage();
+                }
                 await adminLoginPage.login(creds?.username, creds?.password);
             } else if (this.portalType === 'staff') {
                 const staffLoginPage = new StaffLoginPage(this.page);
                 const creds = credentials?.staffUser || credentials || defaultCredentials?.staffUser;
+                if (!await staffLoginPage.isVisible(staffLoginPage.usernameTxt, { timeout: 2000 }).catch(() => false)) {
+                    await staffLoginPage.navigateToLoginPage();
+                }
                 await staffLoginPage.login(creds?.username, creds?.password);
             } else if (this.portalType === 'student') {
                 const studentLoginPage = new StudentLoginPage(this.page);
                 const creds = credentials?.studentUser || credentials || defaultCredentials?.studentUser;
+                if (!await studentLoginPage.isVisible(studentLoginPage.usernameTxt, { timeout: 2000 }).catch(() => false)) {
+                    await studentLoginPage.navigateToLoginPage();
+                }
                 await studentLoginPage.login(creds?.username, creds?.password);
             }
             await this.waitForLoaders();
@@ -113,9 +122,11 @@ export default class HomePageWidgets extends BasePage {
                 const isLogoutLink = /log\s*out|logout/i.test(item.text);
 
                 await test.step(`Click Quick Link [${i + 1}/${linksData.length}]: "${item.text}"`, async () => {
+
                     if (await this.isVisible(this.homeNavLink.first(), 2000)) {
                         await this.click(this.homeNavLink.first());
                         await this.waitForLoaders();
+
                     }
                     const linkToClick = this.quickLinkButtons.nth(item.index);
                     await linkToClick.scrollIntoViewIfNeeded();
@@ -130,13 +141,48 @@ export default class HomePageWidgets extends BasePage {
                             ]);
                             popupPage = newPage;
                         } catch {
-                            // Link did not trigger a new page event (handled gracefully)
+                            // Link did not trigger a new page event (opened in same tab or handled in-page)
                         }
 
                         if (popupPage) {
                             await this.verifyPopupNavigation(popupPage);
                             await popupPage.waitForLoadState('domcontentloaded').catch(() => { });
+
+                            // Check if popup redirected to logout/login (e.g. stale encId invalidating session)
+                            const popupUrl = popupPage.url();
+                            const popupLoggedOut = /login|logout/i.test(popupUrl);
+
                             await popupPage.close().catch(() => { });
+
+                            // If popup caused session invalidation, restore authentication on main page
+                            const isMainLoggedOut = popupLoggedOut ||
+                                /login/i.test(this.page.url()) ||
+                                await this.isVisible(this.loginBtn, { timeout: 1500 }).catch(() => false);
+
+                            if (isMainLoggedOut && i < linksData.length - 1) {
+                                await this.relogin(credentials);
+                                if (await this.isVisible(this.homeNavLink.first(), 2000)) {
+                                    await this.click(this.homeNavLink.first());
+                                    await this.waitForLoaders();
+                                }
+                            }
+                        } else {
+                            // Fallback: Link opened in the same tab despite target="_blank"
+                            await this.waitForLoaders();
+                            const currentUrl = this.page.url();
+                            expect(currentUrl).not.toContain('about:blank');
+
+                            const isLoggedOut = isLogoutLink ||
+                                /login/i.test(currentUrl) ||
+                                await this.isVisible(this.loginBtn, { timeout: 1500 }).catch(() => false);
+
+                            if (isLoggedOut && i < linksData.length - 1) {
+                                await this.relogin(credentials);
+                                if (await this.isVisible(this.homeNavLink.first(), 2000)) {
+                                    await this.click(this.homeNavLink.first());
+                                    await this.waitForLoaders();
+                                }
+                            }
                         }
                     } else {
                         // Internal navigation within the same tab

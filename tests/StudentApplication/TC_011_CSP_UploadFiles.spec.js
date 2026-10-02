@@ -38,6 +38,7 @@ test('TC_011: CSP - Verify that the file is getting uploaded', { tag: ['@CSP', '
     await test.step('Step 5: Verify uploaded file under C-Admin -> Uploaded Files widget', async () => {
         await loginPage.navigateToLoginPage();
         await loginPage.login(credentials.cadmin.username, credentials.cadmin.password);
+        await page.waitForTimeout(15000);
         await adminHomePage.clickShowFilesToConfirm(credentials.studentUser.name, uploadedOnValues);
     });
 });
