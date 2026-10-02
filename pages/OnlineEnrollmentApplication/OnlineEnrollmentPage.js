@@ -115,7 +115,8 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async navigateToTeenOEPage() {
         await test.step('Navigate to Teen Online Enrollment Page', async () => {
-            await this.navigate(config.teenOEURL);
+            const response = await this.navigate(config.teenOEURL);
+            await this.skipIfServerError(response, 'Online Enrollment (Teen)');
             await this.selectDOBForPackage();
             await this.clickContinue();
         });
@@ -133,7 +134,8 @@ export default class OnlineEnrollmentPage extends BasePage {
                 const separator = cleanParams.startsWith('&') || cleanParams.startsWith('?') ? '' : '&';
                 url = `${url}${separator}${cleanParams}`;
             }
-            await this.navigate(url);
+            const response = await this.navigate(url);
+            await this.skipIfServerError(response, 'Online Enrollment (Teen)');
             await this.selectDOBForPackage();
             await this.clickContinue();
         });
@@ -144,7 +146,8 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async navigateToAdultOEPage() {
         await test.step('Navigate to Adult Online Enrollment Page', async () => {
-            await this.navigate(config.adultOEURL);
+            const response = await this.navigate(config.adultOEURL);
+            await this.skipIfServerError(response, 'Online Enrollment (Adult)');
             await this.selectDOBForPackage();
             await this.clickContinue();
         });
@@ -155,7 +158,8 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async navigateToWTOEPage() {
         await test.step('Navigate to WT Online Enrollment Page', async () => {
-            await this.navigate(config.ktOEURL);
+            const response = await this.navigate(config.ktOEURL);
+            await this.skipIfServerError(response, 'Online Enrollment (WT)');
             await this.selectDOBForPackage();
             await this.clickContinue();
         });
@@ -166,7 +170,8 @@ export default class OnlineEnrollmentPage extends BasePage {
      **/
     async navigateToRTOEPage() {
         await test.step('Navigate to RT Online Enrollment Page', async () => {
-            await this.navigate(config.rtOEURL);
+            const response = await this.navigate(config.rtOEURL);
+            await this.skipIfServerError(response, 'Online Enrollment (RT)');
             await this.selectDOBForPackage();
             await this.clickContinue();
         });

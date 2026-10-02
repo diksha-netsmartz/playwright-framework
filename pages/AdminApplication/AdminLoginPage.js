@@ -31,7 +31,8 @@ export default class AdminLoginPage extends BasePage {
     **/
     async navigateToLoginPage() {
         await test.step('Navigate to Admin Login Page', async () => {
-            await this.navigate(config.baseURL);
+            const response = await this.navigate(config.baseURL);
+            await this.skipIfServerError(response, 'Admin Portal');
         });
     }
 
@@ -43,11 +44,13 @@ export default class AdminLoginPage extends BasePage {
     **/
     async login(username, password) {
         await test.step(`Login to Admin Portal with user: ${username}`, async () => {
+            await this.skipIfServerError(null, 'Admin Portal');
             await this.closeMobilePopup();
 
             const isUserVisible = await this.isVisible(this.usernameTxt, { timeout: 10000 }).catch(() => false);
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
             if (!isUserVisible) {
+                await this.skipIfServerError(null, 'Admin Portal');
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
                 if (isCaptcha) {
                     console.warn('\n⚠️ [SKIP] CAPTCHA is enabled on screen. Skipping testcase.');

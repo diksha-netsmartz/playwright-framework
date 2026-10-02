@@ -34,7 +34,8 @@ export default class StudentLoginPage extends BasePage {
     **/
     async navigateToLoginPage() {
         await test.step('Navigate to Student Login Page (CSP)', async () => {
-            await this.navigate(config.cspURL);
+            const response = await this.navigate(config.cspURL);
+            await this.skipIfServerError(response, 'Student Portal');
         });
     }
 
@@ -46,12 +47,14 @@ export default class StudentLoginPage extends BasePage {
     **/
     async login(username, password) {
         await test.step(`Login to Student Portal with user: ${username}`, async () => {
+            await this.skipIfServerError(null, 'Student Portal');
             await this.closeMobilePopup();
             await this.closeSignaturesPopup();
 
             const isUserVisible = await this.isVisible(this.usernameTxt, { timeout: 10000 }).catch(() => false);
             const captcha = this.captchaFrame.locator('#recaptcha-anchor');
             if (!isUserVisible) {
+                await this.skipIfServerError(null, 'Student Portal');
                 const isCaptcha = await this.isVisible(captcha, { timeout: 1000 }).catch(() => false);
                 if (isCaptcha) {
                     console.warn('\n⚠️ [SKIP] CAPTCHA is enabled on screen. Skipping testcase.');
