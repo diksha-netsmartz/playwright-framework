@@ -192,11 +192,12 @@ export default class SchedulerPage extends BasePage {
     }
 
     /**
-     * Calculates target calendar date (7 days prior, non-Sunday), navigates previous months if needed, and clicks the date.
+     * Calculates target calendar date (daysAgo prior, non-Sunday), navigates previous months if needed, and clicks the date.
+     * @param {number} [daysAgo=3] - Number of weekdays prior to select (defaults to 3).
      **/
-    async selectDateInCalendar() {
-        await test.step('Select target date in scheduler calendar', async () => {
-            const targetDate = DateHelper.getWeekdayDaysAgo(7);
+    async selectDateInCalendar(daysAgo = 3) {
+        await test.step(`Select target date in scheduler calendar`, async () => {
+            const targetDate = DateHelper.getWeekdayDaysAgo(daysAgo);
             const dataValue = DateHelper.toSchedulerDataValue(targetDate);
 
             const today = new Date();
@@ -271,6 +272,47 @@ export default class SchedulerPage extends BasePage {
         const slot = this.page.locator("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell'],  #multiVehicleScheduler td[role='gridcell'],  #singleLocationScheduler td[role='gridcell']").nth(freeIndex);
         await slot.scrollIntoViewIfNeeded();
         return slot;
+    }
+
+    /**
+     * Counts unoccupied, visible grid slots currently displayed in the scheduler.
+     * @returns {Promise<number>}
+     **/
+    async getAvailableSlotCount() {
+        return await this.page.evaluate(() => {
+            const cells = Array.from(
+                document.querySelectorAll("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell'],  #multiVehicleScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']")
+            );
+            const appointments = Array.from(
+                document.querySelectorAll("div.k-event, div[data-types='Appointment']")
+            );
+            let count = 0;
+            for (let i = 0; i < cells.length; i++) {
+                const cell = cells[i];
+                const cellBox = cell.getBoundingClientRect();
+                if (cellBox.width === 0 || cellBox.height === 0) continue;
+
+                const bgColor = window.getComputedStyle(cell).backgroundColor;
+                const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
+                if (!isWhite) continue;
+
+                const hasApptOverlap = appointments.some(appt => {
+                    const apptBox = appt.getBoundingClientRect();
+                    if (apptBox.width === 0 || apptBox.height === 0) return false;
+                    return (
+                        apptBox.left < cellBox.right &&
+                        apptBox.right > cellBox.left &&
+                        apptBox.top < cellBox.bottom &&
+                        apptBox.bottom > cellBox.top
+                    );
+                });
+
+                if (!hasApptOverlap) {
+                    count++;
+                }
+            }
+            return count;
+        });
     }
 
     /**
@@ -403,18 +445,55 @@ export default class SchedulerPage extends BasePage {
 
 
     /**
-   * Selects date in calendar, right clicks an unoccupied slot, and selects the given appointment creation option.
+   * Selects base date in calendar, right clicks an unoccupied slot, and selects the given appointment creation option.
+   * If slot count is less than minFreeSlots or student already has an appointment, clicks Previous until both conditions are met.
    * @param {string} appointmentType - Context menu label for appointment type.
+   * @param {Object|string} [studentName=null] - Optional student to verify no appointment exists on selected date.
    **/
-    async selectCreateAppointment(appointmentType) {
+    async selectCreateAppointment(appointmentType, studentName = null) {
         let selectedCol = '';
+        const minFreeSlots = 5;
         await test.step(`Right-click free slot and select: "${appointmentType}"`, async () => {
+            // const dayViewBtn = this.page.locator("//a[normalize-space()='Day']");
+            // if (await this.isVisible(dayViewBtn, { timeout: 1000 }).catch(() => false)) {
+            //     await this.jsClick(dayViewBtn);
+            //     await this.waitForLoaders().catch(() => { });
+            // }
             await this.selectDateInCalendar();
             await this.waitForLoaders().catch(() => { });
             await this.page.waitForTimeout(1000);
             await this.page.waitForLoadState('load', { timeout: 20000 });
 
-            const slot = await this.findAvailableSlot(0);
+            let slot;
+            let attempts = 0;
+            const prevBtn = this.page.getByTitle('Previous');
+
+            while (attempts < 20) {
+                const freeCount = await this.getAvailableSlotCount().catch(() => 0);
+                const hasExistingAppt = studentName ? (await this.allListMenusOfCreatedAppointments(studentName).count().catch(() => 0)) > 0 : false;
+                console.log(`Current scheduler date has ${freeCount} free slot(s) (required: ${minFreeSlots}), existing student appt: ${hasExistingAppt}`);
+
+                if (freeCount >= minFreeSlots && !hasExistingAppt) {
+                    try {
+                        slot = await this.findAvailableSlot(0);
+                        break;
+                    } catch {
+                        console.log("findAvailableSlot failed, clicking Previous...");
+                    }
+                }
+
+                console.log(`Condition not met (free slots: ${freeCount} < ${minFreeSlots}, existing student appt: ${hasExistingAppt}), clicking Previous...`);
+                await this.click(prevBtn);
+                await this.waitForLoaders().catch(() => { });
+                await this.page.waitForTimeout(1000);
+                await this.page.waitForLoadState('load', { timeout: 20000 });
+                attempts++;
+            }
+
+            if (!slot) {
+                slot = await this.findAvailableSlot(0);
+            }
+
             const colIndex = await slot.evaluate(td => td instanceof HTMLTableCellElement ? td.cellIndex : 0);
             selectedCol = (await this.columnHeaders().nth(colIndex).innerText().catch(() => '')).trim();
             this.selectedColumnName = selectedCol;
@@ -681,7 +760,7 @@ export default class SchedulerPage extends BasePage {
                 await this.click(this.createAppointmentOnRightClick("Paste Last Copied Appointment"));
 
                 try {
-                    await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 1500 });
+                    await this.submitButtonPopup.waitFor({ state: 'visible', timeout: 5000 });
                     await this.click(this.submitButtonPopup);
                 } catch {
                     console.log("Submit confirmation popup did not appear.");
