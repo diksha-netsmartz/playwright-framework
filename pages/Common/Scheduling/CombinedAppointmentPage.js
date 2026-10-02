@@ -540,7 +540,7 @@ export default class CombinedAppointmentPage extends BasePage {
 
             await this.click(this.confirmYesButton);
 
-            if (await this.isVisible(this.submitButtonPopup, { timeout: 4000 }).catch(() => false)) {
+            if (await this.isVisible(this.submitButtonPopup, { timeout: 7000 }).catch(() => false)) {
                 await this.click(this.submitButtonPopup);
                 await this.waitForLoaders();
             }
@@ -770,7 +770,7 @@ export default class CombinedAppointmentPage extends BasePage {
             await this.click(this.deleteConfirmationButton);
             await this.waitForLoaders();
 
-            if (await this.isVisible(this.noShowYesButton, { timeout: 2000 }).catch(() => false)) {
+            if (await this.isVisible(this.noShowYesButton, { timeout: 5000 }).catch(() => false)) {
                 await this.click(this.noShowYesButton);
                 await this.waitForLoaders();
             }
