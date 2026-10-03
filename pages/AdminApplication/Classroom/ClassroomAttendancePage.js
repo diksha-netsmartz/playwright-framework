@@ -257,9 +257,7 @@ export default class ClassroomAttendancePage extends BasePage {
     async exportToExcel() {
         return await test.step('Click "Export to Excel" and wait for file download', async () => {
             const downloadPromise = this.page.waitForEvent('download', { timeout: 180000 });
-            if (!await this.isVisible(this.exportToExcelOption)) {
-                await this.clickPrintAttendance();
-            }
+            await this.clickPrintAttendance();
             await this.waitForVisible(this.exportToExcelOption);
             await this.click(this.exportToExcelOption);
             return await downloadPromise;
@@ -361,9 +359,7 @@ export default class ClassroomAttendancePage extends BasePage {
     async exportRosterToExcel() {
         return await test.step('Click "Export to Excel" under Print Roster and wait for download', async () => {
             const downloadPromise = this.page.waitForEvent('download', { timeout: 180000 });
-            if (!await this.isVisible(this.exportToExcelOption)) {
-                await this.clickPrintRoster();
-            }
+            await this.clickPrintRoster();
             await this.waitForVisible(this.exportToExcelOption);
             await this.click(this.exportToExcelOption);
             return await downloadPromise;

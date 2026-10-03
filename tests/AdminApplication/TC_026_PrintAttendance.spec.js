@@ -3,6 +3,7 @@ import LoginPage from '@pages/AdminApplication/AdminLoginPage';
 import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
 import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
 import { credentials, currentEnv } from '@config/config';
+import BasePage from '@utils/BasePage';
 
 /**
  * TC_026: C-Admin > Classroom > Attendance > Take Attendance
@@ -16,6 +17,7 @@ test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', { 
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
+    const basePage = new BasePage(page);
     const crNames = {
         uat: '15dsss11',
         staging: 'CR26',
@@ -45,6 +47,8 @@ test('TC_026: C-admin > Classroom > Attendance - To verify Print Attendance', { 
     });
 
     await test.step('Step 6: Export Attendance report to Excel and verify downloaded file', async () => {
+        await basePage.reload();
+        await attendancePage.selectSession(crName);
         download = await attendancePage.exportToExcel();
         await attendancePage.verifyExcelReportDownloaded(download, 'Attendance Report');
     });

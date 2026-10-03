@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import LoginPage from '@pages/AdminApplication/AdminLoginPage';
 import HomePage from '@pages/AdminApplication/AdminPortalHomePage';
+import BasePage from '@utils/BasePage';
 import ClassroomAttendancePage from '@pages/AdminApplication/Classroom/ClassroomAttendancePage';
 import { credentials, currentEnv } from '@config/config';
 
@@ -16,6 +17,7 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag:
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
     const attendancePage = new ClassroomAttendancePage(page);
+    const basePage = new BasePage(page);
 
     const reportName = /Roster report|Test report|CR Report|CR Roster/i;
     let pdfPage;
@@ -47,6 +49,8 @@ test('TC_027: C-admin > Classroom > Attendance - To verify Print Roster', { tag:
     });
 
     await test.step('Step 6: Export Roster report to Excel and verify downloaded file', async () => {
+        await basePage.reload();
+        await attendancePage.selectSession(crName);
         download = await attendancePage.exportRosterToExcel();
         await attendancePage.verifyExcelReportDownloaded(download, reportName);
     });

@@ -22,7 +22,7 @@ export default class BasePage {
      */
     async navigate(url) {
         this.lastNavigationResponse = await this.page.goto(url);
-        await this.page.waitForLoadState("load", { timeout: 10000 }).catch(() => {});
+        await this.page.waitForLoadState("load", { timeout: 10000 }).catch(() => { });
         return this.lastNavigationResponse;
     }
 
@@ -59,8 +59,9 @@ export default class BasePage {
      * Reloads the current page.
      * @param {Object} [options={ waitUntil: 'networkidle' }] - Reload options.
      */
-    async reload(options = { waitUntil: 'networkidle' }) {
+    async reload(options = { waitUntil: 'load' }) {
         await this.page.reload(options);
+        await this.waitForLoaders();
     }
 
     /**
@@ -94,8 +95,8 @@ export default class BasePage {
 
         const responsePromise = this.page.waitForResponse(
             (resp) => resp.request().isNavigationRequest() &&
-                      resp.request().frame() === this.page.mainFrame() &&
-                      !resp.status().toString().startsWith('3'),
+                resp.request().frame() === this.page.mainFrame() &&
+                !resp.status().toString().startsWith('3'),
             { timeout: responseTimeout }
         ).catch(() => null);
 
@@ -134,8 +135,8 @@ export default class BasePage {
 
         const response = await popupPage.waitForResponse(
             (resp) => resp.request().isNavigationRequest() &&
-                      resp.request().frame() === popupPage.mainFrame() &&
-                      !resp.status().toString().startsWith('3'),
+                resp.request().frame() === popupPage.mainFrame() &&
+                !resp.status().toString().startsWith('3'),
             { timeout: responseTimeout }
         ).catch(() => null);
 
