@@ -19,7 +19,6 @@ export default class StaffHomePage extends BasePage {
 
         this.needsAttentionWidget = page.getByText('NEEDS ATTENTION', { exact: true });
         this.actionDropdownBtn = page.locator("xpath=(//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')])[1]");
-        this.actionDropdownBtn2 = page.locator("xpath=(//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')])[2]");
         this.actionDropdownButtonsList = page.locator("//i[contains(@class,'warning')]//ancestor::div[3]//button[contains(text(),'ACTION')]");
         this.processLink = page.locator('.fa-tire:visible')
         this.noShowLink = page.locator('.fa-eye-slash:visible')
@@ -87,10 +86,14 @@ export default class StaffHomePage extends BasePage {
     async clickProcess(expectedTitle = /Process Lesson|Process Yard Skills/i) {
         return await test.step('Click Process in "Needs Attention" widget', async () => {
             await this.waitForVisible(this.needsAttentionWidget);
-            await this.click(this.actionDropdownBtn);
-            if (!await this.isVisible(this.processLink, { timeout: 5000 }).catch(() => false)) {
+
+            for (let i = 0; i < 3; i++) {
                 await this.click(this.actionDropdownBtn);
+                if (await this.isVisible(this.processLink, { timeout: 3000 }).catch(() => false)) {
+                    break;
+                }
             }
+
             await this.click(this.processLink);
             await this.waitForLoaders();
 
@@ -115,9 +118,11 @@ export default class StaffHomePage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.needsAttentionWidget);
 
-            await this.click(this.actionDropdownBtn);
-            if (!await this.isVisible(this.noShowLink, { timeout: 5000 }).catch(() => false)) {
+            for (let i = 0; i < 3; i++) {
                 await this.click(this.actionDropdownBtn);
+                if (await this.isVisible(this.noShowLink, { timeout: 3000 }).catch(() => false)) {
+                    break;
+                }
             }
             await this.click(this.noShowLink);
             await this.waitForVisible(this.noShowTextbox);
@@ -172,11 +177,15 @@ export default class StaffHomePage extends BasePage {
             await this.waitForLoaders();
             await this.waitForVisible(this.needsAttentionWidget);
 
-            await this.click(this.actionDropdownBtn2);
+            await this.click(this.actionDropdownBtn);
 
-            if (!await this.isVisible(this.cancelLink, { timeout: 5000 }).catch(() => false)) {
-                await this.click(this.actionDropdownBtn2);
+            for (let i = 0; i < 3; i++) {
+                await this.click(this.actionDropdownBtn);
+                if (await this.isVisible(this.cancelLink, { timeout: 3000 }).catch(() => false)) {
+                    break;
+                }
             }
+
             await this.click(this.cancelLink);
             await this.waitForLoaders();
             await this.waitForVisible(this.cancelTextbox);
