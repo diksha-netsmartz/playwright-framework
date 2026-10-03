@@ -297,8 +297,10 @@ export default class NewClassPage extends BasePage {
                 await this.waitForLoaders();
                 await this.waitForVisible(this.confirmYesBtn);
                 await this.click(this.confirmYesBtn);
-                await this.click(this.closeDeleteModal);
-                await this.waitForHidden(this.closeDeleteModal);
+                if (await this.isVisible(this.closeDeleteModal, { timeout: 3000 })) {
+                    await this.click(this.closeDeleteModal);
+                    await this.waitForHidden(this.closeDeleteModal);
+                }
                 // await this.waitForLoaders();
                 // await this.page.waitForTimeout(2000);
                 // if (await this.isVisible(this.teacherRemovedMessage, { timeout: 2000 }).catch(() => false)) {
