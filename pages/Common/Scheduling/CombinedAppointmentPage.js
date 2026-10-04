@@ -107,13 +107,13 @@ export default class CombinedAppointmentPage extends BasePage {
     }
 
     /**
-     * Returns locator for the End Time option corresponding to the given Start Time.
-     * @param {string} startTime - The selected start time string.
-     * @returns {import('@playwright/test').Locator} End time option locator.
-     **/
+         * Returns locator for the End Time option corresponding to the given Start Time.
+         * @param {string} startTime - The selected start time string.
+         * @returns {import('@playwright/test').Locator} End time option locator.
+         **/
     getEndTimeDropdownValue(startTime) {
         return this.page.locator(
-            `xpath=(//button[contains(@data-id,'EndTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1]//following-sibling::li[1])[1]`
+            `xpath=(//button[contains(@data-id,'EndTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1]//following-sibling::li[2])[1]`
         );
     }
 
@@ -124,7 +124,7 @@ export default class CombinedAppointmentPage extends BasePage {
      **/
     getMidTimeDropdownValue(startTime) {
         return this.page.locator(
-            `xpath=(//button[contains(@data-id,'MidTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1])[1]`
+            `xpath=(//button[contains(@data-id,'MidTime')]//parent::div//span[text()='${startTime}']//ancestor::li[1]//following-sibling::li[1])[1]`
         );
     }
 
