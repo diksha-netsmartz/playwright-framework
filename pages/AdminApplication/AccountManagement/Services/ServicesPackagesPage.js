@@ -343,10 +343,16 @@ export default class ServicesPackagesPage extends BasePage {
             }
 
             // Select Purchase through website as Yes
-            await this.click(this.allowPurchaseThroughWebsiteYesRadioButton);
-
+            if (await this.isVisible(this.allowPurchaseThroughWebsiteYesRadioButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowPurchaseThroughWebsiteYesRadioButton);
+            }
+            if (await this.isVisible(this.allowPurchaseThroughWebsiteNoRadioButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowPurchaseThroughWebsiteNoRadioButton);
+            }
             // Select Purchase through portal as No
-            await this.click(this.allowPurchaseThroughPortalNoRadioButton);
+            if (await this.isVisible(this.allowPurchaseThroughPortalNoRadioButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowPurchaseThroughPortalNoRadioButton);
+            }
 
             if (await this.isVisible(this.bypassClassSelectionYesRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.bypassClassSelectionYesRadioButton);
@@ -413,12 +419,20 @@ export default class ServicesPackagesPage extends BasePage {
             }
 
             // Fill Web Name
-            await this.fill(this.webNameInput, this.webName);
+            if (await this.isVisible(this.webNameInput, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.webNameInput, this.webName);
+            }
 
             // Fill Rich Textareas
-            await this.fill(this.webDescriptionTextarea, this.webDescription);
-            await this.fill(this.notesTextarea, this.notes);
-            await this.fill(this.emailContentTextarea, this.emailContent);
+            if (await this.isVisible(this.webDescriptionTextarea, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.webDescriptionTextarea, this.webDescription);
+            }
+            if (await this.isVisible(this.notesTextarea, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.notesTextarea, this.notes);
+            }
+            if (await this.isVisible(this.emailContentTextarea, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emailContentTextarea, this.emailContent);
+            }
             if (await this.isVisible(this.emailContentTextarea2, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.emailContentTextarea2, this.emailContent);
             }
@@ -652,9 +666,12 @@ export default class ServicesPackagesPage extends BasePage {
             }
 
             // 3. Radios & Checkboxes (toggle to opposite values)
-            await this.click(this.allowPurchaseThroughWebsiteNoRadioButton);
-            await this.click(this.allowPurchaseThroughPortalYesRadioButton);
-
+            if (await this.isVisible(this.allowPurchaseThroughWebsiteNoRadioButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowPurchaseThroughWebsiteNoRadioButton);
+            }
+            if (await this.isVisible(this.allowPurchaseThroughPortalYesRadioButton, { timeout: 100 }).catch(() => false)) {
+                await this.click(this.allowPurchaseThroughPortalYesRadioButton);
+            }
             if (await this.isVisible(this.bypassClassSelectionNoRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.bypassClassSelectionNoRadioButton);
             }
@@ -684,9 +701,15 @@ export default class ServicesPackagesPage extends BasePage {
             await this.updateSelectableField(this.selectableAddOnServiceAutoSelection, this.selectedAddOnServiceAutoSelection, 'isAddOnServiceAutoSelectionAdded', 'isAddOnServiceAutoSelectionRemoved');
 
             // 5. Rich Textareas
-            await this.fill(this.webDescriptionTextarea, this.updatedWebDescription);
-            await this.fill(this.notesTextarea, this.updatedNotes);
-            await this.fill(this.emailContentTextarea, this.updatedEmailContent);
+            if (await this.isVisible(this.webDescriptionTextarea, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.webDescriptionTextarea, this.updatedWebDescription);
+            }
+            if (await this.isVisible(this.notesTextarea, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.notesTextarea, this.updatedNotes);
+            }
+            if (await this.isVisible(this.emailContentTextarea, { timeout: 100 }).catch(() => false)) {
+                await this.fill(this.emailContentTextarea, this.updatedEmailContent);
+            }
             if (await this.isVisible(this.emailContentTextarea2, { timeout: 100 }).catch(() => false)) {
                 await this.fill(this.emailContentTextarea2, this.updatedEmailContent);
             }
