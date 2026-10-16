@@ -1,6 +1,6 @@
 import BasePage from '@utils/BasePage';
 import config from '@config/config';
-import { expect, test } from "@playwright/test";
+import { test } from "@playwright/test";
 import TwoFactorAuthPage from '@pages/Common/TwoFactorAuthPage';
 
 /**
@@ -83,7 +83,7 @@ export default class AdminLoginPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 90000 }).catch(() => { });
 
             // Check if login was successful
-            const isLoginSuccessful = await expect(this.page).toHaveTitle(/Home Page/i, { timeout: 15000 })
+            const isLoginSuccessful = await this.page.waitForFunction(() => /Home Page/i.test(document.title), { timeout: 15000 })
                 .then(() => true)
                 .catch(async () => {
                     return await this.quickLinks.isVisible({ timeout: 5000 }).catch(() => false);
@@ -97,6 +97,10 @@ export default class AdminLoginPage extends BasePage {
                     return;
                 }
                 throw new Error('Admin Portal login failed: Authentication failed / Home Page did not load.');
+            }
+
+            if (config.envName === 'uat') {
+                await this.page.waitForTimeout(30000);
             }
         });
     }

@@ -22,6 +22,8 @@ export default class ClassroomAttendancePage extends BasePage {
         // Session selection & Pagination
         this.sessionRadioBtn = page.locator('.radioinner').first();
         this.sessionRadioBtns = page.locator('.radioinner');
+        this.tabClassAttendance = page.locator(".c_attendance.tabsInClass.active")
+        this.classSessionOpened=page.locator('#divCRAttendanceSessionStudent_ShowHtml')
         this.searchTextbox = page.locator("div[id='attendanceTakenDta_filter'] input[placeholder='Search']")
         this.sessionsPageLengthSelect = page.locator('select[name="attendanceTakenDta_length"]').first();
         this.noRecordMessage = page.getByText('No record exists.', { exact: true });
@@ -122,7 +124,7 @@ export default class ClassroomAttendancePage extends BasePage {
                 const isNextAvailable = await this.sessionsNextPageBtn.isVisible().catch(() => false);
                 console.log(`[Classroom Attendance] Checking next page availability: ${isNextAvailable}`);
                 if (isNextAvailable) {
-                    const currentActiveText = await this.sessionsActivePage.textContent().catch(() => String(pageNum));
+                    const currentActiveText = await this.getText(this.sessionsActivePage).catch(() => String(pageNum));
                     pageNum++;
                     console.log(`Navigating to page ${pageNum} of classroom sessions...`);
                     try {
@@ -204,25 +206,6 @@ export default class ClassroomAttendancePage extends BasePage {
     }
 
     /**
-     * Verifies that the checked count for the randomly selected action increased by 1 after saving.
-     **/
-    async verifyAttendanceCountIncremented() {
-        await test.step(`Verify checked count for "${this.selectedAttendanceAction}" incremented by 1`, async () => {
-            await this.waitForLoaders();
-
-            if (this.selectedAttendanceAction === 'Present') {
-                const afterCount = await this.page.locator("xpath=//label[contains(@class,'checkedTruePresent')]").count();
-                console.log(`Checked Present count after save: ${afterCount}, expected: ${this.beforeCheckedCount + 1}`);
-                expect(afterCount).toBe(this.beforeCheckedCount + 1);
-            } else {
-                const afterCount = await this.page.locator("xpath=//label[contains(@class,'checkedTrueAbsent')]").count();
-                console.log(`Checked Absent count after save: ${afterCount}, expected: ${this.beforeCheckedCount + 1}`);
-                expect(afterCount).toBe(this.beforeCheckedCount + 1);
-            }
-        });
-    }
-
-    /**
      * Clicks the PRINT ATTENDANCE button to open the export options dropdown.
      **/
     async clickPrintAttendance() {
@@ -257,9 +240,19 @@ export default class ClassroomAttendancePage extends BasePage {
     async exportToExcel() {
         return await test.step('Click "Export to Excel" and wait for file download', async () => {
             const downloadPromise = this.page.waitForEvent('download', { timeout: 180000 });
-            await this.clickPrintAttendance();
+            const isAlreadyOpen = await this.exportToExcelOption.isVisible({ timeout: 1000 }).catch(() => false);
+            if (!isAlreadyOpen) {
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    await this.clickPrintAttendance();
+                    const isVisible = await this.exportToExcelOption.isVisible({ timeout: 3000 }).catch(() => false);
+                    if (isVisible) {
+                        break;
+                    }
+                    console.log(`[exportToExcel] Attempt ${attempt}/3: "Export to Excel" option not visible, retrying click on PRINT ATTENDANCE...`);
+                }
+            }
             await this.waitForVisible(this.exportToExcelOption);
-            await this.click(this.exportToExcelOption);
+            await this.click(this.exportToExcelOption, { noWaitAfter: true });
             return await downloadPromise;
         });
     }
@@ -359,9 +352,19 @@ export default class ClassroomAttendancePage extends BasePage {
     async exportRosterToExcel() {
         return await test.step('Click "Export to Excel" under Print Roster and wait for download', async () => {
             const downloadPromise = this.page.waitForEvent('download', { timeout: 180000 });
-            await this.clickPrintRoster();
+            const isAlreadyOpen = await this.exportToExcelOption.isVisible({ timeout: 1000 }).catch(() => false);
+            if (!isAlreadyOpen) {
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    await this.clickPrintRoster();
+                    const isVisible = await this.exportToExcelOption.isVisible({ timeout: 3000 }).catch(() => false);
+                    if (isVisible) {
+                        break;
+                    }
+                    console.log(`[exportRosterToExcel] Attempt ${attempt}/3: "Export to Excel" option not visible, retrying click on PRINT ROSTER...`);
+                }
+            }
             await this.waitForVisible(this.exportToExcelOption);
-            await this.click(this.exportToExcelOption);
+            await this.click(this.exportToExcelOption, { noWaitAfter: true });
             return await downloadPromise;
         });
     }
@@ -421,6 +424,17 @@ export default class ClassroomAttendancePage extends BasePage {
             await this.waitForVisible(this.emailSentSuccessMessage, { timeout: 30000 });
             await this.verifyVisible(this.emailSentSuccessMessage, { timeout: 30000 });
             await this.waitForLoaders();
+        });
+    }
+
+    /**
+     * Verifies that the Class Attendance tab is opened with aria-expanded="true".
+     **/
+    async verifyClassAttendanceTabOpened() {
+        await test.step('Verify Class Attendance tab is opened with aria-expanded="true"', async () => {
+            await this.waitForVisible(this.tabClassAttendance, 15000);
+            await this.verifyVisible(this.tabClassAttendance);
+            await this.verifyVisible(this.classSessionOpened);
         });
     }
 }

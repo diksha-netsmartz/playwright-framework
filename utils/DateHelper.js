@@ -75,6 +75,48 @@ export default class DateHelper {
     }
 
     /**
+     * Computes a 2-month date range spanning from the 1st day of the previous month
+     * to the last day of the current month (covering Previous Month and Current Month).
+     * 
+     * Example: If current date is in October 2026:
+     * - Start Date: 09/01/2026
+     * - End Date: 10/31/2026
+     * - Formatted Range: "09/01/2026 - 10/31/2026"
+     * 
+     * @param {Date} [baseDate=new Date()] - Reference date (defaults to current date).
+     * @returns {{ startDate: string, endDate: string, formattedRange: string }} Date range object.
+     */
+    static getPreviousToCurrentMonthDateRange(baseDate = new Date()) {
+        const year = baseDate.getFullYear();
+        const month = baseDate.getMonth();
+
+        // First day of previous month
+        const firstDayPrevMonth = new Date(year, month - 1, 1);
+
+        // Last day of current month (day 0 of month + 1)
+        const lastDayCurrentMonth = new Date(year, month + 1, 0);
+
+        const startDate = this.formatDate(firstDayPrevMonth);
+        const endDate = this.formatDate(lastDayCurrentMonth);
+
+        return {
+            startDate,
+            endDate,
+            formattedRange: `${startDate} - ${endDate}`
+        };
+    }
+
+    /**
+     * Returns only the formatted range string spanning Previous Month start to Current Month end
+     * (e.g. "09/01/2026 - 10/31/2026").
+     * @param {Date} [baseDate=new Date()] - Reference date.
+     * @returns {string}
+     */
+    static getPreviousToCurrentMonthFormattedRange(baseDate = new Date()) {
+        return this.getPreviousToCurrentMonthDateRange(baseDate).formattedRange;
+    }
+
+    /**
      * Computes the current month's start and end dates formatted as MM/DD/YYYY.
      * @param {Date} [baseDate=new Date()] - Reference date.
      * @returns {{ startDate: string, endDate: string, formattedRange: string }}

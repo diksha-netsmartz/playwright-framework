@@ -216,37 +216,28 @@ export default class SchedulerPage extends BasePage {
 
     /**
      * Evaluates the scheduler DOM to find an unoccupied, visible grid slot in the viewport.
+     * Ensures that the slot has the specified number of consecutive free slots (default: 2, e.g. 30 minutes).
      * @param {number} [skipCount=0] - Number of free slots to skip before returning.
+     * @param {number} [consecutiveSlots=2] - Number of consecutive slots required in the same column.
      * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell.
      **/
-    async findAvailableSlot(skipCount = 0) {
-        const freeIndex = await this.page.evaluate((skip) => {
+    async findAvailableSlot(skipCount = 0, consecutiveSlots = 2) {
+        const freeIndex = await this.page.evaluate(({ skip, consecutive }) => {
             const cells = Array.from(
                 document.querySelectorAll("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell'],  #multiVehicleScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']")
             );
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
             );
-            let skipped = 0;
 
-            for (let i = 0; i < cells.length; i++) {
-                const cell = cells[i];
+            const isSingleSlotFree = (cell) => {
+                if (!cell) return false;
                 const cellBox = cell.getBoundingClientRect();
-
-                // Only skip unrendered/hidden cells
-                if (cellBox.width === 0 || cellBox.height === 0) {
-                    continue;
-                }
-
-                // if (cell.classList.contains('k-nonwork-hour')) {
-                //     continue;
-                // }
+                if (cellBox.width === 0 || cellBox.height === 0) return false;
 
                 const bgColor = window.getComputedStyle(cell).backgroundColor;
                 const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
-                if (!isWhite) {
-                    continue;
-                }
+                if (!isWhite) return false;
 
                 const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
@@ -258,14 +249,52 @@ export default class SchedulerPage extends BasePage {
                         apptBox.bottom > cellBox.top
                     );
                 });
+                return !hasApptOverlap;
+            };
 
-                if (!hasApptOverlap) {
+            const hasConsecutiveSlots = (startCell, count) => {
+                if (!isSingleSlotFree(startCell)) return false;
+                let curr = startCell;
+                for (let c = 1; c < count; c++) {
+                    const nextTr = curr.parentElement ? curr.parentElement.nextElementSibling : null;
+                    if (!nextTr) return false;
+
+                    let nextCell = null;
+                    if (curr.cellIndex !== undefined && nextTr.children[curr.cellIndex]) {
+                        const candidate = nextTr.children[curr.cellIndex];
+                        const currBox = curr.getBoundingClientRect();
+                        const candBox = candidate.getBoundingClientRect();
+                        if (Math.abs(candBox.left - currBox.left) < 10) {
+                            nextCell = candidate;
+                        }
+                    }
+                    if (!nextCell) {
+                        const currBox = curr.getBoundingClientRect();
+                        for (let j = 0; j < nextTr.children.length; j++) {
+                            const cand = nextTr.children[j];
+                            const candBox = cand.getBoundingClientRect();
+                            if (Math.abs(candBox.left - currBox.left) < 10) {
+                                nextCell = cand;
+                                break;
+                            }
+                        }
+                    }
+                    if (!nextCell || !isSingleSlotFree(nextCell)) return false;
+                    curr = nextCell;
+                }
+                return true;
+            };
+
+            let skipped = 0;
+            for (let i = 0; i < cells.length; i++) {
+                const cell = cells[i];
+                if (hasConsecutiveSlots(cell, consecutive)) {
                     if (skipped === skip) return i;
                     skipped++;
                 }
             }
             return -1;
-        }, skipCount);
+        }, { skip: skipCount, consecutive: consecutiveSlots });
 
         if (freeIndex === -1) throw new Error("No available slot found in the scheduler");
         console.log(`Found available slot at index ${freeIndex}`);
@@ -275,26 +304,28 @@ export default class SchedulerPage extends BasePage {
     }
 
     /**
-     * Counts unoccupied, visible grid slots currently displayed in the scheduler.
+     * Counts unoccupied, visible grid slots currently displayed in the scheduler
+     * that have at least the required consecutive free slots.
+     * @param {number} [consecutiveSlots=2] - Number of consecutive slots required in the same column.
      * @returns {Promise<number>}
      **/
-    async getAvailableSlotCount() {
-        return await this.page.evaluate(() => {
+    async getAvailableSlotCount(consecutiveSlots = 2) {
+        return await this.page.evaluate((consecutive) => {
             const cells = Array.from(
                 document.querySelectorAll("#scheduler td[role='gridcell'], #multiInsScheduler td[role='gridcell'],  #multiVehicleScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']")
             );
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
             );
-            let count = 0;
-            for (let i = 0; i < cells.length; i++) {
-                const cell = cells[i];
+
+            const isSingleSlotFree = (cell) => {
+                if (!cell) return false;
                 const cellBox = cell.getBoundingClientRect();
-                if (cellBox.width === 0 || cellBox.height === 0) continue;
+                if (cellBox.width === 0 || cellBox.height === 0) return false;
 
                 const bgColor = window.getComputedStyle(cell).backgroundColor;
                 const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
-                if (!isWhite) continue;
+                if (!isWhite) return false;
 
                 const hasApptOverlap = appointments.some(appt => {
                     const apptBox = appt.getBoundingClientRect();
@@ -306,13 +337,50 @@ export default class SchedulerPage extends BasePage {
                         apptBox.bottom > cellBox.top
                     );
                 });
+                return !hasApptOverlap;
+            };
 
-                if (!hasApptOverlap) {
+            const hasConsecutiveSlots = (startCell, count) => {
+                if (!isSingleSlotFree(startCell)) return false;
+                let curr = startCell;
+                for (let c = 1; c < count; c++) {
+                    const nextTr = curr.parentElement ? curr.parentElement.nextElementSibling : null;
+                    if (!nextTr) return false;
+
+                    let nextCell = null;
+                    if (curr.cellIndex !== undefined && nextTr.children[curr.cellIndex]) {
+                        const candidate = nextTr.children[curr.cellIndex];
+                        const currBox = curr.getBoundingClientRect();
+                        const candBox = candidate.getBoundingClientRect();
+                        if (Math.abs(candBox.left - currBox.left) < 10) {
+                            nextCell = candidate;
+                        }
+                    }
+                    if (!nextCell) {
+                        const currBox = curr.getBoundingClientRect();
+                        for (let j = 0; j < nextTr.children.length; j++) {
+                            const cand = nextTr.children[j];
+                            const candBox = cand.getBoundingClientRect();
+                            if (Math.abs(candBox.left - currBox.left) < 10) {
+                                nextCell = cand;
+                                break;
+                            }
+                        }
+                    }
+                    if (!nextCell || !isSingleSlotFree(nextCell)) return false;
+                    curr = nextCell;
+                }
+                return true;
+            };
+
+            let count = 0;
+            for (let i = 0; i < cells.length; i++) {
+                if (hasConsecutiveSlots(cells[i], consecutive)) {
                     count++;
                 }
             }
             return count;
-        });
+        }, consecutiveSlots);
     }
 
     /**
@@ -320,11 +388,12 @@ export default class SchedulerPage extends BasePage {
      * Prioritizes slots in the same column (below, then above), and falls back to other columns (preferably a different row/time).
      * @param {Object|string} studentName - Student object or student name string.
      * @param {number} [skipCount=0] - Number of free slots to skip across candidates.
+     * @param {number} [consecutiveSlots=2] - Number of consecutive slots required in the same column.
      * @returns {Promise<import('@playwright/test').Locator>} Locator for the available gridcell.
      **/
-    async findAvailableSlotForCopy(studentName, skipCount = 0) {
+    async findAvailableSlotForCopy(studentName, skipCount = 0, consecutiveSlots = 2) {
         const searchText = this.getStudentSearchText(studentName);
-        const freeIndex = await this.page.evaluate(({ search, skip }) => {
+        const freeIndex = await this.page.evaluate(({ search, skip, consecutive }) => {
             /** @type {HTMLTableCellElement[]} */
             const cells = Array.from(
                 document.querySelectorAll("#multiInsScheduler td[role='gridcell'], #scheduler td[role='gridcell'], #multiVehicleScheduler td[role='gridcell'], #singleLocationScheduler td[role='gridcell']")
@@ -332,6 +401,61 @@ export default class SchedulerPage extends BasePage {
             const appointments = Array.from(
                 document.querySelectorAll("div.k-event, div[data-types='Appointment']")
             );
+
+            const isSingleSlotFree = (cell) => {
+                if (!cell) return false;
+                const cellBox = cell.getBoundingClientRect();
+                if (cellBox.width === 0 || cellBox.height === 0) return false;
+
+                const bgColor = window.getComputedStyle(cell).backgroundColor;
+                const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
+                if (!isWhite) return false;
+
+                const hasApptOverlap = appointments.some(appt => {
+                    const apptBox = appt.getBoundingClientRect();
+                    if (apptBox.width === 0 || apptBox.height === 0) return false;
+                    return (
+                        apptBox.left < cellBox.right &&
+                        apptBox.right > cellBox.left &&
+                        apptBox.top < cellBox.bottom &&
+                        apptBox.bottom > cellBox.top
+                    );
+                });
+                return !hasApptOverlap;
+            };
+
+            const hasConsecutiveSlots = (startCell, count) => {
+                if (!isSingleSlotFree(startCell)) return false;
+                let curr = startCell;
+                for (let c = 1; c < count; c++) {
+                    const nextTr = curr.parentElement ? curr.parentElement.nextElementSibling : null;
+                    if (!nextTr) return false;
+
+                    let nextCell = null;
+                    if (curr.cellIndex !== undefined && nextTr.children[curr.cellIndex]) {
+                        const candidate = nextTr.children[curr.cellIndex];
+                        const currBox = curr.getBoundingClientRect();
+                        const candBox = candidate.getBoundingClientRect();
+                        if (Math.abs(candBox.left - currBox.left) < 10) {
+                            nextCell = candidate;
+                        }
+                    }
+                    if (!nextCell) {
+                        const currBox = curr.getBoundingClientRect();
+                        for (let j = 0; j < nextTr.children.length; j++) {
+                            const cand = nextTr.children[j];
+                            const candBox = cand.getBoundingClientRect();
+                            if (Math.abs(candBox.left - currBox.left) < 10) {
+                                nextCell = cand;
+                                break;
+                            }
+                        }
+                    }
+                    if (!nextCell || !isSingleSlotFree(nextCell)) return false;
+                    curr = nextCell;
+                }
+                return true;
+            };
 
             // Locate the target appointment element
             const targetAppt = document.querySelector(
@@ -371,25 +495,8 @@ export default class SchedulerPage extends BasePage {
 
             for (let i = 0; i < cells.length; i++) {
                 const cell = cells[i];
+                if (!hasConsecutiveSlots(cell, consecutive)) continue;
                 const cellBox = cell.getBoundingClientRect();
-
-                if (cellBox.width === 0 || cellBox.height === 0) continue;
-                // if (cell.classList.contains('k-nonwork-hour')) continue;
-                const bgColor = window.getComputedStyle(cell).backgroundColor;
-                const isWhite = bgColor === 'rgb(255, 255, 255)' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent';
-                if (!isWhite) continue;
-
-                const hasApptOverlap = appointments.some(appt => {
-                    const apptBox = appt.getBoundingClientRect();
-                    if (apptBox.width === 0 || apptBox.height === 0) return false;
-                    return (
-                        apptBox.left < cellBox.right &&
-                        apptBox.right > cellBox.left &&
-                        apptBox.top < cellBox.bottom &&
-                        apptBox.bottom > cellBox.top
-                    );
-                });
-                if (hasApptOverlap) continue;
 
                 let isSameCol = false;
                 let isSameRow = false;
@@ -434,7 +541,7 @@ export default class SchedulerPage extends BasePage {
             }
 
             return -1;
-        }, { search: searchText, skip: skipCount });
+        }, { search: searchText, skip: skipCount, consecutive: consecutiveSlots });
 
         if (freeIndex === -1) throw new Error(`No available slot found for student "${searchText}"`);
         console.log(`Found available slot for copy at index ${freeIndex}`);
@@ -449,8 +556,9 @@ export default class SchedulerPage extends BasePage {
    * If slot count is less than minFreeSlots or student already has an appointment, clicks Previous until both conditions are met.
    * @param {string} appointmentType - Context menu label for appointment type.
    * @param {Object|string} [studentName=null] - Optional student to verify no appointment exists on selected date.
+   * @param {number} [consecutiveSlots=2] - Number of consecutive slots required.
    **/
-    async selectCreateAppointment(appointmentType, studentName = null) {
+    async selectCreateAppointment(appointmentType, studentName = null, consecutiveSlots = 2) {
         let selectedCol = '';
         const minFreeSlots = 5;
         await test.step(`Right-click free slot and select: "${appointmentType}"`, async () => {
@@ -469,13 +577,13 @@ export default class SchedulerPage extends BasePage {
             const prevBtn = this.page.getByTitle('Previous');
 
             while (attempts < 20) {
-                const freeCount = await this.getAvailableSlotCount().catch(() => 0);
+                const freeCount = await this.getAvailableSlotCount(consecutiveSlots).catch(() => 0);
                 const hasExistingAppt = studentName ? (await this.allListMenusOfCreatedAppointments(studentName).count().catch(() => 0)) > 0 : false;
                 console.log(`Current scheduler date has ${freeCount} free slot(s) (required: ${minFreeSlots}), existing student appt: ${hasExistingAppt}`);
 
                 if (freeCount >= minFreeSlots && !hasExistingAppt) {
                     try {
-                        slot = await this.findAvailableSlot(0);
+                        slot = await this.findAvailableSlot(0, consecutiveSlots);
                         break;
                     } catch {
                         console.log("findAvailableSlot failed, clicking Previous...");
@@ -491,7 +599,7 @@ export default class SchedulerPage extends BasePage {
             }
 
             if (!slot) {
-                slot = await this.findAvailableSlot(0);
+                slot = await this.findAvailableSlot(0, consecutiveSlots);
             }
 
             const colIndex = await slot.evaluate(td => td instanceof HTMLTableCellElement ? td.cellIndex : 0);
@@ -654,24 +762,8 @@ export default class SchedulerPage extends BasePage {
             console.log(`Appointment deleted with message: ${toastMessage}`);
             await this.waitForLoaders();
             await this.page.waitForLoadState('load', { timeout: 30000 })
-
             const listMenu = this.listMenuOfCreatedAppointment(studentName);
-            let count = await listMenu.count();
-
-            if (count > 0) {
-                try {
-                    await expect.poll(async () => {
-                        await this.waitForLoaders().catch(() => { });
-                        return await listMenu.count();
-                    }, { timeout: 60000 }).toBe(0);
-                    count = await listMenu.count();
-                } catch { }
-            }
-
-            expect(count).toBe(0);
-
-            await test.step(`Appointment deleted successfully.`, async () => { });
-
+            await expect(listMenu).toHaveCount(0, { timeout: 60000 });
         });
     }
 

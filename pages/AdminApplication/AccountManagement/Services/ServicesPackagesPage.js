@@ -346,9 +346,7 @@ export default class ServicesPackagesPage extends BasePage {
             if (await this.isVisible(this.allowPurchaseThroughWebsiteYesRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.allowPurchaseThroughWebsiteYesRadioButton);
             }
-            if (await this.isVisible(this.allowPurchaseThroughWebsiteNoRadioButton, { timeout: 100 }).catch(() => false)) {
-                await this.click(this.allowPurchaseThroughWebsiteNoRadioButton);
-            }
+           
             // Select Purchase through portal as No
             if (await this.isVisible(this.allowPurchaseThroughPortalNoRadioButton, { timeout: 100 }).catch(() => false)) {
                 await this.click(this.allowPurchaseThroughPortalNoRadioButton);

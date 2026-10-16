@@ -81,7 +81,7 @@
       "password": "123456Aa#"
     },
     "studentUser": {
-      "name": "testautomation_donotuse",
+      "name": "testautomationdonotuse",
       "username": "tes105400",
       "password": "Student@*/123321"
     },
@@ -98,7 +98,7 @@
     "classroomInstructor": {
       "name": "dsstestsep4inst",
       "username": "dsstestsep4inst",
-      "password": "Staffing@*123321"
+      "password": "123456Aa#"
     }
   }
 }

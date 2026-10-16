@@ -45,10 +45,19 @@ Follow these steps if you are setting up this project on a brand-new computer:
   - *(If Java is not installed, standard Playwright HTML reports `npx playwright show-report` will still work perfectly).*
 
 ### Step 4: Clone the Repository
-```bash
-git clone https://github.com/diksha-netsmartz/playwright-framework.git
-cd playwright-framework
-```
+Clone the repository using SSH or HTTPS:
+
+- **Via SSH (Recommended):**
+  ```bash
+  git clone git@git.netsmartz.net:netsmartz/danubenet/DSSAutomations.git
+  cd DSSAutomations
+  ```
+
+- **Via HTTPS:**
+  ```bash
+  git clone https://git.netsmartz.net/netsmartz/danubenet/DSSAutomations.git
+  cd DSSAutomations
+  ```
 
 ### Step 5: Install Project Dependencies
 ```bash
@@ -79,9 +88,12 @@ npx cross-env HEADLESS=false npx playwright test tests/AdminApplication/TC_022_V
 
 Since `node_modules` is not stored in Git, follow these rules whenever updating the project:
 
-### 1. Whenever you pull updates from Git:
+### 1. Whenever you pull updates from GitLab:
 Always run `npm install` after pulling so any newly added packages (e.g. `imapflow`, `mailparser`, `pdf-to-img`) are installed automatically:
 ```bash
+# Pull latest changes from your working branch or main:
+git pull origin main && npm install
+# or for your current working branch:
 git pull && npm install
 ```
 
@@ -101,7 +113,7 @@ npm install <package-name>
 # Development dependency:
 npm install -D <package-name>
 ```
-*Always commit and push both `package.json` and `package-lock.json` to GitHub so other team members get the update.*
+*Always commit and push both `package.json` and `package-lock.json` to GitLab so other team members get the update.*
 
 ---
 
@@ -208,42 +220,37 @@ Run only smoke-tagged tests across modules without needing separate folders:
 
 ---
 
-## ☁️ Running Tests via GitHub Actions (CI/CD)
+## ☁️ Running Tests via GitLab CI/CD
 
-The framework includes an on-demand workflow ([`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)) that runs tests in headless **1920x1080 desktop resolution** on GitHub's cloud runners and sends an automated Allure execution report via email.
+The framework includes automated GitLab CI/CD pipelines configured in [`.gitlab-ci.yml`](.gitlab-ci.yml) and modular configurations under [`.gitlab/ci/`](.gitlab/ci/) that run tests in headless **1920x1080 desktop resolution** and send an automated Allure execution report via email.
 
-### How to Trigger a Run on GitHub:
-1. Open the repository on GitHub in your browser.
-2. Click the **Actions** tab in the top navigation bar.
-3. In the left sidebar under *Workflows*, select **`Playwright Tests (Main)`**.
-4. Click the **"Run workflow"** button on the right.
-5. Configure your execution options:
-   - **Branch:** Select `main`.
-   - **Environment:** Select the target environment (`coreServer2` [default], `coreServer1`, `uat`, or `staging`).
-   - **Tag or pattern to filter tests (`grep`):** 
-     - Leave blank to run all tests.
-     - Or enter a tag/title to filter (e.g. `@smoke`, `@reportCenter`, or `TC_022`).
-   - **Recipient email(s) (`recipients`):**
-     - Defaults to team members: `diksha.gupta@netsmartz.com`, `abhishek.gautam@netsmartz.net`, `manpreet.lamba@netsmartz.com`, `jitesh.bhardwaj@netsmartz.com`, `manjit.kumar@netsmartz.com`.
-     - Or modify/add custom comma-separated emails.
-6. Click the green **"Run workflow"** button to start execution.
+### How to Trigger an On-Demand Run on GitLab:
+1. Open the repository on GitLab: [`https://git.netsmartz.net/netsmartz/danubenet/DSSAutomations`](https://git.netsmartz.net/netsmartz/danubenet/DSSAutomations).
+2. In the left navigation menu, go to **Build** $\rightarrow$ **Pipelines**.
+3. Click the **"Run pipeline"** button on the top right.
+4. Select the target **Branch** (e.g., `main` or your working branch).
+5. Configure your pipeline execution variables (under **Variables**):
+   - **`ENVIRONMENT`**: Target environment (`coreServer2` [default], `coreServer1`, `uat`, or `staging`).
+   - **`GREP`**: Tag or pattern to filter tests (e.g. `@smoke`, `@homepage`, `@CAdmin`, or `TC_022`). Leave blank to run all tests.
+   - **`RECIPIENTS`**: Comma-separated recipient email(s) for the execution report (defaults to `diksha.gupta@netsmartz.com`).
+6. Click the green **"Run pipeline"** button to start execution.
 
 ### What Happens After Execution:
-- The entire run executes in the cloud without using your local machine resources.
-- Playwright HTML and Allure results are uploaded as build artifacts.
+- The entire run executes in a standardized Playwright Docker container in the cloud without consuming local machine resources.
+- Playwright HTML and Allure results are uploaded as pipeline build artifacts.
 - An email notification is sent to the specified recipients containing:
   - Status summary badge (**PASSED** / **FAILED**).
   - Test count breakdown table (**Total**, **Passed**, **Failed**, **Skipped**).
-  - Direct link to the GitHub Actions Run and Artifacts.
+  - Direct link to the GitLab CI Pipeline and Artifacts.
   - Attached **`Allure-Report.zip`** (extract and double-click `index.html` to view the interactive Allure report).
 
 ### 🌅 Daily Scheduled Regression:
-A dedicated scheduled workflow ([`.github/workflows/daily-servers.yml`](.github/workflows/daily-servers.yml)) runs automatically every day:
-1. Executes all tests on **`coreServer2`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
-2. Once finished, executes all tests on **`coreServer1`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
-3. Once finished, executes all tests on **`uat`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
-4. Once finished, executes all tests on **`staging`** on a dedicated runner $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
-5. Can also be triggered manually on demand via **Actions** $\rightarrow$ **`Daily Regression (Server 2, 1, UAT & Staging)`** $\rightarrow$ **"Run workflow"**.
+Automated multi-server regression pipelines ([`.gitlab/ci/daily-servers.gitlab-ci.yml`](.gitlab/ci/daily-servers.gitlab-ci.yml)) run across all target servers:
+1. Executes all tests on **`coreServer2`** $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+2. Next, executes all tests on **`coreServer1`** $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+3. Next, executes all tests on **`uat`** $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+4. Next, executes all tests on **`staging`** $\rightarrow$ generates fresh Allure report $\rightarrow$ emails report.
+5. Can also be triggered on demand via **Build** $\rightarrow$ **Pipelines** $\rightarrow$ **"Run pipeline"** with variable `TRIGGER_DAILY_REGRESSION = true`.
 
 ---
 
@@ -309,6 +316,7 @@ npx playwright show-trace test-results/<path-to-trace.zip>
 | `npm run test:debug` | `npx playwright test --debug` | Run tests with Playwright Inspector |
 | `npm run check` | `tsc -p jsconfig.json --noEmit` | Validate TypeScript types & syntax without emitting JS |
 | `npm run lint` | `eslint tests/` | Run ESLint validation across all test specs |
+| `npm run check:locators` | `node scripts/validate-page-locators.js` | Validate no duplicate page locators exist in constructors |
 | `npm run check:tags` | `node scripts/validate-spec-tags.js` | Validate module tags on all test specification files |
 | `npm run allure:open` | `node scripts/open-latest-allure.js` | Open the latest generated Allure report in browser |
 | `npm run allure:serve` | `allure serve allure-results` | Serve live Allure report from raw results |
@@ -345,10 +353,13 @@ Automation lifecycle and CI/CD utility scripts located in `scripts/`:
 
 ```text
 ClientPlaywrightFramework/
-├── .github/                     # GitHub Actions CI/CD workflows
-│   └── workflows/
-│       ├── playwright.yml          # On-demand cloud test execution & email reporting
-│       └── syntax.yml              # Automated syntax, lint, & tag validation on PR/push
+├── .gitlab/                     # GitLab CI/CD modular pipelines
+│   └── ci/
+│       ├── daily-servers.gitlab-ci.yml # Scheduled multi-server regression
+│       ├── playwright.gitlab-ci.yml    # On-demand cloud test execution & email reporting
+│       ├── qatdsm.gitlab-ci.yml        # QA TDS Mobile environment pipeline
+│       └── syntax.gitlab-ci.yml        # Automated syntax, lint, & tag validation
+├── .gitlab-ci.yml               # Main GitLab pipeline configuration
 ├── config/                      # Global environment configurations & base URLs (config.js)
 ├── pages/                       # Page Object Models (POM)
 │   ├── AdminApplication/           # Admin portal pages (Scheduling, Billing, Classroom, etc.)

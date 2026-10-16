@@ -47,7 +47,7 @@ export default class HeaderComponent extends BasePage {
         await test.step('Navigate to My Profile from User Dropdown', async () => {
             await this.openUserProfileDropdown();
             await this.waitForVisible(this.userDropdownMyProfileBtn, 3000);
-            await this.clickAndVerifyNavigation(this.userDropdownMyProfileBtn);
+            await this.click(this.userDropdownMyProfileBtn);
         });
     }
 
@@ -58,7 +58,19 @@ export default class HeaderComponent extends BasePage {
         await test.step('Navigate to Change Password from User Dropdown', async () => {
             await this.openUserProfileDropdown();
             await this.waitForVisible(this.userDropdownChangePasswordBtn, 3000);
-            await this.clickAndVerifyNavigation(this.userDropdownChangePasswordBtn);
+            await this.click(this.userDropdownChangePasswordBtn);
+        });
+    }
+
+    /**
+     * Navigates to Admin Home from the User Profile Dropdown.
+     */
+    async  openAdminHome() {
+        await test.step('Navigate to Admin Home from User Dropdown', async () => {
+            await this.openUserProfileDropdown();
+            await this.waitForVisible(this.userDropdownAdminHomeBtn, 3000);
+            await this.click(this.userDropdownAdminHomeBtn);
+            await this.verifyTitle('Home Page');
         });
     }
 

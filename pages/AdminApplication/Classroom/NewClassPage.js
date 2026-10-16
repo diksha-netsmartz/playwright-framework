@@ -297,21 +297,15 @@ export default class NewClassPage extends BasePage {
                 await this.waitForLoaders();
                 await this.waitForVisible(this.confirmYesBtn);
                 await this.click(this.confirmYesBtn);
-                if (await this.isVisible(this.closeDeleteModal, { timeout: 3000 })) {
-                    await this.click(this.closeDeleteModal);
-                    await this.waitForHidden(this.closeDeleteModal);
-                }
-                // await this.waitForLoaders();
-                // await this.page.waitForTimeout(2000);
-                // if (await this.isVisible(this.teacherRemovedMessage, { timeout: 2000 }).catch(() => false)) {
-                //     // await this.waitForVisible(this.teacherRemovedMessage);
-                //     await this.verifyVisible(this.teacherRemovedMessage);
-                // }
-                await this.page.waitForTimeout(2000);
-                if (await this.isVisible(this.teacherAvailableMessage, { timeout: 2000 }).catch(() => false)) {
+                await this.waitForLoaders();
+
+                if (await this.isVisible(this.teacherAvailableMessage, 10000).catch(() => false)) {
                     await this.verifyVisible(this.teacherAvailableMessage);
                     await this.click(this.closeTeacherAvailableModal);
                     await this.waitForHidden(this.closeTeacherAvailableModal);
+                } else if (await this.isVisible(this.closeDeleteModal, { timeout: 2000 }).catch(() => false)) {
+                    await this.click(this.closeDeleteModal, { timeout: 2000 }).catch(() => {});
+                    await this.waitForHidden(this.closeDeleteModal).catch(() => {});
                 }
                 await this.waitForLoaders();
             }

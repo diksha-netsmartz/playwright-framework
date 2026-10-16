@@ -32,11 +32,14 @@ export default class StaffHomePage extends BasePage {
 
         // Student Details Widget Locators
         this.studentNameInput = page.getByRole('textbox', { name: 'Student Name' });
-        this.studentNameOption = (name) => page.getByRole('option', { name: new RegExp(name, 'i') }).or(page.locator('.ui-autocomplete li, .typeahead li, [role="option"], ul.ui-menu li').filter({ hasText: name })).first();
+        this.crNameInput=page.locator('#txtCRNumber');
+        this.studentDropdownButton=page.locator("//button[@data-id='drpFilteredStudent_SearchByCR']")
+        this.dropdownOptionSelect = (name) => page.getByRole('option', { name: new RegExp(name, 'i') }).or(page.locator('.ui-autocomplete li, .typeahead li, [role="option"], ul.ui-menu li').filter({ hasText: name })).first();
         this.showDetailsBtn = page.getByRole('button', { name: 'Show Details' });
         this.studentDetailsModal = page.locator("//h4[text()='Student Details']//ancestor::div[@class='modal-content']");
         this.studentDetailsModalHeading = page.locator("//h4[text()='Student Details']");
         this.studentDetailsTabs = page.locator('#tabStudentInfoDetails ul.nav-tabs li a');
+        this.closeStudentDetailsModalButton=page.getByRole('button', { name: 'Close' }).filter({ visible: true });
 
         //upload files widget
         this.studentNameTextbox = page.locator('#txtFileUploadStudentName')
@@ -54,7 +57,7 @@ export default class StaffHomePage extends BasePage {
         this.staffAppointmentListSubLink = page.locator("#Schul_DailyStaffSchedule_li");
         this.calendarViewSubLink = page.locator("#Schul_Scheduler_li")
         this.myProfileLink = page.locator("#MyProfile_li");
-
+        this.homepageLink =page.locator('#home_li')
         // Task widget locators
         this.tasksWidget = page.locator("(//div[contains(text(),'Tasks')]//ancestor::div[2])[1]");
         this.noTaskPresent = page.locator("//div[contains(text(),'Tasks')]//ancestor::div[2]//span[text()='No Data Found.']");
@@ -238,7 +241,7 @@ export default class StaffHomePage extends BasePage {
     async searchAndSelectStudent(studentName) {
         await test.step(`Search and select student: "${studentName}" in Student Details widget`, async () => {
             await this.waitForLoaders();
-            const option = this.studentNameOption(studentName);
+            const option = this.dropdownOptionSelect(studentName);
             let optionFound = false;
 
             for (let attempt = 1; attempt <= 3; attempt++) {
@@ -254,6 +257,51 @@ export default class StaffHomePage extends BasePage {
 
             await this.waitForVisible(option, 5000);
             await this.click(option);
+
+            await this.waitForVisible(this.showDetailsBtn, 5000);
+            await this.click(this.showDetailsBtn);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+            });
+            await this.waitForLoaders();
+        });
+    }
+
+    
+    /**
+     * Searches for a CR by name in the Student Details widget, selects from the autocomplete dropdown,
+     * and clicks 'Show Details'.
+     * @param {string} crName - The CR name to search.
+     **/
+    async searchAndSelectCR(crName) {
+        await test.step(`Search and select CR: "${crName}" in Student Details widget`, async () => {
+            await this.waitForLoaders();
+            const option = this.dropdownOptionSelect(crName);
+            let optionFound = false;
+
+            for (let attempt = 1; attempt <= 3; attempt++) {
+                await this.waitForVisible(this.crNameInput, 1000);
+                await this.click(this.crNameInput);
+                await this.clear(this.crNameInput);
+                await this.crNameInput.pressSequentially(crName);
+
+                optionFound = await this.isVisible(option, { timeout: 3000 }).catch(() => false);
+                if (optionFound) break;
+                await this.page.waitForTimeout(500);
+            }
+
+            await this.waitForVisible(option, 5000);
+            await this.click(option);
+
+await this.waitForVisible(this.studentDropdownButton);
+await this.click(this.studentDropdownButton);
+
+ const validOptions = this.page.locator('ul.dropdown-menu.inner.selectpicker')
+                .locator('li')
+                .filter({ visible: true })
+                .filter({ hasNotText: /select/i });
+            await this.waitForVisible(validOptions.first(), 10000);
+            await validOptions.first().locator('a').or(validOptions.first()).first().click();
 
             await this.waitForVisible(this.showDetailsBtn, 5000);
             await this.click(this.showDetailsBtn);
@@ -297,6 +345,7 @@ export default class StaffHomePage extends BasePage {
                     tabsClicked++;
                 });
             }
+             await this.click(this.closeStudentDetailsModalButton);
 
             return tabsClicked;
         });
@@ -315,7 +364,7 @@ export default class StaffHomePage extends BasePage {
             await this.waitForVisible(this.uploadFilesWidget);
             await this.verifyVisible(this.uploadFilesWidget, 5000);
 
-            const option = this.studentNameOption(studentName);
+            const option = this.dropdownOptionSelect(studentName);
             let optionFound = false;
 
             for (let attempt = 1; attempt <= 3; attempt++) {
@@ -433,6 +482,23 @@ export default class StaffHomePage extends BasePage {
             await this.verifyTitle('My Profile');
         });
     }
+
+      /**
+     * Navigates to Home page from the left sidebar.
+     **/
+    async navigateToHomePage() {
+        await test.step('Navigate to Home page', async () => {
+            await this.waitForLoaders();
+            await this.waitForVisible(this.homepageLink, 5000);
+            await this.click(this.homepageLink);
+            await this.waitForLoaders();
+            await this.page.waitForLoadState('load', { timeout: 10000 }).catch(() => {
+            });
+            await this.waitForLoaders();
+            await this.verifyTitle('Staff Home');
+        });
+    }
+
 
     /**
      * Scrolls to the Tasks widget on the Staff Home page.

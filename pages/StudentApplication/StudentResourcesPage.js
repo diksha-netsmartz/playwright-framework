@@ -68,4 +68,26 @@ export default class StudentResourcesPage extends BasePage {
             return count;
         });
     }
+
+    /**
+     * Verifies that the resource content on the current tab contains the expected text.
+     * @param {string} expectedText - Text expected in the resource content.
+     **/
+    async verifyResourceContent(expectedText) {
+        await test.step(`Verify resource content contains expected text`, async () => {
+            await this.waitForLoaders();
+            await expect(this.page.locator('body')).toContainText(expectedText);
+        });
+    }
+
+    /**
+     * Clicks a resource tab by its 0-based index and verifies that it reflects the expected text.
+     * @param {number} index - Index of the tab to click.
+     * @param {string} expectedText - Text expected in the tab content.
+     **/
+    async clickTabAndVerifyContent(index, expectedText) {
+        await this.clickResourcesTabByIndex(index);
+        await this.verifyResourceContent(expectedText);
+    }
 }
+

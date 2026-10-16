@@ -1,6 +1,6 @@
 import BasePage from '@utils/BasePage';
 import config from '@config/config';
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import TwoFactorAuthPage from '@pages/Common/TwoFactorAuthPage';
 import StudentPortalHomePage from './StudentPortalHomePage';
 
@@ -87,7 +87,7 @@ export default class StudentLoginPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 75000 }).catch(() => { });
 
             // Check if login was successful
-            const isLoginSuccessful = await expect(this.page).toHaveTitle(/Student Home/i, { timeout: 15000 })
+            const isLoginSuccessful = await this.page.waitForFunction(() => /Student Home/i.test(document.title), { timeout: 15000 })
                 .then(() => true)
                 .catch(async () => {
                     return await this.profileDropdownOnHomepage.isVisible({ timeout: 5000 }).catch(() => false);
@@ -101,6 +101,10 @@ export default class StudentLoginPage extends BasePage {
                     return;
                 }
                 throw new Error('Student Portal login failed: Authentication failed / Student Home did not load.');
+            }
+
+            if (config.envName === 'uat') {
+                await this.page.waitForTimeout(30000);
             }
         });
     }

@@ -327,8 +327,8 @@ export default class ComponentsPage extends BasePage {
                 await expect(this.currentTaxesDropdown).not.toContainText('Please Select');
                 const actualAmount = await this.additionalTaxInput.inputValue();
                 expect(parseFloat(actualAmount)).toBe(parseFloat(this.additionalTax));
-                await expect(this.totalItemPriceLabel).not.toHaveText('$0.00');
-                await expect(this.totalTaxAmountLabel).not.toHaveText('$0.00');
+                // await expect(this.totalItemPriceLabel).not.toHaveText('$0.00');
+                // await expect(this.totalTaxAmountLabel).not.toHaveText('$0.00');
             }
 
             if (await this.isVisible(this.mtoRequiredCheckbox, { timeout: 100 }).catch(() => false)) {

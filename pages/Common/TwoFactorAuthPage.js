@@ -16,7 +16,7 @@ export default class TwoFactorAuthPage extends BasePage {
     constructor(page) {
         super(page);
 
-        this.emailAuthButton = page.locator('button').filter({ hasText: 'EMAIL' }).first();
+        this.emailAuthButton = page.locator("//button[normalize-space()='EMAIL']").filter({ visible: true })
         this.emailLabel = page.locator("//label[contains(text(),'@gmail.com')]").filter({ hasText: /te|ra/i }).first();
         this.sendCodeButton = page.getByRole('button', { name: /Send.*Code/i }).first();
         this.otpInputs = page.locator('.inputcodeEmailContainer input.inputsEmail, input.inputsEmail');

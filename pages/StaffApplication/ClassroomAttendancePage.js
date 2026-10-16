@@ -1,5 +1,5 @@
 import BasePage from '@utils/BasePage';
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 /**
  * Page Object representing the Classroom Attendance Page in Staff Portal.
@@ -16,8 +16,7 @@ export default class ClassroomAttendancePage extends BasePage {
         super(page);
 
         this.viewLink = page.locator("xpath=//a[text()=' View ']");
-        this.viewAllLink = page.locator("xpath=//strong[text()='View All']");
-
+        this.viewAllLink = page.locator("//a[contains(text(),'View All')]")
         // Type filter (first filter dropdown)
         this.typeFilterBtn = page.locator("#ddlTypeSelectVal");
         this.selectAllOption = page.locator("xpath=//input[contains(@class,'selAllTypeDDL')]//following-sibling::ins");
@@ -52,6 +51,7 @@ export default class ClassroomAttendancePage extends BasePage {
     **/
     async clickViewAll() {
         await test.step('Click View All in upcoming schedule', async () => {
+            await this.waitForVisible(this.viewAllLink);
             await this.click(this.viewAllLink);
         });
     }
