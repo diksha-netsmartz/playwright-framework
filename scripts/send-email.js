@@ -66,12 +66,14 @@ async function sendEmail() {
   const singleReportDir = path.join(rootDir, 'allure-single-report');
   const zipPath = path.join(rootDir, 'Allure-Report.zip');
 
-  const jobStatus = (process.env.JOB_STATUS || 'success').toLowerCase();
+  const jobStatus = (process.env.JOB_STATUS || process.env.CI_JOB_STATUS || 'success').toLowerCase();
   const isSuccess = jobStatus === 'success';
   const envName = process.env.ENV || 'coreServer2';
-  const repo = process.env.GITHUB_REPOSITORY || '';
-  const runId = process.env.GITHUB_RUN_ID || '';
-  const runUrl = repo && runId ? `https://github.com/${repo}/actions/runs/${runId}` : '';
+  const branchName = process.env.CI_COMMIT_REF_NAME || process.env.GITHUB_REF_NAME || 'main';
+  const repo = process.env.GITHUB_REPOSITORY || process.env.CI_PROJECT_PATH || '';
+  const runId = process.env.GITHUB_RUN_ID || process.env.CI_PIPELINE_ID || '';
+  const runUrl = process.env.CI_PIPELINE_URL || (process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID ? `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}` : '');
+  const runPlatformLabel = process.env.CI_PIPELINE_URL ? 'View GitLab Pipeline Run' : 'View Pipeline Run';
 
   const summary = getTestSummary(allureResultsDir);
 
@@ -207,11 +209,11 @@ async function sendEmail() {
 
           <ul class="info-list">
             <li><strong>Environment:</strong> ${envName}</li>
-            <li><strong>Target Branch:</strong> main</li>
-            <li><strong>Report:</strong> ${attachZip ? `Allure-Report.zip attached (${zipSizeMB.toFixed(1)} MB)` : (zipExists ? `Allure Report (${zipSizeMB.toFixed(1)} MB) exceeds 20 MB email limit. Available in GitHub Actions artifacts below.` : 'Available in GitHub Actions artifacts')}</li>
+            <li><strong>Target Branch:</strong> ${branchName}</li>
+            <li><strong>Report:</strong> ${attachZip ? `Allure-Report.zip attached (${zipSizeMB.toFixed(1)} MB)` : (zipExists ? `Allure Report (${zipSizeMB.toFixed(1)} MB) exceeds 20 MB email limit. Available in artifacts.` : 'Available in CI/CD artifacts')}</li>
           </ul>
 
-          ${runUrl ? `<div style="text-align: center; margin: 24px 0;"><a href="${runUrl}" class="btn" target="_blank">View GitHub Actions Run</a></div>` : ''}
+          ${runUrl ? `<div style="text-align: center; margin: 24px 0;"><a href="${runUrl}" class="btn" target="_blank">${runPlatformLabel}</a></div>` : ''}
 
           <p style="font-size: 13px; color: #6b7280; line-height: 1.5; margin-top: 20px;">
             <em>Note: To view the full report, extract <strong>Allure-Report.zip</strong> and open <strong>index.html</strong> in any web browser.</em>

@@ -235,7 +235,7 @@ export default class NewStudentEnrollmentPage extends BasePage {
         await test.step('Select Date of Birth details', async () => {
 
             if (await this.isVisible(this.packageProceedButton, { timeout: 5000 }).catch(() => false)) {
-
+                await this.waitForVisible(this.packageDobMonthDropdown, 5000);
                 await this.click(this.packageDobMonthDropdown);
                 await this.click(this.packageDobMonth);
                 await this.click(this.packageDobDayDropdown);

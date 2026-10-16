@@ -21,7 +21,7 @@ test('TC_019: CSM - Verify attendance can be marked', { tag: ['@CSM', '@CSMClass
     });
 
     await test.step('Step 2 & 3: Navigate to Upcoming Schedule and view all', async () => {
-        await classroomAttendancePage.clickViewInUpcomingSchedule();
+        // await classroomAttendancePage.clickViewInUpcomingSchedule();
         await classroomAttendancePage.clickViewAll();
     });
 

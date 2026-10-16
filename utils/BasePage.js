@@ -575,4 +575,106 @@ export default class BasePage {
         test.skip(true, reason);
     }
 
+    /**
+     * Sets up a MutationObserver to listen for a toast/notification message matching expected text/pattern case-insensitively.
+     * Can be invoked before or alongside the triggering action to eliminate race conditions with transient toasts.
+     * @param {string|RegExp} expectedMessage - Text or RegExp to match against notification content.
+     * @param {number} [timeoutMs=15000] - Timeout in milliseconds.
+     * @returns {Promise<string>} Resolves with captured message text, or empty string on timeout.
+     */
+    setupNotificationWatcher(expectedMessage, timeoutMs = 15000) {
+        const patternStr = expectedMessage instanceof RegExp ? expectedMessage.source : String(expectedMessage);
+        const isRegex = expectedMessage instanceof RegExp;
+
+        return this.page.evaluate(({ pattern, isReg, timeout }) => {
+            return new Promise((resolve) => {
+                const getRegex = () => {
+                    try {
+                        if (isReg) return new RegExp(pattern, 'i');
+                        const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        return new RegExp(escaped, 'i');
+                    } catch {
+                        return null;
+                    }
+                };
+                const regex = getRegex();
+                const cleanExpected = pattern.toLowerCase().trim();
+
+                const checkDOM = () => {
+                    const toastElements = document.querySelectorAll(
+                        '#toast-container, .toast-message, .toast, .alert, .noty_text, .notification, .sweet-alert, div[class*="toast"], div[class*="notification"], .popover'
+                    );
+                    for (const el of toastElements) {
+                        const txt = (el.textContent || '').trim();
+                        if (!txt) continue;
+                        if (regex && regex.test(txt)) return txt;
+                        if (txt.toLowerCase().includes(cleanExpected)) return txt;
+                    }
+
+                    const bodyText = (document.body ? document.body.innerText || '' : '');
+                    if (regex && regex.test(bodyText)) return pattern;
+                    if (bodyText.toLowerCase().includes(cleanExpected)) return pattern;
+
+                    return null;
+                };
+
+                const initial = checkDOM();
+                if (initial) return resolve(initial);
+
+                const observer = new MutationObserver(() => {
+                    const found = checkDOM();
+                    if (found) {
+                        observer.disconnect();
+                        resolve(found);
+                    }
+                });
+
+                observer.observe(document.body || document.documentElement, {
+                    childList: true,
+                    subtree: true,
+                    characterData: true
+                });
+
+                setTimeout(() => {
+                    observer.disconnect();
+                    resolve('');
+                }, timeout);
+            });
+        }, { pattern: patternStr, isReg: isRegex, timeout: timeoutMs }).catch(() => '');
+    }
+
+    /**
+     * Waits for and asserts that a notification/toast message appears using MutationObserver with case-insensitivity.
+     * @param {string|RegExp|Promise<string>} messageOrPromise - Expected text, RegExp, or a promise from setupNotificationWatcher.
+     * @param {number} [timeoutMs=15000] - Maximum wait time in milliseconds.
+     */
+    async verifyNotificationMessage(messageOrPromise, timeoutMs = 15000) {
+        const isPromise = typeof messageOrPromise === 'object' && messageOrPromise !== null && 'then' in messageOrPromise;
+        const promise = isPromise
+            ? /** @type {Promise<string>} */ (messageOrPromise)
+            : this.setupNotificationWatcher(/** @type {string|RegExp} */ (messageOrPromise), timeoutMs);
+
+        const captured = await promise;
+        const msgLabel = (typeof messageOrPromise === 'string' || messageOrPromise instanceof RegExp)
+            ? messageOrPromise
+            : 'Notification';
+        expect(Boolean(captured), `Expected notification matching "${msgLabel}" to appear via MutationObserver`).toBeTruthy();
+    }
+
+    /**
+     * Performs an action (clicking a locator or executing a callback) and verifies that a notification appears.
+     * Automatically sets up the MutationObserver before triggering the action to eliminate race conditions.
+     * @param {import('@playwright/test').Locator|(() => Promise<void>)} actionOrLocator - Locator to click or async action callback.
+     * @param {string|RegExp} expectedMessage - Text or RegExp to match against notification content case-insensitively.
+     * @param {number} [timeoutMs=15000] - Timeout in milliseconds.
+     */
+    async clickAndVerifyNotification(actionOrLocator, expectedMessage, timeoutMs = 15000) {
+        const watcher = this.setupNotificationWatcher(expectedMessage, timeoutMs);
+        if (typeof actionOrLocator === 'function') {
+            await actionOrLocator();
+        } else {
+            await this.click(actionOrLocator);
+        }
+        await this.verifyNotificationMessage(watcher, timeoutMs);
+    }
 }

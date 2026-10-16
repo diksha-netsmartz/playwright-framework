@@ -1,6 +1,6 @@
 import BasePage from '@utils/BasePage';
 import config from '@config/config';
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import TwoFactorAuthPage from '@pages/Common/TwoFactorAuthPage';
 import StaffHomePage from './StaffHomePage';
 
@@ -84,7 +84,7 @@ export default class StaffLoginPage extends BasePage {
             await this.page.waitForLoadState('load', { timeout: 75000 }).catch(() => { });
 
             // Check if login was successful
-            const isLoginSuccessful = await expect(this.page).toHaveTitle(/Staff Home/i, { timeout: 15000 })
+            const isLoginSuccessful = await this.page.waitForFunction(() => /Staff Home/i.test(document.title), { timeout: 15000 })
                 .then(() => true)
                 .catch(() => false);
 
@@ -96,6 +96,10 @@ export default class StaffLoginPage extends BasePage {
                     return;
                 }
                 throw new Error('Staff Portal login failed: Authentication failed / Staff Home did not load.');
+            }
+
+            if (config.envName === 'uat') {
+                await this.page.waitForTimeout(30000);
             }
         });
     }

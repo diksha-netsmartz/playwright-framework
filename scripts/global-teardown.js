@@ -20,10 +20,14 @@ function getTimestamp() {
 /**
  * Global Teardown hook executed once after all Playwright tests finish.
  * Automatically generates a timestamped Allure HTML report in 'allure-reports/'
- * and launches it in the browser, while ensuring any previous Allure server instances
- * are cleanly closed first.
+ * and launches it via Allure HTTP server so the interactive Playwright Trace Viewer works.
  */
 async function globalTeardown() {
+    // In CI environments (GitLab CI, GitHub Actions), do not attempt to open a desktop browser
+    if (process.env.CI) {
+        return;
+    }
+
     const rootDir = path.resolve(__dirname, '..');
     const allureResultsDir = path.join(rootDir, 'allure-results');
     const baseReportsDir = path.join(rootDir, 'allure-reports');
@@ -42,6 +46,7 @@ async function globalTeardown() {
             const isWindows = process.platform === 'win32';
             const cmd = isWindows ? 'npx.cmd' : 'npx';
 
+            // Generate full Allure report with trace viewer assets
             execSync(`${cmd} allure generate allure-results --clean -o "${reportFullPath}"`, {
                 cwd: rootDir,
                 stdio: 'inherit'
@@ -59,23 +64,23 @@ async function globalTeardown() {
                     });
                 }
             } catch (_) {
-                // Ignore if no existing process was running or command is unsupported
+                // Ignore cleanup errors
             }
 
-            console.log(`[Reporting] Opening latest Allure Report (${reportRelativeFolder}) in browser...`);
+            console.log(`[Reporting] Launching Allure Report server with interactive Trace Viewer in browser...`);
             const child = spawn(cmd, ['allure', 'open', reportFullPath], {
                 cwd: rootDir,
                 detached: !isWindows,
-                stdio: 'ignore',
+                stdio: 'inherit',
                 shell: true
             });
-            child.unref();
+
+            // Wait a moment so the web server starts and opens the browser
+            await new Promise((resolve) => setTimeout(resolve, 3000));
         } catch (error) {
-            console.error('[Reporting] Could not automatically open Allure report:', error.message);
+            console.error('[Reporting] Could not launch Allure report:', error.message);
         }
     }
 }
 
 module.exports = globalTeardown;
-
-

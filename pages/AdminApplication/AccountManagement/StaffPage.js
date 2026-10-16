@@ -128,6 +128,7 @@ export default class StaffPage extends BasePage {
         this.imageUploaded = page.locator('#imgCroppedImage');
         this.removeImageButton = page.locator("//input[@data-toggle='confirmationRemoveImage']");
         this.yesConfirmationBtn = page.locator("xpath=//a[@data-apply='confirmation' and text()='Yes']");
+        this.profileTab=page.locator('#tab_profile')
 
         // State tracking
         this.selectedStatus = '';
@@ -1338,6 +1339,17 @@ export default class StaffPage extends BasePage {
             //     await this.verifyVisible(this.selectImageBtn);
             // }
 
+        });
+    }
+
+    /**
+     * Verifies that Staff Profile modal is opened and closes it.
+     **/
+    async verifyAndCloseStaffProfileModal() {
+        await test.step('Verify Staff Profile modal is opened and close it', async () => {
+            await this.waitForVisible(this.profileTab, 15000);
+            await this.verifyVisible(this.profileTab);
+            await this.click(this.closeBtnUpdateStaff);
         });
     }
 }

@@ -161,7 +161,7 @@ export default class EmailHelper {
 
             throw new Error(`[EmailHelper] Reset Password email was not received within ${maxWaitTime / 1000} seconds.`);
         } finally {
-            await client.logout();
+            await client.logout().catch(() => {});
         }
     }
 
@@ -260,7 +260,7 @@ export default class EmailHelper {
 
             throw new Error(`[EmailHelper] Email with subject "${searchSubject}" was not received within ${maxWaitTime / 1000} seconds.`);
         } finally {
-            await client.logout();
+            await client.logout().catch(() => {});
         }
     }
 
@@ -339,9 +339,9 @@ export default class EmailHelper {
                 lock.release();
             }
         } catch (err) {
-            console.warn('[EmailHelper] Error while marking previous emails as read:', err.message);
+            console.warn('[EmailHelper] Warning: Could not mark previous emails as read:', err.message);
         } finally {
-            await client.logout();
+            await client.logout().catch(() => {});
         }
     }
 

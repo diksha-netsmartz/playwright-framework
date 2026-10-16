@@ -12,7 +12,7 @@ import TestDataGenerator from '@utils/TestDataGenerator';
  * Steps:
  *   Step 1 - From the side menu, navigate to Report Center >> Business Reports
  *   Step 2 - Search for BTW Data Export Report and click on the report under Select Report
- *   Step 3 - Select 3-month date range (previous month start to next month end)
+ *   Step 3 - Select 2-month date range (previous month start to this month end)
  *   Step 4 - Select all the checkboxes under Select Data Fields
  *   Step 5 - Click on Export Into Excel and verify file downloaded successfully (sheet: BTWOpening_Schedule, 24 columns)
  *   Step 6 - Click on Save as New Filter
@@ -54,7 +54,7 @@ test('TC_061: C-Admin >> Report Center >> Business Report - To verify that BTW D
         await businessReportsPage.searchAndSelectReport(reportName);
     });
 
-    await test.step('Step 4: Enter 3-month appointment date range (previous month start to next month end)', async () => {
+    await test.step('Step 4: Enter appointment date range (previous month start to current month end)', async () => {
         await businessReportsPage.enterBtwAppointmentDateRange();
     });
 
